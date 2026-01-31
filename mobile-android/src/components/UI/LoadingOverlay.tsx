@@ -5,6 +5,7 @@
 import React from 'react';
 import { Modal, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { moderateScale, verticalScale } from '../../utils/responsive';
+import { colors, radius, spacing, fontSize, fontWeight, shadows } from '../../theme/tokens/tokens';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -21,7 +22,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <ActivityIndicator size="large" color="#00A3FF" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.message}>{message}</Text>
           {submessage && <Text style={styles.submessage}>{submessage}</Text>}
         </View>
@@ -33,33 +34,29 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: colors.overlayMedium,
     justifyContent: 'center',
     alignItems: 'center',
   },
   container: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: moderateScale(12),
-    padding: moderateScale(32),
+    backgroundColor: colors.bgSurface,
+    borderRadius: moderateScale(radius.lg),
+    padding: moderateScale(spacing.wide),
     minWidth: moderateScale(250),
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    ...shadows.lg,
   },
   message: {
-    color: '#FFF',
-    fontSize: moderateScale(18),
-    fontWeight: '600',
-    marginTop: verticalScale(16),
+    color: colors.textPrimary,
+    fontSize: moderateScale(fontSize.lg),
+    fontWeight: fontWeight.semibold,
+    marginTop: verticalScale(spacing.base),
     textAlign: 'center',
   },
   submessage: {
-    color: '#AAA',
-    fontSize: moderateScale(14),
-    marginTop: verticalScale(8),
+    color: colors.textMuted,
+    fontSize: moderateScale(fontSize.sm),
+    marginTop: verticalScale(spacing.tight),
     textAlign: 'center',
   },
 });
