@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { spacing, typography } from "../../theme/theme";
+import { colors } from "../../theme/tokens/tokens";
 import {
   usePhotoCaptureOptional,
   type OpenCaptureConfig as CaptureConfig,
@@ -120,7 +121,7 @@ export default function CollapsibleSection({
     }
   }, [onCameraPress, normalizedConfig, openCapture]);
 
-  const cameraTint = photoCount > 0 ? "#FD7332" : "#FFFFFF";
+  const cameraTint = photoCount > 0 ? colors.primary : colors.white;
 
   return (
     <View style={[styles.container, fullWidth && styles.fullWidthContainer]}>
@@ -212,7 +213,7 @@ export default function CollapsibleSection({
         <View style={[styles.body, fullWidth && styles.fullWidthBody]}>
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color="#FD7332" />
+              <ActivityIndicator size="small" color={colors.primary} />
               <RNText style={styles.loadingText}>Loading data...</RNText>
             </View>
           ) : (
@@ -223,7 +224,7 @@ export default function CollapsibleSection({
 
       {/* Bottom separator */}
       <LinearGradient
-        colors={["#FD7332", "#B92011"]}
+        colors={[colors.primary, colors.primaryDark]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.accentBorder}
@@ -235,12 +236,12 @@ export default function CollapsibleSection({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     overflow: "hidden",
     marginBottom: 0,
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
+        shadowColor: colors.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(10),
     paddingHorizontal: moderateScale(20),
     minHeight: verticalScale(64),
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
   },
   headerTouchable: { flex: 1 },
   titleRow: {
@@ -270,18 +271,18 @@ const styles = StyleSheet.create({
     height: moderateScale(36),
     borderRadius: moderateScale(18),
     borderWidth: 2,
-    borderColor: "#FFFFFF",
-    backgroundColor: "transparent",
+    borderColor: colors.white,
+    backgroundColor: colors.transparent,
     alignItems: "center",
     justifyContent: "center",
     marginRight: moderateScale(12),
     marginTop: -4,
   },
   completeCircle: {
-    borderColor: "#36B509",
+    borderColor: colors.success,
   },
   numberText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(24),
     fontWeight: "700",
     fontFamily: "Lato-Bold",
@@ -291,10 +292,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   completeNumberText: {
-    color: "#36B509",
+    color: colors.success,
   },
   title: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(24),
     lineHeight: verticalScale(24),
     marginTop: verticalScale(3),
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
   titleWithNumber: {
     marginTop: verticalScale(3),
   },
-  completeTitle: { color: "#36B509" },
+  completeTitle: { color: colors.success },
   icon: {
     width: moderateScale(30),
     height: moderateScale(30),
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(-5),
   },
   countBadge: {
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     borderRadius: moderateScale(5),
     minWidth: moderateScale(27),
     height: moderateScale(27),
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(-6),
   },
   badgeText: {
-    color: "#FFF",
+    color: colors.white,
     fontWeight: "700",
     fontSize: moderateScale(20),
     letterSpacing: 0.15,
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     marginLeft: moderateScale(8),
   },
   clearText: {
-    color: "#FD7332",
+    color: colors.primary,
     fontSize: moderateScale(20),
     fontWeight: "600",
     fontFamily: "Lato-Bold",
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
   body: {
     paddingHorizontal: moderateScale(20),
     paddingBottom: spacing.sm,
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
   },
   accentBorder: { height: 1, width: "100%" },
   fullWidthContainer: {
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(20),
   },
   loadingText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(16),
     marginLeft: moderateScale(10),
     fontFamily: "Lato-Regular",
