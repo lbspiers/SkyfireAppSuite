@@ -1,0 +1,55 @@
+.statusBanner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  border-left: var(--spacing-xs) solid;
+}
+
+.icon {
+  font-size: var(--text-2xl);
+  flex-shrink: 0;
+}
+
+.message {
+  flex: 1;
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+/* Status variants */
+.warning {
+  background-color: rgba(234, 179, 8, 0.1);
+  border-color: var(--color-warning);
+  color: #fef3c7;
+}
+
+.restricted {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--color-error);
+  color: #fee2e2;
+}
+
+.suspended {
+  background-color: rgba(220, 38, 38, 0.15);
+  border-color: var(--color-danger);
+  color: #fecaca;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .statusBanner {
+    padding: 0.875rem 1rem;
+  }
+
+  .message {
+    font-size: var(--text-sm);
+  }
+
+  .icon {
+    font-size: var(--text-xl);
+  }
+}

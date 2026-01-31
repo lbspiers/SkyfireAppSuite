@@ -1,0 +1,142 @@
+/* PreferredEquipmentModal Styles */
+
+.modalContent {
+  padding: var(--spacing);
+}
+
+.instruction {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing);
+}
+
+/* Equipment List */
+.equipmentList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: var(--spacing);
+}
+
+.equipmentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-base);
+  text-align: left;
+  width: 100%;
+}
+
+.equipmentItem:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-surface);
+}
+
+.equipmentItem.defaultItem {
+  border-color: var(--color-primary);
+}
+
+.equipmentInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--spacing-tight);
+}
+
+.make {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.model {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.defaultBadge {
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  padding: var(--spacing-xs) 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--border-default);
+}
+
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  gap: var(--spacing);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-circle);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error State */
+.errorState {
+  text-align: center;
+  padding: var(--spacing-wide);
+}
+
+.errorState p {
+  color: var(--color-error);
+  margin-bottom: var(--spacing);
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-wide);
+}
+
+.emptyTitle {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-tight);
+}
+
+.emptyHint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing);
+}
+
+.emptyActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  margin-top: var(--spacing);
+}

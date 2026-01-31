@@ -1,0 +1,118 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+}
+
+.required {
+  color: var(--color-error);
+  margin-left: var(--spacing-tight);
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--gradient-input);
+  border: 1px solid #888888;
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+
+.inputContainer.focused {
+  background: var(--gradient-input);
+  border-color: #888888;
+}
+
+.input {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  transition: var(--transition-base);
+}
+
+.input::placeholder {
+  color: var(--text-disabled);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.toggleButton {
+  background: transparent;
+  border: none;
+  padding: var(--spacing-tight);
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-colors);
+}
+
+.toggleButton:hover {
+  color: var(--text-primary);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.sm {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  min-height: 36px;
+}
+
+.md {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  min-height: 36px;
+}
+
+.lg {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+  min-height: 36px;
+}
+
+.inputContainer.error,
+.input.error {
+  border-color: var(--color-error);
+}
+
+.input:disabled {
+  background: var(--bg-input-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--text-disabled);
+}

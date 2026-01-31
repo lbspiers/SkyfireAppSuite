@@ -1,0 +1,14 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.row {
+  display: flex;
+  gap: var(--spacing);
+}
+
+.row > * {
+  flex: 1;
+}

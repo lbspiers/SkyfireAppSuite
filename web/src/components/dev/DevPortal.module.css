@@ -1,0 +1,1619 @@
+.container {
+  background: var(--bg-page);
+  min-height: 100vh;
+  padding: var(--spacing);
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-wide);
+  gap: var(--spacing);
+}
+
+.loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border-subtle);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-circle);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+/* Selection Toolbar */
+.selectionToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing);
+}
+
+.selectionCount {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+.selectionActions {
+  display: flex;
+  gap: var(--spacing-tight);
+}
+
+.toolbarButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.toolbarButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.toolbarButton.primaryButton {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.toolbarButton.primaryButton:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: white;
+}
+
+/* Task Checkbox */
+.taskCheckbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Selected Task Row */
+.taskRowSelected {
+  background: rgba(253, 115, 50, 0.1) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-loose);
+  gap: var(--spacing);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.stats {
+  display: flex;
+  gap: var(--spacing-loose);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.statValue {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.userSwitcher {
+  display: flex;
+  gap: var(--spacing-tight);
+}
+
+.userButton {
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: var(--radius-circle);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.userButton:hover {
+  background: var(--bg-hover);
+}
+
+.userButtonActive {
+  background: var(--bg-active);
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: white;
+}
+
+.toolbar {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  display: flex;
+  gap: var(--spacing);
+  align-items: center;
+  margin-bottom: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.viewSwitcher {
+  display: flex;
+  gap: var(--spacing-xs);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+}
+
+.viewButton {
+  background: transparent;
+  border: none;
+  padding: var(--spacing-tight) var(--spacing);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.viewButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.viewButtonActive {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Task Counts */
+.taskCounts {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.taskCountLabel {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.taskCountSeparator {
+  color: var(--gray-400);
+}
+
+.taskCountSubtasks {
+  color: var(--gray-600);
+}
+
+.searchInput {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  flex: 1;
+  min-width: 200px;
+  transition: var(--transition-base);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.filterSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.filterSelect:hover {
+  background: var(--bg-input-hover);
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.primaryButton {
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: white;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+  box-shadow: var(--glow-orange);
+}
+
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glow-orange-strong);
+}
+
+.secondaryButton {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.secondaryButton:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+}
+
+.listView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  padding-right: var(--spacing-xs);
+}
+
+.taskItem {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  transition: var(--transition-base);
+}
+
+.taskItem:hover {
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-md);
+}
+
+.subtaskItem {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-tight);
+  transition: var(--transition-base);
+}
+
+.subtaskItem:hover {
+  border-color: var(--border-default);
+}
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.taskContent {
+  flex: 1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.taskTitle {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.taskMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.taskDescription {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.iconButton {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-base);
+}
+
+.iconButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.subtaskList {
+  margin-top: var(--spacing);
+  padding-left: var(--spacing-loose);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  border-left: 2px solid var(--border-subtle);
+}
+
+.kanbanView {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing);
+}
+
+.kanbanColumn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.kanbanHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  padding-bottom: var(--spacing-tight);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.kanbanCount {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+}
+
+.kanbanTasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  min-height: 200px;
+}
+
+.historyView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.historyToolbar {
+  display: flex;
+  gap: var(--spacing);
+  align-items: center;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: var(--spacing);
+}
+
+.commandPalette {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing);
+  width: 100%;
+  max-width: 600px;
+  box-shadow: var(--shadow-xl);
+}
+
+.commandInput {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+  font-family: var(--font-sans);
+}
+
+.commandInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.commandInput::placeholder {
+  color: var(--text-muted);
+}
+
+.commandHelp {
+  margin-top: var(--spacing);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.taskModal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-loose);
+  width: 100%;
+  max-width: 600px;
+  box-shadow: var(--shadow-xl);
+}
+
+.modalTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin: 0;
+  margin-bottom: var(--spacing);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  margin-bottom: var(--spacing);
+}
+
+.categoryGroup {
+  min-width: 120px;
+  max-width: 200px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing);
+}
+
+.formLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.formHint {
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+  margin-top: calc(var(--spacing-xs) * -1);
+}
+
+.formInput {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  transition: var(--transition-base);
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.formTextarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  resize: vertical;
+  transition: var(--transition-base);
+}
+
+.formTextarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.formSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.formSelect:hover {
+  background: var(--bg-input-hover);
+}
+
+.formSelect:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+/* Estimate Suggestion */
+.estimateSuggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing);
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-tight);
+}
+
+.useEstimateButton {
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  color: white;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.useEstimateButton:hover {
+  background: var(--color-primary-hover);
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--spacing);
+  justify-content: flex-end;
+  margin-top: var(--spacing-loose);
+}
+
+.completionInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--text-xs);
+  color: var(--color-success);
+  background: var(--bg-surface);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-success);
+}
+
+.sortControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+}
+
+.sortLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.sortSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.sortSelect:hover {
+  background: var(--bg-input-hover);
+}
+
+.sortSelect:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.sortOrderButton {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+}
+
+.sortOrderButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.completedSection {
+  margin-top: var(--spacing-loose);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--spacing);
+}
+
+.completedToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  padding: var(--spacing-tight);
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+  width: 100%;
+  text-align: left;
+}
+
+.completedToggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.completedList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  margin-top: var(--spacing);
+  opacity: 0.7;
+}
+
+.chevronOpen {
+  transform: rotate(0deg);
+  transition: transform var(--transition-base);
+}
+
+.chevronClosed {
+  transform: rotate(-90deg);
+  transition: transform var(--transition-base);
+}
+
+/* Compact Table */
+.compactTable {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 32px 32px 1fr 100px 100px 80px 60px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tableBody {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  padding-right: var(--spacing-xs);
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 32px 32px 1fr 100px 100px 80px 60px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  align-items: center;
+  min-height: 36px;
+}
+
+.tableRow:hover {
+  background: var(--bg-surface-hover);
+}
+
+.rowSelected {
+  background: rgba(253, 115, 50, 0.1) !important;
+}
+
+.rowCompleted {
+  opacity: 0.6;
+}
+
+.rowCompleted .taskTitle {
+  text-decoration: line-through;
+}
+
+/* Column styles */
+.colCheckbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colCheckbox input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.colPriority {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+}
+
+.colTitle {
+  overflow: hidden;
+}
+
+.taskTitle {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.colCategory {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.categoryBadge {
+  font-size: var(--text-xs);
+  padding: 2px 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  font-weight: var(--font-weight-medium);
+}
+
+.colStatus {
+  display: flex;
+  align-items: center;
+}
+
+.statusButton {
+  background: none;
+  border: none;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  font-family: inherit;
+  cursor: pointer;
+  text-transform: capitalize;
+  padding: 2px 0;
+}
+
+.statusButton:hover {
+  text-decoration: underline;
+}
+
+.colTime {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.duration {
+  color: var(--color-success);
+  font-weight: var(--font-medium);
+}
+
+.startedAt {
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timerIcon {
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.estimate {
+  color: var(--text-muted);
+}
+
+/* Color-coded time display */
+.timeOnTarget {
+  color: var(--color-success);
+  font-weight: var(--font-medium);
+}
+
+.timeNear {
+  color: var(--color-warning);
+  font-weight: var(--font-medium);
+}
+
+.timeOver {
+  color: var(--color-error);
+  font-weight: var(--font-medium);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.colActions {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: flex-end;
+}
+
+.rowAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.rowAction:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+/* Expanded Row */
+.expandedRow {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  padding: var(--spacing) var(--spacing) var(--spacing) 76px;
+}
+
+.expandedContent {
+  max-width: 600px;
+}
+
+.description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-tight) 0;
+}
+
+.noDescription {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 var(--spacing-tight) 0;
+}
+
+.metadata {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.emptyRow {
+  padding: var(--spacing-loose);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Tab Navigation */
+.tabNavigation {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.tabButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabButton:hover {
+  background: var(--gray-100);
+  color: var(--color-text-primary);
+}
+
+.tabButtonActive {
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.tabButtonActive:hover {
+  background: var(--color-primary-dark);
+}
+
+.tabShortcut {
+  font-size: var(--font-size-xs);
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* Sprint Badge */
+.sprintBadge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--gray-600);
+  margin-left: var(--spacing-sm);
+  white-space: nowrap;
+}
+
+/* Group Controls */
+.groupControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.controlLabel {
+  font-size: var(--font-size-sm);
+  color: var(--gray-600);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Grouped View */
+.groupedView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md);
+}
+
+.taskGroup {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.groupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--gradient-primary);
+  border-bottom: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+}
+
+.groupName {
+  font-weight: var(--font-semibold);
+  color: white;
+  font-size: var(--text-sm);
+}
+
+.groupCount {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.groupTasks {
+  background: var(--color-surface);
+}
+
+/* Paused Section */
+.pausedSection {
+  margin-top: var(--spacing-lg);
+  opacity: 0.85;
+}
+
+.pausedToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  width: 100%;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-info);
+  transition: all 0.2s ease;
+}
+
+.pausedToggle:hover {
+  background: var(--gray-200);
+}
+
+/* Pause/Resume Buttons */
+.pauseButton,
+.resumeButton,
+.resetTimerButton {
+  padding: var(--spacing-xs);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pauseButton:hover {
+  background: var(--gray-100);
+  color: var(--color-info);
+}
+
+.resumeButton:hover {
+  background: var(--gray-100);
+  color: var(--color-success);
+}
+
+.resetTimerButton:hover {
+  background: var(--gray-100);
+  color: var(--color-warning);
+}
+
+/* Subtask Progress Bar */
+.subtaskProgressBar {
+  width: 100%;
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: var(--spacing-xs);
+}
+
+.subtaskProgressFill {
+  height: 100%;
+  background: var(--color-success);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Inline Add Subtask Form */
+.inlineAddForm {
+  padding: var(--spacing-sm);
+  margin-left: var(--spacing-xl);
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+}
+
+.inlineAddInput {
+  width: 100%;
+  padding: var(--spacing-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-family: inherit;
+}
+
+.inlineAddInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.addSubtaskButton {
+  margin-left: var(--spacing-xl);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: transparent;
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-sm);
+  color: var(--gray-600);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.addSubtaskButton:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-400);
+  color: var(--color-primary);
+}
+
+/* Subtask System Styles */
+.subtaskContainer {
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--spacing-loose);
+  border-left: 2px solid var(--border-subtle);
+  padding-left: var(--spacing);
+  background: var(--bg-surface);
+}
+
+.subtaskRow {
+  display: grid;
+  grid-template-columns: 32px 32px 1fr 100px 100px 80px 60px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9em;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-xs);
+  align-items: center;
+  min-height: 32px;
+  transition: background 0.15s ease;
+}
+
+.subtaskRow:hover {
+  background: var(--bg-hover);
+}
+
+.subtaskRow .taskTitle {
+  font-size: var(--text-sm);
+}
+
+.expandCollapseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-base);
+}
+
+.expandCollapseBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.subtaskBadge {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  margin-left: var(--spacing-tight);
+  font-weight: var(--font-medium);
+}
+
+.addSubtaskBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-base);
+  opacity: 0;
+}
+
+.tableRow:hover .addSubtaskBtn {
+  opacity: 1;
+}
+
+.addSubtaskBtn:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.subtaskParentInfo {
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.subtaskParentInfo strong {
+  color: var(--text-primary);
+}
+
+/* Notes Panel */
+.notesButton {
+  position: relative;
+  padding: var(--spacing-sm);
+  background: var(--gray-100);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-right: var(--spacing-md);
+}
+
+.notesButton:hover {
+  background: var(--gray-200);
+  color: var(--color-primary);
+}
+
+.notesBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Notes Modal */
+.notesModal {
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.notesModalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.modalSubtitle {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4;
+}
+
+.notesModalHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.closeButton {
+  padding: var(--spacing-xs);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--gray-600);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: var(--gray-200);
+  color: var(--gray-900);
+}
+
+.notesModalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  min-height: 400px;
+}
+
+.notesListView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.emptyNotes {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.noteListItem {
+  padding: var(--spacing-md);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.noteListItem:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.noteListItemActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.noteListItemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.noteListItemTitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.noteListItemPreview {
+  font-size: var(--font-size-sm);
+  color: var(--gray-600);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.4;
+}
+
+.noteListItemDate {
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+}
+
+.noteStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.noteStatus-draft {
+  background: var(--gray-200);
+  color: var(--gray-700);
+}
+
+.noteStatus-ready {
+  background: var(--color-info-light);
+  color: var(--color-info);
+}
+
+.noteStatus-sent {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.noteStatus-processed {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.noteListItemDate {
+  font-size: 10px;
+  color: var(--gray-500);
+}
+
+.noteEditorEmpty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+  gap: var(--spacing-md);
+}
+
+.noteTextarea {
+  flex: 1;
+  width: 100%;
+  min-height: 300px;
+  padding: var(--spacing-md);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: var(--spacing-md);
+}
+
+.noteTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.notesModalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--gray-200);
+  margin-top: var(--spacing-md);
+}
+
+.noteStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--gray-600);
+}
+
+.notesModalActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+}

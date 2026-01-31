@@ -1,0 +1,313 @@
+/* Login Page Styles - Modular CSS for reusable login components */
+
+/* Main container with gradient background */
+.gradientContainer {
+  min-height: 100vh;
+  background: var(--gradient-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing);
+}
+
+.loginWrapper {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(var(--spacing-wide) * 1.25) var(--spacing);
+}
+
+/* Logo section */
+.logoContainer {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: calc(var(--spacing-wide) * 1.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Form section */
+.formContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* Input styles matching project forms */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing);
+}
+
+.inputLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.textInput {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: var(--gradient-input) !important;
+  border: 1px solid #888888;
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+  font-family: var(--font-sans);
+  min-height: 36px;
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  box-shadow: 0 0 0px 1000px transparent inset;
+}
+
+.textInput::placeholder {
+  color: var(--text-disabled);
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: #888888;
+  background: var(--gradient-input) !important;
+}
+
+.textInput:hover {
+  background: var(--gradient-input) !important;
+}
+
+.textInput:active {
+  background: var(--gradient-input) !important;
+}
+
+/* Force autofill to keep gradient background */
+.textInput:-webkit-autofill,
+.textInput:-webkit-autofill:hover,
+.textInput:-webkit-autofill:focus,
+.textInput:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
+  background: var(--gradient-input) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.passwordInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordInputContainer .textInput {
+  padding-right: var(--spacing-wide);
+}
+
+.eyeIconButton {
+  position: absolute;
+  right: var(--spacing);
+  background: transparent;
+  border: none;
+  padding: var(--spacing-tight);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+}
+
+.eyeIconButton:hover {
+  opacity: 0.8;
+}
+
+.eyeIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.errorText {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-xs);
+}
+
+.globalError {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  background-color: var(--color-error-light);
+  padding: var(--spacing);
+  border-radius: var(--spacing-xs);
+  border-left: 3px solid var(--color-error);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.globalError:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+/* Legacy checkbox section - REMOVED (replaced by CircleToggle component) */
+
+/* Registration links */
+.registrationLinks {
+  text-align: center;
+  margin-top: var(--spacing);
+}
+
+.registrationText {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.registrationLink {
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+  text-decoration: none;
+}
+
+.registrationLink:hover {
+  text-decoration: underline;
+}
+
+/* Icon buttons row */
+.iconButtonRow {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+}
+
+.iconButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-tight) var(--spacing);
+  transition: var(--transition-base);
+}
+
+.iconButton:hover {
+  transform: scale(1.05);
+}
+
+.iconButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.iconButton:disabled:hover {
+  transform: none;
+}
+
+.iconButtonImage {
+  width: 37px;
+  height: 37px;
+  object-fit: contain;
+}
+
+.primaryIcon {
+  width: 42px;
+  height: 42px;
+}
+
+.iconButtonLabel {
+  font-size: var(--spacing);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.iconButtonLabel.primary {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing);
+}
+
+/* Help/Forgot password link */
+.helpLink {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition-base);
+}
+
+.helpLink:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .loginWrapper {
+    max-width: 100%;
+    padding: var(--spacing) var(--spacing);
+  }
+
+  .logoContainer {
+    max-width: 300px;
+    margin-bottom: var(--spacing);
+  }
+
+  .iconButtonRow {
+    gap: 60px;
+  }
+
+  .iconButtonImage {
+    width: 41px;
+    height: 41px;
+  }
+
+  .primaryIcon {
+    width: 47px;
+    height: 47px;
+  }
+
+  .iconButtonLabel {
+    font-size: var(--text-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .logoContainer {
+    max-width: 250px;
+    margin-bottom: var(--spacing);
+  }
+
+  .iconButtonRow {
+    gap: calc(var(--spacing-wide) * 1.25);
+  }
+
+  .iconButtonImage {
+    width: 37px;
+    height: 37px;
+  }
+
+  .primaryIcon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .iconButtonLabel {
+    font-size: var(--spacing);
+  }
+}

@@ -1,0 +1,197 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.uploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.sectionLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.required {
+  color: var(--color-error);
+}
+
+.uploadZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 120px;
+}
+
+.uploadZone:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover);
+}
+
+.uploadZoneDragActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.uploadZoneError {
+  border-color: var(--color-error);
+}
+
+.uploadText {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.uploadHint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.selectedFile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  color: var(--text-secondary);
+}
+
+.fileDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.fileName {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.fileSize {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.removeFileButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-tight);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeFileButton:hover {
+  background: var(--color-error-light);
+  color: var(--color-error);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.fieldLabel {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.textarea {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.contactSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.contactFields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-tight);
+}
+
+@media (max-width: 768px) {
+  .contactFields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.inputError {
+  border-color: var(--color-error);
+}
+
+.errorMessage {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  margin-bottom: var(--spacing-xs);
+}
+
+.submitSection {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-tight);
+  margin-top: var(--spacing-tight);
+  border-top: 1px solid var(--border-subtle);
+}

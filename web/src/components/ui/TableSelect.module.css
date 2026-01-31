@@ -1,0 +1,131 @@
+/* TableSelect - Simple dropdown for table rows (no search) */
+/* Matches TableDropdown styling */
+.row {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  gap: var(--spacing);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  flex: 0 0 30%;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdownWrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  font-family: inherit;
+  cursor: pointer;
+  padding-right: 1.5rem;
+  padding-left: 0;
+  text-align: left;
+  outline: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dropdown.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.placeholderText {
+  color: var(--text-muted);
+  font-weight: var(--font-normal);
+}
+
+.chevronIcon {
+  position: absolute;
+  right: 0;
+  color: var(--color-primary);
+  pointer-events: none;
+  transition: transform 0.2s;
+  width: 14px;
+  height: 14px;
+}
+
+.chevronIcon.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  min-width: 200px;
+  max-width: 400px;
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Options List */
+.optionsList {
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.option {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  display: flex;
+  align-items: center;
+}
+
+.option:hover {
+  background: var(--bg-hover);
+}
+
+.option.selected {
+  background: var(--bg-active);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.noResults {
+  padding: var(--spacing);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}

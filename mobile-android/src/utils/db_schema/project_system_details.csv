@@ -1,0 +1,1522 @@
+"column_name","data_type","is_nullable","column_default"
+"id","bigint","NO","nextval('project_system_details_id_seq'::regclass)"
+"uuid","uuid","NO","gen_random_uuid()"
+"project_id","uuid","NO",NULL
+"deleted_at","timestamp with time zone","YES",NULL
+"created_at","timestamp with time zone","NO","now()"
+"updated_at","timestamp with time zone","NO","now()"
+"sys1_solar_panel_existing","boolean","YES",NULL
+"sys1_solar_panel_qty","integer","YES",NULL
+"sys1_solar_panel_make","text","YES",NULL
+"sys1_solar_panel_model","text","YES",NULL
+"sys1_solarpanel_id","uuid","YES",NULL
+"sys1_micro_inverter_existing","boolean","YES",NULL
+"sys1_micro_inverter_make","text","YES",NULL
+"sys1_micro_inverter_model","text","YES",NULL
+"sys1_micro_inverter_id","uuid","YES",NULL
+"sys1_micro_inverter_qty","integer","YES",NULL
+"sys1_combiner_existing","boolean","YES",NULL
+"sys1_combiner_panel_make","text","YES",NULL
+"sys1_combiner_panel_model","text","YES",NULL
+"sys1_combinerpanel_id","uuid","YES",NULL
+"sys1_optimizer_existing","boolean","YES",NULL
+"sys1_optimizer_make","text","YES",NULL
+"sys1_optimizer_model","text","YES",NULL
+"sys1_optimizer_id","uuid","YES",NULL
+"sys1_inv_max_continuous_output","text","YES",NULL
+"sys1_panel_count","integer","YES",NULL
+"sys1_branch_string_1","text","YES",NULL
+"sys1_branch_string_2","text","YES",NULL
+"sys1_branch_string_3","text","YES",NULL
+"sys1_branch_string_4","text","YES",NULL
+"sys1_branch_string_5","text","YES",NULL
+"sys1_branch_string_6","text","YES",NULL
+"sys1_branch_string_7","text","YES",NULL
+"sys1_branch_string_8","text","YES",NULL
+"sys1_branch_string_9","text","YES",NULL
+"sys1_branch_string_10","text","YES",NULL
+"sys1_count_validation","text","YES",NULL
+"sys1_backup_option","text","YES",NULL
+"sys1_ess_existing","boolean","YES",NULL
+"sys1_no_sms","boolean","YES",NULL
+"sys1_ess_make","text","YES",NULL
+"sys1_ess_model","text","YES",NULL
+"sys1_ess_id","uuid","YES",NULL
+"sys1_ess_main_breaker_rating","text","YES",NULL
+"sys1_ess_upstream_breaker_rating","text","YES",NULL
+"sys1_ess_upstream_breaker_location","text","YES",NULL
+"sys1_battery1_existing","boolean","YES",NULL
+"sys1_battery_1_qty","integer","YES",NULL
+"sys1_battery_1_make","text","YES",NULL
+"sys1_battery_1_model","text","YES",NULL
+"sys1_battery1_id","uuid","YES",NULL
+"sys1_battery2_existing","boolean","YES",NULL
+"sys1_battery_2_qty","integer","YES",NULL
+"sys1_battery_2_make","text","YES",NULL
+"sys1_battery_2_model","text","YES",NULL
+"sys1_battery2_id","uuid","YES",NULL
+"sys1_combination_method","text","YES",NULL
+"sys2_solarpanel_existing","boolean","YES",NULL
+"sys2_solar_panel_qty","integer","YES",NULL
+"sys2_solar_panel_make","text","YES",NULL
+"sys2_solar_panel_model","text","YES",NULL
+"sys2_solarpanel_id","uuid","YES",NULL
+"sys2_micro_inverter_existing","boolean","YES",NULL
+"sys2_micro_inverter_make","text","YES",NULL
+"sys2_micro_inverter_model","text","YES",NULL
+"sys2_micro_inverter_id","uuid","YES",NULL
+"sys2_micro_inverter_qty","integer","YES",NULL
+"sys2_combiner_existing","boolean","YES",NULL
+"sys2_combiner_panel_make","text","YES",NULL
+"sys2_combiner_panel_model","text","YES",NULL
+"sys2_combinerpanel_id","uuid","YES",NULL
+"sys2_optimizer_existing","boolean","YES",NULL
+"sys2_optimizer_make","text","YES",NULL
+"sys2_optimizer_model","text","YES",NULL
+"sys2_optimizer_id","uuid","YES",NULL
+"sys2_inv_max_continuous_output","text","YES",NULL
+"sys2_panel_count","integer","YES",NULL
+"sys2_branch_string_1","text","YES",NULL
+"sys2_branch_string_2","text","YES",NULL
+"sys2_branch_string_3","text","YES",NULL
+"sys2_branch_string_4","text","YES",NULL
+"sys2_branch_string_5","text","YES",NULL
+"sys2_branch_string_6","text","YES",NULL
+"sys2_branch_string_7","text","YES",NULL
+"sys2_branch_string_8","text","YES",NULL
+"sys2_branch_string_9","text","YES",NULL
+"sys2_branch_string_10","text","YES",NULL
+"sys2_count_validation","text","YES",NULL
+"sys2_backup_option","text","YES",NULL
+"sys2_ess_existing","boolean","YES",NULL
+"sys2_no_sms","boolean","YES",NULL
+"sys2_ess_make","text","YES",NULL
+"sys2_ess_model","text","YES",NULL
+"sys2_ess_id","uuid","YES",NULL
+"sys2_ess_main_breaker_rating","text","YES",NULL
+"sys2_ess_upstream_breaker_rating","text","YES",NULL
+"sys2_ess_upstream_breaker_location","text","YES",NULL
+"sys2_battery1_existing","boolean","YES",NULL
+"sys2_battery_1_qty","integer","YES",NULL
+"sys2_battery_1_make","text","YES",NULL
+"sys2_battery_1_model","text","YES",NULL
+"sys2_battery1_id","uuid","YES",NULL
+"sys2_battery2_existing","boolean","YES",NULL
+"sys2_battery_2_qty","integer","YES",NULL
+"sys2_battery_2_make","text","YES",NULL
+"sys2_battery_2_model","text","YES",NULL
+"sys2_battery2_id","uuid","YES",NULL
+"sys2_combination_method","text","YES",NULL
+"sys3_solar_panel_existing","boolean","YES",NULL
+"sys3_solar_panel_qty","integer","YES",NULL
+"sys3_solar_panel_make","text","YES",NULL
+"sys3_solar_panel_model","text","YES",NULL
+"sys3_solarpanel_id","uuid","YES",NULL
+"sys3_micro_inverter_existing","boolean","YES",NULL
+"sys3_micro_inverter_make","text","YES",NULL
+"sys3_micro_inverter_model","text","YES",NULL
+"sys3_micro_inverter_id","uuid","YES",NULL
+"sys3_micro_inverter_qty","integer","YES",NULL
+"sys3_combiner_existing","boolean","YES",NULL
+"sys3_combiner_panel_make","text","YES",NULL
+"sys3_combiner_panel_model","text","YES",NULL
+"sys3_combinerpanel_id","uuid","YES",NULL
+"sys3_optimizer_existing","boolean","YES",NULL
+"sys3_optimizer_make","text","YES",NULL
+"sys3_optimizer_model","text","YES",NULL
+"sys3_optimizer_id","uuid","YES",NULL
+"sys3_inv_max_continuous_output","text","YES",NULL
+"sys3_panel_count","integer","YES",NULL
+"sys3_branch_string_1","text","YES",NULL
+"sys3_branch_string_2","text","YES",NULL
+"sys3_branch_string_3","text","YES",NULL
+"sys3_branch_string_4","text","YES",NULL
+"sys3_branch_string_5","text","YES",NULL
+"sys3_branch_string_6","text","YES",NULL
+"sys3_branch_string_7","text","YES",NULL
+"sys3_branch_string_8","text","YES",NULL
+"sys3_branch_string_9","text","YES",NULL
+"sys3_branch_string_10","text","YES",NULL
+"sys3_count_validation","text","YES",NULL
+"sys3_backup_option","text","YES",NULL
+"sys3_ess_existing","boolean","YES",NULL
+"sys3_no_sms","boolean","YES",NULL
+"sys3_ess_make","text","YES",NULL
+"sys3_ess_model","text","YES",NULL
+"sys3_ess_id","uuid","YES",NULL
+"sys3_ess_main_breaker_rating","text","YES",NULL
+"sys3_ess_upstream_breaker_rating","text","YES",NULL
+"sys3_ess_upstream_breaker_location","text","YES",NULL
+"sys3_battery1_existing","boolean","YES",NULL
+"sys3_battery_1_qty","integer","YES",NULL
+"sys3_battery_1_make","text","YES",NULL
+"sys3_battery_1_model","text","YES",NULL
+"sys3_battery1_id","uuid","YES",NULL
+"sys3_battery2_existing","boolean","YES",NULL
+"sys3_battery_2_qty","integer","YES",NULL
+"sys3_battery_2_make","text","YES",NULL
+"sys3_battery_2_model","text","YES",NULL
+"sys3_battery2_id","uuid","YES",NULL
+"sys3_combination_method","text","YES",NULL
+"sys4_solar_panel_existing","boolean","YES",NULL
+"sys4_solar_panel_qty","integer","YES",NULL
+"sys4_solar_panel_make","text","YES",NULL
+"sys4_solar_panel_model","text","YES",NULL
+"sys4_solarpanel_id","uuid","YES",NULL
+"sys4_micro_inverter_existing","boolean","YES",NULL
+"sys4_micro_inverter_make","text","YES",NULL
+"sys4_micro_inverter_model","text","YES",NULL
+"sys4_micro_inverter_id","uuid","YES",NULL
+"sys4_micro_inverter_qty","integer","YES",NULL
+"sys4_combiner_existing","boolean","YES",NULL
+"sys4_combiner_panel_make","text","YES",NULL
+"sys4_combiner_panel_model","text","YES",NULL
+"sys4_combinerpanel_id","uuid","YES",NULL
+"sys4_optimizer_existing","boolean","YES",NULL
+"sys4_optimizer_make","text","YES",NULL
+"sys4_optimizer_model","text","YES",NULL
+"sys4_optimizer_id","uuid","YES",NULL
+"sys4_inv_max_continuous_output","text","YES",NULL
+"sys4_panel_count","integer","YES",NULL
+"sys4_branch_string_1","text","YES",NULL
+"sys4_branch_string_2","text","YES",NULL
+"sys4_branch_string_3","text","YES",NULL
+"sys4_branch_string_4","text","YES",NULL
+"sys4_branch_string_5","text","YES",NULL
+"sys4_branch_string_6","text","YES",NULL
+"sys4_branch_string_7","text","YES",NULL
+"sys4_branch_string_8","text","YES",NULL
+"sys4_branch_string_9","text","YES",NULL
+"sys4_branch_string_10","text","YES",NULL
+"sys4_count_validation","text","YES",NULL
+"sys4_backup_option","text","YES",NULL
+"sys4_ess_existing","boolean","YES",NULL
+"sys4_no_sms","boolean","YES",NULL
+"sys4_ess_make","text","YES",NULL
+"sys4_ess_model","text","YES",NULL
+"sys4_ess_id","uuid","YES",NULL
+"sys4_ess_main_breaker_rating","text","YES",NULL
+"sys4_ess_upstream_breaker_rating","text","YES",NULL
+"sys4_ess_upstream_breaker_location","text","YES",NULL
+"sys4_battery_existing","boolean","YES",NULL
+"sys4_battery_1_qty","integer","YES",NULL
+"sys4_battery_1_make","text","YES",NULL
+"sys4_battery_1_model","text","YES",NULL
+"sys4_battery1_id","uuid","YES",NULL
+"sys4_battery2_existing","boolean","YES",NULL
+"sys4_battery_2_qty","integer","YES",NULL
+"sys4_battery_2_make","text","YES",NULL
+"sys4_battery_2_model","text","YES",NULL
+"sys4_battery2_id","uuid","YES",NULL
+"sys4_combination_method","text","YES",NULL
+"ele_ses_type","text","YES",NULL
+"ele_main_circuit_breakers_qty","integer","YES",NULL
+"ele_bus_bar_rating","text","YES",NULL
+"ele_main_circuit_breaker_rating","text","YES",NULL
+"ele_feeder_location_on_bus_bar","text","YES",NULL
+"ele_main_panel_upgrade","boolean","YES",NULL
+"ele_floor_area","text","YES",NULL
+"ele_small_appliance_circuits","text","YES",NULL
+"ele_loadtype_1","text","YES",NULL
+"ele_loadtype_2","text","YES",NULL
+"ele_loadtype_3","text","YES",NULL
+"ele_loadtype_4","text","YES",NULL
+"ele_loadtype_5","text","YES",NULL
+"ele_loadtype_6","text","YES",NULL
+"ele_loadtype_7","text","YES",NULL
+"ele_loadtype_8","text","YES",NULL
+"ele_loadtype_9","text","YES",NULL
+"ele_loadtype_10","text","YES",NULL
+"ele_loadtype_11","text","YES",NULL
+"ele_loadtype_12","text","YES",NULL
+"ele_loadtype_13","text","YES",NULL
+"ele_loadtype_14","text","YES",NULL
+"ele_loadtype_15","text","YES",NULL
+"ele_loadtype_16","text","YES",NULL
+"ele_loadtype_17","text","YES",NULL
+"ele_2p_breaker_1","text","YES",NULL
+"ele_2p_breaker_2","text","YES",NULL
+"ele_2p_breaker_3","text","YES",NULL
+"ele_2p_breaker_4","text","YES",NULL
+"ele_2p_breaker_5","text","YES",NULL
+"ele_2p_breaker_6","text","YES",NULL
+"ele_2p_breaker_7","text","YES",NULL
+"ele_2p_breaker_8","text","YES",NULL
+"ele_2p_breaker_9","text","YES",NULL
+"ele_2p_breaker_10","text","YES",NULL
+"ele_2p_breaker_11","text","YES",NULL
+"ele_2p_breaker_12","text","YES",NULL
+"ele_2p_breaker_13","text","YES",NULL
+"ele_2p_breaker_14","text","YES",NULL
+"ele_2p_breaker_15","text","YES",NULL
+"ele_2p_breaker_16","text","YES",NULL
+"ele_2p_breaker_17","text","YES",NULL
+"ele_method_of_interconnection","text","YES",NULL
+"ele_breaker_location","text","YES",NULL
+"bls1_backuploader_existing","boolean","YES",NULL
+"bls1_backuploader_bus_bar_rating","text","YES",NULL
+"bls1_backuploader_main_breaker_rating","text","YES",NULL
+"bls1_backuploader_upstream_breaker_rating","text","YES",NULL
+"bls1_backup_load_sub_panel_make","text","YES",NULL
+"bls1_backup_load_sub_panel_model","text","YES",NULL
+"bls1_backupload_sub_panel_id","uuid","YES",NULL
+"bls1_load_type_1","text","YES",NULL
+"bls1_load_type_2","text","YES",NULL
+"bls1_load_type_3","text","YES",NULL
+"bls1_load_type_4","text","YES",NULL
+"bls1_load_type_5","text","YES",NULL
+"bls1_load_type_6","text","YES",NULL
+"bls1_load_type_7","text","YES",NULL
+"bls1_load_type_8","text","YES",NULL
+"bls1_load_type_9","text","YES",NULL
+"bls1_load_type_10","text","YES",NULL
+"bls1_load_type_11","text","YES",NULL
+"bls1_load_type_12","text","YES",NULL
+"bls1_load_type_13","text","YES",NULL
+"bls1_load_type_14","text","YES",NULL
+"bls1_load_type_15","text","YES",NULL
+"bls1_load_type_16","text","YES",NULL
+"bls1_load_type_17","text","YES",NULL
+"bls1_load_type_18","text","YES",NULL
+"bls1_load_type_19","text","YES",NULL
+"bls1_load_type_20","text","YES",NULL
+"bls1_breaker_rating_1","text","YES",NULL
+"bls1_breaker_rating_2","text","YES",NULL
+"bls1_breaker_rating_3","text","YES",NULL
+"bls1_breaker_rating_4","text","YES",NULL
+"bls1_breaker_rating_5","text","YES",NULL
+"bls1_breaker_rating_6","text","YES",NULL
+"bls1_breaker_rating_7","text","YES",NULL
+"bls1_breaker_rating_8","text","YES",NULL
+"bls1_breaker_rating_9","text","YES",NULL
+"bls1_breaker_rating_10","text","YES",NULL
+"bls1_breaker_rating_11","text","YES",NULL
+"bls1_breaker_rating_12","text","YES",NULL
+"bls1_breaker_rating_13","text","YES",NULL
+"bls1_breaker_rating_14","text","YES",NULL
+"bls1_breaker_rating_15","text","YES",NULL
+"bls1_breaker_rating_16","text","YES",NULL
+"bls1_breaker_rating_17","text","YES",NULL
+"bls1_breaker_rating_18","text","YES",NULL
+"bls1_breaker_rating_19","text","YES",NULL
+"bls1_breaker_rating_20","text","YES",NULL
+"bls2_backuploader_existing","boolean","YES",NULL
+"bls2_bus_bar_rating","text","YES",NULL
+"bls2_main_breaker_rating","text","YES",NULL
+"bls2_upstream_breaker_rating","text","YES",NULL
+"bls2_battery_combiner_panel_make","text","YES",NULL
+"bls2_battery_combiner_panel_model","text","YES",NULL
+"bls2_batterycombinerpanel_id","uuid","YES",NULL
+"spb_subpanel_existing","boolean","YES",NULL
+"spb_bus_bar_rating","text","YES",NULL
+"spb_main_breaker_rating","text","YES",NULL
+"spb_upstream_breaker_rating","text","YES",NULL
+"spb_sub_panel_make","text","YES",NULL
+"spb_sub_panel_model","text","YES",NULL
+"spb_subpanel_id","uuid","YES",NULL
+"spb_load_type_1","text","YES",NULL
+"spb_load_type_2","text","YES",NULL
+"spb_load_type_3","text","YES",NULL
+"spb_load_type_4","text","YES",NULL
+"spb_load_type_5","text","YES",NULL
+"spb_load_type_6","text","YES",NULL
+"spb_load_type_7","text","YES",NULL
+"spb_load_type_8","text","YES",NULL
+"spb_load_type_9","text","YES",NULL
+"spb_load_type_10","text","YES",NULL
+"spb_load_type_11","text","YES",NULL
+"spb_load_type_12","text","YES",NULL
+"spb_load_type_13","text","YES",NULL
+"spb_load_type_14","text","YES",NULL
+"spb_load_type_15","text","YES",NULL
+"spb_load_type_16","text","YES",NULL
+"spb_load_type_17","text","YES",NULL
+"spb_load_type_18","text","YES",NULL
+"spb_load_type_19","text","YES",NULL
+"spb_load_type_20","text","YES",NULL
+"spb_breaker_rating_1","text","YES",NULL
+"spb_breaker_rating_2","text","YES",NULL
+"spb_breaker_rating_3","text","YES",NULL
+"spb_breaker_rating_4","text","YES",NULL
+"spb_breaker_rating_5","text","YES",NULL
+"spb_breaker_rating_6","text","YES",NULL
+"spb_breaker_rating_7","text","YES",NULL
+"spb_breaker_rating_8","text","YES",NULL
+"spb_breaker_rating_9","text","YES",NULL
+"spb_breaker_rating_10","text","YES",NULL
+"spb_breaker_rating_11","text","YES",NULL
+"spb_breaker_rating_12","text","YES",NULL
+"spb_breaker_rating_13","text","YES",NULL
+"spb_breaker_rating_14","text","YES",NULL
+"spb_breaker_rating_15","text","YES",NULL
+"spb_breaker_rating_16","text","YES",NULL
+"spb_breaker_rating_17","text","YES",NULL
+"spb_breaker_rating_18","text","YES",NULL
+"spb_breaker_rating_19","text","YES",NULL
+"spb_breaker_rating_20","text","YES",NULL
+"rta_roofing_material","text","YES",NULL
+"rta_framing_size","text","YES",NULL
+"rta_framing_spacing","text","YES",NULL
+"rta_rail_make","text","YES",NULL
+"rta_rail_model","text","YES",NULL
+"rta_rail_id","uuid","YES",NULL
+"rta_attachment_make","text","YES",NULL
+"rta_attachment_model","text","YES",NULL
+"rta_attachment_id","uuid","YES",NULL
+"rtb_roofing_material","text","YES",NULL
+"rtb_framing_size","text","YES",NULL
+"rtb_framing_spacing","text","YES",NULL
+"rtb_rail_make","text","YES",NULL
+"rtb_rail_model","text","YES",NULL
+"rtb_rail_id","uuid","YES",NULL
+"rtb_attachment_make","text","YES",NULL
+"rtb_attachment_model","text","YES",NULL
+"rtb_attachment_id","uuid","YES",NULL
+"mp1_roof_type","text","YES",NULL
+"mp1_stories","integer","YES",NULL
+"mp1_pitch","integer","YES",NULL
+"mp1_azimuth","integer","YES",NULL
+"mp1_tilt_mount_azimuth","integer","YES",NULL
+"mp1_tilt_mount_pitch","integer","YES",NULL
+"mp2_roof_type","text","YES",NULL
+"mp2_stories","integer","YES",NULL
+"mp2_pitch","integer","YES",NULL
+"mp2_azimuth","integer","YES",NULL
+"mp2_tilt_mount_azimuth","integer","YES",NULL
+"mp2_tilt_mount_pitch","integer","YES",NULL
+"mp3_roof_type","text","YES",NULL
+"mp3_stories","integer","YES",NULL
+"mp3_pitch","integer","YES",NULL
+"mp3_azimuth","integer","YES",NULL
+"mp3_tilt_mount_azimuth","integer","YES",NULL
+"mp3_tilt_mount_pitch","integer","YES",NULL
+"mp4_roof_type","text","YES",NULL
+"mp4_stories","integer","YES",NULL
+"mp4_pitch","integer","YES",NULL
+"mp4_azimuth","integer","YES",NULL
+"mp4_tilt_mount_azimuth","integer","YES",NULL
+"mp4_tilt_mount_pitch","integer","YES",NULL
+"mp5_roof_type","text","YES",NULL
+"mp5_stories","integer","YES",NULL
+"mp5_pitch","integer","YES",NULL
+"mp5_azimuth","integer","YES",NULL
+"mp5_tilt_mount_azimuth","integer","YES",NULL
+"mp5_tilt_mount_pitch","integer","YES",NULL
+"mp6_roof_type","text","YES",NULL
+"mp6_stories","integer","YES",NULL
+"mp6_pitch","integer","YES",NULL
+"mp6_azimuth","integer","YES",NULL
+"mp6_tilt_mount_azimuth","integer","YES",NULL
+"mp6_tilt_mount_pitch","integer","YES",NULL
+"mp7_roof_type","text","YES",NULL
+"mp7_stories","integer","YES",NULL
+"mp7_pitch","integer","YES",NULL
+"mp7_azimuth","integer","YES",NULL
+"mp7_tilt_mount_azimuth","integer","YES",NULL
+"mp7_tilt_mount_pitch","integer","YES",NULL
+"mp8_roof_type","text","YES",NULL
+"mp8_stories","integer","YES",NULL
+"mp8_pitch","integer","YES",NULL
+"mp8_azimuth","integer","YES",NULL
+"mp8_tilt_mount_azimuth","integer","YES",NULL
+"mp8_tilt_mount_pitch","integer","YES",NULL
+"mp9_roof_type","text","YES",NULL
+"mp9_stories","integer","YES",NULL
+"mp9_pitch","integer","YES",NULL
+"mp9_azimuth","integer","YES",NULL
+"mp9_tilt_mount_azimuth","integer","YES",NULL
+"mp9_tilt_mount_pitch","integer","YES",NULL
+"mp10_roof_type","text","YES",NULL
+"mp10_stories","integer","YES",NULL
+"mp10_pitch","integer","YES",NULL
+"mp10_azimuth","integer","YES",NULL
+"mp10_tilt_mount_azimuth","integer","YES",NULL
+"mp10_tilt_mount_pitch","integer","YES",NULL
+"sys1_ap_hoy_wire_gauge","text","YES",NULL
+"sys1_ap_hoy_breaker_size","text","YES",NULL
+"sys2_ap_hoy_wire_gauge","text","YES",NULL
+"sys2_ap_hoy_breaker_size","text","YES",NULL
+"sys3_ap_hoy_wire_gauge","text","YES",NULL
+"sys3_ap_hoy_breaker_size","text","YES",NULL
+"sys4_ap_hoy_wire_gauge","text","YES",NULL
+"sys4_ap_hoy_breaker_size","text","YES",NULL
+"bsp_backup_feeder_location","text","YES",NULL
+"spb_subpanel_b_feeder_location","text","YES",NULL
+"mpa_bus_bar_existing","boolean","YES",NULL
+"mpa_main_circuit_breaker_existing","boolean","YES",NULL
+"mpa_mainpanela_acunit_amps","text","YES",NULL
+"mpa_mainpanela_furnace_amps","text","YES",NULL
+"bsp_backupload_mcbexisting","boolean","YES",NULL
+"spb_subpanelb_mcbexisting","boolean","YES",NULL
+"ele_utility_meter_behind_fence","boolean","YES",NULL
+"ele_combine_positions","text","YES",NULL
+"precombine_1_1_equipment_type","text","YES",NULL
+"precombine_1_1_existing","boolean","YES",NULL
+"precombine_1_1_make","text","YES",NULL
+"precombine_1_1_model","text","YES",NULL
+"precombine_1_1_equipment_master_id","uuid","YES",NULL
+"precombine_2_1_equipment_type","text","YES",NULL
+"precombine_2_1_existing","boolean","YES",NULL
+"precombine_2_1_make","text","YES",NULL
+"precombine_2_1_model","text","YES",NULL
+"precombine_2_1_equipment_master_id","uuid","YES",NULL
+"precombine_3_1_equipment_type","text","YES",NULL
+"precombine_3_1_existing","boolean","YES",NULL
+"precombine_3_1_make","text","YES",NULL
+"precombine_3_1_model","text","YES",NULL
+"precombine_3_1_equipment_master_id","uuid","YES",NULL
+"postcombine_1_1_equipment_type","text","YES",NULL
+"postcombine_1_1_existing","boolean","YES",NULL
+"postcombine_1_1_make","text","YES",NULL
+"postcombine_1_1_model","text","YES",NULL
+"postcombine_1_1_equipment_master_id","uuid","YES",NULL
+"postcombine_2_1_equipment_type","text","YES",NULL
+"postcombine_2_1_existing","boolean","YES",NULL
+"postcombine_2_1_make","text","YES",NULL
+"postcombine_2_1_model","text","YES",NULL
+"postcombine_2_1_equipment_master_id","uuid","YES",NULL
+"postcombine_3_1_equipment_type","text","YES",NULL
+"postcombine_3_1_existing","boolean","YES",NULL
+"postcombine_3_1_make","text","YES",NULL
+"postcombine_3_1_model","text","YES",NULL
+"postcombine_3_1_equipment_master_id","uuid","YES",NULL
+"precombine_1_2_equipment_type","text","YES",NULL
+"precombine_1_2_existing","boolean","YES",NULL
+"precombine_1_2_make","text","YES",NULL
+"precombine_1_2_model","text","YES",NULL
+"precombine_1_2_equipment_master_id","uuid","YES",NULL
+"precombine_2_2_equipment_type","text","YES",NULL
+"precombine_2_2_existing","boolean","YES",NULL
+"precombine_2_2_make","text","YES",NULL
+"precombine_2_2_model","text","YES",NULL
+"precombine_2_2_equipment_master_id","uuid","YES",NULL
+"precombine_3_2_equipment_type","text","YES",NULL
+"precombine_3_2_existing","boolean","YES",NULL
+"precombine_3_2_make","text","YES",NULL
+"precombine_3_2_model","text","YES",NULL
+"precombine_3_2_equipment_master_id","uuid","YES",NULL
+"postcombine_1_2_equipment_type","text","YES",NULL
+"postcombine_1_2_existing","boolean","YES",NULL
+"postcombine_1_2_make","text","YES",NULL
+"postcombine_1_2_model","text","YES",NULL
+"postcombine_1_2_equipment_master_id","uuid","YES",NULL
+"postcombine_2_2_equipment_type","text","YES",NULL
+"postcombine_2_2_existing","boolean","YES",NULL
+"postcombine_2_2_make","text","YES",NULL
+"postcombine_2_2_model","text","YES",NULL
+"postcombine_2_2_equipment_master_id","uuid","YES",NULL
+"postcombine_3_2_equipment_type","text","YES",NULL
+"postcombine_3_2_existing","boolean","YES",NULL
+"postcombine_3_2_make","text","YES",NULL
+"postcombine_3_2_model","text","YES",NULL
+"postcombine_3_2_equipment_master_id","uuid","YES",NULL
+"precombine_1_3_equipment_type","text","YES",NULL
+"precombine_1_3_existing","boolean","YES",NULL
+"precombine_1_3_make","text","YES",NULL
+"precombine_1_3_model","text","YES",NULL
+"precombine_1_3_equipment_master_id","uuid","YES",NULL
+"precombine_2_3_equipment_type","text","YES",NULL
+"precombine_2_3_existing","boolean","YES",NULL
+"precombine_2_3_make","text","YES",NULL
+"precombine_2_3_model","text","YES",NULL
+"precombine_2_3_equipment_master_id","uuid","YES",NULL
+"precombine_3_3_equipment_type","text","YES",NULL
+"precombine_3_3_existing","boolean","YES",NULL
+"precombine_3_3_make","text","YES",NULL
+"precombine_3_3_model","text","YES",NULL
+"precombine_3_3_equipment_master_id","uuid","YES",NULL
+"postcombine_1_3_equipment_type","text","YES",NULL
+"postcombine_1_3_existing","boolean","YES",NULL
+"postcombine_1_3_make","text","YES",NULL
+"postcombine_1_3_model","text","YES",NULL
+"postcombine_1_3_equipment_master_id","uuid","YES",NULL
+"postcombine_2_3_equipment_type","text","YES",NULL
+"postcombine_2_3_existing","boolean","YES",NULL
+"postcombine_2_3_make","text","YES",NULL
+"postcombine_2_3_model","text","YES",NULL
+"postcombine_2_3_equipment_master_id","uuid","YES",NULL
+"postcombine_3_3_equipment_type","text","YES",NULL
+"postcombine_3_3_existing","boolean","YES",NULL
+"postcombine_3_3_make","text","YES",NULL
+"postcombine_3_3_model","text","YES",NULL
+"postcombine_3_3_equipment_master_id","uuid","YES",NULL
+"sys1_system_combiner_panel1_mlo","text","YES",NULL
+"sys2_system_combiner_panel2_mlo","text","YES",NULL
+"sys3_system_combiner_panel3_mlo","text","YES",NULL
+"sys4_system_combiner_panel4_mlo","text","YES",NULL
+"utility_service_amps","text","YES",NULL
+"roof_sq_ft","integer","YES",NULL
+"roof_a_panel_count","integer","YES",NULL
+"roof_b_panel_count","integer","YES",NULL
+"mpa_tie_in_breaker_existing","boolean","YES",NULL
+"mpa_tie_in_breaker_rating","text","YES",NULL
+"panel_count_mp1","integer","YES",NULL
+"panel_count_mp2","integer","YES",NULL
+"panel_count_mp3","integer","YES",NULL
+"panel_count_mp4","integer","YES",NULL
+"panel_count_mp5","integer","YES",NULL
+"panel_count_mp6","integer","YES",NULL
+"panel_count_mp7","integer","YES",NULL
+"panel_count_mp8","integer","YES",NULL
+"panel_count_mp9","integer","YES",NULL
+"panel_count_mp10","integer","YES",NULL
+"ground_size_sys1","text","YES",NULL
+"ground_size_sys2","text","YES",NULL
+"ground_size_pos3","text","YES",NULL
+"ground_size_pos4","text","YES",NULL
+"tap_interior_exterior","text","YES",NULL
+"sys1_sms_pv_1_input","text","YES",NULL
+"sys1_sms1_pv_2_input","text","YES",NULL
+"sys1_sms_pv_3_input","text","YES",NULL
+"sys1_sms_ess_1_input","text","YES",NULL
+"sys1_sms1_ess_2_input","text","YES",NULL
+"sys1_sms_backup_load_sub_panel_input","text","YES",NULL
+"sys1_sms_rsd_input","text","YES",NULL
+"sys1_sms_1gen_1_input","text","YES",NULL
+"sys1_backup_sp_tie_in_breaker_location","text","YES",NULL
+"subpanelb_small_appliances","text","YES",NULL
+"subpanelb_air_conditioning_amps","text","YES",NULL
+"subpanelb_furnace_amps","text","YES",NULL
+"rooftypea_rafter_truss","text","YES",NULL
+"rooftypeb_rafter_truss","text","YES",NULL
+"sys1_combinerpanel_bus_rating","text","YES",NULL
+"sys2_combiner_panel_bus_rating","text","YES",NULL
+"sys2_backup_load_sub_panel_make","text","YES",NULL
+"sys2_backup_load_sub_panel_model","text","YES",NULL
+"sys2_backuploadsubpanel_id","uuid","YES",NULL
+"sys2_backuploadsubpanel_bus_new_existing","boolean","YES",NULL
+"sys2_backuploadsubpanel_bus_rating","text","YES",NULL
+"sys2_backuploadsubpanel_mcb_new_existing","boolean","YES",NULL
+"sys2_backuploadpanel_mcb_rating","text","YES",NULL
+"sys2_backuploadsubpanel_tie_in_breaker_rating","text","YES",NULL
+"sys2_backuploadsubpanel_tie_in_breaker_location","text","YES",NULL
+"sys2_battery_combiner_panel_make","text","YES",NULL
+"sys2_battery_combiner_panel_model","text","YES",NULL
+"sys2_batterycombinerpanel_id","uuid","YES",NULL
+"sys2_batterycombinerpanel_bus_new_existing","boolean","YES",NULL
+"sys2_batterycombinerpanel_bus_rating","text","YES",NULL
+"sys2_batterycombinerpanel_mcb_new_existing","boolean","YES",NULL
+"sys2_batterycombinerpanel_mcb_rating","text","YES",NULL
+"sys2_batterycombinerpanel_tie_in_breaker_rating","text","YES",NULL
+"sys2_batterycombinerpanel_tie_in_breaker_location","text","YES",NULL
+"sys2_pv_1_input","text","YES",NULL
+"sys2_pv_2_input","text","YES",NULL
+"sys2_pv_3_input","text","YES",NULL
+"sys2_ess_1_input","text","YES",NULL
+"sys2_ess_2_input","text","YES",NULL
+"sys2_backup_load_sub_panel_input","text","YES",NULL
+"sys2_rsd_input","text","YES",NULL
+"sys2_gen_1_input","text","YES",NULL
+"sys2_pv1_overwrite","boolean","YES",NULL
+"sys2_pv2_overwrite","boolean","YES",NULL
+"sys2_pv3_overwrite","boolean","YES",NULL
+"sys2_ess1_overwrite","boolean","YES",NULL
+"sys2_ess2_overwrite","boolean","YES",NULL
+"sys2_backloadtype1","text","YES",NULL
+"sys2_backloadtype2","text","YES",NULL
+"sys2_backloadtype3","text","YES",NULL
+"sys2_backloadtype4","text","YES",NULL
+"sys2_backloadtype5","text","YES",NULL
+"sys2_backloadtype6","text","YES",NULL
+"sys2_backloadtype7","text","YES",NULL
+"sys2_backloadtype8","text","YES",NULL
+"sys2_backloadtype9","text","YES",NULL
+"sys2_backloadtype10","text","YES",NULL
+"sys2_backloadtype11","text","YES",NULL
+"sys2_backloadtype12","text","YES",NULL
+"sys2_backloadtype13","text","YES",NULL
+"sys2_backloadtype14","text","YES",NULL
+"sys2_backloadtype15","text","YES",NULL
+"sys2_backloadtype16","text","YES",NULL
+"sys2_backloadtype17","text","YES",NULL
+"sys2_backloadtype18","text","YES",NULL
+"sys2_backloadtype19","text","YES",NULL
+"sys2_backloadtype20","text","YES",NULL
+"sys2_backup_load_rating_1","text","YES",NULL
+"sys2_backup_load_rating_2","text","YES",NULL
+"sys2_backup_load_rating_3","text","YES",NULL
+"sys2_backup_load_rating_4","text","YES",NULL
+"sys2_backup_load_rating_5","text","YES",NULL
+"sys2_backup_load_rating_6","text","YES",NULL
+"sys2_backup_load_rating_7","text","YES",NULL
+"sys2_backup_load_rating_8","text","YES",NULL
+"sys2_backup_load_rating_9","text","YES",NULL
+"sys2_backup_load_rating_10","text","YES",NULL
+"sys2_backup_load_rating_11","text","YES",NULL
+"sys2_backup_load_rating_12","text","YES",NULL
+"sys2_backup_load_rating_13","text","YES",NULL
+"sys2_backup_load_rating_14","text","YES",NULL
+"sys2_backup_load_rating_15","text","YES",NULL
+"sys2_backup_load_rating_16","text","YES",NULL
+"sys2_backup_load_rating_17","text","YES",NULL
+"sys2_backup_load_rating_18","text","YES",NULL
+"sys2_backup_load_rating_19","text","YES",NULL
+"sys2_backup_load_rating_20","text","YES",NULL
+"bos1c_amp_rating","text","YES",NULL
+"bos1d_amp_rating","text","YES",NULL
+"bos1e_amp_rating","text","YES",NULL
+"bos1f_amp_rating","text","YES",NULL
+"bos2c_amp_rating","text","YES",NULL
+"bos2d_amp_rating","text","YES",NULL
+"bos2e_amp_rating","text","YES",NULL
+"bos2f_amp_rating","text","YES",NULL
+"mount_type_a","text","YES",NULL
+"mount_type_b","text","YES",NULL
+"sys1_pcs_settings","boolean","YES",NULL
+"pos_2_pcs_settings","text","YES",NULL
+"house_stories","integer","YES",NULL
+"system_combiner_panel_1_make","text","YES",NULL
+"system_combiner_panel_1_model","text","YES",NULL
+"system_combiner1_id","uuid","YES",NULL
+"system_combiner_panel_1_amp_rating","text","YES",NULL
+"breaker_rating","text","YES",NULL
+"system_combiner_panel_2_make","text","YES",NULL
+"system_combiner_panel_2_model","text","YES",NULL
+"system_combiner2_id","uuid","YES",NULL
+"system_combiner_panel_2_amp_rating","text","YES",NULL
+"created_by","integer","YES",NULL
+"sys1_selectedsystem","text","YES",NULL
+"sys2_selectedsystem","text","YES",NULL
+"sys3_selectedsystem","text","YES",NULL
+"sys4_selectedsystem","text","YES",NULL
+"sys1_combinerpanel_main_breaker_rating","text","YES",NULL
+"sys1_sms_make","text","YES",NULL
+"sys1_sms_model","text","YES",NULL
+"sys1_sms_id","uuid","YES",NULL
+"sys1_sms_breaker_rating","text","YES",NULL
+"sys1_sms_backup_load_sub_panel_breaker_rating","text","YES",NULL
+"sys1_sms_pv_breaker_rating_override","text","YES",NULL
+"sys1_sms_ess_breaker_rating_override","text","YES",NULL
+"sys1_sms_tie_in_breaker_rating_override","text","YES",NULL
+"sys1_sms_rsd_enabled","boolean","YES",NULL
+"sys1_battery_configuration","text","YES",NULL
+"sys1_combinerpanel_existing","boolean","YES",NULL
+"sys1_sms_existing","boolean","YES",NULL
+"el_mpa_derated","boolean","YES",NULL
+"el_spb_derated","boolean","YES",NULL
+"el_spc_existing","boolean","YES",NULL
+"el_spc_bus_rating","integer","YES",NULL
+"el_spc_main_breaker_rating","integer","YES",NULL
+"el_spc_feeder_location","text","YES",NULL
+"el_spc_upstream_breaker_rating","integer","YES",NULL
+"el_spc_upstream_breaker_location","text","YES",NULL
+"el_spd_existing","boolean","YES",NULL
+"el_spd_bus_rating","integer","YES",NULL
+"el_spd_main_breaker_rating","integer","YES",NULL
+"el_spd_feeder_location","text","YES",NULL
+"el_spd_upstream_breaker_rating","integer","YES",NULL
+"el_spd_upstream_breaker_location","text","YES",NULL
+"el_poi_breaker_rating","integer","YES",NULL
+"el_poi_disconnect_rating","integer","YES",NULL
+"st_roof_a_area_sqft","integer","YES",NULL
+"st_roof_b_area_sqft","integer","YES",NULL
+"st_roof_a_framing_type","text","YES",NULL
+"st_roof_b_framing_type","text","YES",NULL
+"st_mp1_arrayqty_1","integer","YES",NULL
+"st_mp1_arrayqty_2","integer","YES",NULL
+"st_mp1_arrayqty_3","integer","YES",NULL
+"st_mp1_arrayqty_4","integer","YES",NULL
+"st_mp1_arrayqty_5","integer","YES",NULL
+"st_mp1_arrayqty_6","integer","YES",NULL
+"st_mp1_arrayqty_7","integer","YES",NULL
+"st_mp1_arrayqty_8","integer","YES",NULL
+"st_mp2_arrayqty_1","integer","YES",NULL
+"st_mp2_arrayqty_2","integer","YES",NULL
+"st_mp2_arrayqty_3","integer","YES",NULL
+"st_mp2_arrayqty_4","integer","YES",NULL
+"st_mp2_arrayqty_5","integer","YES",NULL
+"st_mp2_arrayqty_6","integer","YES",NULL
+"st_mp2_arrayqty_7","integer","YES",NULL
+"st_mp2_arrayqty_8","integer","YES",NULL
+"st_mp3_arrayqty_1","integer","YES",NULL
+"st_mp3_arrayqty_2","integer","YES",NULL
+"st_mp3_arrayqty_3","integer","YES",NULL
+"st_mp3_arrayqty_4","integer","YES",NULL
+"st_mp3_arrayqty_5","integer","YES",NULL
+"st_mp3_arrayqty_6","integer","YES",NULL
+"st_mp3_arrayqty_7","integer","YES",NULL
+"st_mp3_arrayqty_8","integer","YES",NULL
+"st_mp4_arrayqty_1","integer","YES",NULL
+"st_mp4_arrayqty_2","integer","YES",NULL
+"st_mp4_arrayqty_3","integer","YES",NULL
+"st_mp4_arrayqty_4","integer","YES",NULL
+"st_mp4_arrayqty_5","integer","YES",NULL
+"st_mp4_arrayqty_6","integer","YES",NULL
+"st_mp4_arrayqty_7","integer","YES",NULL
+"st_mp4_arrayqty_8","integer","YES",NULL
+"st_mp5_arrayqty_1","integer","YES",NULL
+"st_mp5_arrayqty_2","integer","YES",NULL
+"st_mp5_arrayqty_3","integer","YES",NULL
+"st_mp5_arrayqty_4","integer","YES",NULL
+"st_mp5_arrayqty_5","integer","YES",NULL
+"st_mp5_arrayqty_6","integer","YES",NULL
+"st_mp5_arrayqty_7","integer","YES",NULL
+"st_mp5_arrayqty_8","integer","YES",NULL
+"st_mp6_arrayqty_1","integer","YES",NULL
+"st_mp6_arrayqty_2","integer","YES",NULL
+"st_mp6_arrayqty_3","integer","YES",NULL
+"st_mp6_arrayqty_4","integer","YES",NULL
+"st_mp6_arrayqty_5","integer","YES",NULL
+"st_mp6_arrayqty_6","integer","YES",NULL
+"st_mp6_arrayqty_7","integer","YES",NULL
+"st_mp6_arrayqty_8","integer","YES",NULL
+"st_mp7_arrayqty_1","integer","YES",NULL
+"st_mp7_arrayqty_2","integer","YES",NULL
+"st_mp7_arrayqty_3","integer","YES",NULL
+"st_mp7_arrayqty_4","integer","YES",NULL
+"st_mp7_arrayqty_5","integer","YES",NULL
+"st_mp7_arrayqty_6","integer","YES",NULL
+"st_mp7_arrayqty_7","integer","YES",NULL
+"st_mp7_arrayqty_8","integer","YES",NULL
+"st_mp8_arrayqty_1","integer","YES",NULL
+"st_mp8_arrayqty_2","integer","YES",NULL
+"st_mp8_arrayqty_3","integer","YES",NULL
+"st_mp8_arrayqty_4","integer","YES",NULL
+"st_mp8_arrayqty_5","integer","YES",NULL
+"st_mp8_arrayqty_6","integer","YES",NULL
+"st_mp8_arrayqty_7","integer","YES",NULL
+"st_mp8_arrayqty_8","integer","YES",NULL
+"st_mp9_arrayqty_1","integer","YES",NULL
+"st_mp9_arrayqty_2","integer","YES",NULL
+"st_mp9_arrayqty_3","integer","YES",NULL
+"st_mp9_arrayqty_4","integer","YES",NULL
+"st_mp9_arrayqty_5","integer","YES",NULL
+"st_mp9_arrayqty_6","integer","YES",NULL
+"st_mp9_arrayqty_7","integer","YES",NULL
+"st_mp9_arrayqty_8","integer","YES",NULL
+"st_mp10_arrayqty_1","integer","YES",NULL
+"st_mp10_arrayqty_2","integer","YES",NULL
+"st_mp10_arrayqty_3","integer","YES",NULL
+"st_mp10_arrayqty_4","integer","YES",NULL
+"st_mp10_arrayqty_5","integer","YES",NULL
+"st_mp10_arrayqty_6","integer","YES",NULL
+"st_mp10_arrayqty_7","integer","YES",NULL
+"st_mp10_arrayqty_8","integer","YES",NULL
+"st_mp1_mode","text","YES",NULL
+"st_mp2_mode","text","YES",NULL
+"st_mp3_mode","text","YES",NULL
+"st_mp4_mode","text","YES",NULL
+"st_mp5_mode","text","YES",NULL
+"st_mp6_mode","text","YES",NULL
+"st_mp7_mode","text","YES",NULL
+"st_mp8_mode","text","YES",NULL
+"st_mp9_mode","text","YES",NULL
+"st_mp10_mode","text","YES",NULL
+"el_mca_system_back_feed","integer","YES",NULL
+"house_sqft","integer","YES",NULL
+"sys1_tesla_extensions","character varying","YES",NULL
+"sys2_tesla_extensions","character varying","YES",NULL
+"sys3_tesla_extensions","character varying","YES",NULL
+"sys4_tesla_extensions","character varying","YES",NULL
+"sys1_batteryonly","boolean","YES","false"
+"sys2_batteryonly","boolean","YES","false"
+"sys3_batteryonly","boolean","YES","false"
+"sys4_batteryonly","boolean","YES","false"
+"sys1_show_second_panel_type","boolean","YES","false"
+"sys1_solar_panel_type2_quantity","integer","YES",NULL
+"sys1_solar_panel_type2_manufacturer","character varying","YES",NULL
+"sys1_solar_panel_type2_model","character varying","YES",NULL
+"sys1_solar_panel_type2_is_new","boolean","YES","true"
+"sys2_show_second_panel_type","boolean","YES","false"
+"sys2_solar_panel_type2_quantity","integer","YES",NULL
+"sys2_solar_panel_type2_manufacturer","character varying","YES",NULL
+"sys2_solar_panel_type2_model","character varying","YES",NULL
+"sys2_solar_panel_type2_is_new","boolean","YES","true"
+"sys3_show_second_panel_type","boolean","YES","false"
+"sys3_solar_panel_type2_quantity","integer","YES",NULL
+"sys3_solar_panel_type2_manufacturer","character varying","YES",NULL
+"sys3_solar_panel_type2_model","character varying","YES",NULL
+"sys3_solar_panel_type2_is_new","boolean","YES","true"
+"sys4_show_second_panel_type","boolean","YES","false"
+"sys4_solar_panel_type2_quantity","integer","YES",NULL
+"sys4_solar_panel_type2_manufacturer","character varying","YES",NULL
+"sys4_solar_panel_type2_model","character varying","YES",NULL
+"sys4_solar_panel_type2_is_new","boolean","YES","true"
+"sys1_teslagatewaytype","text","YES",NULL
+"sys2_teslagatewaytype","text","YES",NULL
+"sys3_teslagatewaytype","text","YES",NULL
+"sys4_teslagatewaytype","text","YES",NULL
+"sys1_backupswitch_location","text","YES",NULL
+"sys2_backupswitch_location","text","YES",NULL
+"sys3_backupswitch_location","text","YES",NULL
+"sys4_backupswitch_location","text","YES",NULL
+"version_number","integer","NO","1"
+"last_generated_at","timestamp with time zone","YES",NULL
+"last_generated_by","character varying","YES",NULL
+"sys2_sms_make","text","YES",NULL
+"sys2_sms_model","text","YES",NULL
+"sys2_sms_id","uuid","YES",NULL
+"sys2_sms_breaker_rating","text","YES",NULL
+"sys2_sms_backup_load_sub_panel_breaker_rating","text","YES",NULL
+"sys2_sms_pv_breaker_rating_override","text","YES",NULL
+"sys2_sms_ess_breaker_rating_override","text","YES",NULL
+"sys2_sms_tie_in_breaker_rating_override","text","YES",NULL
+"sys2_sms_rsd_enabled","boolean","YES",NULL
+"sys2_sms_pv_1_input","text","YES",NULL
+"sys2_sms_pv_2_input","text","YES",NULL
+"sys2_sms_pv_3_input","text","YES",NULL
+"sys2_sms_ess_1_input","text","YES",NULL
+"sys2_sms_ess_2_input","text","YES",NULL
+"sys2_sms_backup_load_sub_panel_input","text","YES",NULL
+"sys2_sms_rsd_input","text","YES",NULL
+"sys2_sms_gen_1_input","text","YES",NULL
+"sys2_battery_configuration","text","YES",NULL
+"sys2_pcs_settings","boolean","YES",NULL
+"sys2_combinerpanel_main_breaker_rating","text","YES",NULL
+"sys2_combinerpanel_existing","boolean","YES",NULL
+"sys2_combinerpanel_bus_rating","text","YES",NULL
+"sys2_backup_sp_tie_in_breaker_location","text","YES",NULL
+"sys2_stringing_type","text","YES",NULL
+"sys3_sms_make","text","YES",NULL
+"sys3_sms_model","text","YES",NULL
+"sys3_sms_id","uuid","YES",NULL
+"sys3_sms_existing","boolean","YES",NULL
+"sys3_sms_breaker_rating","text","YES",NULL
+"sys3_sms_backup_load_sub_panel_breaker_rating","text","YES",NULL
+"sys3_sms_pv_breaker_rating_override","text","YES",NULL
+"sys3_sms_ess_breaker_rating_override","text","YES",NULL
+"sys3_sms_tie_in_breaker_rating_override","text","YES",NULL
+"sys3_sms_rsd_enabled","boolean","YES",NULL
+"sys3_sms_pv_1_input","text","YES",NULL
+"sys3_sms_pv_2_input","text","YES",NULL
+"sys3_sms_pv_3_input","text","YES",NULL
+"sys3_sms_ess_1_input","text","YES",NULL
+"sys3_sms_ess_2_input","text","YES",NULL
+"sys3_sms_backup_load_sub_panel_input","text","YES",NULL
+"sys3_sms_rsd_input","text","YES",NULL
+"sys3_sms_gen_1_input","text","YES",NULL
+"sys3_battery_configuration","text","YES",NULL
+"sys3_pcs_settings","boolean","YES",NULL
+"sys3_combinerpanel_main_breaker_rating","text","YES",NULL
+"sys3_combinerpanel_existing","boolean","YES",NULL
+"sys3_combinerpanel_bus_rating","text","YES",NULL
+"sys3_backup_sp_tie_in_breaker_location","text","YES",NULL
+"sys3_stringing_type","text","YES",NULL
+"sys4_sms_make","text","YES",NULL
+"sys4_sms_model","text","YES",NULL
+"sys4_sms_id","uuid","YES",NULL
+"sys4_sms_existing","boolean","YES",NULL
+"sys4_sms_breaker_rating","text","YES",NULL
+"sys4_sms_backup_load_sub_panel_breaker_rating","text","YES",NULL
+"sys4_sms_pv_breaker_rating_override","text","YES",NULL
+"sys4_sms_ess_breaker_rating_override","text","YES",NULL
+"sys4_sms_tie_in_breaker_rating_override","text","YES",NULL
+"sys4_sms_rsd_enabled","boolean","YES",NULL
+"sys4_sms_pv_1_input","text","YES",NULL
+"sys4_sms_pv_2_input","text","YES",NULL
+"sys4_sms_pv_3_input","text","YES",NULL
+"sys4_sms_ess_1_input","text","YES",NULL
+"sys4_sms_ess_2_input","text","YES",NULL
+"sys4_sms_backup_load_sub_panel_input","text","YES",NULL
+"sys4_sms_rsd_input","text","YES",NULL
+"sys4_sms_gen_1_input","text","YES",NULL
+"sys4_battery_configuration","text","YES",NULL
+"sys4_pcs_settings","boolean","YES",NULL
+"sys4_combinerpanel_main_breaker_rating","text","YES",NULL
+"sys4_combinerpanel_existing","boolean","YES",NULL
+"sys4_combinerpanel_bus_rating","text","YES",NULL
+"sys4_backup_sp_tie_in_breaker_location","text","YES",NULL
+"sys4_stringing_type","text","YES",NULL
+"bos_sys1_type1_equipment_type","text","YES",NULL
+"bos_sys1_type1_make","text","YES",NULL
+"bos_sys1_type1_model","text","YES",NULL
+"bos_sys1_type1_amp_rating","text","YES",NULL
+"bos_sys1_type1_is_new","boolean","YES",NULL
+"bos_sys1_type1_active","boolean","YES",NULL
+"bos_sys1_type2_equipment_type","text","YES",NULL
+"bos_sys1_type2_make","text","YES",NULL
+"bos_sys1_type2_model","text","YES",NULL
+"bos_sys1_type2_amp_rating","text","YES",NULL
+"bos_sys1_type2_is_new","boolean","YES",NULL
+"bos_sys1_type2_active","boolean","YES",NULL
+"bos_sys1_type3_equipment_type","text","YES",NULL
+"bos_sys1_type3_make","text","YES",NULL
+"bos_sys1_type3_model","text","YES",NULL
+"bos_sys1_type3_amp_rating","text","YES",NULL
+"bos_sys1_type3_is_new","boolean","YES",NULL
+"bos_sys1_type3_active","boolean","YES",NULL
+"bos_sys1_show_type1","boolean","YES",NULL
+"bos_sys1_show_type2","boolean","YES",NULL
+"bos_sys1_show_type3","boolean","YES",NULL
+"bos_sys2_type1_equipment_type","text","YES",NULL
+"bos_sys2_type1_make","text","YES",NULL
+"bos_sys2_type1_model","text","YES",NULL
+"bos_sys2_type1_amp_rating","text","YES",NULL
+"bos_sys2_type1_is_new","boolean","YES",NULL
+"bos_sys2_type1_active","boolean","YES",NULL
+"bos_sys2_type2_equipment_type","text","YES",NULL
+"bos_sys2_type2_make","text","YES",NULL
+"bos_sys2_type2_model","text","YES",NULL
+"bos_sys2_type2_amp_rating","text","YES",NULL
+"bos_sys2_type2_is_new","boolean","YES",NULL
+"bos_sys2_type2_active","boolean","YES",NULL
+"bos_sys2_type3_equipment_type","text","YES",NULL
+"bos_sys2_type3_make","text","YES",NULL
+"bos_sys2_type3_model","text","YES",NULL
+"bos_sys2_type3_amp_rating","text","YES",NULL
+"bos_sys2_type3_is_new","boolean","YES",NULL
+"bos_sys2_type3_active","boolean","YES",NULL
+"bos_sys2_show_type1","boolean","YES",NULL
+"bos_sys2_show_type2","boolean","YES",NULL
+"bos_sys2_show_type3","boolean","YES",NULL
+"bos_sys3_type1_equipment_type","text","YES",NULL
+"bos_sys3_type1_make","text","YES",NULL
+"bos_sys3_type1_model","text","YES",NULL
+"bos_sys3_type1_amp_rating","text","YES",NULL
+"bos_sys3_type1_is_new","boolean","YES",NULL
+"bos_sys3_type1_active","boolean","YES",NULL
+"bos_sys3_type2_equipment_type","text","YES",NULL
+"bos_sys3_type2_make","text","YES",NULL
+"bos_sys3_type2_model","text","YES",NULL
+"bos_sys3_type2_amp_rating","text","YES",NULL
+"bos_sys3_type2_is_new","boolean","YES",NULL
+"bos_sys3_type2_active","boolean","YES",NULL
+"bos_sys3_type3_equipment_type","text","YES",NULL
+"bos_sys3_type3_make","text","YES",NULL
+"bos_sys3_type3_model","text","YES",NULL
+"bos_sys3_type3_amp_rating","text","YES",NULL
+"bos_sys3_type3_is_new","boolean","YES",NULL
+"bos_sys3_type3_active","boolean","YES",NULL
+"bos_sys3_show_type1","boolean","YES",NULL
+"bos_sys3_show_type2","boolean","YES",NULL
+"bos_sys3_show_type3","boolean","YES",NULL
+"bos_sys4_type1_equipment_type","text","YES",NULL
+"bos_sys4_type1_make","text","YES",NULL
+"bos_sys4_type1_model","text","YES",NULL
+"bos_sys4_type1_amp_rating","text","YES",NULL
+"bos_sys4_type1_is_new","boolean","YES",NULL
+"bos_sys4_type1_active","boolean","YES",NULL
+"bos_sys4_type2_equipment_type","text","YES",NULL
+"bos_sys4_type2_make","text","YES",NULL
+"bos_sys4_type2_model","text","YES",NULL
+"bos_sys4_type2_amp_rating","text","YES",NULL
+"bos_sys4_type2_is_new","boolean","YES",NULL
+"bos_sys4_type2_active","boolean","YES",NULL
+"bos_sys4_type3_equipment_type","text","YES",NULL
+"bos_sys4_type3_make","text","YES",NULL
+"bos_sys4_type3_model","text","YES",NULL
+"bos_sys4_type3_amp_rating","text","YES",NULL
+"bos_sys4_type3_is_new","boolean","YES",NULL
+"bos_sys4_type3_active","boolean","YES",NULL
+"bos_sys4_show_type1","boolean","YES",NULL
+"bos_sys4_show_type2","boolean","YES",NULL
+"bos_sys4_show_type3","boolean","YES",NULL
+"sys1_stringing_type","text","YES",NULL
+"sys2_ele_breaker_location","character varying","YES",NULL
+"sys3_ele_breaker_location","character varying","YES",NULL
+"sys4_ele_breaker_location","character varying","YES",NULL
+"sys1_pcs_amps","integer","YES",NULL
+"sys2_pcs_amps","integer","YES",NULL
+"sys3_pcs_amps","integer","YES",NULL
+"sys4_pcs_amps","integer","YES",NULL
+"isacintegrated","boolean","YES","false"
+"ele_bathroom_circuits","text","YES",NULL
+"ele_laundry_circuits","text","YES",NULL
+"ele_electric_vehicle_amps","text","YES",NULL
+"ele_hvac_air_handler_amps","text","YES",NULL
+"spb_floor_area","text","YES",NULL
+"spb_bathroom_circuits","text","YES",NULL
+"spb_laundry_circuits","text","YES",NULL
+"spb_electric_vehicle_amps","text","YES",NULL
+"spb_hvac_air_handler_amps","text","YES",NULL
+"spb_electrical_furnace_amps","text","YES",NULL
+"spb_ac_unit_amps","text","YES",NULL
+"special_scenario","character varying","NO","'none'::character varying"
+"special_scenario_reason","text","YES",NULL
+"affected_systems","character varying","YES",NULL
+"ele_combine_systems","boolean","YES","false"
+"ele_combine_active_systems","character varying","YES",NULL
+"ele_combine_system_desc","character varying","YES",NULL
+"sys1_landing_destination","character varying","YES",NULL
+"sys2_landing_destination","character varying","YES",NULL
+"sys3_landing_destination","character varying","YES",NULL
+"sys4_landing_destination","character varying","YES",NULL
+"bos_sys1_type4_equipment_type","character varying","YES",NULL
+"bos_sys1_type4_make","character varying","YES",NULL
+"bos_sys1_type4_model","character varying","YES",NULL
+"bos_sys1_type4_amp_rating","character varying","YES",NULL
+"bos_sys1_type4_is_new","boolean","YES","true"
+"bos_sys1_type4_active","boolean","YES","false"
+"bos_sys1_type5_equipment_type","character varying","YES",NULL
+"bos_sys1_type5_make","character varying","YES",NULL
+"bos_sys1_type5_model","character varying","YES",NULL
+"bos_sys1_type5_amp_rating","character varying","YES",NULL
+"bos_sys1_type5_is_new","boolean","YES","true"
+"bos_sys1_type5_active","boolean","YES","false"
+"bos_sys1_type6_equipment_type","character varying","YES",NULL
+"bos_sys1_type6_make","character varying","YES",NULL
+"bos_sys1_type6_model","character varying","YES",NULL
+"bos_sys1_type6_amp_rating","character varying","YES",NULL
+"bos_sys1_type6_is_new","boolean","YES","true"
+"bos_sys1_type6_active","boolean","YES","false"
+"bos_sys2_type4_equipment_type","character varying","YES",NULL
+"bos_sys2_type4_make","character varying","YES",NULL
+"bos_sys2_type4_model","character varying","YES",NULL
+"bos_sys2_type4_amp_rating","character varying","YES",NULL
+"bos_sys2_type4_is_new","boolean","YES","true"
+"bos_sys2_type4_active","boolean","YES","false"
+"bos_sys2_type5_equipment_type","character varying","YES",NULL
+"bos_sys2_type5_make","character varying","YES",NULL
+"bos_sys2_type5_model","character varying","YES",NULL
+"bos_sys2_type5_amp_rating","character varying","YES",NULL
+"bos_sys2_type5_is_new","boolean","YES","true"
+"bos_sys2_type5_active","boolean","YES","false"
+"bos_sys2_type6_equipment_type","character varying","YES",NULL
+"bos_sys2_type6_make","character varying","YES",NULL
+"bos_sys2_type6_model","character varying","YES",NULL
+"bos_sys2_type6_amp_rating","character varying","YES",NULL
+"bos_sys2_type6_is_new","boolean","YES","true"
+"bos_sys2_type6_active","boolean","YES","false"
+"bos_sys3_type4_equipment_type","character varying","YES",NULL
+"bos_sys3_type4_make","character varying","YES",NULL
+"bos_sys3_type4_model","character varying","YES",NULL
+"bos_sys3_type4_amp_rating","character varying","YES",NULL
+"bos_sys3_type4_is_new","boolean","YES","true"
+"bos_sys3_type4_active","boolean","YES","false"
+"bos_sys3_type5_equipment_type","character varying","YES",NULL
+"bos_sys3_type5_make","character varying","YES",NULL
+"bos_sys3_type5_model","character varying","YES",NULL
+"bos_sys3_type5_amp_rating","character varying","YES",NULL
+"bos_sys3_type5_is_new","boolean","YES","true"
+"bos_sys3_type5_active","boolean","YES","false"
+"bos_sys3_type6_equipment_type","character varying","YES",NULL
+"bos_sys3_type6_make","character varying","YES",NULL
+"bos_sys3_type6_model","character varying","YES",NULL
+"bos_sys3_type6_amp_rating","character varying","YES",NULL
+"bos_sys3_type6_is_new","boolean","YES","true"
+"bos_sys3_type6_active","boolean","YES","false"
+"bos_sys4_type4_equipment_type","character varying","YES",NULL
+"bos_sys4_type4_make","character varying","YES",NULL
+"bos_sys4_type4_model","character varying","YES",NULL
+"bos_sys4_type4_amp_rating","character varying","YES",NULL
+"bos_sys4_type4_is_new","boolean","YES","true"
+"bos_sys4_type4_active","boolean","YES","false"
+"bos_sys4_type5_equipment_type","character varying","YES",NULL
+"bos_sys4_type5_make","character varying","YES",NULL
+"bos_sys4_type5_model","character varying","YES",NULL
+"bos_sys4_type5_amp_rating","character varying","YES",NULL
+"bos_sys4_type5_is_new","boolean","YES","true"
+"bos_sys4_type5_active","boolean","YES","false"
+"bos_sys4_type6_equipment_type","character varying","YES",NULL
+"bos_sys4_type6_make","character varying","YES",NULL
+"bos_sys4_type6_model","character varying","YES",NULL
+"bos_sys4_type6_amp_rating","character varying","YES",NULL
+"bos_sys4_type6_is_new","boolean","YES","true"
+"bos_sys4_type6_active","boolean","YES","false"
+"bos_sys1_type1_trigger","character varying","YES",NULL
+"bos_sys1_type2_trigger","character varying","YES",NULL
+"bos_sys1_type3_trigger","character varying","YES",NULL
+"bos_sys1_type4_trigger","character varying","YES",NULL
+"bos_sys1_type5_trigger","character varying","YES",NULL
+"bos_sys1_type6_trigger","character varying","YES",NULL
+"bos_sys2_type1_trigger","character varying","YES",NULL
+"bos_sys2_type2_trigger","character varying","YES",NULL
+"bos_sys2_type3_trigger","character varying","YES",NULL
+"bos_sys2_type4_trigger","character varying","YES",NULL
+"bos_sys2_type5_trigger","character varying","YES",NULL
+"bos_sys2_type6_trigger","character varying","YES",NULL
+"bos_sys3_type1_trigger","character varying","YES",NULL
+"bos_sys3_type2_trigger","character varying","YES",NULL
+"bos_sys3_type3_trigger","character varying","YES",NULL
+"bos_sys3_type4_trigger","character varying","YES",NULL
+"bos_sys3_type5_trigger","character varying","YES",NULL
+"bos_sys3_type6_trigger","character varying","YES",NULL
+"bos_sys4_type1_trigger","character varying","YES",NULL
+"bos_sys4_type2_trigger","character varying","YES",NULL
+"bos_sys4_type3_trigger","character varying","YES",NULL
+"bos_sys4_type4_trigger","character varying","YES",NULL
+"bos_sys4_type5_trigger","character varying","YES",NULL
+"bos_sys4_type6_trigger","character varying","YES",NULL
+"post_sms_bos_sys1_type1_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys1_type1_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys1_type1_make","character varying","YES",NULL
+"post_sms_bos_sys1_type1_model","character varying","YES",NULL
+"post_sms_bos_sys1_type1_is_new","boolean","YES","true"
+"post_sms_bos_sys1_type1_trigger","character varying","YES",NULL
+"post_sms_bos_sys1_type1_active","boolean","YES","false"
+"post_sms_bos_sys2_type1_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys2_type1_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys2_type1_make","character varying","YES",NULL
+"post_sms_bos_sys2_type1_model","character varying","YES",NULL
+"post_sms_bos_sys2_type1_is_new","boolean","YES","true"
+"post_sms_bos_sys2_type1_trigger","character varying","YES",NULL
+"post_sms_bos_sys2_type1_active","boolean","YES","false"
+"post_sms_bos_sys3_type1_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys3_type1_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys3_type1_make","character varying","YES",NULL
+"post_sms_bos_sys3_type1_model","character varying","YES",NULL
+"post_sms_bos_sys3_type1_is_new","boolean","YES","true"
+"post_sms_bos_sys3_type1_trigger","character varying","YES",NULL
+"post_sms_bos_sys3_type1_active","boolean","YES","false"
+"post_sms_bos_sys4_type1_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys4_type1_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys4_type1_make","character varying","YES",NULL
+"post_sms_bos_sys4_type1_model","character varying","YES",NULL
+"post_sms_bos_sys4_type1_is_new","boolean","YES","true"
+"post_sms_bos_sys4_type1_trigger","character varying","YES",NULL
+"post_sms_bos_sys4_type1_active","boolean","YES","false"
+"post_sms_bos_sys1_type2_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys1_type2_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys1_type2_make","character varying","YES",NULL
+"post_sms_bos_sys1_type2_model","character varying","YES",NULL
+"post_sms_bos_sys1_type2_is_new","boolean","YES","true"
+"post_sms_bos_sys1_type2_trigger","character varying","YES",NULL
+"post_sms_bos_sys1_type2_active","boolean","YES","false"
+"post_sms_bos_sys2_type2_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys2_type2_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys2_type2_make","character varying","YES",NULL
+"post_sms_bos_sys2_type2_model","character varying","YES",NULL
+"post_sms_bos_sys2_type2_is_new","boolean","YES","true"
+"post_sms_bos_sys2_type2_trigger","character varying","YES",NULL
+"post_sms_bos_sys2_type2_active","boolean","YES","false"
+"post_sms_bos_sys3_type2_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys3_type2_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys3_type2_make","character varying","YES",NULL
+"post_sms_bos_sys3_type2_model","character varying","YES",NULL
+"post_sms_bos_sys3_type2_is_new","boolean","YES","true"
+"post_sms_bos_sys3_type2_trigger","character varying","YES",NULL
+"post_sms_bos_sys3_type2_active","boolean","YES","false"
+"post_sms_bos_sys4_type2_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys4_type2_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys4_type2_make","character varying","YES",NULL
+"post_sms_bos_sys4_type2_model","character varying","YES",NULL
+"post_sms_bos_sys4_type2_is_new","boolean","YES","true"
+"post_sms_bos_sys4_type2_trigger","character varying","YES",NULL
+"post_sms_bos_sys4_type2_active","boolean","YES","false"
+"post_sms_bos_sys1_type3_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys1_type3_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys1_type3_make","character varying","YES",NULL
+"post_sms_bos_sys1_type3_model","character varying","YES",NULL
+"post_sms_bos_sys1_type3_is_new","boolean","YES","true"
+"post_sms_bos_sys1_type3_trigger","character varying","YES",NULL
+"post_sms_bos_sys1_type3_active","boolean","YES","false"
+"post_sms_bos_sys2_type3_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys2_type3_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys2_type3_make","character varying","YES",NULL
+"post_sms_bos_sys2_type3_model","character varying","YES",NULL
+"post_sms_bos_sys2_type3_is_new","boolean","YES","true"
+"post_sms_bos_sys2_type3_trigger","character varying","YES",NULL
+"post_sms_bos_sys2_type3_active","boolean","YES","false"
+"post_sms_bos_sys3_type3_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys3_type3_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys3_type3_make","character varying","YES",NULL
+"post_sms_bos_sys3_type3_model","character varying","YES",NULL
+"post_sms_bos_sys3_type3_is_new","boolean","YES","true"
+"post_sms_bos_sys3_type3_trigger","character varying","YES",NULL
+"post_sms_bos_sys3_type3_active","boolean","YES","false"
+"post_sms_bos_sys4_type3_equipment_type","character varying","YES",NULL
+"post_sms_bos_sys4_type3_amp_rating","character varying","YES",NULL
+"post_sms_bos_sys4_type3_make","character varying","YES",NULL
+"post_sms_bos_sys4_type3_model","character varying","YES",NULL
+"post_sms_bos_sys4_type3_is_new","boolean","YES","true"
+"post_sms_bos_sys4_type3_trigger","character varying","YES",NULL
+"post_sms_bos_sys4_type3_active","boolean","YES","false"
+"bos_sys1_battery1_type1_equipment_type","character varying","YES",NULL
+"bos_sys1_battery1_type1_make","character varying","YES",NULL
+"bos_sys1_battery1_type1_model","character varying","YES",NULL
+"bos_sys1_battery1_type1_amp_rating","character varying","YES",NULL
+"bos_sys1_battery1_type1_is_new","boolean","YES","true"
+"bos_sys1_battery1_type1_trigger","character varying","YES",NULL
+"bos_sys1_battery1_type2_equipment_type","character varying","YES",NULL
+"bos_sys1_battery1_type2_make","character varying","YES",NULL
+"bos_sys1_battery1_type2_model","character varying","YES",NULL
+"bos_sys1_battery1_type2_amp_rating","character varying","YES",NULL
+"bos_sys1_battery1_type2_is_new","boolean","YES","true"
+"bos_sys1_battery1_type2_trigger","character varying","YES",NULL
+"bos_sys1_battery2_type1_equipment_type","character varying","YES",NULL
+"bos_sys1_battery2_type1_make","character varying","YES",NULL
+"bos_sys1_battery2_type1_model","character varying","YES",NULL
+"bos_sys1_battery2_type1_amp_rating","character varying","YES",NULL
+"bos_sys1_battery2_type1_is_new","boolean","YES","true"
+"bos_sys1_battery2_type1_trigger","character varying","YES",NULL
+"bos_sys1_battery2_type2_equipment_type","character varying","YES",NULL
+"bos_sys1_battery2_type2_make","character varying","YES",NULL
+"bos_sys1_battery2_type2_model","character varying","YES",NULL
+"bos_sys1_battery2_type2_amp_rating","character varying","YES",NULL
+"bos_sys1_battery2_type2_is_new","boolean","YES","true"
+"bos_sys1_battery2_type2_trigger","character varying","YES",NULL
+"bos_sys1_backup_type1_equipment_type","character varying","YES",NULL
+"bos_sys1_backup_type1_make","character varying","YES",NULL
+"bos_sys1_backup_type1_model","character varying","YES",NULL
+"bos_sys1_backup_type1_amp_rating","character varying","YES",NULL
+"bos_sys1_backup_type1_is_new","boolean","YES","true"
+"bos_sys1_backup_type1_trigger","character varying","YES",NULL
+"bos_sys1_backup_type2_equipment_type","character varying","YES",NULL
+"bos_sys1_backup_type2_make","character varying","YES",NULL
+"bos_sys1_backup_type2_model","character varying","YES",NULL
+"bos_sys1_backup_type2_amp_rating","character varying","YES",NULL
+"bos_sys1_backup_type2_is_new","boolean","YES","true"
+"bos_sys1_backup_type2_trigger","character varying","YES",NULL
+"bos_sys1_backup_type3_equipment_type","character varying","YES",NULL
+"bos_sys1_backup_type3_make","character varying","YES",NULL
+"bos_sys1_backup_type3_model","character varying","YES",NULL
+"bos_sys1_backup_type3_amp_rating","character varying","YES",NULL
+"bos_sys1_backup_type3_is_new","boolean","YES","true"
+"bos_sys1_backup_type3_trigger","character varying","YES",NULL
+"bos_sys2_battery1_type1_equipment_type","character varying","YES",NULL
+"bos_sys2_battery1_type1_make","character varying","YES",NULL
+"bos_sys2_battery1_type1_model","character varying","YES",NULL
+"bos_sys2_battery1_type1_amp_rating","character varying","YES",NULL
+"bos_sys2_battery1_type1_is_new","boolean","YES","true"
+"bos_sys2_battery1_type1_trigger","character varying","YES",NULL
+"bos_sys2_battery1_type2_equipment_type","character varying","YES",NULL
+"bos_sys2_battery1_type2_make","character varying","YES",NULL
+"bos_sys2_battery1_type2_model","character varying","YES",NULL
+"bos_sys2_battery1_type2_amp_rating","character varying","YES",NULL
+"bos_sys2_battery1_type2_is_new","boolean","YES","true"
+"bos_sys2_battery1_type2_trigger","character varying","YES",NULL
+"bos_sys2_battery2_type1_equipment_type","character varying","YES",NULL
+"bos_sys2_battery2_type1_make","character varying","YES",NULL
+"bos_sys2_battery2_type1_model","character varying","YES",NULL
+"bos_sys2_battery2_type1_amp_rating","character varying","YES",NULL
+"bos_sys2_battery2_type1_is_new","boolean","YES","true"
+"bos_sys2_battery2_type1_trigger","character varying","YES",NULL
+"bos_sys2_battery2_type2_equipment_type","character varying","YES",NULL
+"bos_sys2_battery2_type2_make","character varying","YES",NULL
+"bos_sys2_battery2_type2_model","character varying","YES",NULL
+"bos_sys2_battery2_type2_amp_rating","character varying","YES",NULL
+"bos_sys2_battery2_type2_is_new","boolean","YES","true"
+"bos_sys2_battery2_type2_trigger","character varying","YES",NULL
+"bos_sys2_backup_type1_equipment_type","character varying","YES",NULL
+"bos_sys2_backup_type1_make","character varying","YES",NULL
+"bos_sys2_backup_type1_model","character varying","YES",NULL
+"bos_sys2_backup_type1_amp_rating","character varying","YES",NULL
+"bos_sys2_backup_type1_is_new","boolean","YES","true"
+"bos_sys2_backup_type1_trigger","character varying","YES",NULL
+"bos_sys2_backup_type2_equipment_type","character varying","YES",NULL
+"bos_sys2_backup_type2_make","character varying","YES",NULL
+"bos_sys2_backup_type2_model","character varying","YES",NULL
+"bos_sys2_backup_type2_amp_rating","character varying","YES",NULL
+"bos_sys2_backup_type2_is_new","boolean","YES","true"
+"bos_sys2_backup_type2_trigger","character varying","YES",NULL
+"bos_sys2_backup_type3_equipment_type","character varying","YES",NULL
+"bos_sys2_backup_type3_make","character varying","YES",NULL
+"bos_sys2_backup_type3_model","character varying","YES",NULL
+"bos_sys2_backup_type3_amp_rating","character varying","YES",NULL
+"bos_sys2_backup_type3_is_new","boolean","YES","true"
+"bos_sys2_backup_type3_trigger","character varying","YES",NULL
+"bos_sys3_battery1_type1_equipment_type","character varying","YES",NULL
+"bos_sys3_battery1_type1_make","character varying","YES",NULL
+"bos_sys3_battery1_type1_model","character varying","YES",NULL
+"bos_sys3_battery1_type1_amp_rating","character varying","YES",NULL
+"bos_sys3_battery1_type1_is_new","boolean","YES","true"
+"bos_sys3_battery1_type1_trigger","character varying","YES",NULL
+"bos_sys3_battery1_type2_equipment_type","character varying","YES",NULL
+"bos_sys3_battery1_type2_make","character varying","YES",NULL
+"bos_sys3_battery1_type2_model","character varying","YES",NULL
+"bos_sys3_battery1_type2_amp_rating","character varying","YES",NULL
+"bos_sys3_battery1_type2_is_new","boolean","YES","true"
+"bos_sys3_battery1_type2_trigger","character varying","YES",NULL
+"bos_sys3_battery2_type1_equipment_type","character varying","YES",NULL
+"bos_sys3_battery2_type1_make","character varying","YES",NULL
+"bos_sys3_battery2_type1_model","character varying","YES",NULL
+"bos_sys3_battery2_type1_amp_rating","character varying","YES",NULL
+"bos_sys3_battery2_type1_is_new","boolean","YES","true"
+"bos_sys3_battery2_type1_trigger","character varying","YES",NULL
+"bos_sys3_battery2_type2_equipment_type","character varying","YES",NULL
+"bos_sys3_battery2_type2_make","character varying","YES",NULL
+"bos_sys3_battery2_type2_model","character varying","YES",NULL
+"bos_sys3_battery2_type2_amp_rating","character varying","YES",NULL
+"bos_sys3_battery2_type2_is_new","boolean","YES","true"
+"bos_sys3_battery2_type2_trigger","character varying","YES",NULL
+"bos_sys3_backup_type1_equipment_type","character varying","YES",NULL
+"bos_sys3_backup_type1_make","character varying","YES",NULL
+"bos_sys3_backup_type1_model","character varying","YES",NULL
+"bos_sys3_backup_type1_amp_rating","character varying","YES",NULL
+"bos_sys3_backup_type1_is_new","boolean","YES","true"
+"bos_sys3_backup_type1_trigger","character varying","YES",NULL
+"bos_sys3_backup_type2_equipment_type","character varying","YES",NULL
+"bos_sys3_backup_type2_make","character varying","YES",NULL
+"bos_sys3_backup_type2_model","character varying","YES",NULL
+"bos_sys3_backup_type2_amp_rating","character varying","YES",NULL
+"bos_sys3_backup_type2_is_new","boolean","YES","true"
+"bos_sys3_backup_type2_trigger","character varying","YES",NULL
+"bos_sys3_backup_type3_equipment_type","character varying","YES",NULL
+"bos_sys3_backup_type3_make","character varying","YES",NULL
+"bos_sys3_backup_type3_model","character varying","YES",NULL
+"bos_sys3_backup_type3_amp_rating","character varying","YES",NULL
+"bos_sys3_backup_type3_is_new","boolean","YES","true"
+"bos_sys3_backup_type3_trigger","character varying","YES",NULL
+"bos_sys4_battery1_type1_equipment_type","character varying","YES",NULL
+"bos_sys4_battery1_type1_make","character varying","YES",NULL
+"bos_sys4_battery1_type1_model","character varying","YES",NULL
+"bos_sys4_battery1_type1_amp_rating","character varying","YES",NULL
+"bos_sys4_battery1_type1_is_new","boolean","YES","true"
+"bos_sys4_battery1_type1_trigger","character varying","YES",NULL
+"bos_sys4_battery1_type2_equipment_type","character varying","YES",NULL
+"bos_sys4_battery1_type2_make","character varying","YES",NULL
+"bos_sys4_battery1_type2_model","character varying","YES",NULL
+"bos_sys4_battery1_type2_amp_rating","character varying","YES",NULL
+"bos_sys4_battery1_type2_is_new","boolean","YES","true"
+"bos_sys4_battery1_type2_trigger","character varying","YES",NULL
+"bos_sys4_battery2_type1_equipment_type","character varying","YES",NULL
+"bos_sys4_battery2_type1_make","character varying","YES",NULL
+"bos_sys4_battery2_type1_model","character varying","YES",NULL
+"bos_sys4_battery2_type1_amp_rating","character varying","YES",NULL
+"bos_sys4_battery2_type1_is_new","boolean","YES","true"
+"bos_sys4_battery2_type1_trigger","character varying","YES",NULL
+"bos_sys4_battery2_type2_equipment_type","character varying","YES",NULL
+"bos_sys4_battery2_type2_make","character varying","YES",NULL
+"bos_sys4_battery2_type2_model","character varying","YES",NULL
+"bos_sys4_battery2_type2_amp_rating","character varying","YES",NULL
+"bos_sys4_battery2_type2_is_new","boolean","YES","true"
+"bos_sys4_battery2_type2_trigger","character varying","YES",NULL
+"bos_sys4_backup_type1_equipment_type","character varying","YES",NULL
+"bos_sys4_backup_type1_make","character varying","YES",NULL
+"bos_sys4_backup_type1_model","character varying","YES",NULL
+"bos_sys4_backup_type1_amp_rating","character varying","YES",NULL
+"bos_sys4_backup_type1_is_new","boolean","YES","true"
+"bos_sys4_backup_type1_trigger","character varying","YES",NULL
+"bos_sys4_backup_type2_equipment_type","character varying","YES",NULL
+"bos_sys4_backup_type2_make","character varying","YES",NULL
+"bos_sys4_backup_type2_model","character varying","YES",NULL
+"bos_sys4_backup_type2_amp_rating","character varying","YES",NULL
+"bos_sys4_backup_type2_is_new","boolean","YES","true"
+"bos_sys4_backup_type2_trigger","character varying","YES",NULL
+"bos_sys4_backup_type3_equipment_type","character varying","YES",NULL
+"bos_sys4_backup_type3_make","character varying","YES",NULL
+"bos_sys4_backup_type3_model","character varying","YES",NULL
+"bos_sys4_backup_type3_amp_rating","character varying","YES",NULL
+"bos_sys4_backup_type3_is_new","boolean","YES","true"
+"bos_sys4_backup_type3_trigger","character varying","YES",NULL
+"bos_sys1_lastslot","integer","YES",NULL
+"bos_sys2_lastslot","integer","YES",NULL
+"bos_sys3_lastslot","integer","YES",NULL
+"bos_sys4_lastslot","integer","YES",NULL
+"bos_sys1_type1_block_name","character varying","YES",NULL
+"bos_sys1_type2_block_name","character varying","YES",NULL
+"bos_sys1_type3_block_name","character varying","YES",NULL
+"bos_sys1_type4_block_name","character varying","YES",NULL
+"bos_sys1_type5_block_name","character varying","YES",NULL
+"bos_sys1_type6_block_name","character varying","YES",NULL
+"bos_sys1_battery1_type1_block_name","character varying","YES",NULL
+"bos_sys1_battery1_type2_block_name","character varying","YES",NULL
+"bos_sys1_battery2_type1_block_name","character varying","YES",NULL
+"bos_sys1_battery2_type2_block_name","character varying","YES",NULL
+"bos_sys1_backup_type1_block_name","character varying","YES",NULL
+"bos_sys1_backup_type2_block_name","character varying","YES",NULL
+"bos_sys1_backup_type3_block_name","character varying","YES",NULL
+"post_sms_bos_sys1_type1_block_name","character varying","YES",NULL
+"post_sms_bos_sys1_type2_block_name","character varying","YES",NULL
+"post_sms_bos_sys1_type3_block_name","character varying","YES",NULL
+"bos_sys2_type1_block_name","character varying","YES",NULL
+"bos_sys2_type2_block_name","character varying","YES",NULL
+"bos_sys2_type3_block_name","character varying","YES",NULL
+"bos_sys2_type4_block_name","character varying","YES",NULL
+"bos_sys2_type5_block_name","character varying","YES",NULL
+"bos_sys2_type6_block_name","character varying","YES",NULL
+"bos_sys2_battery1_type1_block_name","character varying","YES",NULL
+"bos_sys2_battery1_type2_block_name","character varying","YES",NULL
+"bos_sys2_battery2_type1_block_name","character varying","YES",NULL
+"bos_sys2_battery2_type2_block_name","character varying","YES",NULL
+"bos_sys2_backup_type1_block_name","character varying","YES",NULL
+"bos_sys2_backup_type2_block_name","character varying","YES",NULL
+"bos_sys2_backup_type3_block_name","character varying","YES",NULL
+"post_sms_bos_sys2_type1_block_name","character varying","YES",NULL
+"post_sms_bos_sys2_type2_block_name","character varying","YES",NULL
+"post_sms_bos_sys2_type3_block_name","character varying","YES",NULL
+"bos_sys3_type1_block_name","character varying","YES",NULL
+"bos_sys3_type2_block_name","character varying","YES",NULL
+"bos_sys3_type3_block_name","character varying","YES",NULL
+"bos_sys3_type4_block_name","character varying","YES",NULL
+"bos_sys3_type5_block_name","character varying","YES",NULL
+"bos_sys3_type6_block_name","character varying","YES",NULL
+"bos_sys3_battery1_type1_block_name","character varying","YES",NULL
+"bos_sys3_battery1_type2_block_name","character varying","YES",NULL
+"bos_sys3_battery2_type1_block_name","character varying","YES",NULL
+"bos_sys3_battery2_type2_block_name","character varying","YES",NULL
+"bos_sys3_backup_type1_block_name","character varying","YES",NULL
+"bos_sys3_backup_type2_block_name","character varying","YES",NULL
+"bos_sys3_backup_type3_block_name","character varying","YES",NULL
+"post_sms_bos_sys3_type1_block_name","character varying","YES",NULL
+"post_sms_bos_sys3_type2_block_name","character varying","YES",NULL
+"post_sms_bos_sys3_type3_block_name","character varying","YES",NULL
+"bos_sys4_type1_block_name","character varying","YES",NULL
+"bos_sys4_type2_block_name","character varying","YES",NULL
+"bos_sys4_type3_block_name","character varying","YES",NULL
+"bos_sys4_type4_block_name","character varying","YES",NULL
+"bos_sys4_type5_block_name","character varying","YES",NULL
+"bos_sys4_type6_block_name","character varying","YES",NULL
+"bos_sys4_battery1_type1_block_name","character varying","YES",NULL
+"bos_sys4_battery1_type2_block_name","character varying","YES",NULL
+"bos_sys4_battery2_type1_block_name","character varying","YES",NULL
+"bos_sys4_battery2_type2_block_name","character varying","YES",NULL
+"bos_sys4_backup_type1_block_name","character varying","YES",NULL
+"bos_sys4_backup_type2_block_name","character varying","YES",NULL
+"bos_sys4_backup_type3_block_name","character varying","YES",NULL
+"post_sms_bos_sys4_type1_block_name","character varying","YES",NULL
+"post_sms_bos_sys4_type2_block_name","character varying","YES",NULL
+"post_sms_bos_sys4_type3_block_name","character varying","YES",NULL
+"selected_additional_services","text","YES",NULL
+"sys1_battery1_tie_in_location","text","YES",NULL
+"sys1_battery2_tie_in_location","text","YES",NULL
+"sys2_battery1_tie_in_location","text","YES",NULL
+"sys2_battery2_tie_in_location","text","YES",NULL
+"sys3_battery1_tie_in_location","text","YES",NULL
+"sys3_battery2_tie_in_location","text","YES",NULL
+"sys4_battery1_tie_in_location","text","YES",NULL
+"sys4_battery2_tie_in_location","text","YES",NULL
+"sys1_isacintegrated","boolean","YES","false"
+"sys2_isacintegrated","boolean","YES","false"
+"sys3_isacintegrated","boolean","YES","false"
+"sys4_isacintegrated","boolean","YES","false"
+"bos_sys1_battery1_type3_equipment_type","character varying","YES",NULL
+"bos_sys1_battery1_type3_make","character varying","YES",NULL
+"bos_sys1_battery1_type3_model","character varying","YES",NULL
+"bos_sys1_battery1_type3_amp_rating","character varying","YES",NULL
+"bos_sys1_battery1_type3_is_new","boolean","YES","true"
+"bos_sys1_battery1_type3_trigger","character varying","YES",NULL
+"bos_sys1_battery1_type3_block_name","character varying","YES",NULL
+"bos_sys1_battery2_type3_equipment_type","character varying","YES",NULL
+"bos_sys1_battery2_type3_make","character varying","YES",NULL
+"bos_sys1_battery2_type3_model","character varying","YES",NULL
+"bos_sys1_battery2_type3_amp_rating","character varying","YES",NULL
+"bos_sys1_battery2_type3_is_new","boolean","YES","true"
+"bos_sys1_battery2_type3_trigger","character varying","YES",NULL
+"bos_sys1_battery2_type3_block_name","character varying","YES",NULL
+"bos_sys2_battery1_type3_equipment_type","character varying","YES",NULL
+"bos_sys2_battery1_type3_make","character varying","YES",NULL
+"bos_sys2_battery1_type3_model","character varying","YES",NULL
+"bos_sys2_battery1_type3_amp_rating","character varying","YES",NULL
+"bos_sys2_battery1_type3_is_new","boolean","YES","true"
+"bos_sys2_battery1_type3_trigger","character varying","YES",NULL
+"bos_sys2_battery1_type3_block_name","character varying","YES",NULL
+"bos_sys2_battery2_type3_equipment_type","character varying","YES",NULL
+"bos_sys2_battery2_type3_make","character varying","YES",NULL
+"bos_sys2_battery2_type3_model","character varying","YES",NULL
+"bos_sys2_battery2_type3_amp_rating","character varying","YES",NULL
+"bos_sys2_battery2_type3_is_new","boolean","YES","true"
+"bos_sys2_battery2_type3_trigger","character varying","YES",NULL
+"bos_sys2_battery2_type3_block_name","character varying","YES",NULL
+"bos_sys3_battery1_type3_equipment_type","character varying","YES",NULL
+"bos_sys3_battery1_type3_make","character varying","YES",NULL
+"bos_sys3_battery1_type3_model","character varying","YES",NULL
+"bos_sys3_battery1_type3_amp_rating","character varying","YES",NULL
+"bos_sys3_battery1_type3_is_new","boolean","YES","true"
+"bos_sys3_battery1_type3_trigger","character varying","YES",NULL
+"bos_sys3_battery1_type3_block_name","character varying","YES",NULL
+"bos_sys3_battery2_type3_equipment_type","character varying","YES",NULL
+"bos_sys3_battery2_type3_make","character varying","YES",NULL
+"bos_sys3_battery2_type3_model","character varying","YES",NULL
+"bos_sys3_battery2_type3_amp_rating","character varying","YES",NULL
+"bos_sys3_battery2_type3_is_new","boolean","YES","true"
+"bos_sys3_battery2_type3_trigger","character varying","YES",NULL
+"bos_sys3_battery2_type3_block_name","character varying","YES",NULL
+"bos_sys4_battery1_type3_equipment_type","character varying","YES",NULL
+"bos_sys4_battery1_type3_make","character varying","YES",NULL
+"bos_sys4_battery1_type3_model","character varying","YES",NULL
+"bos_sys4_battery1_type3_amp_rating","character varying","YES",NULL
+"bos_sys4_battery1_type3_is_new","boolean","YES","true"
+"bos_sys4_battery1_type3_trigger","character varying","YES",NULL
+"bos_sys4_battery1_type3_block_name","character varying","YES",NULL
+"bos_sys4_battery2_type3_equipment_type","character varying","YES",NULL
+"bos_sys4_battery2_type3_make","character varying","YES",NULL
+"bos_sys4_battery2_type3_model","character varying","YES",NULL
+"bos_sys4_battery2_type3_amp_rating","character varying","YES",NULL
+"bos_sys4_battery2_type3_is_new","boolean","YES","true"
+"bos_sys4_battery2_type3_trigger","character varying","YES",NULL
+"bos_sys4_battery2_type3_block_name","character varying","YES",NULL
+"sys1_sms_equipment_type","character varying","YES",NULL
+"sys2_sms_equipment_type","character varying","YES",NULL
+"sys3_sms_equipment_type","character varying","YES",NULL
+"sys4_sms_equipment_type","character varying","YES",NULL

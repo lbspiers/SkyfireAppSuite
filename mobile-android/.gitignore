@@ -1,0 +1,40 @@
+# Node / RN
+node_modules/
+npm-debug.log*
+yarn*.log*
+expo/*
+.expo*
+dist/
+coverage/
+# Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/build/
+android/app/build/
+*.iml
+# iOS
+ios/Pods/
+ios/build/
+ios/*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+ios/DerivedData/
+*.xcuserdatad
+*.xcuserdata
+ios/main.jsbundle
+ios/assets/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets / Keys (keep these out of git)
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+.env
+.env.*
+GoogleService-Info.plist
+google-services.json

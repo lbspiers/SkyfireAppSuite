@@ -1,0 +1,107 @@
+/* CircleToggle - Radio-style toggle component */
+
+.container {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--spacing);
+  cursor: pointer;
+  user-select: none;
+}
+
+.disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.circle {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: var(--radius-circle);
+  background: var(--gradient-input);
+  border: 1px solid #888888;
+  transition: var(--transition-base);
+}
+
+.circle:hover:not(.disabled) {
+  border-color: var(--color-primary);
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: inherit;
+  margin: 0;
+}
+
+.input:focus-visible ~ .dot {
+  box-shadow: 0 0 0 2px var(--bg-panel), 0 0 0 4px var(--border-focus);
+}
+
+.dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: var(--radius-circle);
+  background: var(--color-primary);
+  transition: var(--transition-base);
+}
+
+.checked {
+  border-color: var(--color-primary);
+  background: var(--gradient-input);
+}
+
+.checked .dot {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Sizes */
+.sm {
+  width: 16px;
+  height: 16px;
+}
+.sm .dot {
+  width: 8px;
+  height: 8px;
+}
+
+.md {
+  width: 20px;
+  height: 20px;
+}
+.md .dot {
+  width: 10px;
+  height: 10px;
+}
+
+.lg {
+  width: 24px;
+  height: 24px;
+}
+.lg .dot {
+  width: 12px;
+  height: 12px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding-top: 1px;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.description {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+}

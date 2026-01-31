@@ -1,0 +1,113 @@
+/* ===== PDF MODAL STYLING ===== */
+.pdfModal {
+  background: rgba(0, 0, 0, 0.95);
+  padding: 0;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ===== HEADER BAR ===== */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing) var(--spacing);
+  background: var(--bg-page);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.fileName {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--gray-50);
+}
+
+.closeButton {
+  font-size: var(--text-2xl) !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  min-width: unset !important;
+}
+
+/* ===== PDF VIEWER AREA ===== */
+.pdfViewerArea {
+  flex: 1;
+  display: block;
+  background: var(--bg-panel);
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pdfIframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 1;
+}
+
+.loadingState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+}
+
+.loadingSpinner {
+  font-size: var(--text-4xl);
+  margin-bottom: var(--spacing);
+}
+
+/* ===== FOOTER BAR ===== */
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing) var(--spacing);
+  background: var(--bg-page);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footerLeft,
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.toolsButton {
+  border-radius: 1.5rem !important;
+}
+
+.annotationCount {
+  font-size: var(--text-sm);
+  color: var(--gray-400);
+  font-weight: 500;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  .modalHeader,
+  .modalFooter {
+    padding: var(--spacing) var(--spacing);
+  }
+
+  .fileName {
+    font-size: var(--text-sm);
+  }
+}

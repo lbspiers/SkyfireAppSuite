@@ -1,0 +1,59 @@
+/* ===== SELECT COLORS ===== */
+.selectFilled {
+  color: var(--gray-50);
+}
+
+.selectEmpty {
+  color: var(--gray-500);
+}
+
+/* ===== RSD BUTTON GROUP ===== */
+.rsdButtonGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.rsdButton {
+  width: auto;
+  padding: 0.375rem 1rem;
+  min-width: 90px;
+}
+
+/* ===== BREAKER OVERRIDE HEADER ===== */
+.breakerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: var(--color-primary-dark);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+/* ===== BREAKER DEFAULT TEXT ===== */
+.breakerDefaultText {
+  color: var(--gray-50);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.375rem;
+}

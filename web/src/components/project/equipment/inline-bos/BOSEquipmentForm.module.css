@@ -1,0 +1,76 @@
+/**
+ * BOSEquipmentForm Component Styles
+ * Uses design tokens and proper component patterns
+ */
+
+.bosEquipmentForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* New/Existing Toggle Row with Max Output */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: var(--spacing-tight);
+}
+
+.toggleButtons {
+  display: flex;
+  gap: var(--spacing-tight);
+}
+
+.maxOutputDisplay {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  padding: var(--spacing-tight) var(--spacing);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+}
+
+.loadingText {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+  padding: var(--spacing-xs) 0;
+}
+
+.errorText {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.helpText {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing);
+  margin-top: var(--spacing);
+}
+
+@media (max-width: 768px) {
+  .toggleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-tight);
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,117 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--spacing-tight);
+  margin: 0;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--bg-panel), var(--bg-panel)) padding-box,
+              linear-gradient(135deg, #FF6B35 0%, var(--color-primary-light) 100%) border-box;
+  transition: var(--transition-base);
+}
+
+/* Variants */
+.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+}
+
+.info {
+  color: var(--text-primary);
+}
+
+.icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 var(--spacing) 0 0;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.title {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+}
+
+.message {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.action {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: currentColor;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.dismiss:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dismiss:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Collapsed state */
+.collapsed {
+  border: none;
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+}
+
+.collapsedLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+/* Cursor styles */
+.alertClickable {
+  cursor: pointer;
+}
+
+.alertDefault {
+  cursor: default;
+}
+
+/* Icon styles */
+.flameIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}

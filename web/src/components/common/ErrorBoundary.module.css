@@ -1,0 +1,113 @@
+.errorContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: var(--spacing-loose);
+}
+
+.errorCard {
+  background: #1e2a3a;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.errorIcon {
+  font-size: 64px;
+  margin-bottom: var(--spacing-loose);
+}
+
+.errorTitle {
+  color: var(--text-primary);
+  font-size: var(--text-3xl);
+  margin-bottom: var(--spacing);
+  font-weight: 600;
+}
+
+.errorMessage {
+  color: #a0aec0;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-wide);
+}
+
+.errorActions {
+  display: flex;
+  gap: var(--spacing);
+  justify-content: center;
+  margin-bottom: var(--spacing-wide);
+}
+
+.primaryButton {
+  background: var(--color-info);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) 24px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primaryButton:hover {
+  background: var(--color-accent-blue-dark);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: #a0aec0;
+  border: 1px solid var(--gray-700);
+  padding: var(--spacing-sm) 24px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover {
+  background: #2d3a4a;
+  color: var(--text-primary);
+}
+
+.errorDetails {
+  text-align: left;
+  margin-bottom: var(--spacing-loose);
+  color: var(--gray-500);
+  font-size: var(--text-sm);
+}
+
+.errorDetails summary {
+  cursor: pointer;
+  margin-bottom: var(--spacing-tight);
+}
+
+.errorDetails pre {
+  background: var(--gray-900);
+  padding: var(--spacing);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-size: var(--text-xs);
+  max-height: 200px;
+  overflow-y: auto;
+  color: var(--gray-400);
+}
+
+.dangerLink {
+  background: none;
+  border: none;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.7;
+}
+
+.dangerLink:hover {
+  opacity: 1;
+}

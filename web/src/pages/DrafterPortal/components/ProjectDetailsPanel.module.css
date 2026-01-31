@@ -1,0 +1,97 @@
+.panel {
+  background: var(--card-background, #1e1e1e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.panelTitle {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: var(--text-primary, var(--text-primary));
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary, #999);
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detailItem.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.detailLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary, #999);
+}
+
+.detailValue {
+  font-size: var(--text-base);
+  color: var(--text-primary, var(--text-primary));
+  line-height: 1.5;
+}
+
+.addressLink {
+  color: var(--color-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.addressLink:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.mapIcon {
+  font-size: var(--text-xl);
+}
+
+.notes {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-warning);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panel {
+    padding: 1rem;
+  }
+
+  .panelTitle {
+    font-size: var(--text-lg);
+  }
+
+  .detailValue {
+    font-size: var(--text-sm);
+  }
+
+  .detailLabel {
+    font-size: 0.6875rem;
+  }
+}

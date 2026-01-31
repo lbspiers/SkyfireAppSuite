@@ -1,0 +1,25 @@
+.preferredButton {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing-tight);
+  background: transparent;
+  border: var(--border-thin) solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.preferredButton:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--text-primary);
+}
+
+.preferredButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

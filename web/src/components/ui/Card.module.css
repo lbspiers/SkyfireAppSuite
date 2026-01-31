@@ -1,0 +1,82 @@
+.card {
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Variants */
+.default {
+  border: var(--border-thin) solid var(--border-subtle);
+}
+
+.elevated {
+  border: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.outlined {
+  background: transparent;
+  border: var(--border-thin) solid var(--border-default);
+}
+
+.glass {
+  background: var(--bg-glass);
+  border: var(--border-thin) solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+}
+
+/* Padding */
+.padding-none { padding: 0; }
+.padding-sm { padding: var(--spacing); }
+.padding-md { padding: var(--spacing-loose); }
+.padding-lg { padding: var(--spacing-wide); }
+
+/* Hover */
+.hoverable {
+  transition: var(--transition-base);
+}
+
+.hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-elevated);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Slots */
+.header {
+  padding: var(--spacing) var(--spacing-loose);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  font-weight: var(--font-semibold);
+}
+
+.body {
+  padding: var(--spacing-loose);
+}
+
+.footer {
+  padding: var(--spacing) var(--spacing-loose);
+  border-top: var(--border-thin) solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing);
+}
+
+/* When card has no padding, slots provide their own */
+.padding-none .header,
+.padding-none .footer {
+  padding: var(--spacing) var(--spacing-loose);
+}
+
+.padding-none .body {
+  padding: var(--spacing-loose);
+}

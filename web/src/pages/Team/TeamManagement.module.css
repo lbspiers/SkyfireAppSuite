@@ -1,0 +1,337 @@
+/**
+ * Team Management Styles
+ * Uses design tokens - no hardcoded values
+ */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-loose);
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Suggestions Section */
+.suggestionsSection {
+  margin-bottom: var(--spacing);
+}
+
+.suggestionsSection > *:not(:last-child) {
+  margin-bottom: var(--spacing-tight);
+}
+
+/* Live Indicator */
+.liveIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-bottom: var(--spacing);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  width: fit-content;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-circle);
+  background: var(--color-success);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+/* Loading */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+/* Member List */
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+/* Section Divider */
+.sectionDivider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  margin: var(--spacing) 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.sectionDivider::before,
+.sectionDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* Member Row */
+.memberRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: var(--transition-base);
+}
+
+.memberRow:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+}
+
+.pendingRow {
+  opacity: 0.8;
+  background: var(--bg-panel);
+}
+
+.pendingRow:hover {
+  opacity: 1;
+}
+
+/* Member Identity */
+.memberIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  min-width: 0; /* Allow text truncation */
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.memberName {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.youBadge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-normal);
+  color: var(--text-tertiary);
+}
+
+.memberEmail {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Role */
+.memberRole {
+  min-width: 140px;
+}
+
+.roleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.roleLabel i {
+  font-size: var(--text-base);
+  color: var(--text-tertiary);
+}
+
+/* Role Selector (Editable) */
+.roleSelectorTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.roleSelectorTrigger:hover {
+  background: var(--bg-elevated);
+  border-color: var(--color-primary);
+}
+
+.roleSelectorTrigger i:first-child {
+  font-size: var(--text-base);
+  color: var(--color-primary);
+}
+
+.roleSelectorTrigger i:last-child {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-left: var(--spacing-xs);
+}
+
+/* Role dropdown item states */
+.roleItemActive {
+  background: var(--color-primary-light) !important;
+}
+
+.roleCheckmark {
+  margin-left: auto;
+  color: var(--color-primary);
+}
+
+/* Status */
+.memberStatus {
+  min-width: 100px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Actions */
+.memberActions {
+  min-width: 40px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.actionButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Modal Footer */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-tight);
+}
+
+/* Remove Confirmation */
+.removeConfirm p {
+  margin: 0 0 var(--spacing);
+  color: var(--text-primary);
+}
+
+.removeWarning {
+  font-size: var(--text-sm);
+  color: var(--color-warning);
+}
+
+/* New member highlight animation */
+.memberRow.newMember {
+  animation: highlightNew 2s ease-out;
+}
+
+@keyframes highlightNew {
+  0% {
+    background: var(--color-success-light);
+    border-color: var(--color-success);
+  }
+  100% {
+    background: var(--bg-surface);
+    border-color: var(--border-subtle);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .memberRow {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  .memberIdentity {
+    grid-column: 1;
+  }
+
+  .memberActions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .memberRole,
+  .memberStatus {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    min-width: auto;
+  }
+
+  .memberRole {
+    margin-top: var(--spacing-tight);
+  }
+}

@@ -1,0 +1,93 @@
+/**
+ * PostCombineBOSSection Styles
+ *
+ * Styles for Post-Combine BOS equipment section
+ * Follows design tokens from tokens.css
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-300);
+  padding: var(--space-300);
+  background: var(--surface-1);
+  border-radius: var(--radius-200);
+  border: 1px solid var(--border-1);
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-100);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-300);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-400);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-1);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--font-size-200);
+  color: var(--text-2);
+}
+
+.maxOutputBadge {
+  display: flex;
+  align-items: center;
+  padding: var(--space-150) var(--space-300);
+  background: var(--accent-surface);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-200);
+  font-size: var(--font-size-200);
+  font-weight: var(--font-weight-medium);
+  color: var(--accent-text);
+  white-space: nowrap;
+}
+
+/* Form Sections */
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  padding: var(--space-300);
+  background: var(--surface-2);
+  border-radius: var(--radius-200);
+  border: 1px solid var(--border-1);
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  padding-bottom: var(--space-200);
+  border-bottom: 1px solid var(--border-1);
+}
+
+.formTitle {
+  font-size: var(--font-size-300);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .maxOutputBadge {
+    width: 100%;
+    justify-content: center;
+  }
+}

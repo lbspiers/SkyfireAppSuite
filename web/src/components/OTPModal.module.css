@@ -1,0 +1,55 @@
+/* OTPModal - Design System Compliant */
+
+.iconContainer {
+  text-align: center;
+  margin-bottom: var(--spacing-loose);
+}
+
+.successIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: var(--color-success-light);
+  border-radius: var(--radius-circle);
+  color: var(--color-success);
+  font-size: var(--text-4xl);
+}
+
+.emailDisplay {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing);
+  text-align: center;
+}
+
+.resendContainer {
+  margin-top: var(--spacing);
+  text-align: center;
+}
+
+.resendLink {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  transition: var(--transition-base);
+}
+
+.resendLink:hover:not(:disabled) {
+  color: var(--color-primary-dark);
+}
+
+.resendLink:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.resendTimer {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}

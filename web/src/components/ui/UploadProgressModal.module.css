@@ -1,0 +1,208 @@
+/* Upload Progress Modal Styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding-bottom: var(--spacing);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.summaryText {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing);
+  padding: var(--spacing-tight) var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  transition: background-color 0.2s ease;
+}
+
+.fileRow.complete {
+  background: var(--color-success-light);
+}
+
+.fileRow.error {
+  background: var(--color-error-light);
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileStage {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.fileRow.error .fileStage {
+  color: var(--color-error);
+}
+
+.fileProgress {
+  flex-shrink: 0;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.checkIcon {
+  color: var(--color-success);
+}
+
+.errorIcon {
+  color: var(--color-error);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--border-subtle);
+  min-height: 40px;
+}
+
+.doneButton {
+  padding: var(--spacing-tight) var(--spacing-loose);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.doneButton:hover {
+  background: var(--color-primary-dark);
+}
+
+.cancelButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+/* Header with minimize button */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--spacing);
+}
+
+.minimizeButton {
+  padding: var(--spacing-xs);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.minimizeButton:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* Completion summary stats */
+.completionSummary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-wide);
+  margin-top: var(--spacing);
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.statIcon {
+  font-size: var(--text-xl);
+}
+
+.statValue {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Retry button */
+.retryButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--color-warning);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  margin-right: var(--spacing-tight);
+}
+
+.retryButton:hover {
+  background: var(--color-warning-dark);
+  transform: translateY(-1px);
+}

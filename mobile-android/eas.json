@@ -1,0 +1,42 @@
+{
+  "cli": {
+    "version": ">= 16.18.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": { 
+        "image": "latest", 
+        "scheme": "skyfire", 
+        "buildConfiguration": "Debug" 
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "image": "latest",
+        "scheme": "skyfire",
+        "buildConfiguration": "Release",
+        "prebuildCommand": "bash scripts/ios-release-bundle.sh"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest",
+        "cocoapods": "1.15.2",
+        "scheme": "skyfire",
+        "buildConfiguration": "Release",
+        "prebuildCommand": "bash scripts/ios-release-bundle.sh",
+        "cache": {
+          "disabled": true
+        }
+      }
+    }
+  },
+  "submit": { 
+    "production": {} 
+  }
+}

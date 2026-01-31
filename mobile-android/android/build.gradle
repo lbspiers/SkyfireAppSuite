@@ -1,0 +1,29 @@
+buildscript {
+    ext {
+        buildToolsVersion = "35.0.0"
+        minSdkVersion = 24  // Updated for React Native 0.78.3 Hermes compatibility
+        compileSdkVersion = 35
+        targetSdkVersion = 35
+        ndkVersion = "27.0.12077973"  // NDK r27 - Required for proper 16KB page size alignment
+        kotlinVersion = "1.9.22"
+    }
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+        maven { url "$rootDir/../node_modules/react-native/android" }
+        maven { url 'https://maven.google.com' }
+        maven { url "https://www.jitpack.io" }
+        mavenCentral()
+    }
+
+    // Moved classpath outside dependencies block
+
+    dependencies {
+        classpath "com.facebook.react:react-native-gradle-plugin"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin"
+        classpath "com.android.tools.build:gradle:8.5.2"  // CRITICAL: AGP 8.5.2 required for true 16KB page size compliance (Google Play mandatory)
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"

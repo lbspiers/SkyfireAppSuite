@@ -1,0 +1,27 @@
+println("🧠 [1] Starting settings.gradle")
+
+rootProject.name = 'skyfire'
+println("✅ [2] Set project name")
+
+println("🔍 [3] Applying native_modules.gradle...")
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle")
+println("✅ [4] Applied native_modules.gradle")
+
+println("🔍 [5] Calling applyNativeModulesSettingsGradle")
+applyNativeModulesSettingsGradle(settings)
+println("✅ [6] Called applyNativeModulesSettingsGradle")
+
+println("🔍 [7] Including :app")
+include ':app'
+println("✅ [8] Included :app")
+
+println("🔍 [9] Including gradle plugin")
+includeBuild('../node_modules/@react-native/gradle-plugin')
+println("✅ [10] Included gradle plugin")
+
+println("🔍 [11] Including react-native-sensors")
+include ':react-native-sensors'
+project(':react-native-sensors').projectDir = new File(rootProject.projectDir,  '../node_modules/react-native-sensors/android')
+println("✅ [12] Linked react-native-sensors")
+
+println("✅ [13] Finished settings.gradle ✅")

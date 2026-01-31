@@ -1,0 +1,184 @@
+.section {
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: var(--transition-colors);
+}
+
+.header:hover {
+  background: var(--bg-hover);
+}
+
+.headerComplete {
+  border-left: var(--spacing-xs) solid var(--color-success);
+}
+
+.headerIncomplete {
+  border-left: var(--spacing-xs) solid var(--color-warning);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.arrow {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  transition: transform var(--duration-base);
+  transform: rotate(-90deg);
+}
+
+.arrowExpanded {
+  transform: rotate(0deg);
+}
+
+.title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+}
+
+.completeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-circle);
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+  font-size: var(--text-xs);
+}
+
+.count {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.countComplete {
+  color: var(--color-success);
+}
+
+.content {
+  padding: 0 var(--spacing) var(--spacing) var(--spacing);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.field {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--spacing);
+  background: var(--bg-panel);
+  border-radius: var(--radius-md);
+  border: var(--border-thin) solid var(--border-subtle);
+  transition: var(--transition-colors);
+}
+
+.fieldClickable {
+  cursor: pointer;
+}
+
+.fieldClickable:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+}
+
+.fieldMain {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing);
+  flex: 1;
+}
+
+.iconComplete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-circle);
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+
+.iconMissing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-circle);
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+
+.iconWarning {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-circle);
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+
+.fieldInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.fieldLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.fieldValue {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
+}
+
+.fieldCount {
+  color: var(--text-tertiary);
+  font-weight: var(--font-normal);
+}
+
+.fieldMessage {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.navigateIcon {
+  color: var(--text-tertiary);
+  font-size: var(--text-lg);
+  flex-shrink: 0;
+}

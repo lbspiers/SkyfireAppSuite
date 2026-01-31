@@ -1,0 +1,125 @@
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+.fullWidth .tab {
+  flex: 1;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+  white-space: nowrap;
+}
+
+.tab:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.tab:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.active {
+  color: var(--text-primary);
+}
+
+/* Sizes */
+.sm .tab {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-xs);
+}
+
+.md .tab {
+  padding: var(--spacing) var(--spacing-loose);
+  font-size: var(--text-sm);
+}
+
+.lg .tab {
+  padding: var(--spacing) var(--spacing-wide);
+  font-size: var(--text-base);
+}
+
+/* Default variant */
+.default {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight);
+}
+
+.default .tab {
+  border-radius: var(--radius-sm);
+}
+
+.default .active {
+  background: var(--bg-elevated);
+}
+
+/* Pills variant */
+.pills .tab {
+  border-radius: var(--radius-pill);
+}
+
+.pills .active {
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+}
+
+/* Underline variant */
+.underline {
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  gap: 0;
+  padding: 0;
+}
+
+.underline .tab {
+  border-radius: 0;
+  border-bottom: var(--spacing-xs) solid transparent;
+  margin-bottom: -1px;
+}
+
+.underline .active {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.icon {
+  display: flex;
+  font-size: 1.125em;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--spacing-tight);
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}

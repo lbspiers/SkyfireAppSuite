@@ -1,0 +1,123 @@
+/* Update Toast Styles */
+/* Uses Skyfire design tokens */
+
+.container {
+  position: fixed;
+  top: var(--spacing);
+  right: var(--spacing);
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: var(--bg-elevated);
+  border: 1px solid var(--color-accent-blue);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.2);
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.iconContainer {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--radius-md);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-accent-blue);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.description {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-tight);
+  flex-shrink: 0;
+}
+
+.laterButton {
+  padding: var(--spacing-tight);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.laterButton:hover {
+  color: var(--text-primary);
+}
+
+.updateButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--color-accent-blue);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.updateButton:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.updateButton:active {
+  transform: translateY(0);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .container {
+    left: var(--spacing);
+    right: var(--spacing);
+  }
+
+  .toast {
+    min-width: unset;
+    width: 100%;
+  }
+}

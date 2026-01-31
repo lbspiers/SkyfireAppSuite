@@ -1,0 +1,13 @@
+.buttonGroup {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.fullWidth .button {
+  flex: 1;
+}
+
+.disabled {
+  opacity: var(--opacity-disabled);
+  pointer-events: none;
+}

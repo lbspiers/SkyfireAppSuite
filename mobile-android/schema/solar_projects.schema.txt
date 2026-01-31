@@ -1,0 +1,10 @@
+"table_name"	"column_name"	"data_type"	"character_maximum_length"	"numeric_precision"	"is_nullable"	"column_default"	"ordinal_position"
+"solar_projects"	"created_at"	"timestamp with time zone"			"NO"	"('now'::text)::timestamp(6) with time zone"	1
+"solar_projects"	"created_by"	"integer"		32	"NO"		2
+"solar_projects"	"deleted_at"	"timestamp with time zone"			"YES"		3
+"solar_projects"	"id"	"integer"		32	"NO"	"nextval('solar_projects_id_seq'::regclass)"	4
+"solar_projects"	"uuid"	"uuid"			"NO"	"uuid_generate_v4()"	5
+"solar_projects"	"completed_step"	"integer"		32	"NO"	"0"	6
+"solar_projects"	"is_draft"	"boolean"			"NO"	"true"	7
+"solar_projects"	"company_id"	"integer"		32	"NO"		8
+"solar_projects"	"updated_at"	"timestamp with time zone"			"YES"	"now()"	9

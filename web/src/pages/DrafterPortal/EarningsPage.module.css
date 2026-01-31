@@ -1,0 +1,105 @@
+/* EarningsPage - Skyfire Design System */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-loose);
+  padding: var(--spacing-loose);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.titleIcon {
+  font-size: var(--text-3xl);
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--spacing);
+  flex-shrink: 0;
+}
+
+/* Sections */
+.section {
+  width: 100%;
+}
+
+/* Error State */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing);
+  padding: var(--spacing-wide);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  min-height: 400px;
+}
+
+.errorIcon {
+  font-size: var(--text-4xl);
+  opacity: var(--opacity-muted);
+}
+
+.errorText {
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing);
+    gap: var(--spacing);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .headerActions button {
+    width: 100%;
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+}

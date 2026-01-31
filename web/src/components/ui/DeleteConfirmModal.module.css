@@ -1,0 +1,33 @@
+/* DeleteConfirmModal Styles */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing);
+  gap: var(--spacing);
+}
+
+.warningIcon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.warning {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.warning strong {
+  color: var(--color-error);
+}
+
+.subwarning {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 300px;
+}

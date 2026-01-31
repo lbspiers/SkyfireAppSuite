@@ -1,0 +1,97 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: var(--z-tooltip, 50);
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-elevated);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fadeIn 0.15s ease-out;
+  transform: translateX(-50%);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--bg-elevated);
+  border: var(--border-thin) solid var(--border-subtle);
+  transform: rotate(45deg);
+}
+
+/* Positions */
+.top .arrow {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-top: none;
+  border-left: none;
+}
+
+.bottom {
+  transform: translateX(-50%);
+}
+
+.bottom .arrow {
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-bottom: none;
+  border-right: none;
+}
+
+.left {
+  transform: translateY(-50%);
+}
+
+.left .arrow {
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-left: none;
+  border-bottom: none;
+}
+
+.right {
+  transform: translateY(-50%);
+}
+
+.right .arrow {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-right: none;
+  border-top: none;
+}
+
+/* Alert-styled tooltip (no extra container, custom styling) */
+:global(.alertTooltip) {
+  padding: var(--spacing-tight) !important;
+  background: linear-gradient(var(--bg-panel), var(--bg-panel)) padding-box, linear-gradient(135deg, #FF6B35 0%, var(--color-primary-light) 100%) border-box !important;
+  border: 2px solid transparent !important;
+  border-radius: var(--radius-md) !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  max-width: 500px !important;
+  min-width: 400px !important;
+  width: 450px !important;
+  white-space: normal !important;
+}
+
+:global(.alertTooltip) .arrow {
+  display: none !important;
+}

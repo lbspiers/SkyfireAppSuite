@@ -1,0 +1,164 @@
+/* ===== CONTAINER ===== */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== HEADER ===== */
+.header {
+  margin-bottom: var(--spacing);
+}
+
+.title {
+  font-size: var(--spacing);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing) 0;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* ===== FORM GRID ===== */
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* ===== SECTION ===== */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing) 0;
+  padding-bottom: var(--spacing);
+  border-bottom: 1px solid rgba(253, 115, 50, 0.2);
+}
+
+/* ===== FORM ROWS ===== */
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing);
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* ===== LABELS ===== */
+.label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== INPUTS ===== */
+.input,
+.select {
+  padding: var(--spacing-tight) var(--spacing);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--spacing-xs);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  transition: all 0.2s;
+  min-height: 36px;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 3px rgba(253, 115, 50, 0.1);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.select option {
+  background: #0f1f3a;
+  color: var(--text-primary);
+}
+
+/* ===== CALCULATED VALUE ===== */
+.calculatedValue {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing) var(--spacing);
+  background: rgba(253, 115, 50, 0.1);
+  border: 1px solid rgba(253, 115, 50, 0.3);
+  border-radius: var(--spacing-xs);
+  margin-top: var(--spacing);
+}
+
+.calculatedLabel {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.calculatedResult {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+.saveButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.3);
+}
+
+.saveButton:hover {
+  background: linear-gradient(135deg, #FF7B45 0%, #FF9C52 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(253, 115, 50, 0.4);
+}
+
+.saveButton:active {
+  transform: translateY(0);
+}

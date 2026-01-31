@@ -1,0 +1,73 @@
+.quickReactionsContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  position: relative;
+}
+
+.quickReactionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: var(--text-base);
+  padding: 0;
+}
+
+.size-sm .quickReactionBtn {
+  width: 28px;
+  height: 28px;
+}
+
+.size-md .quickReactionBtn {
+  width: 32px;
+  height: 32px;
+}
+
+.quickReactionBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  transform: scale(1.1);
+}
+
+.quickReactionBtnActive {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+}
+
+.quickReactionBtnActive:hover {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+}
+
+.emojiPickerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-muted);
+}
+
+.size-sm .emojiPickerBtn {
+  width: 28px;
+  height: 28px;
+}
+
+.size-md .emojiPickerBtn {
+  width: 32px;
+  height: 32px;
+}
+
+.emojiPickerBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}

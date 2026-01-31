@@ -1,0 +1,20 @@
+/* Existing Projects Page Styles */
+
+/* Table Component */
+.searchInput {
+  width: calc(var(--spacing) * 37);
+}
+
+.gridContainer {
+  height: calc(var(--spacing) * 75);
+  width: 100%;
+}
+
+/* Delete Button */
+.deleteButton {
+  background: transparent;
+  color: var(--color-error);
+  border: none;
+  font-size: var(--text-xl);
+  height: auto;
+}

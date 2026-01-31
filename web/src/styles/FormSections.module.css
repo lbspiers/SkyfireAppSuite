@@ -1,0 +1,379 @@
+/* Shared Form Section Styles */
+
+/* Section Layout */
+.sectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.sectionRow {
+  display: flex;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.sectionColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Field Groups */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fieldRow {
+  display: flex;
+  gap: var(--spacing);
+  align-items: flex-end;
+  margin-bottom: var(--spacing);
+}
+
+.fieldRowEqual {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing);
+}
+
+.fieldRowThirds {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing);
+}
+
+.fieldRowQuarters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing);
+}
+
+@media (max-width: 768px) {
+  .fieldRowEqual,
+  .fieldRowThirds,
+  .fieldRowQuarters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Field Sizing */
+.fieldFlex1 { flex: 1; }
+.fieldFlex2 { flex: 2; }
+.fieldFlex3 { flex: 3; }
+.fieldAuto { flex: 0 0 auto; }
+
+.fieldSmall { width: 120px; }
+.fieldMedium { width: 200px; }
+.fieldLarge { width: 300px; }
+.fieldFull { width: 100%; }
+
+/* Labels */
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.labelRequired::after {
+  content: '*';
+  color: var(--color-error);
+  margin-left: var(--spacing);
+}
+
+.labelInline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+/* Values & Display */
+.valueDisplay {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  padding: var(--spacing) var(--spacing);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+}
+
+.valueHighlight {
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+.valueSuccess {
+  color: var(--color-success);
+}
+
+.valueWarning {
+  color: var(--color-warning);
+}
+
+.valueError {
+  color: var(--color-error);
+}
+
+/* Dividers & Spacing */
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: var(--spacing) 0;
+}
+
+.spacerSmall { height: var(--spacing); }
+.spacerMedium { height: var(--spacing-loose); }
+.spacerLarge { height: var(--spacing-wide); }
+
+/* Subsection Headers */
+.subsectionHeader {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  margin-bottom: var(--spacing-xs);
+}
+
+.subsectionDescription {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing);
+}
+
+/* Action Buttons */
+.actionRow {
+  display: flex;
+  gap: var(--spacing);
+  justify-content: flex-end;
+  margin-top: var(--spacing);
+}
+
+.actionRowStart {
+  justify-content: flex-start;
+}
+
+.actionRowBetween {
+  justify-content: space-between;
+}
+
+/* Add/Remove Buttons */
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: var(--border-thin) dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.addButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-lighter);
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.removeButton:hover {
+  color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+/* Dynamic Lists (Strings, Panels, etc.) */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.listItem {
+  display: flex;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.listItemContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.listItemActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.listItemIndex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+}
+
+/* Info Boxes */
+.infoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: var(--color-info-light);
+  border-radius: var(--radius-md);
+  border-left: none;
+}
+
+.infoBoxIcon {
+  color: var(--color-info);
+  flex-shrink: 0;
+}
+
+.infoBoxContent {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.warningBox {
+  background: var(--color-warning-light);
+}
+
+.warningBox .infoBoxIcon {
+  color: var(--color-warning);
+}
+
+/* Calculation Results */
+.calculationResult {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing) var(--spacing);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+}
+
+.calculationLabel {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.calculationValue {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+/* Toggle Groups */
+.toggleGroup {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing);
+}
+
+.toggleButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: var(--border-thin) solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.toggleButton:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.toggleButton:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.toggleButton:not(:first-child) {
+  margin-left: calc(-1 * var(--border-thin));
+}
+
+.toggleButtonActive {
+  background: var(--gradient-primary);
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+  z-index: 1;
+}
+
+/* Unit Inputs */
+.unitInput {
+  display: flex;
+  align-items: stretch;
+}
+
+.unitInput input {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.unitSuffix {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-left: none;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Placeholder Text (for selects with no value) */
+.placeholderText {
+  color: var(--text-disabled);
+}
+
+/* Info Box Variants */
+.primaryInfoBox {
+  background: var(--color-primary-lighter);
+  border-left: none;
+}
+
+.primaryInfoBox .infoBoxContent {
+  color: var(--text-primary);
+}
+
+.backfeedLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+.backfeedFormula {
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  margin-top: var(--spacing);
+}

@@ -1,0 +1,179 @@
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+// ============================================================================
+// EMULATOR SUPPORT FLAG
+// Set to true to include x86_64 libraries for x86_64 emulators
+// Set to false for production-only builds (arm64-v8a only)
+// ============================================================================
+def INCLUDE_X86_FOR_EMULATOR = true
+
+/**
+ * This is the configuration block to customize your React Native Android app.
+ * By default you don't need to apply any configuration, just uncomment the lines you need.
+ */
+react {
+    /* Folders */
+    //   The root of your project, i.e. where "package.json" lives. Default is '..'
+    // root = file("../")
+    //   The folder where the react-native NPM package is. Default is ../node_modules/react-native
+    // reactNativeDir = file("../node_modules/react-native")
+    //   The folder where the react-native Codegen package is. Default is ../node_modules/@react-native/codegen
+    // codegenDir = file("../node_modules/@react-native/codegen")
+    //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
+    // cliFile = file("../node_modules/react-native/cli.js")
+
+    /* Variants */
+    //   The list of variants to that are debuggable. For those we're going to
+    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
+    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    // debuggableVariants = ["liteDebug", "prodDebug"]
+
+    /* Bundling */
+    //   A list containing the node command and its flags. Default is just 'node'.
+    // nodeExecutableAndArgs = ["node"]
+    //
+    //   The command to run when bundling. By default is 'bundle'
+    // bundleCommand = "ram-bundle"
+    //
+    //   The path to the CLI configuration file. Default is empty.
+    // bundleConfig = file(../rn-cli.config.js)
+    //
+    //   The name of the generated asset file containing your JS bundle
+    // bundleAssetName = "MyApplication.android.bundle"
+    //
+    //   The entry file for bundle generation. Default is 'index.android.js' or 'index.js'
+    // entryFile = file("../js/MyApplication.android.js")
+    //
+    //   A list of extra flags to pass to the 'bundle' commands.
+    //   See https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
+    // extraPackagerArgs = []
+
+    /* Hermes Commands */
+    //   The hermes compiler command to run. By default it is 'hermesc'
+    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+    //
+    //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
+    // hermesFlags = ["-O", "-output-source-map"]
+}
+
+/**
+ * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ */
+def enableProguardInReleaseBuilds = false
+
+/**
+ * The preferred build flavor of JavaScriptCore (JSC)
+ *
+ * For example, to use the international variant, you can use:
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ *
+ * The international variant includes ICU i18n library and necessary data
+ * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
+ * give correct results when using with locales other than en-US. Note that
+ * this variant is about 6MiB larger per architecture than default.
+ */
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
+
+    namespace "com.skyfire.solarapp"
+    defaultConfig {
+        applicationId "com.skyfire.solarapp"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 46
+        versionName "3.1.1"
+        vectorDrawables.useSupportLibrary = true
+
+        // Android 16 KB page size support
+        // Controlled by INCLUDE_X86_FOR_EMULATOR flag at top of file
+        // Production: arm64-v8a only (16KB compliant)
+        // Development with x86_64 emulator: arm64-v8a + x86_64
+        ndk {
+            if (INCLUDE_X86_FOR_EMULATOR) {
+                abiFilters "arm64-v8a", "x86_64"
+            } else {
+                abiFilters "arm64-v8a"
+            }
+        }
+
+        // NOTE: Manual 16KB linker flags REMOVED - React Native 0.76+ has native 16KB support
+        // RN 0.76 libraries (libhermes.so, libreactnativejni.so) are pre-built with 16KB alignment
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        } 
+       release {
+            storeFile file('skyfire.keystore')
+            storePassword 'skyfirekey'
+            keyAlias 'skyfire_key'
+            keyPassword 'skyfirekey'
+          }
+
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
+            signingConfig signingConfigs.debug
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+        }
+    }
+
+    // Android 16 KB page size support - CRITICAL: Modern packaging with 16KB alignment
+    packagingOptions {
+        // CRITICAL: Disable legacy packaging to enable 16KB aligned uncompressed native libs
+        jniLibs {
+            useLegacyPackaging = false  // AGP 8.5+ handles 16KB zip alignment automatically
+        }
+
+        // Handle native library conflicts
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/*/libjsc.so'
+        pickFirst 'lib/*/libhermes.so'
+    }
+}
+
+dependencies {
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation("com.facebook.react:react-android")
+    implementation project(':react-native-sensors')
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+}
+
+// Delete the React Gradle Plugin's auto-generated PackageList to avoid duplicates
+// We use the legacy native_modules.gradle's PackageList instead
+tasks.configureEach { task ->
+    if (task.name == 'generateAutolinkingPackageList') {
+        task.doLast {
+            def autolinkingPackageList = file("${buildDir}/generated/autolinking/src/main/java/com/facebook/react/PackageList.java")
+            if (autolinkingPackageList.exists()) {
+                println("🗑️ Deleting duplicate React Gradle Plugin PackageList: ${autolinkingPackageList}")
+                autolinkingPackageList.delete()
+            }
+        }
+    }
+}
+
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

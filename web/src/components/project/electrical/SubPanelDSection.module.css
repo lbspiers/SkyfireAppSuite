@@ -1,0 +1,32 @@
+/* ===== SECTION WRAPPER ===== */
+.sectionWrapper {
+  margin-bottom: var(--spacing);
+}
+
+/* ===== PANEL TYPE TOGGLE ===== */
+.panelTypeToggle {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ===== ALLOWABLE BACKFEED ===== */
+.allowableBackfeedContainer {
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+}
+
+.allowableBackfeedValue {
+  text-align: center;
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--spacing-tight);
+}
+
+.allowableBackfeedFormula {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}

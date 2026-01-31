@@ -1,0 +1,162 @@
+/* ===== TOOLBAR CONTAINER ===== */
+.toolbarContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 240px;
+  height: 100%;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+/* ===== TOOLBAR CONTENT ===== */
+.toolbarContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing) var(--spacing);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.sectionTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ===== TOOLS GRID ===== */
+.toolsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing);
+}
+
+.toolButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--spacing-xs);
+  color: var(--text-muted);
+  font-size: var(--spacing-tight);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+}
+
+.toolButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(253, 115, 50, 0.3);
+  color: var(--text-primary);
+}
+
+.toolButton.active {
+  background: rgba(253, 115, 50, 0.15);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.toolIcon {
+  font-size: var(--spacing);
+  line-height: 1;
+}
+
+.toolLabel {
+  font-weight: var(--font-medium);
+}
+
+/* ===== COLOR SELECTOR ===== */
+.colorOptions {
+  display: flex;
+  gap: var(--spacing);
+  justify-content: flex-start;
+}
+
+.colorSwatch {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--spacing-xs);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-base);
+  padding: 0;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.1);
+}
+
+.colorSwatch.selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(253, 115, 50, 0.3);
+}
+
+/* ===== SAVE BUTTON ===== */
+.saveButton {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+}
+
+.saveButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.3);
+}
+
+.saveButton:disabled {
+  background: var(--bg-hover);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.saveHint {
+  font-size: var(--spacing-tight);
+  color: var(--text-disabled);
+  margin: 0;
+  text-align: center;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.toolbarContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toolbarContent::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.toolbarContent::-webkit-scrollbar-thumb {
+  background: var(--border-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.toolbarContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

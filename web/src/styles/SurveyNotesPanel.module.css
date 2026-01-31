@@ -1,0 +1,227 @@
+/* ===== SURVEY NOTES PANEL - Main Container ===== */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ===== TOOLBAR ===== */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 var(--spacing) 0;
+  flex-shrink: 0;
+  gap: var(--spacing);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--spacing);
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.noteCount {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ===== SEARCH BAR ===== */
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  min-width: 250px;
+  transition: all 0.2s ease;
+}
+
+.searchBar:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(253, 115, 50, 0.1);
+}
+
+.searchBar svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.clearButton {
+  background: transparent;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ===== FILTER TABS ===== */
+.filterTabs {
+  display: flex;
+  gap: var(--spacing-xs);
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: var(--spacing);
+}
+
+.filterTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.filterButton {
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+/* ===== SECTION LIST ===== */
+.sectionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-wide);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: var(--spacing-wide);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== NOTES LIST ===== */
+.notesList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== EMPTY STATE ===== */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-wide);
+  text-align: center;
+  flex: 1;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing);
+  opacity: 0.3;
+}
+
+.emptyTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-tight);
+}
+
+.emptyText {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 300px;
+}
+
+/* ===== LOADING STATE ===== */
+.loadingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing);
+}
+
+.loadingSkeleton {
+  height: 120px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.5; }
+}
+
+/* ===== SCROLLBAR ===== */
+.sectionList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sectionList::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+}
+
+.sectionList::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.sectionList::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ===== COMPACT MODE ===== */
+.container.compact {
+  max-height: 180px;
+  min-height: 60px;
+}
+
+.container.compact .sectionList {
+  padding-bottom: var(--spacing);
+}
+
+.compactEmptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing);
+  min-height: 60px;
+}
+
+.compactEmptyText {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+}

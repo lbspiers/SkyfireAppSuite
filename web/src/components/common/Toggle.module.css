@@ -1,0 +1,70 @@
+/* ===== TOGGLE ROW ===== */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  margin: 0 0 var(--spacing) 0;
+  padding: 0;
+}
+
+/* ===== TOGGLE CONTAINER ===== */
+.toggleContainer {
+  display: flex;
+  gap: var(--spacing-xs);
+  width: fit-content;
+}
+
+/* ===== TOGGLE BUTTON ===== */
+.toggleButton {
+  flex: 0 0 auto;
+  min-width: 80px;
+  padding: var(--spacing-tight) var(--spacing-tight);
+  background: var(--gradient-input);
+  border: var(--border-thin) solid var(--border-elevated);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+  white-space: nowrap;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleButton:hover:not(.toggleButtonActive) {
+  background: linear-gradient(180deg, #2a3f62 0%, #1f2f4a 100%);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== ACTIVE STATE ===== */
+.toggleButtonActive {
+  background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dark));
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.toggleButtonActive:hover {
+  background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dark));
+}
+
+/* ===== CLEAR BUTTON ===== */
+.clearButton {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--spacing-tight) var(--spacing);
+  transition: color 0.2s;
+  font-family: inherit;
+}
+
+.clearButton:hover {
+  color: var(--color-primary-light);
+}

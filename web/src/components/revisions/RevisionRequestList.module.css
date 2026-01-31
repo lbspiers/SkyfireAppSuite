@@ -1,0 +1,139 @@
+.revisionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--spacing);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.listTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.listCount {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.listItems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-loose);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing);
+}
+
+.emptyText {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.revisionDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  padding: var(--spacing);
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-tight) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.detailRow:last-of-type {
+  border-bottom: none;
+}
+
+.detailLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.detailValue {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.notesSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.notesContent {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+}
+
+.documentSection {
+  padding-top: var(--spacing);
+  display: flex;
+  justify-content: flex-start;
+}
+
+.documentSection button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.completedInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: var(--color-success-light);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing);
+}
+
+.completedLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-success);
+}
+
+.completedDate {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}

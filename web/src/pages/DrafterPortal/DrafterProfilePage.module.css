@@ -1,0 +1,357 @@
+/* DrafterProfilePage - Skyfire Design System */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-loose);
+  padding: var(--spacing-loose);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.titleIcon {
+  font-size: var(--text-3xl);
+}
+
+/* Mock Banner */
+.mockBanner {
+  background: var(--color-info-light);
+  border: var(--border-thin) solid var(--color-info);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-info);
+  font-weight: var(--font-semibold);
+}
+
+/* Section */
+.section {
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-loose);
+}
+
+.sectionTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-loose) 0;
+}
+
+/* Profile Photo Section */
+.photoSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-loose);
+}
+
+.avatarContainer {
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-circle);
+  object-fit: cover;
+  border: var(--border-medium) solid var(--border-elevated);
+}
+
+.avatarPlaceholder {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-circle);
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: white;
+  border: var(--border-medium) solid var(--border-elevated);
+}
+
+.photoActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.fileInput {
+  display: none;
+}
+
+.photoHint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Form Grid */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing);
+}
+
+.lockIcon {
+  font-size: var(--text-base);
+}
+
+.saveActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing);
+}
+
+/* Notification Preferences */
+.notificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.notificationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.notificationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.notificationLabel {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.notificationHint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Payment Information */
+.paymentInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.paymentMethod {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.paymentIcon {
+  font-size: var(--text-3xl);
+}
+
+.paymentDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.paymentLabel {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.paymentHint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Tax Information */
+.taxInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.taxStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.taxLabel {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+/* Account Statistics */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing);
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding: var(--spacing);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+/* Danger Zone */
+.dangerSection {
+  border-color: var(--color-error);
+}
+
+.dangerHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.chevron {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.dangerContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  padding-top: var(--spacing-loose);
+}
+
+.dangerWarning {
+  padding: var(--spacing);
+  background: var(--color-error-light);
+  border: var(--border-thin) solid var(--color-error);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+}
+
+/* Modal Content */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+}
+
+.deactivateList {
+  margin: 0;
+  padding-left: var(--spacing-loose);
+  color: var(--text-secondary);
+}
+
+.deactivateList li {
+  margin-bottom: var(--spacing-tight);
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing);
+  }
+
+  .header {
+    grid-template-columns: 1fr;
+  }
+
+  .headerSpacer {
+    display: none;
+  }
+
+  .headerTitle {
+    justify-content: flex-start;
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .photoSection {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .paymentInfo,
+  .taxInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing);
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}

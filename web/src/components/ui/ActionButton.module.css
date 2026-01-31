@@ -1,0 +1,35 @@
+/* ActionButton - Square action button with icon */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: var(--transition-colors);
+  padding: 0;
+}
+
+.button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.button:hover .icon {
+  filter: brightness(0) saturate(100%) invert(100%);
+  opacity: 0.9;
+}
+
+.icon {
+  width: 12px;
+  height: 12px;
+  display: block;
+  filter: brightness(0) saturate(100%) invert(100%);
+  opacity: 0.7;
+  transition: opacity 0.2s, filter 0.2s;
+}

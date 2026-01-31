@@ -1,0 +1,459 @@
+/**
+ * InlineBOS Component Styles
+ *
+ * Styling for inline BOS equipment sections matching mobile app design
+ */
+
+/* ========================================
+   SECTION CONTAINER
+   ======================================== */
+
+.inlineBOSSection {
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing);
+  background: #f8f9fa;
+  border-radius: var(--radius-md);
+  border: 1px solid #dee2e6;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: var(--spacing-xs) solid #dee2e6;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: #212529;
+}
+
+.slotCount {
+  font-size: var(--text-sm);
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.slotsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* ========================================
+   BOS SLOT
+   ======================================== */
+
+.bosSlot {
+  width: 100%;
+}
+
+/* Empty slot container */
+.emptySlotContainer {
+  width: 100%;
+}
+
+/* Add BOS button (initial state) */
+.addBOSButton {
+  width: 100%;
+  padding: var(--spacing-sm) 16px;
+  background: white;
+  border: 2px dashed #adb5bd;
+  border-radius: var(--radius-md);
+  color: #495057;
+  font-size: var(--text-base);
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
+  transition: all 0.2s ease;
+}
+
+.addBOSButton:hover {
+  background: #f8f9fa;
+  border-color: #6c757d;
+  color: #212529;
+}
+
+.addBOSButton:active {
+  transform: scale(0.98);
+}
+
+.addIcon {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+/* Populated slot container */
+.populatedSlotContainer {
+  width: 100%;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.populatedSlotContainer:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   SLOT HEADER
+   ======================================== */
+
+.slotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 16px;
+  background: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.slotHeader:hover {
+  background: #f8f9fa;
+}
+
+.slotHeader.expanded {
+  background: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.slotHeaderLeft {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.slotLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #212529;
+}
+
+.slotSummary {
+  font-size: var(--text-sm);
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.slotHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+/* Icon buttons in header */
+.iconButton {
+  padding: var(--spacing-xxs);
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: var(--text-sm);
+}
+
+.iconButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #495057;
+}
+
+.iconButton:active {
+  transform: scale(0.95);
+}
+
+.chevronIcon {
+  font-size: var(--text-sm);
+  color: #6c757d;
+  transition: transform 0.2s ease;
+}
+
+/* ========================================
+   SLOT FORM CONTAINER
+   ======================================== */
+
+.slotFormContainer {
+  padding: var(--spacing);
+  background: white;
+  border-top: 1px solid #e9ecef;
+}
+
+.slotContent {
+  width: 100%;
+}
+
+/* ========================================
+   BOS EQUIPMENT FORM
+   ======================================== */
+
+.bosEquipmentForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* New/Existing Toggle Row with Max Output */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: var(--spacing-sm);
+}
+
+.toggleButtons {
+  display: flex;
+  gap: var(--spacing-tight);
+}
+
+.toggleButton {
+  padding: var(--spacing-tight) 16px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border: 1px solid #ced4da;
+  border-radius: var(--radius-sm);
+  background: white;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.toggleButton.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.toggleButton:active {
+  transform: scale(0.98);
+}
+
+.maxOutputDisplay {
+  font-size: var(--text-xs);
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: var(--spacing-tight) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.formLabel {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.required {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.formSelect,
+.formInput {
+  padding: var(--spacing-tight) 12px;
+  font-size: var(--text-sm);
+  border: 1px solid #ced4da;
+  border-radius: var(--radius-sm);
+  background: white;
+  color: #212529;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formSelect:focus,
+.formInput:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.formSelect:disabled,
+.formInput:disabled {
+  background: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.formInput[readonly] {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.helpText {
+  font-size: var(--text-xs);
+  color: #6c757d;
+  font-style: italic;
+  margin-top: var(--spacing-xs);
+}
+
+/* Max Output Info Display */
+.maxOutputInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background-color: var(--color-surface-secondary);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing);
+  font-size: var(--font-size-sm);
+}
+
+.maxOutputLabel,
+.minRequiredLabel {
+  color: var(--color-text-secondary);
+}
+
+.maxOutputValue {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  margin-right: var(--spacing);
+}
+
+.minRequiredValue {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-semibold);
+}
+
+.loadingText {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  padding: var(--spacing-xs) 0;
+}
+
+.errorText {
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+}
+
+/* Checkbox */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  font-size: var(--text-sm);
+  color: #495057;
+  cursor: pointer;
+  user-select: none;
+}
+
+.formCheckbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* ========================================
+   FORM ACTIONS
+   ======================================== */
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-tight);
+  padding-top: var(--spacing);
+  border-top: 1px solid #e9ecef;
+}
+
+.cancelButton,
+.saveButton {
+  padding: var(--spacing-tight) 20px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton {
+  background: #6c757d;
+  color: white;
+}
+
+.cancelButton:hover {
+  background: #5a6268;
+}
+
+.saveButton {
+  background: #007bff;
+  color: white;
+}
+
+.saveButton:hover {
+  background: #0056b3;
+}
+
+.cancelButton:active,
+.saveButton:active {
+  transform: scale(0.98);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .inlineBOSSection {
+    padding: var(--spacing-sm);
+  }
+
+  .sectionTitle {
+    font-size: var(--text-base);
+  }
+
+  .slotCount {
+    font-size: var(--text-sm);
+  }
+
+  .slotHeader {
+    padding: var(--spacing-sm);
+  }
+
+  .slotFormContainer {
+    padding: var(--spacing-sm);
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .saveButton {
+    width: 100%;
+  }
+}

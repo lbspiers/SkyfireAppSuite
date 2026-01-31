@@ -1,0 +1,196 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
+  margin-bottom: var(--spacing);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: var(--font-semibold);
+  transition: var(--transition-base);
+  white-space: nowrap;
+  line-height: 1;
+  user-select: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Sizes - All match unified pill button standard */
+.sm {
+  padding: var(--spacing-tight) var(--spacing-tight);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-pill);
+}
+
+.md {
+  padding: var(--spacing-tight) var(--spacing-tight);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-pill);
+}
+
+.lg {
+  padding: var(--spacing-tight) var(--spacing-tight);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-pill);
+}
+
+.pill {
+  border-radius: var(--radius-pill);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.fixedWidth {
+  min-width: 80px;
+}
+
+/* Primary - Orange gradient */
+.primary {
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.primary:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: var(--glow-orange-strong);
+}
+
+.primary:active:not(:disabled) {
+  transform: scale(1);
+}
+
+/* Secondary - Outline */
+.secondary {
+  background: var(--gradient-input);
+  color: var(--text-muted);
+  border: var(--border-thin) solid var(--border-elevated);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--gradient-button-hover);
+  border-color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Outline - Alias for secondary with explicit naming */
+.outline {
+  background: transparent;
+  color: var(--text-muted);
+  border: var(--border-thin) solid var(--border-elevated);
+}
+
+.outline:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+  transform: scale(1.02);
+}
+
+.outline:disabled {
+  background: transparent;
+  border-color: var(--border-base);
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Toggle - For on/off states */
+.toggle {
+  background: var(--gradient-tab-inactive);
+  color: var(--text-muted);
+  box-shadow: var(--shadow-tab);
+}
+
+.toggle:hover:not(:disabled):not(.active) {
+  background: var(--gradient-tab-hover);
+  transform: translateY(-2px);
+}
+
+.toggle.active {
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  box-shadow: var(--glow-orange);
+}
+
+/* Ghost - Minimal */
+.ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+/* Chatter - Blue */
+.chatter {
+  background: var(--gradient-chatter);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.chatter:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-blue-strong);
+}
+
+/* Danger - Red */
+.danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: scale(1.02);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+.danger:active:not(:disabled) {
+  transform: scale(1);
+}
+
+/* Disabled */
+.disabled,
+.button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Loading */
+.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.loadingSpinner {
+  position: absolute;
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.spinnerDot {
+  width: 6px;
+  height: 6px;
+  background: var(--text-primary);
+  border-radius: var(--radius-circle);
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.spinnerDot:nth-child(1) { animation-delay: -0.32s; }
+.spinnerDot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}

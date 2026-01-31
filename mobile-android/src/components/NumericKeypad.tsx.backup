@@ -1,0 +1,418 @@
+// src/components/NumericKeypad.tsx
+import React, { useEffect, useMemo, useRef } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Easing,
+  Platform,
+  Dimensions,
+} from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import { useResponsive } from "../utils/responsive";
+import { ORANGE_TB, ORANGE_LR, BLUE_2C_BT } from "../styles/gradient";
+
+type NumericKeypadProps = {
+  isVisible: boolean;
+  onNumberPress: (number: string) => void;
+  onBackspace: () => void;
+  onClose: () => void; // acts as "Confirm" ✓
+  currentValue: string;
+  /** optional dynamic title, e.g., "Azimuth" or "Array 3" (defaults to "Quantity") */
+  title?: string;
+};
+
+const KEYS: Array<
+  Array<
+    | "1"
+    | "2"
+    | "3"
+    | "4"
+    | "5"
+    | "6"
+    | "7"
+    | "8"
+    | "9"
+    | "0"
+    | "backspace"
+    | "close"
+  >
+> = [
+  ["1", "2", "3"],
+  ["4", "5", "6"],
+  ["7", "8", "9"],
+  ["backspace", "0", "close"],
+];
+
+const NumericKeypad: React.FC<NumericKeypadProps> = ({
+  isVisible,
+  onNumberPress,
+  onBackspace,
+  onClose,
+  currentValue,
+  title = "Quantity",
+}) => {
+  const { moderateScale: rs, verticalScale: vs, font: rf } = useResponsive();
+  const { width: screenWidth } = Dimensions.get("window");
+
+  // a bit wider/taller but capped for small screens
+  const CARD_WIDTH = Math.min(screenWidth * 0.94, rs(380));
+  const HEADER_HEIGHT = vs(72);
+
+  // entrance/exit animation
+  const opacity = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    if (isVisible) {
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 160,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scale, {
+          toValue: 1,
+          bounciness: 7,
+          speed: 14,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      opacity.setValue(0);
+      scale.setValue(0.9);
+    }
+  }, [isVisible, opacity, scale]);
+
+  const displayValue = useMemo(() => currentValue || "0", [currentValue]);
+
+  // Key (with press animation + optional long-press clear on backspace)
+  const Key: React.FC<{
+    label: string;
+    variant?: "number" | "backspace" | "close";
+    onPress: () => void;
+    onLongPress?: () => void;
+  }> = ({ label, variant = "number", onPress, onLongPress }) => {
+    const press = useRef(new Animated.Value(0)).current;
+    const down = () =>
+      Animated.timing(press, {
+        toValue: 1,
+        duration: 90,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+    const up = () =>
+      Animated.timing(press, {
+        toValue: 0,
+        duration: 110,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+
+    const s = press.interpolate({ inputRange: [0, 1], outputRange: [1, 0.96] });
+    const bgOpacity = press.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 0.12],
+    });
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPressIn={down}
+        onPressOut={up}
+        onPress={onPress}
+        onLongPress={onLongPress}
+        delayLongPress={350}
+        style={{ flex: 1, marginHorizontal: rs(6) }}
+      >
+        <View
+          style={[
+            styles.keyBase,
+            { borderRadius: rs(12), paddingVertical: vs(20) },
+          ]}
+        >
+          {variant === "number" ? (
+            <LinearGradient
+              {...BLUE_2C_BT}
+              style={[StyleSheet.absoluteFillObject, { borderRadius: rs(12) }]}
+            />
+          ) : null}
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                backgroundColor: "#ffffff",
+                opacity: bgOpacity,
+                borderRadius: rs(12),
+              },
+            ]}
+          />
+          <Animated.View style={{ transform: [{ scale: s }] }}>
+            <Text
+              style={[
+                styles.keyText,
+                {
+                  fontSize: rf(24),
+                  color: "#fff",
+                  ...(variant === "close" ? { fontWeight: "800" } : null),
+                },
+              ]}
+            >
+              {variant === "backspace"
+                ? "⌫"
+                : variant === "close"
+                ? "✓"
+                : label}
+            </Text>
+          </Animated.View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  if (!isVisible) return null;
+
+  // long-press backspace clears
+  const handleBackspaceLong = () => {
+    const times = Math.max(1, displayValue.length);
+    for (let i = 0; i < times; i++) onBackspace();
+  };
+
+  return (
+    <Modal
+      visible={isVisible}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+      statusBarTranslucent
+    >
+      <View style={styles.overlay}>
+        <Animated.View style={{ opacity, transform: [{ scale }] }}>
+          <View style={{ borderRadius: rs(20), overflow: "visible" }}>
+            <LinearGradient
+              {...ORANGE_LR}
+              style={{
+                padding: rs(3), // slightly thicker ring
+                borderRadius: rs(20),
+                shadowColor: "#000",
+                shadowOpacity: 0.35,
+                shadowRadius: rs(14),
+                shadowOffset: { width: 0, height: rs(7) },
+                elevation: 18,
+              }}
+            >
+              {/* card */}
+              <View
+                style={[
+                  styles.container,
+                  {
+                    borderRadius: rs(18),
+                    padding: rs(18),
+                    width: CARD_WIDTH,
+                    backgroundColor: "#1B2533",
+                  },
+                ]}
+              >
+                {/* Header */}
+                <View
+                  style={[
+                    styles.header,
+                    { height: HEADER_HEIGHT, marginBottom: vs(12) },
+                  ]}
+                >
+                  <LinearGradient
+                    {...BLUE_2C_BT}
+                    style={{
+                      position: "absolute",
+                      left: -rs(18),
+                      right: -rs(18),
+                      top: -rs(18),
+                      height: HEADER_HEIGHT,
+                      borderTopLeftRadius: rs(18),
+                      borderTopRightRadius: rs(18),
+                    }}
+                  />
+                  <Text
+                    style={[styles.headerText, { fontSize: rf(22) }]}
+                    numberOfLines={1}
+                  >
+                    {title}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={onClose}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text style={[styles.headerClose, { fontSize: rf(34) }]}>
+                      ×
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Display */}
+                <View
+                  style={[
+                    styles.display,
+                    {
+                      borderRadius: rs(12),
+                      paddingVertical: vs(12),
+                      paddingHorizontal: rs(12),
+                    },
+                  ]}
+                >
+                  <Text style={[styles.displayText, { fontSize: rf(34) }]}>
+                    {displayValue}
+                  </Text>
+                </View>
+
+                {/* Keypad */}
+                <View style={{ width: "100%", marginTop: vs(12) }}>
+                  {KEYS.map((row, i) => (
+                    <View
+                      key={i}
+                      style={[styles.row, { marginBottom: vs(12) }]}
+                    >
+                      {row.map((key) => {
+                        if (key === "backspace")
+                          return (
+                            <Key
+                              key={key}
+                              label={key}
+                              variant="backspace"
+                              onPress={onBackspace}
+                              onLongPress={handleBackspaceLong}
+                            />
+                          );
+                        if (key === "close")
+                          return (
+                            <TouchableOpacity
+                              key={key}
+                              style={{ flex: 1, marginHorizontal: rs(6) }}
+                              onPress={onClose}
+                              activeOpacity={0.92}
+                            >
+                              <View
+                                style={{
+                                  borderRadius: rs(12),
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <LinearGradient
+                                  {...ORANGE_TB}
+                                  style={{
+                                    paddingVertical: vs(20),
+                                    alignItems: "center",
+                                    borderRadius: rs(12),
+                                  }}
+                                >
+                                  <Text
+                                    style={[
+                                      styles.keyText,
+                                      {
+                                        fontSize: rf(24),
+                                        fontWeight: "800",
+                                        color: "#fff",
+                                      },
+                                    ]}
+                                  >
+                                    ✓
+                                  </Text>
+                                </LinearGradient>
+                              </View>
+                            </TouchableOpacity>
+                          );
+                        return (
+                          <Key
+                            key={key}
+                            label={key}
+                            variant="number"
+                            onPress={() => onNumberPress(key)}
+                          />
+                        );
+                      })}
+                    </View>
+                  ))}
+                </View>
+
+                {/* Hint */}
+                <Text
+                  style={{
+                    marginTop: vs(4),
+                    color: "rgba(255,255,255,0.55)",
+                    fontSize: rf(13),
+                    textAlign: "center",
+                  }}
+                >
+                  Tap ✓ to apply • long-press ⌫ to clear
+                </Text>
+              </View>
+            </LinearGradient>
+          </View>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+};
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.46)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    alignItems: "center",
+  },
+  header: {
+    width: "100%",
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerText: {
+    color: "#FFFFFF",
+    fontFamily: "Lato-Bold",
+    fontWeight: "700",
+  },
+  headerClose: {
+    color: "#FFFFFF",
+    opacity: 0.85,
+    fontWeight: "700",
+    marginLeft: 8,
+  },
+  display: {
+    width: "100%",
+    alignItems: "center",
+    backgroundColor: "#111924",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  displayText: {
+    color: "#FFFFFF",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    letterSpacing: 0.6,
+    fontWeight: "700",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  keyBase: {
+    backgroundColor: "#2C3644",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  keyText: {
+    fontFamily: "Lato-Bold",
+    fontWeight: "700",
+  },
+});
+
+export default NumericKeypad;

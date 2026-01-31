@@ -1,0 +1,6 @@
+/* ProjectOverview Component Styles */
+
+.displayRowValue {
+  padding: var(--spacing-tight);
+  color: var(--text-primary);
+}

@@ -1,0 +1,45 @@
+/* ToggleButton - Styled toggle/selector button component */
+
+.button {
+  flex: 1;
+  padding: var(--spacing-tight) var(--spacing);
+  border-radius: 1.5rem;
+  border: 1px solid #888888;
+  background: var(--gradient-input);
+  color: #BBBBBB;
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.button:hover:not(.active):not(.disabled) {
+  background: var(--gradient-button-hover);
+  border-color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.button.active {
+  background: var(--gradient-primary);
+  border: none;
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.3);
+}
+
+.button.active:hover {
+  background: var(--gradient-primary);
+  box-shadow: 0 6px 16px rgba(253, 115, 50, 0.4);
+}
+
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,1450 @@
+bitnami@ip-172-26-6-240:~/skyfire-automation$ python3 -c "
+from database import get_connection
+conn = get_connection()
+cur = conn.cursor()
+
+for table in ['solar_project_sites', 'project_system_details']:
+    print(f'{table}:')
+    cur.execute('''
+        SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_name = %s
+        ORDER BY ordinal_position
+    ''', (table,))
+    for row in cur.fetchall():
+        print(f'  {row[0]}: {row[1]}')
+    print()
+
+conn.close()
+"
+solar_project_sites:
+  created_at: timestamp with time zone
+  created_by: integer
+  deleted_at: timestamp with time zone
+  deleted_by: integer
+  id: integer
+  project_id: integer
+  site_name: character varying
+  site_description: text
+  address: character varying
+  city: character varying
+  state: character varying
+  zip_code: character varying
+  country: character varying
+  roof_area_sqft: character varying
+  utility: character varying
+  ahj: character varying
+  behind_obstacle: boolean
+  apn: character varying
+  latitude: double precision
+  longitude: double precision
+  jurisdiction_questions: character varying
+  utility_questions: character varying
+  misc_questions: character varying
+
+project_system_details:
+  id: bigint
+  uuid: uuid
+  project_id: uuid
+  deleted_at: timestamp with time zone
+  created_at: timestamp with time zone
+  updated_at: timestamp with time zone
+  sys1_solar_panel_existing: boolean
+  sys1_solar_panel_qty: integer
+  sys1_solar_panel_make: text
+  sys1_solar_panel_model: text
+  sys1_solarpanel_id: integer
+  sys1_micro_inverter_existing: boolean
+  sys1_micro_inverter_make: text
+  sys1_micro_inverter_model: text
+  sys1_micro_inverter_id: integer
+  sys1_micro_inverter_qty: integer
+  sys1_combiner_existing: boolean
+  sys1_combiner_panel_make: text
+  sys1_combiner_panel_model: text
+  sys1_combinerpanel_id: integer
+  sys1_optimizer_existing: boolean
+  sys1_optimizer_make: text
+  sys1_optimizer_model: text
+  sys1_optimizer_id: integer
+  sys1_inv_max_continuous_output: text
+  sys1_panel_count: integer
+  sys1_branch_string_1: text
+  sys1_branch_string_2: text
+  sys1_branch_string_3: text
+  sys1_branch_string_4: text
+  sys1_branch_string_5: text
+  sys1_branch_string_6: text
+  sys1_branch_string_7: text
+  sys1_branch_string_8: text
+  sys1_branch_string_9: text
+  sys1_branch_string_10: text
+  sys1_count_validation: text
+  sys1_backup_option: text
+  sys1_ess_existing: boolean
+  sys1_no_sms: boolean
+  sys1_ess_make: text
+  sys1_ess_model: text
+  sys1_ess_id: integer
+  sys1_ess_main_breaker_rating: text
+  sys1_ess_upstream_breaker_rating: text
+  sys1_ess_upstream_breaker_location: text
+  sys1_battery1_existing: boolean
+  sys1_battery_1_qty: integer
+  sys1_battery_1_make: text
+  sys1_battery_1_model: text
+  sys1_battery1_id: integer
+  sys1_battery2_existing: boolean
+  sys1_battery_2_qty: integer
+  sys1_battery_2_make: text
+  sys1_battery_2_model: text
+  sys1_battery2_id: integer
+  sys1_combination_method: text
+  sys2_solarpanel_existing: boolean
+  sys2_solar_panel_qty: integer
+  sys2_solar_panel_make: text
+  sys2_solar_panel_model: text
+  sys2_solarpanel_id: integer
+  sys2_micro_inverter_existing: boolean
+  sys2_micro_inverter_make: text
+  sys2_micro_inverter_model: text
+  sys2_micro_inverter_id: integer
+  sys2_micro_inverter_qty: integer
+  sys2_combiner_existing: boolean
+  sys2_combiner_panel_make: text
+  sys2_combiner_panel_model: text
+  sys2_combinerpanel_id: integer
+  sys2_optimizer_existing: boolean
+  sys2_optimizer_make: text
+  sys2_optimizer_model: text
+  sys2_optimizer_id: integer
+  sys2_inv_max_continuous_output: text
+  sys2_panel_count: integer
+  sys2_branch_string_1: text
+  sys2_branch_string_2: text
+  sys2_branch_string_3: text
+  sys2_branch_string_4: text
+  sys2_branch_string_5: text
+  sys2_branch_string_6: text
+  sys2_branch_string_7: text
+  sys2_branch_string_8: text
+  sys2_branch_string_9: text
+  sys2_branch_string_10: text
+  sys2_count_validation: text
+  sys2_backup_option: text
+  sys2_ess_existing: boolean
+  sys2_no_sms: boolean
+  sys2_ess_make: text
+  sys2_ess_model: text
+  sys2_ess_id: integer
+  sys2_ess_main_breaker_rating: text
+  sys2_ess_upstream_breaker_rating: text
+  sys2_ess_upstream_breaker_location: text
+  sys2_battery1_existing: boolean
+  sys2_battery_1_qty: integer
+  sys2_battery_1_make: text
+  sys2_battery_1_model: text
+  sys2_battery1_id: integer
+  sys2_battery2_existing: boolean
+  sys2_battery_2_qty: integer
+  sys2_battery_2_make: text
+  sys2_battery_2_model: text
+  sys2_battery2_id: integer
+  sys2_combination_method: text
+  ele_ses_type: text
+  ele_main_circuit_breakers_qty: integer
+  ele_bus_bar_rating: text
+  ele_main_circuit_breaker_rating: text
+  ele_feeder_location_on_bus_bar: text
+  ele_main_panel_upgrade: boolean
+  ele_floor_area: text
+  ele_small_appliance_circuits: text
+  ele_loadtype_1: text
+  ele_loadtype_2: text
+  ele_loadtype_3: text
+  ele_loadtype_4: text
+  ele_loadtype_5: text
+  ele_loadtype_6: text
+  ele_loadtype_7: text
+  ele_loadtype_8: text
+  ele_loadtype_9: text
+  ele_loadtype_10: text
+  ele_loadtype_11: text
+  ele_loadtype_12: text
+  ele_loadtype_13: text
+  ele_loadtype_14: text
+  ele_loadtype_15: text
+  ele_loadtype_16: text
+  ele_loadtype_17: text
+  ele_2p_breaker_1: text
+  ele_2p_breaker_2: text
+  ele_2p_breaker_3: text
+  ele_2p_breaker_4: text
+  ele_2p_breaker_5: text
+  ele_2p_breaker_6: text
+  ele_2p_breaker_7: text
+  ele_2p_breaker_8: text
+  ele_2p_breaker_9: text
+  ele_2p_breaker_10: text
+  ele_2p_breaker_11: text
+  ele_2p_breaker_12: text
+  ele_2p_breaker_13: text
+  ele_2p_breaker_14: text
+  ele_2p_breaker_15: text
+  ele_2p_breaker_16: text
+  ele_2p_breaker_17: text
+  ele_method_of_interconnection: text
+  ele_breaker_location: text
+  bls1_backuploader_existing: boolean
+  bls1_backuploader_bus_bar_rating: text
+  bls1_backuploader_main_breaker_rating: text
+  bls1_backuploader_upstream_breaker_rating: text
+  bls1_backup_load_sub_panel_make: text
+  bls1_backup_load_sub_panel_model: text
+  bls1_backupload_sub_panel_id: integer
+  bls1_load_type_1: text
+  bls1_load_type_2: text
+  bls1_load_type_3: text
+  bls1_load_type_4: text
+  bls1_load_type_5: text
+  bls1_load_type_6: text
+  bls1_load_type_7: text
+  bls1_load_type_8: text
+  bls1_load_type_9: text
+  bls1_load_type_10: text
+  bls1_load_type_11: text
+  bls1_load_type_12: text
+  bls1_load_type_13: text
+  bls1_load_type_14: text
+  bls1_load_type_15: text
+  bls1_load_type_16: text
+  bls1_load_type_17: text
+  bls1_load_type_18: text
+  bls1_load_type_19: text
+  bls1_load_type_20: text
+  bls1_breaker_rating_1: text
+  bls1_breaker_rating_2: text
+  bls1_breaker_rating_3: text
+  bls1_breaker_rating_4: text
+  bls1_breaker_rating_5: text
+  bls1_breaker_rating_6: text
+  bls1_breaker_rating_7: text
+  bls1_breaker_rating_8: text
+  bls1_breaker_rating_9: text
+  bls1_breaker_rating_10: text
+  bls1_breaker_rating_11: text
+  bls1_breaker_rating_12: text
+  bls1_breaker_rating_13: text
+  bls1_breaker_rating_14: text
+  bls1_breaker_rating_15: text
+  bls1_breaker_rating_16: text
+  bls1_breaker_rating_17: text
+  bls1_breaker_rating_18: text
+  bls1_breaker_rating_19: text
+  bls1_breaker_rating_20: text
+  bls2_backuploader_existing: boolean
+  bls2_bus_bar_rating: text
+  bls2_main_breaker_rating: text
+  bls2_upstream_breaker_rating: text
+  bls2_battery_combiner_panel_make: text
+  bls2_battery_combiner_panel_model: text
+  bls2_batterycombinerpanel_id: integer
+  spb_subpanel_existing: boolean
+  spb_bus_bar_rating: text
+  spb_main_breaker_rating: text
+  spb_upstream_breaker_rating: text
+  spb_sub_panel_make: text
+  spb_sub_panel_model: text
+  spb_subpanel_id: integer
+  spb_load_type_1: text
+  spb_load_type_2: text
+  spb_load_type_3: text
+  spb_load_type_4: text
+  spb_load_type_5: text
+  spb_load_type_6: text
+  spb_load_type_7: text
+  spb_load_type_8: text
+  spb_load_type_9: text
+  spb_load_type_10: text
+  spb_load_type_11: text
+  spb_load_type_12: text
+  spb_load_type_13: text
+  spb_load_type_14: text
+  spb_load_type_15: text
+  spb_load_type_16: text
+  spb_load_type_17: text
+  spb_load_type_18: text
+  spb_load_type_19: text
+  spb_load_type_20: text
+  spb_breaker_rating_1: text
+  spb_breaker_rating_2: text
+  spb_breaker_rating_3: text
+  spb_breaker_rating_4: text
+  spb_breaker_rating_5: text
+  spb_breaker_rating_6: text
+  spb_breaker_rating_7: text
+  spb_breaker_rating_8: text
+  spb_breaker_rating_9: text
+  spb_breaker_rating_10: text
+  spb_breaker_rating_11: text
+  spb_breaker_rating_12: text
+  spb_breaker_rating_13: text
+  spb_breaker_rating_14: text
+  spb_breaker_rating_15: text
+  spb_breaker_rating_16: text
+  spb_breaker_rating_17: text
+  spb_breaker_rating_18: text
+  spb_breaker_rating_19: text
+  spb_breaker_rating_20: text
+  rta_roofing_material: text
+  rta_framing_size: text
+  rta_framing_spacing: text
+  rta_rail_make: text
+  rta_rail_model: text
+  rta_rail_id: integer
+  rta_attachment_make: text
+  rta_attachment_model: text
+  rta_attachment_id: integer
+  rtb_roofing_material: text
+  rtb_framing_size: text
+  rtb_framing_spacing: text
+  rtb_rail_make: text
+  rtb_rail_model: text
+  rtb_rail_id: integer
+  rtb_attachment_make: text
+  rtb_attachment_model: text
+  rtb_attachment_id: integer
+  mp1_roof_type: text
+  mp1_stories: integer
+  mp1_pitch: integer
+  mp1_azimuth: integer
+  mp1_tilt_mount_azimuth: integer
+  mp1_tilt_mount_pitch: integer
+  mp2_roof_type: text
+  mp2_stories: integer
+  mp2_pitch: integer
+  mp2_azimuth: integer
+  mp2_tilt_mount_azimuth: integer
+  mp2_tilt_mount_pitch: integer
+  mp3_roof_type: text
+  mp3_stories: integer
+  mp3_pitch: integer
+  mp3_azimuth: integer
+  mp3_tilt_mount_azimuth: integer
+  mp3_tilt_mount_pitch: integer
+  mp4_roof_type: text
+  mp4_stories: integer
+  mp4_pitch: integer
+  mp4_azimuth: integer
+  mp4_tilt_mount_azimuth: integer
+  mp4_tilt_mount_pitch: integer
+  mp5_roof_type: text
+  mp5_stories: integer
+  mp5_pitch: integer
+  mp5_azimuth: integer
+  mp5_tilt_mount_azimuth: integer
+  mp5_tilt_mount_pitch: integer
+  mp6_roof_type: text
+  mp6_stories: integer
+  mp6_pitch: integer
+  mp6_azimuth: integer
+  mp6_tilt_mount_azimuth: integer
+  mp6_tilt_mount_pitch: integer
+  mp7_roof_type: text
+  mp7_stories: integer
+  mp7_pitch: integer
+  mp7_azimuth: integer
+  mp7_tilt_mount_azimuth: integer
+  mp7_tilt_mount_pitch: integer
+  mp8_roof_type: text
+  mp8_stories: integer
+  mp8_pitch: integer
+  mp8_azimuth: integer
+  mp8_tilt_mount_azimuth: integer
+  mp8_tilt_mount_pitch: integer
+  mp9_roof_type: text
+  mp9_stories: integer
+  mp9_pitch: integer
+  mp9_azimuth: integer
+  mp9_tilt_mount_azimuth: integer
+  mp9_tilt_mount_pitch: integer
+  mp10_roof_type: text
+  mp10_stories: integer
+  mp10_pitch: integer
+  mp10_azimuth: integer
+  mp10_tilt_mount_azimuth: integer
+  mp10_tilt_mount_pitch: integer
+  sys1_ap_hoy_wire_gauge: text
+  sys1_ap_hoy_breaker_size: text
+  sys2_ap_hoy_wire_gauge: text
+  sys2_ap_hoy_breaker_size: text
+  bsp_backup_feeder_location: text
+  spb_subpanel_b_feeder_location: text
+  mpa_bus_bar_existing: boolean
+  mpa_main_circuit_breaker_existing: boolean
+  mpa_mainpanela_acunit_amps: text
+  mpa_mainpanela_furnace_amps: text
+  bsp_backupload_mcbexisting: boolean
+  spb_subpanelb_mcbexisting: boolean
+  ele_utility_meter_behind_fence: boolean
+  ele_combine_positions: text
+  precombine_1_1_equipment_type: text
+  precombine_1_1_existing: boolean
+  precombine_1_1_make: text
+  precombine_1_1_model: text
+  precombine_1_1_equipment_master_id: integer
+  precombine_2_1_equipment_type: text
+  precombine_2_1_existing: boolean
+  precombine_2_1_make: text
+  precombine_2_1_model: text
+  precombine_2_1_equipment_master_id: integer
+  precombine_3_1_equipment_type: text
+  precombine_3_1_existing: boolean
+  precombine_3_1_make: text
+  precombine_3_1_model: text
+  precombine_3_1_equipment_master_id: integer
+  postcombine_1_1_equipment_type: text
+  postcombine_1_1_existing: boolean
+  postcombine_1_1_make: text
+  postcombine_1_1_model: text
+  postcombine_1_1_equipment_master_id: integer
+  postcombine_2_1_equipment_type: text
+  postcombine_2_1_existing: boolean
+  postcombine_2_1_make: text
+  postcombine_2_1_model: text
+  postcombine_2_1_equipment_master_id: integer
+  postcombine_3_1_equipment_type: text
+  postcombine_3_1_existing: boolean
+  postcombine_3_1_make: text
+  postcombine_3_1_model: text
+  postcombine_3_1_equipment_master_id: integer
+  precombine_1_2_equipment_type: text
+  precombine_1_2_existing: boolean
+  precombine_1_2_make: text
+  precombine_1_2_model: text
+  precombine_1_2_equipment_master_id: integer
+  precombine_2_2_equipment_type: text
+  precombine_2_2_existing: boolean
+  precombine_2_2_make: text
+  precombine_2_2_model: text
+  precombine_2_2_equipment_master_id: integer
+  precombine_3_2_equipment_type: text
+  precombine_3_2_existing: boolean
+  precombine_3_2_make: text
+  precombine_3_2_model: text
+  precombine_3_2_equipment_master_id: integer
+  postcombine_1_2_equipment_type: text
+  postcombine_1_2_existing: boolean
+  postcombine_1_2_make: text
+  postcombine_1_2_model: text
+  postcombine_1_2_equipment_master_id: integer
+  postcombine_2_2_equipment_type: text
+  postcombine_2_2_existing: boolean
+  postcombine_2_2_make: text
+  postcombine_2_2_model: text
+  postcombine_2_2_equipment_master_id: integer
+  postcombine_3_2_equipment_type: text
+  postcombine_3_2_existing: boolean
+  postcombine_3_2_make: text
+  postcombine_3_2_model: text
+  postcombine_3_2_equipment_master_id: integer
+  precombine_1_3_equipment_type: text
+  precombine_1_3_existing: boolean
+  precombine_1_3_make: text
+  precombine_1_3_model: text
+  precombine_1_3_equipment_master_id: integer
+  precombine_2_3_equipment_type: text
+  precombine_2_3_existing: boolean
+  precombine_2_3_make: text
+  precombine_2_3_model: text
+  precombine_2_3_equipment_master_id: integer
+  precombine_3_3_equipment_type: text
+  precombine_3_3_existing: boolean
+  precombine_3_3_make: text
+  precombine_3_3_model: text
+  precombine_3_3_equipment_master_id: integer
+  postcombine_1_3_equipment_type: text
+  postcombine_1_3_existing: boolean
+  postcombine_1_3_make: text
+  postcombine_1_3_model: text
+  postcombine_1_3_equipment_master_id: integer
+  postcombine_2_3_equipment_type: text
+  postcombine_2_3_existing: boolean
+  postcombine_2_3_make: text
+  postcombine_2_3_model: text
+  postcombine_2_3_equipment_master_id: integer
+  postcombine_3_3_equipment_type: text
+  postcombine_3_3_existing: boolean
+  postcombine_3_3_make: text
+  postcombine_3_3_model: text
+  postcombine_3_3_equipment_master_id: integer
+  sys1_system_combiner_panel1_mlo: text
+  sys2_system_combiner_panel2_mlo: text
+  utility_service_amps: text
+  roof_sq_ft: integer
+  roof_a_panel_count: integer
+  roof_b_panel_count: integer
+  mpa_tie_in_breaker_existing: boolean
+  mpa_tie_in_breaker_rating: text
+  panel_count_mp1: integer
+  panel_count_mp2: integer
+  panel_count_mp3: integer
+  panel_count_mp4: integer
+  panel_count_mp5: integer
+  panel_count_mp6: integer
+  panel_count_mp7: integer
+  panel_count_mp8: integer
+  panel_count_mp9: integer
+  panel_count_mp10: integer
+  ground_size_sys1: text
+  ground_size_sys2: text
+  ground_size_pos3: text
+  ground_size_pos4: text
+  tap_interior_exterior: text
+  sys1_sms_pv_1_input: text
+  sys1_sms1_pv_2_input: text
+  sys1_sms_pv_3_input: text
+  sys1_sms_ess_1_input: text
+  sys1_sms1_ess_2_input: text
+  sys1_sms_backup_load_sub_panel_input: text
+  sys1_sms_rsd_input: text
+  sys1_sms_1gen_1_input: text
+  sys1_backup_sp_tie_in_breaker_location: text
+  subpanelb_small_appliances: text
+  subpanelb_air_conditioning_amps: text
+  subpanelb_furnace_amps: text
+  rooftypea_rafter_truss: text
+  rooftypeb_rafter_truss: text
+  sys1_combinerpanel_bus_rating: text
+  sys2_combiner_panel_bus_rating: text
+  sys2_backup_load_sub_panel_make: text
+  sys2_backup_load_sub_panel_model: text
+  sys2_backuploadsubpanel_id: integer
+  sys2_backuploadsubpanel_bus_new_existing: boolean
+  sys2_backuploadsubpanel_bus_rating: text
+  sys2_backuploadsubpanel_mcb_new_existing: boolean
+  sys2_backuploadpanel_mcb_rating: text
+  sys2_backuploadsubpanel_tie_in_breaker_rating: text
+  sys2_backuploadsubpanel_tie_in_breaker_location: text
+  sys2_battery_combiner_panel_make: text
+  sys2_battery_combiner_panel_model: text
+  sys2_batterycombinerpanel_id: integer
+  sys2_batterycombinerpanel_bus_new_existing: boolean
+  sys2_batterycombinerpanel_bus_rating: text
+  sys2_batterycombinerpanel_mcb_new_existing: boolean
+  sys2_batterycombinerpanel_mcb_rating: text
+  sys2_batterycombinerpanel_tie_in_breaker_rating: text
+  sys2_batterycombinerpanel_tie_in_breaker_location: text
+  sys2_pv_1_input: text
+  sys2_pv_2_input: text
+  sys2_pv_3_input: text
+  sys2_ess_1_input: text
+  sys2_ess_2_input: text
+  sys2_backup_load_sub_panel_input: text
+  sys2_rsd_input: text
+  sys2_gen_1_input: text
+  sys2_pv1_overwrite: boolean
+  sys2_pv2_overwrite: boolean
+  sys2_pv3_overwrite: boolean
+  sys2_ess1_overwrite: boolean
+  sys2_ess2_overwrite: boolean
+  sys2_backloadtype1: text
+  sys2_backloadtype2: text
+  sys2_backloadtype3: text
+  sys2_backloadtype4: text
+  sys2_backloadtype5: text
+  sys2_backloadtype6: text
+  sys2_backloadtype7: text
+  sys2_backloadtype8: text
+  sys2_backloadtype9: text
+  sys2_backloadtype10: text
+  sys2_backloadtype11: text
+  sys2_backloadtype12: text
+  sys2_backloadtype13: text
+  sys2_backloadtype14: text
+  sys2_backloadtype15: text
+  sys2_backloadtype16: text
+  sys2_backloadtype17: text
+  sys2_backloadtype18: text
+  sys2_backloadtype19: text
+  sys2_backloadtype20: text
+  sys2_backup_load_rating_1: text
+  sys2_backup_load_rating_2: text
+  sys2_backup_load_rating_3: text
+  sys2_backup_load_rating_4: text
+  sys2_backup_load_rating_5: text
+  sys2_backup_load_rating_6: text
+  sys2_backup_load_rating_7: text
+  sys2_backup_load_rating_8: text
+  sys2_backup_load_rating_9: text
+  sys2_backup_load_rating_10: text
+  sys2_backup_load_rating_11: text
+  sys2_backup_load_rating_12: text
+  sys2_backup_load_rating_13: text
+  sys2_backup_load_rating_14: text
+  sys2_backup_load_rating_15: text
+  sys2_backup_load_rating_16: text
+  sys2_backup_load_rating_17: text
+  sys2_backup_load_rating_18: text
+  sys2_backup_load_rating_19: text
+  sys2_backup_load_rating_20: text
+  bos1c_amp_rating: text
+  bos1d_amp_rating: text
+  bos1e_amp_rating: text
+  bos1f_amp_rating: text
+  bos2c_amp_rating: text
+  bos2d_amp_rating: text
+  bos2e_amp_rating: text
+  bos2f_amp_rating: text
+  mount_type_a: text
+  mount_type_b: text
+  sys1_pcs_settings: boolean
+  pos_2_pcs_settings: text
+  house_stories: integer
+  system_combiner_panel_1_make: text
+  system_combiner_panel_1_model: text
+  system_combiner1_id: integer
+  system_combiner_panel_1_amp_rating: text
+  breaker_rating: text
+  system_combiner_panel_2_make: text
+  system_combiner_panel_2_model: text
+  system_combiner2_id: integer
+  system_combiner_panel_2_amp_rating: text
+  created_by: integer
+  sys1_selectedsystem: text
+  sys2_selectedsystem: text
+  sys1_combinerpanel_main_breaker_rating: text
+  sys1_sms_make: text
+  sys1_sms_model: text
+  sys1_sms_id: integer
+  sys1_sms_breaker_rating: text
+  sys1_sms_backup_load_sub_panel_breaker_rating: text
+  sys1_sms_pv_breaker_rating_override: text
+  sys1_sms_ess_breaker_rating_override: text
+  sys1_sms_tie_in_breaker_rating_override: text
+  sys1_sms_rsd_enabled: boolean
+  sys1_battery_configuration: text
+  sys1_combinerpanel_existing: boolean
+  sys1_sms_existing: boolean
+  el_mpa_derated: boolean
+  el_spb_derated: boolean
+  el_spc_existing: boolean
+  el_spc_bus_rating: integer
+  el_spc_main_breaker_rating: integer
+  el_spc_feeder_location: text
+  el_spc_upstream_breaker_rating: integer
+  el_spc_upstream_breaker_location: text
+  el_spd_existing: boolean
+  el_spd_bus_rating: integer
+  el_spd_main_breaker_rating: integer
+  el_spd_feeder_location: text
+  el_spd_upstream_breaker_rating: integer
+  el_spd_upstream_breaker_location: text
+  el_poi_breaker_rating: integer
+  el_poi_disconnect_rating: integer
+  st_roof_a_area_sqft: integer
+  st_roof_b_area_sqft: integer
+  st_roof_a_framing_type: text
+  st_roof_b_framing_type: text
+  st_mp1_arrayqty_1: integer
+  st_mp1_arrayqty_2: integer
+  st_mp1_arrayqty_3: integer
+  st_mp1_arrayqty_4: integer
+  st_mp1_arrayqty_5: integer
+  st_mp1_arrayqty_6: integer
+  st_mp1_arrayqty_7: integer
+  st_mp1_arrayqty_8: integer
+  st_mp2_arrayqty_1: integer
+  st_mp2_arrayqty_2: integer
+  st_mp2_arrayqty_3: integer
+  st_mp2_arrayqty_4: integer
+  st_mp2_arrayqty_5: integer
+  st_mp2_arrayqty_6: integer
+  st_mp2_arrayqty_7: integer
+  st_mp2_arrayqty_8: integer
+  st_mp3_arrayqty_1: integer
+  st_mp3_arrayqty_2: integer
+  st_mp3_arrayqty_3: integer
+  st_mp3_arrayqty_4: integer
+  st_mp3_arrayqty_5: integer
+  st_mp3_arrayqty_6: integer
+  st_mp3_arrayqty_7: integer
+  st_mp3_arrayqty_8: integer
+  st_mp4_arrayqty_1: integer
+  st_mp4_arrayqty_2: integer
+  st_mp4_arrayqty_3: integer
+  st_mp4_arrayqty_4: integer
+  st_mp4_arrayqty_5: integer
+  st_mp4_arrayqty_6: integer
+  st_mp4_arrayqty_7: integer
+  st_mp4_arrayqty_8: integer
+  st_mp5_arrayqty_1: integer
+  st_mp5_arrayqty_2: integer
+  st_mp5_arrayqty_3: integer
+  st_mp5_arrayqty_4: integer
+  st_mp5_arrayqty_5: integer
+  st_mp5_arrayqty_6: integer
+  st_mp5_arrayqty_7: integer
+  st_mp5_arrayqty_8: integer
+  st_mp6_arrayqty_1: integer
+  st_mp6_arrayqty_2: integer
+  st_mp6_arrayqty_3: integer
+  st_mp6_arrayqty_4: integer
+  st_mp6_arrayqty_5: integer
+  st_mp6_arrayqty_6: integer
+  st_mp6_arrayqty_7: integer
+  st_mp6_arrayqty_8: integer
+  st_mp7_arrayqty_1: integer
+  st_mp7_arrayqty_2: integer
+  st_mp7_arrayqty_3: integer
+  st_mp7_arrayqty_4: integer
+  st_mp7_arrayqty_5: integer
+  st_mp7_arrayqty_6: integer
+  st_mp7_arrayqty_7: integer
+  st_mp7_arrayqty_8: integer
+  st_mp8_arrayqty_1: integer
+  st_mp8_arrayqty_2: integer
+  st_mp8_arrayqty_3: integer
+  st_mp8_arrayqty_4: integer
+  st_mp8_arrayqty_5: integer
+  st_mp8_arrayqty_6: integer
+  st_mp8_arrayqty_7: integer
+  st_mp8_arrayqty_8: integer
+  st_mp9_arrayqty_1: integer
+  st_mp9_arrayqty_2: integer
+  st_mp9_arrayqty_3: integer
+  st_mp9_arrayqty_4: integer
+  st_mp9_arrayqty_5: integer
+  st_mp9_arrayqty_6: integer
+  st_mp9_arrayqty_7: integer
+  st_mp9_arrayqty_8: integer
+  st_mp10_arrayqty_1: integer
+  st_mp10_arrayqty_2: integer
+  st_mp10_arrayqty_3: integer
+  st_mp10_arrayqty_4: integer
+  st_mp10_arrayqty_5: integer
+  st_mp10_arrayqty_6: integer
+  st_mp10_arrayqty_7: integer
+  st_mp10_arrayqty_8: integer
+  st_mp1_mode: text
+  st_mp2_mode: text
+  st_mp3_mode: text
+  st_mp4_mode: text
+  st_mp5_mode: text
+  st_mp6_mode: text
+  st_mp7_mode: text
+  st_mp8_mode: text
+  st_mp9_mode: text
+  st_mp10_mode: text
+  el_mca_system_back_feed: integer
+  house_sqft: integer
+  sys1_tesla_extensions: character varying
+  sys2_tesla_extensions: character varying
+  sys1_batteryonly: boolean
+  sys2_batteryonly: boolean
+  sys1_show_second_panel_type: boolean
+  sys1_solar_panel_type2_quantity: integer
+  sys1_solar_panel_type2_manufacturer: character varying
+  sys1_solar_panel_type2_model: character varying
+  sys1_solar_panel_type2_is_new: boolean
+  sys2_show_second_panel_type: boolean
+  sys2_solar_panel_type2_quantity: integer
+  sys2_solar_panel_type2_manufacturer: character varying
+  sys2_solar_panel_type2_model: character varying
+  sys2_solar_panel_type2_is_new: boolean
+  sys1_teslagatewaytype: text
+  sys2_teslagatewaytype: text
+  sys1_backupswitch_location: text
+  sys2_backupswitch_location: text
+  version_number: integer
+  last_generated_at: timestamp with time zone
+  last_generated_by: character varying
+  sys2_sms_make: text
+  sys2_sms_model: text
+  sys2_sms_id: integer
+  sys2_sms_breaker_rating: text
+  sys2_sms_backup_load_sub_panel_breaker_rating: text
+  sys2_sms_pv_breaker_rating_override: text
+  sys2_sms_ess_breaker_rating_override: text
+  sys2_sms_tie_in_breaker_rating_override: text
+  sys2_sms_rsd_enabled: boolean
+  sys2_sms_pv_1_input: text
+  sys2_sms_pv_2_input: text
+  sys2_sms_pv_3_input: text
+  sys2_sms_ess_1_input: text
+  sys2_sms_ess_2_input: text
+  sys2_sms_backup_load_sub_panel_input: text
+  sys2_sms_rsd_input: text
+  sys2_sms_gen_1_input: text
+  sys2_battery_configuration: text
+  sys2_pcs_settings: boolean
+  sys2_combinerpanel_main_breaker_rating: text
+  sys2_combinerpanel_existing: boolean
+  sys2_combinerpanel_bus_rating: text
+  sys2_backup_sp_tie_in_breaker_location: text
+  sys2_stringing_type: text
+  bos_sys1_type1_equipment_type: text
+  bos_sys1_type1_make: text
+  bos_sys1_type1_model: text
+  bos_sys1_type1_amp_rating: text
+  bos_sys1_type1_is_new: boolean
+  bos_sys1_type1_active: boolean
+  bos_sys1_type2_equipment_type: text
+  bos_sys1_type2_make: text
+  bos_sys1_type2_model: text
+  bos_sys1_type2_amp_rating: text
+  bos_sys1_type2_is_new: boolean
+  bos_sys1_type2_active: boolean
+  bos_sys1_type3_equipment_type: text
+  bos_sys1_type3_make: text
+  bos_sys1_type3_model: text
+  bos_sys1_type3_amp_rating: text
+  bos_sys1_type3_is_new: boolean
+  bos_sys1_type3_active: boolean
+  bos_sys1_show_type1: boolean
+  bos_sys1_show_type2: boolean
+  bos_sys1_show_type3: boolean
+  bos_sys2_type1_equipment_type: text
+  bos_sys2_type1_make: text
+  bos_sys2_type1_model: text
+  bos_sys2_type1_amp_rating: text
+  bos_sys2_type1_is_new: boolean
+  bos_sys2_type1_active: boolean
+  bos_sys2_type2_equipment_type: text
+  bos_sys2_type2_make: text
+  bos_sys2_type2_model: text
+  bos_sys2_type2_amp_rating: text
+  bos_sys2_type2_is_new: boolean
+  bos_sys2_type2_active: boolean
+  bos_sys2_type3_equipment_type: text
+  bos_sys2_type3_make: text
+  bos_sys2_type3_model: text
+  bos_sys2_type3_amp_rating: text
+  bos_sys2_type3_is_new: boolean
+  bos_sys2_type3_active: boolean
+  bos_sys2_show_type1: boolean
+  bos_sys2_show_type2: boolean
+  bos_sys2_show_type3: boolean
+  bos_sys3_type1_equipment_type: text
+  bos_sys3_type1_make: text
+  bos_sys3_type1_model: text
+  bos_sys3_type1_amp_rating: text
+  bos_sys3_type1_is_new: boolean
+  bos_sys3_type1_active: boolean
+  bos_sys3_type2_equipment_type: text
+  bos_sys3_type2_make: text
+  bos_sys3_type2_model: text
+  bos_sys3_type2_amp_rating: text
+  bos_sys3_type2_is_new: boolean
+  bos_sys3_type2_active: boolean
+  bos_sys3_type3_equipment_type: text
+  bos_sys3_type3_make: text
+  bos_sys3_type3_model: text
+  bos_sys3_type3_amp_rating: text
+  bos_sys3_type3_is_new: boolean
+  bos_sys3_type3_active: boolean
+  bos_sys3_show_type1: boolean
+  bos_sys3_show_type2: boolean
+  bos_sys3_show_type3: boolean
+  bos_sys4_type1_equipment_type: text
+  bos_sys4_type1_make: text
+  bos_sys4_type1_model: text
+  bos_sys4_type1_amp_rating: text
+  bos_sys4_type1_is_new: boolean
+  bos_sys4_type1_active: boolean
+  bos_sys4_type2_equipment_type: text
+  bos_sys4_type2_make: text
+  bos_sys4_type2_model: text
+  bos_sys4_type2_amp_rating: text
+  bos_sys4_type2_is_new: boolean
+  bos_sys4_type2_active: boolean
+  bos_sys4_type3_equipment_type: text
+  bos_sys4_type3_make: text
+  bos_sys4_type3_model: text
+  bos_sys4_type3_amp_rating: text
+  bos_sys4_type3_is_new: boolean
+  bos_sys4_type3_active: boolean
+  bos_sys4_show_type1: boolean
+  bos_sys4_show_type2: boolean
+  bos_sys4_show_type3: boolean
+  sys1_stringing_type: text
+  sys2_ele_breaker_location: character varying
+  sys1_pcs_amps: integer
+  sys2_pcs_amps: integer
+  isacintegrated: boolean
+  ele_bathroom_circuits: text
+  ele_laundry_circuits: text
+  ele_electric_vehicle_amps: text
+  ele_hvac_air_handler_amps: text
+  spb_floor_area: text
+  spb_bathroom_circuits: text
+  spb_laundry_circuits: text
+  spb_electric_vehicle_amps: text
+  spb_hvac_air_handler_amps: text
+  spb_electrical_furnace_amps: text
+  spb_ac_unit_amps: text
+  special_scenario: character varying
+  special_scenario_reason: text
+  affected_systems: character varying
+  ele_combine_systems: boolean
+  ele_combine_active_systems: character varying
+  ele_combine_system_desc: character varying
+  sys1_landing_destination: character varying
+  sys2_landing_destination: character varying
+  bos_sys1_type4_equipment_type: character varying
+  bos_sys1_type4_make: character varying
+  bos_sys1_type4_model: character varying
+  bos_sys1_type4_amp_rating: character varying
+  bos_sys1_type4_is_new: boolean
+  bos_sys1_type4_active: boolean
+  bos_sys1_type5_equipment_type: character varying
+  bos_sys1_type5_make: character varying
+  bos_sys1_type5_model: character varying
+  bos_sys1_type5_amp_rating: character varying
+  bos_sys1_type5_is_new: boolean
+  bos_sys1_type5_active: boolean
+  bos_sys1_type6_equipment_type: character varying
+  bos_sys1_type6_make: character varying
+  bos_sys1_type6_model: character varying
+  bos_sys1_type6_amp_rating: character varying
+  bos_sys1_type6_is_new: boolean
+  bos_sys1_type6_active: boolean
+  bos_sys2_type4_equipment_type: character varying
+  bos_sys2_type4_make: character varying
+  bos_sys2_type4_model: character varying
+  bos_sys2_type4_amp_rating: character varying
+  bos_sys2_type4_is_new: boolean
+  bos_sys2_type4_active: boolean
+  bos_sys2_type5_equipment_type: character varying
+  bos_sys2_type5_make: character varying
+  bos_sys2_type5_model: character varying
+  bos_sys2_type5_amp_rating: character varying
+  bos_sys2_type5_is_new: boolean
+  bos_sys2_type5_active: boolean
+  bos_sys2_type6_equipment_type: character varying
+  bos_sys2_type6_make: character varying
+  bos_sys2_type6_model: character varying
+  bos_sys2_type6_amp_rating: character varying
+  bos_sys2_type6_is_new: boolean
+  bos_sys2_type6_active: boolean
+  bos_sys3_type4_equipment_type: character varying
+  bos_sys3_type4_make: character varying
+  bos_sys3_type4_model: character varying
+  bos_sys3_type4_amp_rating: character varying
+  bos_sys3_type4_is_new: boolean
+  bos_sys3_type4_active: boolean
+  bos_sys3_type5_equipment_type: character varying
+  bos_sys3_type5_make: character varying
+  bos_sys3_type5_model: character varying
+  bos_sys3_type5_amp_rating: character varying
+  bos_sys3_type5_is_new: boolean
+  bos_sys3_type5_active: boolean
+  bos_sys3_type6_equipment_type: character varying
+  bos_sys3_type6_make: character varying
+  bos_sys3_type6_model: character varying
+  bos_sys3_type6_amp_rating: character varying
+  bos_sys3_type6_is_new: boolean
+  bos_sys3_type6_active: boolean
+  bos_sys4_type4_equipment_type: character varying
+  bos_sys4_type4_make: character varying
+  bos_sys4_type4_model: character varying
+  bos_sys4_type4_amp_rating: character varying
+  bos_sys4_type4_is_new: boolean
+  bos_sys4_type4_active: boolean
+  bos_sys4_type5_equipment_type: character varying
+  bos_sys4_type5_make: character varying
+  bos_sys4_type5_model: character varying
+  bos_sys4_type5_amp_rating: character varying
+  bos_sys4_type5_is_new: boolean
+  bos_sys4_type5_active: boolean
+  bos_sys4_type6_equipment_type: character varying
+  bos_sys4_type6_make: character varying
+  bos_sys4_type6_model: character varying
+  bos_sys4_type6_amp_rating: character varying
+  bos_sys4_type6_is_new: boolean
+  bos_sys4_type6_active: boolean
+  bos_sys1_type1_trigger: character varying
+  bos_sys1_type2_trigger: character varying
+  bos_sys1_type3_trigger: character varying
+  bos_sys1_type4_trigger: character varying
+  bos_sys1_type5_trigger: character varying
+  bos_sys1_type6_trigger: character varying
+  bos_sys2_type1_trigger: character varying
+  bos_sys2_type2_trigger: character varying
+  bos_sys2_type3_trigger: character varying
+  bos_sys2_type4_trigger: character varying
+  bos_sys2_type5_trigger: character varying
+  bos_sys2_type6_trigger: character varying
+  bos_sys3_type1_trigger: character varying
+  bos_sys3_type2_trigger: character varying
+  bos_sys3_type3_trigger: character varying
+  bos_sys3_type4_trigger: character varying
+  bos_sys3_type5_trigger: character varying
+  bos_sys3_type6_trigger: character varying
+  bos_sys4_type1_trigger: character varying
+  bos_sys4_type2_trigger: character varying
+  bos_sys4_type3_trigger: character varying
+  bos_sys4_type4_trigger: character varying
+  bos_sys4_type5_trigger: character varying
+  bos_sys4_type6_trigger: character varying
+  post_sms_bos_sys1_type1_equipment_type: character varying
+  post_sms_bos_sys1_type1_amp_rating: character varying
+  post_sms_bos_sys1_type1_make: character varying
+  post_sms_bos_sys1_type1_model: character varying
+  post_sms_bos_sys1_type1_is_new: boolean
+  post_sms_bos_sys1_type1_trigger: character varying
+  post_sms_bos_sys1_type1_active: boolean
+  post_sms_bos_sys2_type1_equipment_type: character varying
+  post_sms_bos_sys2_type1_amp_rating: character varying
+  post_sms_bos_sys2_type1_make: character varying
+  post_sms_bos_sys2_type1_model: character varying
+  post_sms_bos_sys2_type1_is_new: boolean
+  post_sms_bos_sys2_type1_trigger: character varying
+  post_sms_bos_sys2_type1_active: boolean
+  post_sms_bos_sys3_type1_equipment_type: character varying
+  post_sms_bos_sys3_type1_amp_rating: character varying
+  post_sms_bos_sys3_type1_make: character varying
+  post_sms_bos_sys3_type1_model: character varying
+  post_sms_bos_sys3_type1_is_new: boolean
+  post_sms_bos_sys3_type1_trigger: character varying
+  post_sms_bos_sys3_type1_active: boolean
+  post_sms_bos_sys4_type1_equipment_type: character varying
+  post_sms_bos_sys4_type1_amp_rating: character varying
+  post_sms_bos_sys4_type1_make: character varying
+  post_sms_bos_sys4_type1_model: character varying
+  post_sms_bos_sys4_type1_is_new: boolean
+  post_sms_bos_sys4_type1_trigger: character varying
+  post_sms_bos_sys4_type1_active: boolean
+  post_sms_bos_sys1_type2_equipment_type: character varying
+  post_sms_bos_sys1_type2_amp_rating: character varying
+  post_sms_bos_sys1_type2_make: character varying
+  post_sms_bos_sys1_type2_model: character varying
+  post_sms_bos_sys1_type2_is_new: boolean
+  post_sms_bos_sys1_type2_trigger: character varying
+  post_sms_bos_sys1_type2_active: boolean
+  post_sms_bos_sys2_type2_equipment_type: character varying
+  post_sms_bos_sys2_type2_amp_rating: character varying
+  post_sms_bos_sys2_type2_make: character varying
+  post_sms_bos_sys2_type2_model: character varying
+  post_sms_bos_sys2_type2_is_new: boolean
+  post_sms_bos_sys2_type2_trigger: character varying
+  post_sms_bos_sys2_type2_active: boolean
+  post_sms_bos_sys3_type2_equipment_type: character varying
+  post_sms_bos_sys3_type2_amp_rating: character varying
+  post_sms_bos_sys3_type2_make: character varying
+  post_sms_bos_sys3_type2_model: character varying
+  post_sms_bos_sys3_type2_is_new: boolean
+  post_sms_bos_sys3_type2_trigger: character varying
+  post_sms_bos_sys3_type2_active: boolean
+  post_sms_bos_sys4_type2_equipment_type: character varying
+  post_sms_bos_sys4_type2_amp_rating: character varying
+  post_sms_bos_sys4_type2_make: character varying
+  post_sms_bos_sys4_type2_model: character varying
+  post_sms_bos_sys4_type2_is_new: boolean
+  post_sms_bos_sys4_type2_trigger: character varying
+  post_sms_bos_sys4_type2_active: boolean
+  post_sms_bos_sys1_type3_equipment_type: character varying
+  post_sms_bos_sys1_type3_amp_rating: character varying
+  post_sms_bos_sys1_type3_make: character varying
+  post_sms_bos_sys1_type3_model: character varying
+  post_sms_bos_sys1_type3_is_new: boolean
+  post_sms_bos_sys1_type3_trigger: character varying
+  post_sms_bos_sys1_type3_active: boolean
+  post_sms_bos_sys2_type3_equipment_type: character varying
+  post_sms_bos_sys2_type3_amp_rating: character varying
+  post_sms_bos_sys2_type3_make: character varying
+  post_sms_bos_sys2_type3_model: character varying
+  post_sms_bos_sys2_type3_is_new: boolean
+  post_sms_bos_sys2_type3_trigger: character varying
+  post_sms_bos_sys2_type3_active: boolean
+  post_sms_bos_sys3_type3_equipment_type: character varying
+  post_sms_bos_sys3_type3_amp_rating: character varying
+  post_sms_bos_sys3_type3_make: character varying
+  post_sms_bos_sys3_type3_model: character varying
+  post_sms_bos_sys3_type3_is_new: boolean
+  post_sms_bos_sys3_type3_trigger: character varying
+  post_sms_bos_sys3_type3_active: boolean
+  post_sms_bos_sys4_type3_equipment_type: character varying
+  post_sms_bos_sys4_type3_amp_rating: character varying
+  post_sms_bos_sys4_type3_make: character varying
+  post_sms_bos_sys4_type3_model: character varying
+  post_sms_bos_sys4_type3_is_new: boolean
+  post_sms_bos_sys4_type3_trigger: character varying
+  post_sms_bos_sys4_type3_active: boolean
+  bos_sys1_battery1_type1_equipment_type: character varying
+  bos_sys1_battery1_type1_make: character varying
+  bos_sys1_battery1_type1_model: character varying
+  bos_sys1_battery1_type1_amp_rating: character varying
+  bos_sys1_battery1_type1_is_new: boolean
+  bos_sys1_battery1_type1_trigger: character varying
+  bos_sys1_battery1_type2_equipment_type: character varying
+  bos_sys1_battery1_type2_make: character varying
+  bos_sys1_battery1_type2_model: character varying
+  bos_sys1_battery1_type2_amp_rating: character varying
+  bos_sys1_battery1_type2_is_new: boolean
+  bos_sys1_battery1_type2_trigger: character varying
+  bos_sys1_battery2_type1_equipment_type: character varying
+  bos_sys1_battery2_type1_make: character varying
+  bos_sys1_battery2_type1_model: character varying
+  bos_sys1_battery2_type1_amp_rating: character varying
+  bos_sys1_battery2_type1_is_new: boolean
+  bos_sys1_battery2_type1_trigger: character varying
+  bos_sys1_battery2_type2_equipment_type: character varying
+  bos_sys1_battery2_type2_make: character varying
+  bos_sys1_battery2_type2_model: character varying
+  bos_sys1_battery2_type2_amp_rating: character varying
+  bos_sys1_battery2_type2_is_new: boolean
+  bos_sys1_battery2_type2_trigger: character varying
+  bos_sys1_backup_type1_equipment_type: character varying
+  bos_sys1_backup_type1_make: character varying
+  bos_sys1_backup_type1_model: character varying
+  bos_sys1_backup_type1_amp_rating: character varying
+  bos_sys1_backup_type1_is_new: boolean
+  bos_sys1_backup_type1_trigger: character varying
+  bos_sys1_backup_type2_equipment_type: character varying
+  bos_sys1_backup_type2_make: character varying
+  bos_sys1_backup_type2_model: character varying
+  bos_sys1_backup_type2_amp_rating: character varying
+  bos_sys1_backup_type2_is_new: boolean
+  bos_sys1_backup_type2_trigger: character varying
+  bos_sys1_backup_type3_equipment_type: character varying
+  bos_sys1_backup_type3_make: character varying
+  bos_sys1_backup_type3_model: character varying
+  bos_sys1_backup_type3_amp_rating: character varying
+  bos_sys1_backup_type3_is_new: boolean
+  bos_sys1_backup_type3_trigger: character varying
+  bos_sys2_battery1_type1_equipment_type: character varying
+  bos_sys2_battery1_type1_make: character varying
+  bos_sys2_battery1_type1_model: character varying
+  bos_sys2_battery1_type1_amp_rating: character varying
+  bos_sys2_battery1_type1_is_new: boolean
+  bos_sys2_battery1_type1_trigger: character varying
+  bos_sys2_battery1_type2_equipment_type: character varying
+  bos_sys2_battery1_type2_make: character varying
+  bos_sys2_battery1_type2_model: character varying
+  bos_sys2_battery1_type2_amp_rating: character varying
+  bos_sys2_battery1_type2_is_new: boolean
+  bos_sys2_battery1_type2_trigger: character varying
+  bos_sys2_battery2_type1_equipment_type: character varying
+  bos_sys2_battery2_type1_make: character varying
+  bos_sys2_battery2_type1_model: character varying
+  bos_sys2_battery2_type1_amp_rating: character varying
+  bos_sys2_battery2_type1_is_new: boolean
+  bos_sys2_battery2_type1_trigger: character varying
+  bos_sys2_battery2_type2_equipment_type: character varying
+  bos_sys2_battery2_type2_make: character varying
+  bos_sys2_battery2_type2_model: character varying
+  bos_sys2_battery2_type2_amp_rating: character varying
+  bos_sys2_battery2_type2_is_new: boolean
+  bos_sys2_battery2_type2_trigger: character varying
+  bos_sys2_backup_type1_equipment_type: character varying
+  bos_sys2_backup_type1_make: character varying
+  bos_sys2_backup_type1_model: character varying
+  bos_sys2_backup_type1_amp_rating: character varying
+  bos_sys2_backup_type1_is_new: boolean
+  bos_sys2_backup_type1_trigger: character varying
+  bos_sys2_backup_type2_equipment_type: character varying
+  bos_sys2_backup_type2_make: character varying
+  bos_sys2_backup_type2_model: character varying
+  bos_sys2_backup_type2_amp_rating: character varying
+  bos_sys2_backup_type2_is_new: boolean
+  bos_sys2_backup_type2_trigger: character varying
+  bos_sys2_backup_type3_equipment_type: character varying
+  bos_sys2_backup_type3_make: character varying
+  bos_sys2_backup_type3_model: character varying
+  bos_sys2_backup_type3_amp_rating: character varying
+  bos_sys2_backup_type3_is_new: boolean
+  bos_sys2_backup_type3_trigger: character varying
+  bos_sys3_battery1_type1_equipment_type: character varying
+  bos_sys3_battery1_type1_make: character varying
+  bos_sys3_battery1_type1_model: character varying
+  bos_sys3_battery1_type1_amp_rating: character varying
+  bos_sys3_battery1_type1_is_new: boolean
+  bos_sys3_battery1_type1_trigger: character varying
+  bos_sys3_battery1_type2_equipment_type: character varying
+  bos_sys3_battery1_type2_make: character varying
+  bos_sys3_battery1_type2_model: character varying
+  bos_sys3_battery1_type2_amp_rating: character varying
+  bos_sys3_battery1_type2_is_new: boolean
+  bos_sys3_battery1_type2_trigger: character varying
+  bos_sys3_battery2_type1_equipment_type: character varying
+  bos_sys3_battery2_type1_make: character varying
+  bos_sys3_battery2_type1_model: character varying
+  bos_sys3_battery2_type1_amp_rating: character varying
+  bos_sys3_battery2_type1_is_new: boolean
+  bos_sys3_battery2_type1_trigger: character varying
+  bos_sys3_battery2_type2_equipment_type: character varying
+  bos_sys3_battery2_type2_make: character varying
+  bos_sys3_battery2_type2_model: character varying
+  bos_sys3_battery2_type2_amp_rating: character varying
+  bos_sys3_battery2_type2_is_new: boolean
+  bos_sys3_battery2_type2_trigger: character varying
+  bos_sys3_backup_type1_equipment_type: character varying
+  bos_sys3_backup_type1_make: character varying
+  bos_sys3_backup_type1_model: character varying
+  bos_sys3_backup_type1_amp_rating: character varying
+  bos_sys3_backup_type1_is_new: boolean
+  bos_sys3_backup_type1_trigger: character varying
+  bos_sys3_backup_type2_equipment_type: character varying
+  bos_sys3_backup_type2_make: character varying
+  bos_sys3_backup_type2_model: character varying
+  bos_sys3_backup_type2_amp_rating: character varying
+  bos_sys3_backup_type2_is_new: boolean
+  bos_sys3_backup_type2_trigger: character varying
+  bos_sys3_backup_type3_equipment_type: character varying
+  bos_sys3_backup_type3_make: character varying
+  bos_sys3_backup_type3_model: character varying
+  bos_sys3_backup_type3_amp_rating: character varying
+  bos_sys3_backup_type3_is_new: boolean
+  bos_sys3_backup_type3_trigger: character varying
+  bos_sys4_battery1_type1_equipment_type: character varying
+  bos_sys4_battery1_type1_make: character varying
+  bos_sys4_battery1_type1_model: character varying
+  bos_sys4_battery1_type1_amp_rating: character varying
+  bos_sys4_battery1_type1_is_new: boolean
+  bos_sys4_battery1_type1_trigger: character varying
+  bos_sys4_battery1_type2_equipment_type: character varying
+  bos_sys4_battery1_type2_make: character varying
+  bos_sys4_battery1_type2_model: character varying
+  bos_sys4_battery1_type2_amp_rating: character varying
+  bos_sys4_battery1_type2_is_new: boolean
+  bos_sys4_battery1_type2_trigger: character varying
+  bos_sys4_battery2_type1_equipment_type: character varying
+  bos_sys4_battery2_type1_make: character varying
+  bos_sys4_battery2_type1_model: character varying
+  bos_sys4_battery2_type1_amp_rating: character varying
+  bos_sys4_battery2_type1_is_new: boolean
+  bos_sys4_battery2_type1_trigger: character varying
+  bos_sys4_battery2_type2_equipment_type: character varying
+  bos_sys4_battery2_type2_make: character varying
+  bos_sys4_battery2_type2_model: character varying
+  bos_sys4_battery2_type2_amp_rating: character varying
+  bos_sys4_battery2_type2_is_new: boolean
+  bos_sys4_battery2_type2_trigger: character varying
+  bos_sys4_backup_type1_equipment_type: character varying
+  bos_sys4_backup_type1_make: character varying
+  bos_sys4_backup_type1_model: character varying
+  bos_sys4_backup_type1_amp_rating: character varying
+  bos_sys4_backup_type1_is_new: boolean
+  bos_sys4_backup_type1_trigger: character varying
+  bos_sys4_backup_type2_equipment_type: character varying
+  bos_sys4_backup_type2_make: character varying
+  bos_sys4_backup_type2_model: character varying
+  bos_sys4_backup_type2_amp_rating: character varying
+  bos_sys4_backup_type2_is_new: boolean
+  bos_sys4_backup_type2_trigger: character varying
+  bos_sys4_backup_type3_equipment_type: character varying
+  bos_sys4_backup_type3_make: character varying
+  bos_sys4_backup_type3_model: character varying
+  bos_sys4_backup_type3_amp_rating: character varying
+  bos_sys4_backup_type3_is_new: boolean
+  bos_sys4_backup_type3_trigger: character varying
+  bos_sys1_lastslot: integer
+  bos_sys2_lastslot: integer
+  bos_sys3_lastslot: integer
+  bos_sys4_lastslot: integer
+  bos_sys1_type1_block_name: character varying
+  bos_sys1_type2_block_name: character varying
+  bos_sys1_type3_block_name: character varying
+  bos_sys1_type4_block_name: character varying
+  bos_sys1_type5_block_name: character varying
+  bos_sys1_type6_block_name: character varying
+  bos_sys1_battery1_type1_block_name: character varying
+  bos_sys1_battery1_type2_block_name: character varying
+  bos_sys1_battery2_type1_block_name: character varying
+  bos_sys1_battery2_type2_block_name: character varying
+  bos_sys1_backup_type1_block_name: character varying
+  bos_sys1_backup_type2_block_name: character varying
+  bos_sys1_backup_type3_block_name: character varying
+  post_sms_bos_sys1_type1_block_name: character varying
+  post_sms_bos_sys1_type2_block_name: character varying
+  post_sms_bos_sys1_type3_block_name: character varying
+  bos_sys2_type1_block_name: character varying
+  bos_sys2_type2_block_name: character varying
+  bos_sys2_type3_block_name: character varying
+  bos_sys2_type4_block_name: character varying
+  bos_sys2_type5_block_name: character varying
+  bos_sys2_type6_block_name: character varying
+  bos_sys2_battery1_type1_block_name: character varying
+  bos_sys2_battery1_type2_block_name: character varying
+  bos_sys2_battery2_type1_block_name: character varying
+  bos_sys2_battery2_type2_block_name: character varying
+  bos_sys2_backup_type1_block_name: character varying
+  bos_sys2_backup_type2_block_name: character varying
+  bos_sys2_backup_type3_block_name: character varying
+  post_sms_bos_sys2_type1_block_name: character varying
+  post_sms_bos_sys2_type2_block_name: character varying
+  post_sms_bos_sys2_type3_block_name: character varying
+  bos_sys3_type1_block_name: character varying
+  bos_sys3_type2_block_name: character varying
+  bos_sys3_type3_block_name: character varying
+  bos_sys3_type4_block_name: character varying
+  bos_sys3_type5_block_name: character varying
+  bos_sys3_type6_block_name: character varying
+  bos_sys3_battery1_type1_block_name: character varying
+  bos_sys3_battery1_type2_block_name: character varying
+  bos_sys3_battery2_type1_block_name: character varying
+  bos_sys3_battery2_type2_block_name: character varying
+  bos_sys3_backup_type1_block_name: character varying
+  bos_sys3_backup_type2_block_name: character varying
+  bos_sys3_backup_type3_block_name: character varying
+  post_sms_bos_sys3_type1_block_name: character varying
+  post_sms_bos_sys3_type2_block_name: character varying
+  post_sms_bos_sys3_type3_block_name: character varying
+  bos_sys4_type1_block_name: character varying
+  bos_sys4_type2_block_name: character varying
+  bos_sys4_type3_block_name: character varying
+  bos_sys4_type4_block_name: character varying
+  bos_sys4_type5_block_name: character varying
+  bos_sys4_type6_block_name: character varying
+  bos_sys4_battery1_type1_block_name: character varying
+  bos_sys4_battery1_type2_block_name: character varying
+  bos_sys4_battery2_type1_block_name: character varying
+  bos_sys4_battery2_type2_block_name: character varying
+  bos_sys4_backup_type1_block_name: character varying
+  bos_sys4_backup_type2_block_name: character varying
+  bos_sys4_backup_type3_block_name: character varying
+  post_sms_bos_sys4_type1_block_name: character varying
+  post_sms_bos_sys4_type2_block_name: character varying
+  post_sms_bos_sys4_type3_block_name: character varying
+  selected_additional_services: text
+  sys1_battery1_tie_in_location: text
+  sys1_battery2_tie_in_location: text
+  sys2_battery1_tie_in_location: text
+  sys2_battery2_tie_in_location: text
+  sys1_isacintegrated: boolean
+  sys2_isacintegrated: boolean
+  bos_sys1_battery1_type3_equipment_type: character varying
+  bos_sys1_battery1_type3_make: character varying
+  bos_sys1_battery1_type3_model: character varying
+  bos_sys1_battery1_type3_amp_rating: character varying
+  bos_sys1_battery1_type3_is_new: boolean
+  bos_sys1_battery1_type3_trigger: character varying
+  bos_sys1_battery1_type3_block_name: character varying
+  bos_sys1_battery2_type3_equipment_type: character varying
+  bos_sys1_battery2_type3_make: character varying
+  bos_sys1_battery2_type3_model: character varying
+  bos_sys1_battery2_type3_amp_rating: character varying
+  bos_sys1_battery2_type3_is_new: boolean
+  bos_sys1_battery2_type3_trigger: character varying
+  bos_sys1_battery2_type3_block_name: character varying
+  bos_sys2_battery1_type3_equipment_type: character varying
+  bos_sys2_battery1_type3_make: character varying
+  bos_sys2_battery1_type3_model: character varying
+  bos_sys2_battery1_type3_amp_rating: character varying
+  bos_sys2_battery1_type3_is_new: boolean
+  bos_sys2_battery1_type3_trigger: character varying
+  bos_sys2_battery1_type3_block_name: character varying
+  bos_sys2_battery2_type3_equipment_type: character varying
+  bos_sys2_battery2_type3_make: character varying
+  bos_sys2_battery2_type3_model: character varying
+  bos_sys2_battery2_type3_amp_rating: character varying
+  bos_sys2_battery2_type3_is_new: boolean
+  bos_sys2_battery2_type3_trigger: character varying
+  bos_sys2_battery2_type3_block_name: character varying
+  bos_sys3_battery1_type3_equipment_type: character varying
+  bos_sys3_battery1_type3_make: character varying
+  bos_sys3_battery1_type3_model: character varying
+  bos_sys3_battery1_type3_amp_rating: character varying
+  bos_sys3_battery1_type3_is_new: boolean
+  bos_sys3_battery1_type3_trigger: character varying
+  bos_sys3_battery1_type3_block_name: character varying
+  bos_sys3_battery2_type3_equipment_type: character varying
+  bos_sys3_battery2_type3_make: character varying
+  bos_sys3_battery2_type3_model: character varying
+  bos_sys3_battery2_type3_amp_rating: character varying
+  bos_sys3_battery2_type3_is_new: boolean
+  bos_sys3_battery2_type3_trigger: character varying
+  bos_sys3_battery2_type3_block_name: character varying
+  bos_sys4_battery1_type3_equipment_type: character varying
+  bos_sys4_battery1_type3_make: character varying
+  bos_sys4_battery1_type3_model: character varying
+  bos_sys4_battery1_type3_amp_rating: character varying
+  bos_sys4_battery1_type3_is_new: boolean
+  bos_sys4_battery1_type3_trigger: character varying
+  bos_sys4_battery1_type3_block_name: character varying
+  bos_sys4_battery2_type3_equipment_type: character varying
+  bos_sys4_battery2_type3_make: character varying
+  bos_sys4_battery2_type3_model: character varying
+  bos_sys4_battery2_type3_amp_rating: character varying
+  bos_sys4_battery2_type3_is_new: boolean
+  bos_sys4_battery2_type3_trigger: character varying
+  bos_sys4_battery2_type3_block_name: character varying
+  sys1_sms_equipment_type: character varying
+  sys2_sms_equipment_type: character varying
+  allowable_backfeed: integer
+  postcombine_1_1_amp_rating: integer
+  postcombine_2_1_amp_rating: integer
+  postcombine_3_1_amp_rating: integer
+  postcombine_1_1_position: character varying
+  postcombine_2_1_position: character varying
+  postcombine_3_1_position: character varying
+  sys1_inverter_stringing_configuration: text
+  sys2_inverter_stringing_configuration: text
+  sys1_micro1Panels: integer
+  sys1_micro2Panels: integer
+  sys1_micro3Panels: integer
+  sys1_micro4Panels: integer
+  sys1_micro5Panels: integer
+  sys1_micro6Panels: integer
+  sys1_micro7Panels: integer
+  sys1_micro8Panels: integer
+  sys1_micro9Panels: integer
+  sys1_micro10Panels: integer
+  sys1_micro11Panels: integer
+  sys1_micro12Panels: integer
+  sys1_micro13Panels: integer
+  sys1_micro14Panels: integer
+  sys1_micro15Panels: integer
+  sys1_micro16Panels: integer
+  sys1_micro17Panels: integer
+  sys1_micro18Panels: integer
+  sys1_micro19Panels: integer
+  sys1_micro20Panels: integer
+  sys1_micro21Panels: integer
+  sys1_micro22Panels: integer
+  sys1_micro23Panels: integer
+  sys1_micro24Panels: integer
+  sys1_micro25Panels: integer
+  sys2_micro1Panels: integer
+  sys2_micro2Panels: integer
+  sys2_micro3Panels: integer
+  sys2_micro4Panels: integer
+  sys2_micro5Panels: integer
+  sys2_micro6Panels: integer
+  sys2_micro7Panels: integer
+  sys2_micro8Panels: integer
+  sys2_micro9Panels: integer
+  sys2_micro10Panels: integer
+  sys2_micro11Panels: integer
+  sys2_micro12Panels: integer
+  sys2_micro13Panels: integer
+  sys2_micro14Panels: integer
+  sys2_micro15Panels: integer
+  sys2_micro16Panels: integer
+  sys2_micro17Panels: integer
+  sys2_micro18Panels: integer
+  sys2_micro19Panels: integer
+  sys2_micro20Panels: integer
+  sys2_micro21Panels: integer
+  sys2_micro22Panels: integer
+  sys2_micro23Panels: integer
+  sys2_micro24Panels: integer
+  sys2_micro25Panels: integer
+  bcp1_existing: boolean
+  bcp1_busbar: character varying
+  bcp1_mainbreaker1: character varying
+  bcp1_tieinbreaker: character varying
+  bcp1_make: character varying
+  bcp1_model: character varying
+  sys1_meter_collar_setting: character varying
+  sys2_meter_collar_setting: character varying
+  project_valuation: numeric
+  sys3_ele_breaker_location: character varying
+  sys3_pcs_amps: integer
+  sys3_pcs_settings: boolean
+  sys4_ele_breaker_location: character varying
+  sys4_pcs_amps: integer
+  sys4_pcs_settings: boolean
+
+bitnami@ip-172-26-6-240:~/skyfire-automation$

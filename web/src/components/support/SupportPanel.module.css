@@ -1,0 +1,63 @@
+/* Support Panel with Subtabs */
+
+.container {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for flex children with overflow */
+}
+
+/* Subtab Navigation */
+.subTabContainer {
+  display: flex;
+  gap: var(--spacing);
+  padding: 0 var(--spacing) var(--spacing-tight) var(--spacing);
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+.subTab {
+  position: relative;
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.subTab:hover {
+  color: var(--text-primary);
+}
+
+.subTabActive {
+  color: var(--text-primary);
+}
+
+.subTabUnderline {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+/* Subtab Content */
+.subTabContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0; /* Important for flex children with overflow */
+}
+
+.placeholder {
+  padding: var(--spacing-wide);
+  text-align: center;
+  color: var(--text-secondary);
+}

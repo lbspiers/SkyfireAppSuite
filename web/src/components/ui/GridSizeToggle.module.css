@@ -1,0 +1,42 @@
+.gridSizeToggle {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.gridSizeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: var(--spacing-tight);
+  border-radius: var(--radius-md);
+  border: 1px solid #888888;
+  background: var(--gradient-input);
+  color: #BBBBBB;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gridSizeBtn:hover {
+  border-color: #AAAAAA;
+  background: linear-gradient(to bottom, #2A2A2A, #252525);
+}
+
+.gridSizeBtn.selected {
+  background: var(--gradient-primary);
+  border: none;
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.3);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) saturate(100%) invert(75%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%);
+}
+
+.selected .icon {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+}

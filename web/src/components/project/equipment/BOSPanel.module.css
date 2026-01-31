@@ -1,0 +1,238 @@
+/* BOS Panel - Collapsible Slots Architecture */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-wide);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+/* ===== UTILITY BAR ===== */
+.utilityBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.utilityInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.utilityLabel {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.utilityValue {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.autoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+}
+
+.autoBtn:hover:not(:disabled) {
+  box-shadow: var(--glow-orange);
+}
+
+.autoBtn:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: var(--radius-circle);
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.successBadge {
+  font-size: var(--text-sm);
+  color: var(--color-success);
+}
+
+.errorBadge {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+}
+
+.allSet {
+  font-size: var(--text-sm);
+  color: var(--color-success);
+}
+
+/* ===== EQUIPMENT LIST ===== */
+.equipmentList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.bosSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.sectionTitle {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.slotCount {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Context Equipment Box */
+
+.contextBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.contextBoxLeft {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.contextBoxModel {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contextBoxRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.contextBoxQty {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.contextBoxBadge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  border-radius: var(--radius-sm);
+}
+
+
+/* Add Button */
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: var(--border-thin) dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+}
+
+.addBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-lighter);
+}
+
+/* ===== EMPTY STATE ===== */
+.emptyState {
+  padding: var(--spacing-wide);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  background: var(--bg-panel);
+  border: var(--border-thin) dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .utilityBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .autoBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

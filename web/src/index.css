@@ -1,0 +1,181 @@
+/* SKYFIRE DESIGN SYSTEM */
+@import './styles/tokens.css';
+@import './styles/utilities.css';
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Premium desktop PWA: Eliminate white flash on launch */
+  background: linear-gradient(180deg, var(--bg-page) 0%, var(--bg-input-hover) 100%);
+  /* Fallback for pages that set their own background */
+  background-attachment: fixed;
+  color: var(--text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+}
+
+/* Achievement Toast - Special styling */
+.Toastify__toast--achievement,
+.achievement-toast {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+  color: #1a1a2e !important;
+}
+
+.Toastify__toast--achievement .Toastify__progress-bar,
+.achievement-toast .Toastify__progress-bar {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Custom toast container positioning */
+.Toastify__toast-container--top-center {
+  top: 1rem;
+}
+
+/* Drafter-specific toasts */
+.drafter-toast {
+  border-left: 4px solid var(--color-primary);
+}
+
+.drafter-toast-warning {
+  border-left: 4px solid var(--color-warning);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.drafter-toast-critical {
+  border-left: 4px solid var(--color-error);
+  background: rgba(239, 68, 68, 0.1);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   PREMIUM DESKTOP PWA FEATURES
+   ======================================== */
+
+/* Safe Area Insets - Support for notched devices (MacBook Pro 14"/16", iPhone X+) */
+.App {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Window Controls Overlay - Windows 11 native title bar integration */
+@media (display-mode: window-controls-overlay) {
+  /* When WCO is active, adjust header to accommodate window controls */
+  body {
+    /* Prevent content from going under window controls */
+    padding-top: env(titlebar-area-height, 40px);
+  }
+
+  /* Make header draggable (allows window dragging) */
+  .dashboard-header,
+  .portal-header,
+  .page-header,
+  [class*="dashboardHeader"],
+  [class*="portalHeader"],
+  [class*="pageHeader"] {
+    app-region: drag;
+    -webkit-app-region: drag;
+  }
+
+  /* Interactive elements inside header must NOT be draggable */
+  .dashboard-header button,
+  .dashboard-header a,
+  .dashboard-header input,
+  .dashboard-header select,
+  .portal-header button,
+  .portal-header a,
+  .portal-header input,
+  .portal-header select,
+  .page-header button,
+  .page-header a,
+  .page-header input,
+  .page-header select,
+  [class*="dashboardHeader"] button,
+  [class*="dashboardHeader"] a,
+  [class*="dashboardHeader"] input,
+  [class*="dashboardHeader"] select,
+  [class*="portalHeader"] button,
+  [class*="portalHeader"] a,
+  [class*="portalHeader"] input,
+  [class*="portalHeader"] select,
+  [class*="pageHeader"] button,
+  [class*="pageHeader"] a,
+  [class*="pageHeader"] input,
+  [class*="pageHeader"] select {
+    app-region: no-drag;
+    -webkit-app-region: no-drag;
+  }
+}
+
+/* Standalone Mode - Hide browser-specific UI when installed as PWA */
+@media (display-mode: standalone) {
+  /* Hide install prompts when app is already installed */
+  .install-prompt,
+  .pwa-install-banner,
+  [class*="installPrompt"],
+  [class*="InstallPrompt"] {
+    display: none !important;
+  }
+}
+
+/* Auth page styles */
+.auth-page-wrapper {
+  background: var(--gradient-page);
+}
+
+.auth-page-wrapper--left-content {
+  padding: var(--spacing-wide);
+  color: var(--text-primary);
+}
+
+.auth-page-wrapper--right-content {
+  background: var(--bg-panel);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--spacing-wide);
+}
+
+.auth-page-wrapper--right-content--top-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.auth-page-wrapper--right-content--top-div .logo {
+  max-width: 300px;
+  height: auto;
+}
+
+.auth-page-wrapper--right-content--bottom-div {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.password-addon {
+  padding: var(--spacing-tight) var(--spacing);
+  border: none;
+  background: transparent;
+}
+
+.password-addon:hover {
+  background: transparent;
+}

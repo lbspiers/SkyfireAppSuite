@@ -1,0 +1,8 @@
+.note {
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  margin-bottom: var(--spacing);
+  padding: 0;
+  background: transparent;
+}

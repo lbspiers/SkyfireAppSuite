@@ -1,0 +1,58 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+/* Sizes */
+.sm {
+  padding: var(--spacing-xs) var(--spacing-tight);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-sm);
+}
+
+.md {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-md);
+}
+
+.lg {
+  padding: var(--spacing) var(--spacing-loose);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+}
+
+.pill {
+  border-radius: var(--radius-pill);
+}
+
+/* Colors - matching StatusBadge pattern */
+.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+}
+
+.info {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--color-info);
+}
+
+.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}
+
+.muted {
+  background: rgba(107, 114, 128, 0.15);
+  color: var(--text-muted);
+}

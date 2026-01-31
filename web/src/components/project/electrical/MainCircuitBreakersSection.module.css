@@ -1,0 +1,73 @@
+/* MainCircuitBreakersSection.module.css */
+
+.input {
+  width: 100%;
+  padding: var(--spacing-tight);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  background-color: transparent;
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Service Disconnects Section */
+.serviceDisconnectsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-tight) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.serviceDisconnectsQuestion {
+  text-align: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+}
+
+.serviceDisconnectsButtons {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.serviceDisconnectButton {
+  min-width: 80px;
+  padding: var(--spacing-xs) var(--spacing-wide);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-default);
+  border-radius: 100px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--duration-base);
+}
+
+.serviceDisconnectButton:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-input-hover);
+}
+
+.serviceDisconnectButton.active {
+  background: var(--gradient-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.serviceDisconnectButton:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}

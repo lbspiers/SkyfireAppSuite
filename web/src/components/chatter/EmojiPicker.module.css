@@ -1,0 +1,17 @@
+.emojiPickerContainer {
+  position: absolute;
+  z-index: var(--z-modal);
+  margin-top: var(--spacing-tight);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-panel);
+}
+
+/* Override emoji-mart theme for dark mode consistency */
+.emojiPickerContainer :global(em-emoji-picker) {
+  --rgb-background: var(--bg-panel);
+  --rgb-input: var(--bg-input);
+  --rgb-color: var(--text-primary);
+  --border-radius: var(--radius-md);
+  --font-family: var(--font-sans);
+}

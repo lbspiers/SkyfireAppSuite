@@ -1,0 +1,196 @@
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { io } from 'socket.io-client';
+
+const SOCKET_URL = 'https://api.skyfireapp.io';
+
+/**
+ * useSocket - Socket.io connection hook with user room management
+ *
+ * Provides real-time communication for:
+ * - Notifications (task assignments, mentions, etc.)
+ * - PDF generation completion
+ * - App updates
+ * - Project collaboration
+ */
+export const useSocket = () => {
+  const socketRef = useRef(null);
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    // Get user from session storage
+    const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+
+    // Connect to socket
+    socketRef.current = io(SOCKET_URL, {
+      withCredentials: true,
+      transports: ['websocket', 'polling']
+    });
+
+    socketRef.current.on('connect', () => {
+      console.log('[Socket] Connected:', socketRef.current.id);
+      setIsConnected(true);
+
+      // Join user's notification room if logged in
+      if (userData?.uuid) {
+        socketRef.current.emit('join:user', userData.uuid);
+        console.log('[Socket] Joined user room:', userData.uuid);
+      }
+
+      // Join superadmin room if super admin
+      if (userData?.isSuperAdmin) {
+        socketRef.current.emit('join:superadmin');
+        console.log('[Socket] Joined superadmin room');
+      }
+    });
+
+    socketRef.current.on('disconnect', () => {
+      console.log('[Socket] Disconnected');
+      setIsConnected(false);
+    });
+
+    socketRef.current.on('error', (error) => {
+      console.error('[Socket] Error:', error);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  // Re-join user room when user changes (login/logout)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      if (socketRef.current?.connected && userData?.uuid) {
+        socketRef.current.emit('join:user', userData.uuid);
+        console.log('[Socket] Re-joined user room:', userData.uuid);
+
+        // Re-join superadmin room if super admin
+        if (userData?.isSuperAdmin) {
+          socketRef.current.emit('join:superadmin');
+          console.log('[Socket] Re-joined superadmin room');
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  /**
+   * Join a project room for real-time collaboration
+   */
+  const joinProject = useCallback((projectUuid) => {
+    if (socketRef.current?.connected && projectUuid) {
+      socketRef.current.emit('join-project', projectUuid);
+      console.log('[Socket] Joined project:', projectUuid);
+    }
+  }, []);
+
+  /**
+   * Leave a project room
+   */
+  const leaveProject = useCallback((projectUuid) => {
+    if (socketRef.current?.connected && projectUuid) {
+      socketRef.current.emit('leave-project', projectUuid);
+      console.log('[Socket] Left project:', projectUuid);
+    }
+  }, []);
+
+  /**
+   * Listen for new notifications
+   * @param {Function} callback - Called when notification received
+   * @returns {Function} Cleanup function
+   */
+  const onNotification = useCallback((callback) => {
+    if (!socketRef.current) return () => {};
+
+    socketRef.current.on('notification:new', callback);
+    return () => socketRef.current?.off('notification:new', callback);
+  }, []);
+
+  /**
+   * Listen for PDF generation completion
+   * @param {Function} callback - Called when PDF is ready
+   * @returns {Function} Cleanup function
+   */
+  const onPdfReady = useCallback((callback) => {
+    if (!socketRef.current) return () => {};
+
+    socketRef.current.on('pdf-ready', callback);
+    return () => socketRef.current?.off('pdf-ready', callback);
+  }, []);
+
+  /**
+   * Listen for app updates
+   * @param {Function} callback - Called when app update available
+   * @returns {Function} Cleanup function
+   */
+  const onAppUpdate = useCallback((callback) => {
+    if (!socketRef.current) return () => {};
+
+    socketRef.current.on('app:update', callback);
+    return () => socketRef.current?.off('app:update', callback);
+  }, []);
+
+  /**
+   * Listen for task updates
+   * @param {Function} callback - Called when task is updated
+   * @returns {Function} Cleanup function
+   */
+  const onTaskUpdate = useCallback((callback) => {
+    if (!socketRef.current) return () => {};
+
+    socketRef.current.on('task:update', callback);
+    return () => socketRef.current?.off('task:update', callback);
+  }, []);
+
+  /**
+   * Listen for project updates
+   * @param {Function} callback - Called when project is updated
+   * @returns {Function} Cleanup function
+   */
+  const onProjectUpdate = useCallback((callback) => {
+    if (!socketRef.current) return () => {};
+
+    socketRef.current.on('project:update', callback);
+    return () => socketRef.current?.off('project:update', callback);
+  }, []);
+
+  /**
+   * Listen for automation completion (new project created via webhook)
+   * @param {Function} callback - Called when automation completes
+   * @returns {Function} Cleanup function
+   */
+  const onAutomationComplete = useCallback((callback) => {
+    if (!socketRef.current) {
+      console.warn('[Socket] onAutomationComplete called but socket not initialized');
+      return () => {};
+    }
+
+    console.log('[Socket] Registering automation:complete listener');
+    socketRef.current.on('automation:complete', callback);
+
+    return () => {
+      console.log('[Socket] Removing automation:complete listener');
+      socketRef.current?.off('automation:complete', callback);
+    };
+  }, []);
+
+  return {
+    socket: socketRef.current,
+    isConnected,
+    joinProject,
+    leaveProject,
+    onNotification,
+    onPdfReady,
+    onAppUpdate,
+    onTaskUpdate,
+    onProjectUpdate,
+    onAutomationComplete
+  };
+};
+
+export default useSocket;

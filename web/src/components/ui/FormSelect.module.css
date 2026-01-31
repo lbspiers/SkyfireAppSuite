@@ -1,0 +1,121 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+}
+
+.required {
+  color: var(--color-error);
+  margin-left: var(--spacing-tight);
+}
+
+.selectContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select {
+  width: 100%;
+  background: var(--gradient-input);
+  border: var(--border-thin) solid transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  appearance: none;
+  padding-right: var(--spacing-wide);
+  transition: var(--transition-base);
+}
+
+.select:hover:not(:disabled) {
+  border-color: var(--border-subtle);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* Placeholder option styling - light, small, muted */
+.select option:disabled {
+  color: var(--text-disabled);
+  font-size: var(--text-xs);
+  font-weight: var(--font-normal);
+}
+
+/* When select shows placeholder (no value selected) */
+.select:invalid,
+.select[value=""] {
+  color: var(--text-disabled);
+  font-size: var(--text-xs);
+  font-weight: var(--font-normal);
+}
+
+.sm {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  min-height: 36px;
+}
+
+.md {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  min-height: 36px;
+}
+
+.lg {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+  min-height: 36px;
+}
+
+.chevron {
+  position: absolute;
+  right: var(--spacing);
+  pointer-events: none;
+  color: var(--text-muted);
+  transition: var(--transition-colors);
+}
+
+.chevronFilled {
+  color: var(--color-primary);
+}
+
+.select.error {
+  border-color: var(--color-error);
+}
+
+.select:disabled {
+  background: var(--bg-input-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--text-disabled);
+}

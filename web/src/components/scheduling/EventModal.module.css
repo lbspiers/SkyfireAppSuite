@@ -1,0 +1,71 @@
+/* EventModal - Design System Compliant */
+
+.headerColorBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing);
+  margin-bottom: var(--spacing);
+}
+
+.error {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.loadingText {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.teamChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.teamChip {
+  padding: var(--spacing-xs) var(--spacing);
+  background: var(--bg-elevated);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.teamChip:hover {
+  background: var(--bg-hover);
+}
+
+.teamChipActive {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.emptyText {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}

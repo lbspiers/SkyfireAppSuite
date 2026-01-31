@@ -1,0 +1,56 @@
+/* PillButton - ONE style for ALL pill buttons */
+
+.pillButton {
+  /* Base styles - matches PreferredButton exactly */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-tight) var(--spacing-tight);
+  background: transparent;
+  border: var(--border-thin) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  transition: var(--transition-base);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* Hover state */
+.pillButton:hover:not(:disabled):not(.active) {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+  transform: scale(1.02);
+}
+
+/* Active/selected state */
+.pillButton.active {
+  background: var(--gradient-primary);
+  border-color: transparent;
+  color: var(--text-primary);
+}
+
+.pillButton.active:hover {
+  background: var(--gradient-primary);
+}
+
+/* Disabled state */
+.pillButton:disabled,
+.pillButton.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus state */
+.pillButton:focus-visible {
+  outline: 2px solid rgba(253, 115, 50, 0.5);
+  outline-offset: 2px;
+}
+
+/* Active (pressed) state */
+.pillButton:active:not(:disabled) {
+  transform: translateY(0);
+}

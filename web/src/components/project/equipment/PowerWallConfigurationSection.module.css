@@ -1,0 +1,81 @@
+/* PowerWall Configuration Section Styles */
+
+.fieldGroup {
+  margin-bottom: var(--spacing);
+}
+
+.fieldGroup:last-child {
+  margin-bottom: 0;
+}
+
+.fieldHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-tight);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-tight);
+}
+
+.fieldHeader .label {
+  margin-bottom: 0;
+}
+
+/* Info Note (No Backup) */
+.infoNote {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing);
+  background: var(--color-info-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing);
+}
+
+.infoIcon {
+  flex-shrink: 0;
+  font-size: var(--text-base);
+}
+
+.infoText {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Warning Note (Backup Switch) */
+.warningNote {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing);
+  background: var(--color-warning-light);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing);
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  font-size: var(--text-base);
+}
+
+.warningText {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+/* New/Existing Toggle (compact inline version) */
+.toggleContainer {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.toggleContainer .toggleButton {
+  flex: 0 0 auto;
+  min-width: 70px;
+}

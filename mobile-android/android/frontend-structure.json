@@ -1,0 +1,529 @@
+﻿[
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app",
+        "Files":  [
+                      {
+                          "Name":  "build.gradle",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\build.gradle"
+                      },
+                      {
+                          "Name":  "debug.keystore",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\debug.keystore"
+                      },
+                      {
+                          "Name":  "proguard-rules.pro",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\proguard-rules.pro"
+                      },
+                      {
+                          "Name":  "skyfire.keystore",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\skyfire.keystore"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\gradle",
+        "Files":  {
+
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src",
+        "Files":  {
+
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\debug",
+        "Files":  {
+                      "Name":  "AndroidManifest.xml",
+                      "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\debug\\AndroidManifest.xml"
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main",
+        "Files":  {
+                      "Name":  "AndroidManifest.xml",
+                      "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\AndroidManifest.xml"
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets",
+        "Files":  {
+
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\java",
+        "Files":  {
+
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res",
+        "Files":  {
+
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\custom",
+        "Files":  [
+                      {
+                          "Name":  "Lato_OFL.txt",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\custom\\Lato_OFL.txt"
+                      },
+                      {
+                          "Name":  "OFL.txt",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\custom\\OFL.txt"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts",
+        "Files":  [
+                      {
+                          "Name":  "Inter_18pt-Black.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Black.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-BlackItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-BlackItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-Bold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Bold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-BoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-BoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-ExtraBold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-ExtraBold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-ExtraBoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-ExtraBoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-ExtraLight.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-ExtraLight.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-ExtraLightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-ExtraLightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-Italic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Italic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-Light.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Light.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-LightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-LightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-Medium.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Medium.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-MediumItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-MediumItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-Regular.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Regular.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-SemiBold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-SemiBold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-SemiBoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-SemiBoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-Thin.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-Thin.ttf"
+                      },
+                      {
+                          "Name":  "Inter_18pt-ThinItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_18pt-ThinItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Black.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Black.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-BlackItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-BlackItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Bold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Bold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-BoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-BoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-ExtraBold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-ExtraBold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-ExtraBoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-ExtraBoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-ExtraLight.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-ExtraLight.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-ExtraLightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-ExtraLightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Italic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Italic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Light.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Light.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-LightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-LightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Medium.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Medium.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-MediumItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-MediumItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Regular.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Regular.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-SemiBold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-SemiBold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-SemiBoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-SemiBoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-Thin.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-Thin.ttf"
+                      },
+                      {
+                          "Name":  "Inter_24pt-ThinItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_24pt-ThinItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Black.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Black.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-BlackItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-BlackItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Bold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Bold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-BoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-BoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-ExtraBold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-ExtraBold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-ExtraBoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-ExtraBoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-ExtraLight.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-ExtraLight.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-ExtraLightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-ExtraLightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Italic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Italic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Light.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Light.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-LightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-LightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Medium.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Medium.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-MediumItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-MediumItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Regular.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Regular.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-SemiBold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-SemiBold.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-SemiBoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-SemiBoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-Thin.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-Thin.ttf"
+                      },
+                      {
+                          "Name":  "Inter_28pt-ThinItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Inter_28pt-ThinItalic.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Black 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Black 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Black.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Black.ttf"
+                      },
+                      {
+                          "Name":  "Lato-BlackItalic 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-BlackItalic 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-BlackItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-BlackItalic.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Bold 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Bold 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Bold.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Bold.ttf"
+                      },
+                      {
+                          "Name":  "Lato-BoldItalic 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-BoldItalic 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-BoldItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-BoldItalic.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Italic 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Italic 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Italic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Italic.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Light 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Light 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Light.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Light.ttf"
+                      },
+                      {
+                          "Name":  "Lato-LightItalic 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-LightItalic 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-LightItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-LightItalic.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Regular 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Regular 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Regular.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Regular.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Thin 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Thin 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-Thin.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-Thin.ttf"
+                      },
+                      {
+                          "Name":  "Lato-ThinItalic 2.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-ThinItalic 2.ttf"
+                      },
+                      {
+                          "Name":  "Lato-ThinItalic.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\Lato-ThinItalic.ttf"
+                      },
+                      {
+                          "Name":  "MaterialIcons.ttf",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\assets\\fonts\\MaterialIcons.ttf"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\java\\com",
+        "Files":  {
+
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\java\\com\\skyfire",
+        "Files":  [
+                      {
+                          "Name":  "MainActivity.kt",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\java\\com\\skyfire\\MainActivity.kt"
+                      },
+                      {
+                          "Name":  "MainApplication.kt",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\java\\com\\skyfire\\MainApplication.kt"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\drawable",
+        "Files":  {
+                      "Name":  "rn_edit_text_material.xml",
+                      "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\drawable\\rn_edit_text_material.xml"
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-hdpi",
+        "Files":  [
+                      {
+                          "Name":  "ic_launcher.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_foreground.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_foreground.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_round.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-ldpi",
+        "Files":  {
+                      "Name":  "ic_launcher.png",
+                      "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-ldpi\\ic_launcher.png"
+                  }
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-mdpi",
+        "Files":  [
+                      {
+                          "Name":  "ic_launcher.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_foreground.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_foreground.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_round.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.png"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xhdpi",
+        "Files":  [
+                      {
+                          "Name":  "ic_launcher.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_foreground.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_foreground.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_round.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_round.png"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxhdpi",
+        "Files":  [
+                      {
+                          "Name":  "ic_launcher.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_foreground.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_foreground.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_round.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_round.png"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxxhdpi",
+        "Files":  [
+                      {
+                          "Name":  "ic_launcher.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_foreground.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_foreground.png"
+                      },
+                      {
+                          "Name":  "ic_launcher_round.png",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_round.png"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\values",
+        "Files":  [
+                      {
+                          "Name":  "strings.xml",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\values\\strings.xml"
+                      },
+                      {
+                          "Name":  "styles.xml",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\app\\src\\main\\res\\values\\styles.xml"
+                      }
+                  ]
+    },
+    {
+        "Folder":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\gradle\\wrapper",
+        "Files":  [
+                      {
+                          "Name":  "gradle-wrapper.jar",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\gradle\\wrapper\\gradle-wrapper.jar"
+                      },
+                      {
+                          "Name":  "gradle-wrapper.properties",
+                          "FullName":  "C:\\App2\\Front\\skyfire_mobileapp_dev\\android\\gradle\\wrapper\\gradle-wrapper.properties"
+                      }
+                  ]
+    }
+]

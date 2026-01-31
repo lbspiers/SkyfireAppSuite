@@ -1,0 +1,79 @@
+/* EarningsChart - Skyfire Design System */
+
+.container {
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing);
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.chartWrapper {
+  min-height: 300px;
+}
+
+/* Custom Tooltip */
+.tooltip {
+  background: var(--bg-elevated);
+  border: var(--border-thin) solid var(--border-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-tight) var(--spacing);
+  box-shadow: var(--shadow-lg);
+}
+
+.tooltipLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.tooltipValue {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.tooltipJobs {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Empty State */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: var(--spacing);
+}
+
+.emptyIcon {
+  font-size: var(--text-4xl);
+  opacity: var(--opacity-muted);
+}
+
+.emptyText {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}

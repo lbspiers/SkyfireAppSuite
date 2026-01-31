@@ -1,0 +1,59 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, '15.0'
+prepare_react_native_project!
+
+linkage = ENV['USE_FRAMEWORKS']
+rn_maps_path = '../node_modules/react-native-maps'
+pod 'react-native-google-maps', :path => rn_maps_path
+
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'skyfire' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  target 'skyfireTests' do
+    inherit! :complete
+  end
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+
+    # Force min iOS across all pods
+    installer.pods_project.targets.each do |t|
+      t.build_configurations.each do |bc|
+        bc.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      end
+    end
+
+    # Deduplicate RCTI18nStrings.bundle (your existing fix)
+    bundle_targets = installer.pods_project.targets.select { |t| t.name.end_with?('RCTI18nStrings') }
+    if bundle_targets.length > 1
+      preferred = bundle_targets.find { |t| t.name.match?(/^React-Core-[0-9a-f]+-RCTI18nStrings$/i) } || bundle_targets.first
+      bundle_targets.each { |t| t.remove_from_project unless t == preferred }
+    end
+    installer.pods_project.targets.each do |t|
+      next unless t.respond_to?(:resources_build_phase) && t.resources_build_phase
+      refs = t.resources_build_phase.files_references.select { |f| f.path && File.basename(f.path) == 'RCTI18nStrings.bundle' }
+      refs.drop(1).each { |f| t.resources_build_phase.remove_file_reference(f) }
+    end
+    installer.pods_project.save
+  end
+end

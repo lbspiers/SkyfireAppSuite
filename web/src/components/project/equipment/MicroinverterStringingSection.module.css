@@ -1,0 +1,24 @@
+/* ===== SECTION WRAPPER ===== */
+.sectionWrapper {
+  margin-bottom: var(--spacing);
+}
+
+/* ===== AUTO MODE ALERT CONTAINER ===== */
+.autoAlertContainer {
+  padding: var(--spacing);
+}
+
+/* ===== CUSTOM MODE CONTAINER ===== */
+.customContainer {
+  padding: var(--spacing);
+}
+
+/* ===== SPECS INFO ALERT ===== */
+.specsInfoAlert {
+  margin-bottom: var(--spacing);
+}
+
+/* ===== AUTO CALCULATE BUTTON ===== */
+.autoCalculateButton {
+  margin-bottom: var(--spacing);
+}

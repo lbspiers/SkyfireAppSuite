@@ -1,0 +1,48 @@
+/* Send Button - Pill-shaped orange gradient button */
+.sendButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-xl);
+  color: white;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sendButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.4);
+}
+
+.sendButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sendButton:focus-visible {
+  outline: 2px solid rgba(253, 115, 50, 0.5);
+  outline-offset: 2px;
+}
+
+.sendIcon {
+  font-size: var(--text-xs);
+  line-height: 1;
+  margin-left: -2px;
+}
+
+.sendButtonCompact {
+  padding: var(--spacing-xs) var(--spacing);
+  font-size: var(--text-xs);
+}

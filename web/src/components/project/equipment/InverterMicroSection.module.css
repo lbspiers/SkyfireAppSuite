@@ -1,0 +1,137 @@
+/* ===== COMPONENT WRAPPER ===== */
+.sectionWrapper {
+  margin-bottom: var(--spacing);
+}
+
+/* ===== AUTO STRINGING ===== */
+.autoStringingInfo {
+  padding: var(--spacing);
+}
+
+/* ===== CUSTOM STRINGING ===== */
+.customStringingSection {
+  padding: var(--spacing);
+}
+
+.panelsRemainingCounter {
+  margin-bottom: var(--spacing);
+  text-align: center;
+}
+
+.panelsRemainingText {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.panelsRemainingValue {
+  font-weight: var(--font-bold);
+}
+
+.panelsRemainingComplete {
+  color: var(--color-success);
+}
+
+.panelsRemainingError {
+  color: var(--color-error);
+}
+
+.panelsRemainingWarning {
+  color: var(--color-primary);
+}
+
+.autoCalculateButton {
+  margin-bottom: var(--spacing);
+  width: 100%;
+}
+
+/* ===== STRING INPUT ROWS ===== */
+.stringInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  margin-bottom: var(--spacing);
+}
+
+.stringInputRow {
+  display: flex;
+  gap: var(--spacing-tight);
+  align-items: center;
+  padding: var(--spacing-tight) 0;
+}
+
+.mpptLabel {
+  min-width: 80px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.stringInput {
+  flex: 1;
+  max-width: 120px;
+  padding: var(--spacing-tight);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.stringInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.stringInput:disabled {
+  background: var(--bg-input-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.stringInput::placeholder {
+  color: var(--text-disabled);
+}
+
+.multiplySymbol {
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+  min-width: 20px;
+  text-align: center;
+}
+
+.panelsPerStringInput {
+  flex: 1;
+  max-width: 140px;
+  padding: var(--spacing-tight);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.panelsPerStringInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.panelsPerStringInput::placeholder {
+  color: var(--text-disabled);
+}
+
+/* ===== POWERWALL 3 SELECT ===== */
+.pw3SelectFilled {
+  color: var(--text-primary);
+}
+
+.pw3SelectEmpty {
+  color: var(--text-disabled);
+}
+
+/* ===== OPTIMIZER SECTION ===== */
+.optimizerSection {
+  margin-top: var(--spacing);
+}

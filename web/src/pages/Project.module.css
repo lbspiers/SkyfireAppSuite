@@ -1,0 +1,84 @@
+/* Project Page Styles */
+
+/* Company Header */
+.companyHeader {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+  margin-top: var(--spacing-xs);
+}
+
+/* Menu Panel */
+.menuPanel {
+  margin-bottom: var(--spacing);
+}
+
+/* Panel Padding Variants */
+.panelNoPadding {
+  padding: 0;
+}
+
+.logoutPanel {
+  padding: var(--spacing);
+}
+
+.logoutMessage {
+  margin-bottom: var(--spacing);
+}
+
+/* Tab Content Sections */
+.tabContent {
+  padding: var(--spacing);
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.tabContentTitle {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing);
+}
+
+.tabContentPlaceholder {
+  color: var(--text-muted);
+}
+
+/* Tab Label - Conditional Styling */
+.tabLabelSelected {
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+}
+
+.tabLabelUnselected {
+  color: var(--text-muted);
+  font-weight: var(--font-semibold);
+}
+
+/* Content Panel Border Radius Variants */
+.contentPanelLeftSquare {
+  border-top-left-radius: 0;
+  border-top-right-radius: var(--radius-md);
+}
+
+.contentPanelRightSquare {
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: 0;
+}
+
+.contentPanelBothSquare {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.contentPanelBothRounded {
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+}
+
+/* Tab Selected Border Gradient */
+.tabSelected {
+  border-bottom: 3px solid transparent;
+  border-image: var(--gradient-primary);
+  border-image-slice: 1;
+}

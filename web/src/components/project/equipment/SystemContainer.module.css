@@ -1,0 +1,54 @@
+/* SystemContainer - Orange bordered container with system label breaking top border */
+
+.container {
+  position: relative;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background: var(--bg-surface);
+}
+
+.header {
+  position: absolute;
+  top: -12px;
+  left: var(--spacing);
+  background: var(--bg-surface);
+  padding: 0 var(--spacing-tight);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.systemLabel {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.deleteButton:hover {
+  color: var(--color-danger);
+}
+
+.deleteButton:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.content {
+  /* Consistent padding inside container border */
+  padding: calc(var(--spacing-tight) + 8px) var(--spacing) var(--spacing-tight) var(--spacing);
+}

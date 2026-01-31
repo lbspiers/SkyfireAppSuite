@@ -1,0 +1,264 @@
+/* CombineSystemsForm - Tight spacing, inline expandable rows */
+
+.container {
+  width: 100%;
+  padding: 0;
+  position: relative;
+}
+
+/* Mode Toggle */
+.modeToggle {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing);
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+  line-height: 1;
+}
+
+.toggleBtn:hover:not(.active):not(:disabled) {
+  color: #FF8A4D;
+  border-color: var(--color-primary);
+}
+
+.toggleBtn.active {
+  background: var(--gradient-primary);
+  border: none;
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.3);
+}
+
+.toggleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* System Landing Row */
+.landingRow {
+  margin-bottom: var(--spacing-tight);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  overflow: hidden;
+  transition: var(--transition-base);
+}
+
+.landingRow:hover {
+  border-color: rgba(253, 115, 50, 0.3);
+}
+
+.landingRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition-base);
+}
+
+.landingRowHeader:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.landingRowLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.systemName {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.landingArrow {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin: 0 var(--spacing-xs);
+}
+
+.landingValue {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.landingEmpty {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Landing Options Panel */
+.optionsPanel {
+  padding: var(--spacing-tight) var(--spacing);
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-tight);
+}
+
+.optionCard {
+  padding: var(--spacing);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.optionCard:hover:not(.disabled) {
+  border-color: var(--color-primary);
+  background: rgba(253, 115, 50, 0.05);
+}
+
+.optionCard.selected {
+  border-color: var(--color-primary);
+  background: rgba(253, 115, 50, 0.1);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.optionCard.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.optionCard.shared {
+  border-color: rgba(253, 115, 50, 0.5);
+  background: rgba(253, 115, 50, 0.05);
+}
+
+.optionTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.optionCard.selected .optionTitle {
+  color: var(--color-primary);
+}
+
+.optionSubtitle {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.optionDisabledReason {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: var(--spacing-xs);
+}
+
+.sharedBadge {
+  font-size: var(--text-xs);
+  background: rgba(253, 115, 50, 0.2);
+  color: var(--color-primary);
+  padding: var(--spacing-xs) 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Message Box */
+.messageBox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  margin-top: var(--spacing);
+}
+
+.messageIcon {
+  font-size: var(--text-xl);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.messageIcon.success {
+  color: var(--success);
+}
+
+.messageIcon.info {
+  color: var(--color-info);
+}
+
+.messageText {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* Combiner Panel Form Section */
+.combinerPanelSection {
+  margin-top: var(--spacing);
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sectionTitle {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-tight);
+}
+
+/* Chevron SVG */
+.chevronSvg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}

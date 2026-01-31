@@ -1,0 +1,29 @@
+/* DrafterPortalLayout - Skyfire Design System */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+/* Main Content Area */
+.main {
+  flex: 1;
+  margin-left: 240px;
+  transition: margin-left var(--duration-base) var(--ease-out);
+}
+
+.mainCollapsed {
+  margin-left: 72px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+  }
+
+  .mainCollapsed {
+    margin-left: 0;
+  }
+}

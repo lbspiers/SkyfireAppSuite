@@ -1,0 +1,101 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  cursor: pointer;
+}
+
+.popover {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.content {
+  background: var(--bg-panel);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing);
+  min-width: 200px;
+}
+
+.arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--bg-panel);
+  border: var(--border-thin) solid var(--border-subtle);
+  transform: rotate(45deg);
+}
+
+/* Positions */
+.top {
+  bottom: 100%;
+  margin-bottom: var(--spacing);
+}
+
+.top .arrow {
+  bottom: -6px;
+  border-top: none;
+  border-left: none;
+}
+
+.bottom {
+  top: 100%;
+  margin-top: var(--spacing);
+}
+
+.bottom .arrow {
+  top: -6px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.left {
+  right: 100%;
+  margin-right: var(--spacing);
+}
+
+.left .arrow {
+  right: -6px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.right {
+  left: 100%;
+  margin-left: var(--spacing);
+}
+
+.right .arrow {
+  left: -6px;
+  border-right: none;
+  border-top: none;
+}
+
+/* Alignment */
+.top.align-start, .bottom.align-start { left: 0; }
+.top.align-start .arrow, .bottom.align-start .arrow { left: var(--spacing); }
+
+.top.align-center, .bottom.align-center { left: 50%; transform: translateX(-50%); }
+.top.align-center .arrow, .bottom.align-center .arrow { left: 50%; margin-left: -5px; }
+
+.top.align-end, .bottom.align-end { right: 0; }
+.top.align-end .arrow, .bottom.align-end .arrow { right: var(--spacing); }
+
+.left.align-start, .right.align-start { top: 0; }
+.left.align-start .arrow, .right.align-start .arrow { top: var(--spacing-sm); }
+
+.left.align-center, .right.align-center { top: 50%; transform: translateY(-50%); }
+.left.align-center .arrow, .right.align-center .arrow { top: 50%; margin-top: -5px; }
+
+.left.align-end, .right.align-end { bottom: 0; }
+.left.align-end .arrow, .right.align-end .arrow { bottom: var(--spacing-sm); }

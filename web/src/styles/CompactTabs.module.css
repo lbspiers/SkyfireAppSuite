@@ -1,0 +1,121 @@
+/* ===== COMPACT TABS - Sub-Tab Navigation Style ===== */
+
+.compactTabsContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  flex: 1;
+  flex-shrink: 1;
+}
+
+/* ===== SUB-TAB NAVIGATION (Equipment/BOS Pattern) ===== */
+.viewNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing);
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+  padding-bottom: 0;
+  padding-left: 1rem;
+}
+
+.viewNavigationTabs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.viewNavigationControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.viewLink {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  padding: var(--spacing) var(--spacing) var(--spacing-xs) var(--spacing);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  position: relative;
+  background: transparent;
+  cursor: pointer;
+}
+
+.viewLinkFirst {
+  padding: var(--spacing) var(--spacing) var(--spacing-xs) 0;
+}
+
+.viewLink:hover {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.viewLinkActive {
+  color: var(--text-primary);
+  position: relative;
+}
+
+.viewLinkIndicator {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 1px;
+  background: var(--gradient-primary);
+  border-radius: 0;
+}
+
+.viewLinkIndicatorFirst {
+  left: 0;
+  width: calc(100% - var(--spacing));
+}
+
+.viewLinkIndicatorCenter {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+}
+
+/* ===== CONTENT AREA ===== */
+.contentArea {
+  flex: 1;
+  min-height: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== EMPTY STATE ===== */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-wide);
+  text-align: center;
+  flex: 1;
+}
+
+.emptyStateIcon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing);
+  opacity: 0.3;
+}
+
+.emptyStateTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-tight);
+}
+
+.emptyStateText {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 300px;
+}

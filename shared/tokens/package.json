@@ -1,0 +1,28 @@
+{
+  "name": "@skyfire/tokens",
+  "version": "1.0.0",
+  "description": "Shared design tokens for Skyfire web and mobile apps",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "PRIVATE",
+  "keywords": [
+    "skyfire",
+    "design-tokens",
+    "theme",
+    "react-native",
+    "react"
+  ],
+  "peerDependencies": {
+    "react-native": ">=0.70.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  },
+  "files": [
+    "*.ts",
+    "*.js",
+    "*.d.ts"
+  ]
+}

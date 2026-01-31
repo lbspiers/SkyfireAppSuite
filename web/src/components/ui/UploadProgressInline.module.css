@@ -1,0 +1,54 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing);
+}
+
+.progressSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+.statusText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  margin-right: var(--spacing-tight);
+}
+
+.successIcon {
+  color: var(--color-success);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.retryButton {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-primary);
+  background-color: transparent;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.retryButton:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.retryButton:active {
+  transform: scale(0.98);
+}

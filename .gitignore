@@ -70,3 +70,15 @@ mobile-ios/ios/*.xcworkspace/xcuserdata/
 *.log
 .tmp/
 tmp/
+
+# Android build caches (long path issues)
+**/.cxx/
+**/app/build/
+**/.gradle/
+
+# iOS build
+**/Pods/
+**/DerivedData/
+
+# Web build output
+web/build/

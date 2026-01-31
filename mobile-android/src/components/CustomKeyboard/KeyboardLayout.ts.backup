@@ -1,0 +1,175 @@
+// src/components/CustomKeyboard/KeyboardLayout.ts
+import { KeyboardLayout, KeyData } from './types';
+
+// QWERTY Layout - Row 1 (Numbers)
+const numberRow: KeyData[] = [
+  { primary: '1', secondary: '!', type: 'number' },
+  { primary: '2', secondary: '@', type: 'number' },
+  { primary: '3', secondary: '#', type: 'number' },
+  { primary: '4', secondary: '$', type: 'number' },
+  { primary: '5', secondary: '%', type: 'number' },
+  { primary: '6', secondary: '^', type: 'number' },
+  { primary: '7', secondary: '&', type: 'number' },
+  { primary: '8', secondary: '*', type: 'number' },
+  { primary: '9', secondary: '(', type: 'number' },
+  { primary: '0', secondary: ')', type: 'number' },
+];
+
+// QWERTY Layout - Row 2 (Top letter row)
+const topRow: KeyData[] = [
+  { primary: 'q', secondary: 'Q', type: 'character' },
+  { primary: 'w', secondary: 'W', type: 'character' },
+  { primary: 'e', secondary: 'E', type: 'character' },
+  { primary: 'r', secondary: 'R', type: 'character' },
+  { primary: 't', secondary: 'T', type: 'character' },
+  { primary: 'y', secondary: 'Y', type: 'character' },
+  { primary: 'u', secondary: 'U', type: 'character' },
+  { primary: 'i', secondary: 'I', type: 'character' },
+  { primary: 'o', secondary: 'O', type: 'character' },
+  { primary: 'p', secondary: 'P', type: 'character' },
+];
+
+// QWERTY Layout - Row 3 (Home row)
+const homeRow: KeyData[] = [
+  { primary: 'a', secondary: 'A', type: 'character' },
+  { primary: 's', secondary: 'S', type: 'character' },
+  { primary: 'd', secondary: 'D', type: 'character' },
+  { primary: 'f', secondary: 'F', type: 'character' },
+  { primary: 'g', secondary: 'G', type: 'character' },
+  { primary: 'h', secondary: 'H', type: 'character' },
+  { primary: 'j', secondary: 'J', type: 'character' },
+  { primary: 'k', secondary: 'K', type: 'character' },
+  { primary: 'l', secondary: 'L', type: 'character' },
+];
+
+// QWERTY Layout - Row 4 (Bottom row)
+const bottomRowLeft: KeyData[] = [
+  { primary: 'caps', type: 'caps', width: 1.3, label: 'CAPS' },
+  { primary: 'z', secondary: 'Z', type: 'character' },
+  { primary: 'x', secondary: 'X', type: 'character' },
+  { primary: 'c', secondary: 'C', type: 'character' },
+  { primary: 'v', secondary: 'V', type: 'character' },
+  { primary: 'b', secondary: 'B', type: 'character' },
+  { primary: 'n', secondary: 'N', type: 'character' },
+  { primary: 'm', secondary: 'M', type: 'character' },
+];
+
+const bottomRowRight: KeyData[] = [
+  { primary: 'backspace', type: 'backspace', width: 1.3, label: '⌫' },
+];
+
+// QWERTY Layout - Row 5 (Space row)
+const spaceRow: KeyData[] = [
+  { primary: 'symbols', type: 'symbol', width: 1.2, label: '#@$' },
+  { primary: '@', secondary: '_', type: 'punctuation' },
+  { primary: ' ', type: 'space', width: 3.5, label: 'Space' },
+  { primary: ',', secondary: ',', type: 'punctuation' },
+  { primary: '.', secondary: '.', type: 'punctuation' },
+  { primary: 'enter', type: 'enter', width: 1.5, label: 'return' },
+];
+
+// Symbol/Number Layout
+const symbolNumberRow1: KeyData[] = [
+  { primary: '1', secondary: '1', type: 'number' },
+  { primary: '2', secondary: '2', type: 'number' },
+  { primary: '3', secondary: '3', type: 'number' },
+  { primary: '4', secondary: '4', type: 'number' },
+  { primary: '5', secondary: '5', type: 'number' },
+  { primary: '6', secondary: '6', type: 'number' },
+  { primary: '7', secondary: '7', type: 'number' },
+  { primary: '8', secondary: '8', type: 'number' },
+  { primary: '9', secondary: '9', type: 'number' },
+  { primary: '0', secondary: '0', type: 'number' },
+];
+
+const symbolRow2: KeyData[] = [
+  { primary: '@', secondary: '#', type: 'punctuation' },
+  { primary: '#', secondary: '$', type: 'punctuation' },
+  { primary: '$', secondary: '%', type: 'punctuation' },
+  { primary: '%', secondary: '^', type: 'punctuation' },
+  { primary: '^', secondary: '&', type: 'punctuation' },
+  { primary: '&', secondary: '*', type: 'punctuation' },
+  { primary: '*', secondary: '(', type: 'punctuation' },
+  { primary: '(', secondary: ')', type: 'punctuation' },
+  { primary: ')', secondary: '!', type: 'punctuation' },
+];
+
+const symbolRow3: KeyData[] = [
+  { primary: '_', secondary: '-', type: 'punctuation' },
+  { primary: '-', secondary: '+', type: 'punctuation' },
+  { primary: '=', secondary: ':', type: 'punctuation' },
+  { primary: ':', secondary: ';', type: 'punctuation' },
+  { primary: ';', secondary: '?', type: 'punctuation' },
+  { primary: '?', secondary: '!', type: 'punctuation' },
+  { primary: '/', secondary: '\\', type: 'punctuation' },
+  { primary: "'", secondary: '"', type: 'punctuation' },
+];
+
+const symbolRow4: KeyData[] = [
+  { primary: '#+=', type: 'symbol', width: 1.3, label: '#+=' },
+  { primary: '[', secondary: '{', type: 'punctuation' },
+  { primary: ']', secondary: '}', type: 'punctuation' },
+  { primary: '<', secondary: '«', type: 'punctuation' },
+  { primary: '>', secondary: '»', type: 'punctuation' },
+  { primary: '.', secondary: '_', type: 'punctuation' },
+  { primary: ',', secondary: '~', type: 'punctuation' },
+  { primary: '+', secondary: '|', type: 'punctuation' },
+  { primary: 'backspace', type: 'backspace', width: 1.3, label: '⌫' },
+];
+
+const symbolSpaceRow: KeyData[] = [
+  { primary: 'ABC', type: 'symbol', width: 1.2, label: 'ABC' },
+  { primary: '@', secondary: '_', type: 'punctuation' },
+  { primary: ' ', type: 'space', width: 4, label: 'Space' },
+  { primary: '.', secondary: '.', type: 'punctuation' },
+  { primary: 'enter', type: 'enter', width: 1.5, label: 'return' },
+];
+
+// Main layout getter function
+export function getKeyboardLayout(isSymbolMode: boolean, isShiftActive: boolean): KeyboardLayout {
+  if (isSymbolMode) {
+    return [
+      symbolNumberRow1,
+      symbolRow2,
+      symbolRow3,
+      symbolRow4,
+      symbolSpaceRow,
+    ];
+  }
+
+  // Standard QWERTY layout
+  const normalLayout: KeyboardLayout = [
+    numberRow,
+    topRow,
+    homeRow,
+    [...bottomRowLeft, ...bottomRowRight],
+    spaceRow,
+  ];
+
+  return normalLayout;
+}
+
+// Helper function to get individual key layouts for specific use cases
+export function getNumberRow(): KeyData[] {
+  return numberRow;
+}
+
+export function getSymbolLayout(): KeyboardLayout {
+  return [
+    symbolNumberRow1,
+    symbolRow2,
+    symbolRow3,
+    symbolRow4,
+    symbolSpaceRow,
+  ];
+}
+
+export function getQwertyLayout(): KeyboardLayout {
+  return [
+    numberRow,
+    topRow,
+    homeRow,
+    [...bottomRowLeft, ...bottomRowRight],
+    spaceRow,
+  ];
+}

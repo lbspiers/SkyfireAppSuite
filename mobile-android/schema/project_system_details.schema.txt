@@ -1,0 +1,1462 @@
+"table_name"	"column_name"	"data_type"	"character_maximum_length"	"numeric_precision"	"is_nullable"	"column_default"	"ordinal_position"
+"project_system_details"	"id"	"bigint"		64	"NO"	"nextval('project_system_details_id_seq'::regclass)"	1
+"project_system_details"	"uuid"	"uuid"			"NO"	"gen_random_uuid()"	2
+"project_system_details"	"project_id"	"uuid"			"NO"		3
+"project_system_details"	"deleted_at"	"timestamp with time zone"			"YES"		5
+"project_system_details"	"created_at"	"timestamp with time zone"			"NO"	"now()"	6
+"project_system_details"	"updated_at"	"timestamp with time zone"			"NO"	"now()"	7
+"project_system_details"	"sys1_solar_panel_existing"	"boolean"			"YES"		8
+"project_system_details"	"sys1_solar_panel_qty"	"integer"		32	"YES"		9
+"project_system_details"	"sys1_solar_panel_make"	"text"			"YES"		10
+"project_system_details"	"sys1_solar_panel_model"	"text"			"YES"		11
+"project_system_details"	"sys1_solarpanel_id"	"uuid"			"YES"		12
+"project_system_details"	"sys1_micro_inverter_existing"	"boolean"			"YES"		13
+"project_system_details"	"sys1_micro_inverter_make"	"text"			"YES"		14
+"project_system_details"	"sys1_micro_inverter_model"	"text"			"YES"		15
+"project_system_details"	"sys1_micro_inverter_id"	"uuid"			"YES"		16
+"project_system_details"	"sys1_micro_inverter_qty"	"integer"		32	"YES"		17
+"project_system_details"	"sys1_combiner_existing"	"boolean"			"YES"		18
+"project_system_details"	"sys1_combiner_panel_make"	"text"			"YES"		19
+"project_system_details"	"sys1_combiner_panel_model"	"text"			"YES"		20
+"project_system_details"	"sys1_combinerpanel_id"	"uuid"			"YES"		21
+"project_system_details"	"sys1_optimizer_existing"	"boolean"			"YES"		22
+"project_system_details"	"sys1_optimizer_make"	"text"			"YES"		23
+"project_system_details"	"sys1_optimizer_model"	"text"			"YES"		24
+"project_system_details"	"sys1_optimizer_id"	"uuid"			"YES"		25
+"project_system_details"	"sys1_inv_max_continuous_output"	"text"			"YES"		26
+"project_system_details"	"sys1_panel_count"	"integer"		32	"YES"		27
+"project_system_details"	"sys1_branch_string_1"	"text"			"YES"		28
+"project_system_details"	"sys1_branch_string_2"	"text"			"YES"		29
+"project_system_details"	"sys1_branch_string_3"	"text"			"YES"		30
+"project_system_details"	"sys1_branch_string_4"	"text"			"YES"		31
+"project_system_details"	"sys1_branch_string_5"	"text"			"YES"		32
+"project_system_details"	"sys1_branch_string_6"	"text"			"YES"		33
+"project_system_details"	"sys1_branch_string_7"	"text"			"YES"		34
+"project_system_details"	"sys1_branch_string_8"	"text"			"YES"		35
+"project_system_details"	"sys1_branch_string_9"	"text"			"YES"		36
+"project_system_details"	"sys1_branch_string_10"	"text"			"YES"		37
+"project_system_details"	"sys1_count_validation"	"text"			"YES"		38
+"project_system_details"	"sys1_backup_option"	"text"			"YES"		39
+"project_system_details"	"sys1_ess_existing"	"boolean"			"YES"		40
+"project_system_details"	"sys1_no_sms"	"boolean"			"YES"		41
+"project_system_details"	"sys1_ess_make"	"text"			"YES"		42
+"project_system_details"	"sys1_ess_model"	"text"			"YES"		43
+"project_system_details"	"sys1_ess_id"	"uuid"			"YES"		44
+"project_system_details"	"sys1_ess_main_breaker_rating"	"text"			"YES"		45
+"project_system_details"	"sys1_ess_upstream_breaker_rating"	"text"			"YES"		46
+"project_system_details"	"sys1_ess_upstream_breaker_location"	"text"			"YES"		47
+"project_system_details"	"sys1_battery1_existing"	"boolean"			"YES"		48
+"project_system_details"	"sys1_battery_1_qty"	"integer"		32	"YES"		49
+"project_system_details"	"sys1_battery_1_make"	"text"			"YES"		50
+"project_system_details"	"sys1_battery_1_model"	"text"			"YES"		51
+"project_system_details"	"sys1_battery1_id"	"uuid"			"YES"		52
+"project_system_details"	"sys1_battery2_existing"	"boolean"			"YES"		53
+"project_system_details"	"sys1_battery_2_qty"	"integer"		32	"YES"		54
+"project_system_details"	"sys1_battery_2_make"	"text"			"YES"		55
+"project_system_details"	"sys1_battery_2_model"	"text"			"YES"		56
+"project_system_details"	"sys1_battery2_id"	"uuid"			"YES"		57
+"project_system_details"	"sys1_combination_method"	"text"			"YES"		58
+"project_system_details"	"sys2_solarpanel_existing"	"boolean"			"YES"		59
+"project_system_details"	"sys2_solar_panel_qty"	"integer"		32	"YES"		60
+"project_system_details"	"sys2_solar_panel_make"	"text"			"YES"		61
+"project_system_details"	"sys2_solar_panel_model"	"text"			"YES"		62
+"project_system_details"	"sys2_solarpanel_id"	"uuid"			"YES"		63
+"project_system_details"	"sys2_micro_inverter_existing"	"boolean"			"YES"		64
+"project_system_details"	"sys2_micro_inverter_make"	"text"			"YES"		65
+"project_system_details"	"sys2_micro_inverter_model"	"text"			"YES"		66
+"project_system_details"	"sys2_micro_inverter_id"	"uuid"			"YES"		67
+"project_system_details"	"sys2_micro_inverter_qty"	"integer"		32	"YES"		68
+"project_system_details"	"sys2_combiner_existing"	"boolean"			"YES"		69
+"project_system_details"	"sys2_combiner_panel_make"	"text"			"YES"		70
+"project_system_details"	"sys2_combiner_panel_model"	"text"			"YES"		71
+"project_system_details"	"sys2_combinerpanel_id"	"uuid"			"YES"		72
+"project_system_details"	"sys2_optimizer_existing"	"boolean"			"YES"		73
+"project_system_details"	"sys2_optimizer_make"	"text"			"YES"		74
+"project_system_details"	"sys2_optimizer_model"	"text"			"YES"		75
+"project_system_details"	"sys2_optimizer_id"	"uuid"			"YES"		76
+"project_system_details"	"sys2_inv_max_continuous_output"	"text"			"YES"		77
+"project_system_details"	"sys2_panel_count"	"integer"		32	"YES"		78
+"project_system_details"	"sys2_branch_string_1"	"text"			"YES"		79
+"project_system_details"	"sys2_branch_string_2"	"text"			"YES"		80
+"project_system_details"	"sys2_branch_string_3"	"text"			"YES"		81
+"project_system_details"	"sys2_branch_string_4"	"text"			"YES"		82
+"project_system_details"	"sys2_branch_string_5"	"text"			"YES"		83
+"project_system_details"	"sys2_branch_string_6"	"text"			"YES"		84
+"project_system_details"	"sys2_branch_string_7"	"text"			"YES"		85
+"project_system_details"	"sys2_branch_string_8"	"text"			"YES"		86
+"project_system_details"	"sys2_branch_string_9"	"text"			"YES"		87
+"project_system_details"	"sys2_branch_string_10"	"text"			"YES"		88
+"project_system_details"	"sys2_count_validation"	"text"			"YES"		89
+"project_system_details"	"sys2_backup_option"	"text"			"YES"		90
+"project_system_details"	"sys2_ess_existing"	"boolean"			"YES"		91
+"project_system_details"	"sys2_no_sms"	"boolean"			"YES"		92
+"project_system_details"	"sys2_ess_make"	"text"			"YES"		93
+"project_system_details"	"sys2_ess_model"	"text"			"YES"		94
+"project_system_details"	"sys2_ess_id"	"uuid"			"YES"		95
+"project_system_details"	"sys2_ess_main_breaker_rating"	"text"			"YES"		96
+"project_system_details"	"sys2_ess_upstream_breaker_rating"	"text"			"YES"		97
+"project_system_details"	"sys2_ess_upstream_breaker_location"	"text"			"YES"		98
+"project_system_details"	"sys2_battery1_existing"	"boolean"			"YES"		99
+"project_system_details"	"sys2_battery_1_qty"	"integer"		32	"YES"		100
+"project_system_details"	"sys2_battery_1_make"	"text"			"YES"		101
+"project_system_details"	"sys2_battery_1_model"	"text"			"YES"		102
+"project_system_details"	"sys2_battery1_id"	"uuid"			"YES"		103
+"project_system_details"	"sys2_battery2_existing"	"boolean"			"YES"		104
+"project_system_details"	"sys2_battery_2_qty"	"integer"		32	"YES"		105
+"project_system_details"	"sys2_battery_2_make"	"text"			"YES"		106
+"project_system_details"	"sys2_battery_2_model"	"text"			"YES"		107
+"project_system_details"	"sys2_battery2_id"	"uuid"			"YES"		108
+"project_system_details"	"sys2_combination_method"	"text"			"YES"		109
+"project_system_details"	"sys3_solar_panel_existing"	"boolean"			"YES"		110
+"project_system_details"	"sys3_solar_panel_qty"	"integer"		32	"YES"		111
+"project_system_details"	"sys3_solar_panel_make"	"text"			"YES"		112
+"project_system_details"	"sys3_solar_panel_model"	"text"			"YES"		113
+"project_system_details"	"sys3_solarpanel_id"	"uuid"			"YES"		114
+"project_system_details"	"sys3_micro_inverter_existing"	"boolean"			"YES"		115
+"project_system_details"	"sys3_micro_inverter_make"	"text"			"YES"		116
+"project_system_details"	"sys3_micro_inverter_model"	"text"			"YES"		117
+"project_system_details"	"sys3_micro_inverter_id"	"uuid"			"YES"		118
+"project_system_details"	"sys3_micro_inverter_qty"	"integer"		32	"YES"		119
+"project_system_details"	"sys3_combiner_existing"	"boolean"			"YES"		120
+"project_system_details"	"sys3_combiner_panel_make"	"text"			"YES"		121
+"project_system_details"	"sys3_combiner_panel_model"	"text"			"YES"		122
+"project_system_details"	"sys3_combinerpanel_id"	"uuid"			"YES"		123
+"project_system_details"	"sys3_optimizer_existing"	"boolean"			"YES"		124
+"project_system_details"	"sys3_optimizer_make"	"text"			"YES"		125
+"project_system_details"	"sys3_optimizer_model"	"text"			"YES"		126
+"project_system_details"	"sys3_optimizer_id"	"uuid"			"YES"		127
+"project_system_details"	"sys3_inv_max_continuous_output"	"text"			"YES"		128
+"project_system_details"	"sys3_panel_count"	"integer"		32	"YES"		129
+"project_system_details"	"sys3_branch_string_1"	"text"			"YES"		130
+"project_system_details"	"sys3_branch_string_2"	"text"			"YES"		131
+"project_system_details"	"sys3_branch_string_3"	"text"			"YES"		132
+"project_system_details"	"sys3_branch_string_4"	"text"			"YES"		133
+"project_system_details"	"sys3_branch_string_5"	"text"			"YES"		134
+"project_system_details"	"sys3_branch_string_6"	"text"			"YES"		135
+"project_system_details"	"sys3_branch_string_7"	"text"			"YES"		136
+"project_system_details"	"sys3_branch_string_8"	"text"			"YES"		137
+"project_system_details"	"sys3_branch_string_9"	"text"			"YES"		138
+"project_system_details"	"sys3_branch_string_10"	"text"			"YES"		139
+"project_system_details"	"sys3_count_validation"	"text"			"YES"		140
+"project_system_details"	"sys3_backup_option"	"text"			"YES"		141
+"project_system_details"	"sys3_ess_existing"	"boolean"			"YES"		142
+"project_system_details"	"sys3_no_sms"	"boolean"			"YES"		143
+"project_system_details"	"sys3_ess_make"	"text"			"YES"		144
+"project_system_details"	"sys3_ess_model"	"text"			"YES"		145
+"project_system_details"	"sys3_ess_id"	"uuid"			"YES"		146
+"project_system_details"	"sys3_ess_main_breaker_rating"	"text"			"YES"		147
+"project_system_details"	"sys3_ess_upstream_breaker_rating"	"text"			"YES"		148
+"project_system_details"	"sys3_ess_upstream_breaker_location"	"text"			"YES"		149
+"project_system_details"	"sys3_battery1_existing"	"boolean"			"YES"		150
+"project_system_details"	"sys3_battery_1_qty"	"integer"		32	"YES"		151
+"project_system_details"	"sys3_battery_1_make"	"text"			"YES"		152
+"project_system_details"	"sys3_battery_1_model"	"text"			"YES"		153
+"project_system_details"	"sys3_battery1_id"	"uuid"			"YES"		154
+"project_system_details"	"sys3_battery2_existing"	"boolean"			"YES"		155
+"project_system_details"	"sys3_battery_2_qty"	"integer"		32	"YES"		156
+"project_system_details"	"sys3_battery_2_make"	"text"			"YES"		157
+"project_system_details"	"sys3_battery_2_model"	"text"			"YES"		158
+"project_system_details"	"sys3_battery2_id"	"uuid"			"YES"		159
+"project_system_details"	"sys3_combination_method"	"text"			"YES"		160
+"project_system_details"	"sys4_solar_panel_existing"	"boolean"			"YES"		161
+"project_system_details"	"sys4_solar_panel_qty"	"integer"		32	"YES"		162
+"project_system_details"	"sys4_solar_panel_make"	"text"			"YES"		163
+"project_system_details"	"sys4_solar_panel_model"	"text"			"YES"		164
+"project_system_details"	"sys4_solarpanel_id"	"uuid"			"YES"		165
+"project_system_details"	"sys4_micro_inverter_existing"	"boolean"			"YES"		166
+"project_system_details"	"sys4_micro_inverter_make"	"text"			"YES"		167
+"project_system_details"	"sys4_micro_inverter_model"	"text"			"YES"		168
+"project_system_details"	"sys4_micro_inverter_id"	"uuid"			"YES"		169
+"project_system_details"	"sys4_micro_inverter_qty"	"integer"		32	"YES"		170
+"project_system_details"	"sys4_combiner_existing"	"boolean"			"YES"		171
+"project_system_details"	"sys4_combiner_panel_make"	"text"			"YES"		172
+"project_system_details"	"sys4_combiner_panel_model"	"text"			"YES"		173
+"project_system_details"	"sys4_combinerpanel_id"	"uuid"			"YES"		174
+"project_system_details"	"sys4_optimizer_existing"	"boolean"			"YES"		175
+"project_system_details"	"sys4_optimizer_make"	"text"			"YES"		176
+"project_system_details"	"sys4_optimizer_model"	"text"			"YES"		177
+"project_system_details"	"sys4_optimizer_id"	"uuid"			"YES"		178
+"project_system_details"	"sys4_inv_max_continuous_output"	"text"			"YES"		179
+"project_system_details"	"sys4_panel_count"	"integer"		32	"YES"		180
+"project_system_details"	"sys4_branch_string_1"	"text"			"YES"		181
+"project_system_details"	"sys4_branch_string_2"	"text"			"YES"		182
+"project_system_details"	"sys4_branch_string_3"	"text"			"YES"		183
+"project_system_details"	"sys4_branch_string_4"	"text"			"YES"		184
+"project_system_details"	"sys4_branch_string_5"	"text"			"YES"		185
+"project_system_details"	"sys4_branch_string_6"	"text"			"YES"		186
+"project_system_details"	"sys4_branch_string_7"	"text"			"YES"		187
+"project_system_details"	"sys4_branch_string_8"	"text"			"YES"		188
+"project_system_details"	"sys4_branch_string_9"	"text"			"YES"		189
+"project_system_details"	"sys4_branch_string_10"	"text"			"YES"		190
+"project_system_details"	"sys4_count_validation"	"text"			"YES"		191
+"project_system_details"	"sys4_backup_option"	"text"			"YES"		192
+"project_system_details"	"sys4_ess_existing"	"boolean"			"YES"		193
+"project_system_details"	"sys4_no_sms"	"boolean"			"YES"		194
+"project_system_details"	"sys4_ess_make"	"text"			"YES"		195
+"project_system_details"	"sys4_ess_model"	"text"			"YES"		196
+"project_system_details"	"sys4_ess_id"	"uuid"			"YES"		197
+"project_system_details"	"sys4_ess_main_breaker_rating"	"text"			"YES"		198
+"project_system_details"	"sys4_ess_upstream_breaker_rating"	"text"			"YES"		199
+"project_system_details"	"sys4_ess_upstream_breaker_location"	"text"			"YES"		200
+"project_system_details"	"sys4_battery_existing"	"boolean"			"YES"		201
+"project_system_details"	"sys4_battery_1_qty"	"integer"		32	"YES"		202
+"project_system_details"	"sys4_battery_1_make"	"text"			"YES"		203
+"project_system_details"	"sys4_battery_1_model"	"text"			"YES"		204
+"project_system_details"	"sys4_battery1_id"	"uuid"			"YES"		205
+"project_system_details"	"sys4_battery2_existing"	"boolean"			"YES"		206
+"project_system_details"	"sys4_battery_2_qty"	"integer"		32	"YES"		207
+"project_system_details"	"sys4_battery_2_make"	"text"			"YES"		208
+"project_system_details"	"sys4_battery_2_model"	"text"			"YES"		209
+"project_system_details"	"sys4_battery2_id"	"uuid"			"YES"		210
+"project_system_details"	"sys4_combination_method"	"text"			"YES"		211
+"project_system_details"	"ele_ses_type"	"text"			"YES"		212
+"project_system_details"	"ele_main_circuit_breakers_qty"	"integer"		32	"YES"		213
+"project_system_details"	"ele_bus_bar_rating"	"text"			"YES"		214
+"project_system_details"	"ele_main_circuit_breaker_rating"	"text"			"YES"		215
+"project_system_details"	"ele_feeder_location_on_bus_bar"	"text"			"YES"		216
+"project_system_details"	"ele_main_panel_upgrade"	"boolean"			"YES"		217
+"project_system_details"	"ele_floor_area"	"text"			"YES"		218
+"project_system_details"	"ele_small_appliance_circuits"	"text"			"YES"		219
+"project_system_details"	"ele_loadtype_1"	"text"			"YES"		220
+"project_system_details"	"ele_loadtype_2"	"text"			"YES"		221
+"project_system_details"	"ele_loadtype_3"	"text"			"YES"		222
+"project_system_details"	"ele_loadtype_4"	"text"			"YES"		223
+"project_system_details"	"ele_loadtype_5"	"text"			"YES"		224
+"project_system_details"	"ele_loadtype_6"	"text"			"YES"		225
+"project_system_details"	"ele_loadtype_7"	"text"			"YES"		226
+"project_system_details"	"ele_loadtype_8"	"text"			"YES"		227
+"project_system_details"	"ele_loadtype_9"	"text"			"YES"		228
+"project_system_details"	"ele_loadtype_10"	"text"			"YES"		229
+"project_system_details"	"ele_loadtype_11"	"text"			"YES"		230
+"project_system_details"	"ele_loadtype_12"	"text"			"YES"		231
+"project_system_details"	"ele_loadtype_13"	"text"			"YES"		232
+"project_system_details"	"ele_loadtype_14"	"text"			"YES"		233
+"project_system_details"	"ele_loadtype_15"	"text"			"YES"		234
+"project_system_details"	"ele_loadtype_16"	"text"			"YES"		235
+"project_system_details"	"ele_loadtype_17"	"text"			"YES"		236
+"project_system_details"	"ele_2p_breaker_1"	"text"			"YES"		237
+"project_system_details"	"ele_2p_breaker_2"	"text"			"YES"		238
+"project_system_details"	"ele_2p_breaker_3"	"text"			"YES"		239
+"project_system_details"	"ele_2p_breaker_4"	"text"			"YES"		240
+"project_system_details"	"ele_2p_breaker_5"	"text"			"YES"		241
+"project_system_details"	"ele_2p_breaker_6"	"text"			"YES"		242
+"project_system_details"	"ele_2p_breaker_7"	"text"			"YES"		243
+"project_system_details"	"ele_2p_breaker_8"	"text"			"YES"		244
+"project_system_details"	"ele_2p_breaker_9"	"text"			"YES"		245
+"project_system_details"	"ele_2p_breaker_10"	"text"			"YES"		246
+"project_system_details"	"ele_2p_breaker_11"	"text"			"YES"		247
+"project_system_details"	"ele_2p_breaker_12"	"text"			"YES"		248
+"project_system_details"	"ele_2p_breaker_13"	"text"			"YES"		249
+"project_system_details"	"ele_2p_breaker_14"	"text"			"YES"		250
+"project_system_details"	"ele_2p_breaker_15"	"text"			"YES"		251
+"project_system_details"	"ele_2p_breaker_16"	"text"			"YES"		252
+"project_system_details"	"ele_2p_breaker_17"	"text"			"YES"		253
+"project_system_details"	"ele_method_of_interconnection"	"text"			"YES"		254
+"project_system_details"	"ele_breaker_location"	"text"			"YES"		255
+"project_system_details"	"bls1_backuploader_existing"	"boolean"			"YES"		256
+"project_system_details"	"bls1_backuploader_bus_bar_rating"	"text"			"YES"		257
+"project_system_details"	"bls1_backuploader_main_breaker_rating"	"text"			"YES"		258
+"project_system_details"	"bls1_backuploader_upstream_breaker_rating"	"text"			"YES"		259
+"project_system_details"	"bls1_backup_load_sub_panel_make"	"text"			"YES"		260
+"project_system_details"	"bls1_backup_load_sub_panel_model"	"text"			"YES"		261
+"project_system_details"	"bls1_backupload_sub_panel_id"	"uuid"			"YES"		262
+"project_system_details"	"bls1_load_type_1"	"text"			"YES"		263
+"project_system_details"	"bls1_load_type_2"	"text"			"YES"		264
+"project_system_details"	"bls1_load_type_3"	"text"			"YES"		265
+"project_system_details"	"bls1_load_type_4"	"text"			"YES"		266
+"project_system_details"	"bls1_load_type_5"	"text"			"YES"		267
+"project_system_details"	"bls1_load_type_6"	"text"			"YES"		268
+"project_system_details"	"bls1_load_type_7"	"text"			"YES"		269
+"project_system_details"	"bls1_load_type_8"	"text"			"YES"		270
+"project_system_details"	"bls1_load_type_9"	"text"			"YES"		271
+"project_system_details"	"bls1_load_type_10"	"text"			"YES"		272
+"project_system_details"	"bls1_load_type_11"	"text"			"YES"		273
+"project_system_details"	"bls1_load_type_12"	"text"			"YES"		274
+"project_system_details"	"bls1_load_type_13"	"text"			"YES"		275
+"project_system_details"	"bls1_load_type_14"	"text"			"YES"		276
+"project_system_details"	"bls1_load_type_15"	"text"			"YES"		277
+"project_system_details"	"bls1_load_type_16"	"text"			"YES"		278
+"project_system_details"	"bls1_load_type_17"	"text"			"YES"		279
+"project_system_details"	"bls1_load_type_18"	"text"			"YES"		280
+"project_system_details"	"bls1_load_type_19"	"text"			"YES"		281
+"project_system_details"	"bls1_load_type_20"	"text"			"YES"		282
+"project_system_details"	"bls1_breaker_rating_1"	"text"			"YES"		283
+"project_system_details"	"bls1_breaker_rating_2"	"text"			"YES"		284
+"project_system_details"	"bls1_breaker_rating_3"	"text"			"YES"		285
+"project_system_details"	"bls1_breaker_rating_4"	"text"			"YES"		286
+"project_system_details"	"bls1_breaker_rating_5"	"text"			"YES"		287
+"project_system_details"	"bls1_breaker_rating_6"	"text"			"YES"		288
+"project_system_details"	"bls1_breaker_rating_7"	"text"			"YES"		289
+"project_system_details"	"bls1_breaker_rating_8"	"text"			"YES"		290
+"project_system_details"	"bls1_breaker_rating_9"	"text"			"YES"		291
+"project_system_details"	"bls1_breaker_rating_10"	"text"			"YES"		292
+"project_system_details"	"bls1_breaker_rating_11"	"text"			"YES"		293
+"project_system_details"	"bls1_breaker_rating_12"	"text"			"YES"		294
+"project_system_details"	"bls1_breaker_rating_13"	"text"			"YES"		295
+"project_system_details"	"bls1_breaker_rating_14"	"text"			"YES"		296
+"project_system_details"	"bls1_breaker_rating_15"	"text"			"YES"		297
+"project_system_details"	"bls1_breaker_rating_16"	"text"			"YES"		298
+"project_system_details"	"bls1_breaker_rating_17"	"text"			"YES"		299
+"project_system_details"	"bls1_breaker_rating_18"	"text"			"YES"		300
+"project_system_details"	"bls1_breaker_rating_19"	"text"			"YES"		301
+"project_system_details"	"bls1_breaker_rating_20"	"text"			"YES"		302
+"project_system_details"	"bls2_backuploader_existing"	"boolean"			"YES"		303
+"project_system_details"	"bls2_bus_bar_rating"	"text"			"YES"		304
+"project_system_details"	"bls2_main_breaker_rating"	"text"			"YES"		305
+"project_system_details"	"bls2_upstream_breaker_rating"	"text"			"YES"		306
+"project_system_details"	"bls2_battery_combiner_panel_make"	"text"			"YES"		307
+"project_system_details"	"bls2_battery_combiner_panel_model"	"text"			"YES"		308
+"project_system_details"	"bls2_batterycombinerpanel_id"	"uuid"			"YES"		309
+"project_system_details"	"spb_subpanel_existing"	"boolean"			"YES"		310
+"project_system_details"	"spb_bus_bar_rating"	"text"			"YES"		311
+"project_system_details"	"spb_main_breaker_rating"	"text"			"YES"		312
+"project_system_details"	"spb_upstream_breaker_rating"	"text"			"YES"		313
+"project_system_details"	"spb_sub_panel_make"	"text"			"YES"		314
+"project_system_details"	"spb_sub_panel_model"	"text"			"YES"		315
+"project_system_details"	"spb_subpanel_id"	"uuid"			"YES"		316
+"project_system_details"	"spb_load_type_1"	"text"			"YES"		317
+"project_system_details"	"spb_load_type_2"	"text"			"YES"		318
+"project_system_details"	"spb_load_type_3"	"text"			"YES"		319
+"project_system_details"	"spb_load_type_4"	"text"			"YES"		320
+"project_system_details"	"spb_load_type_5"	"text"			"YES"		321
+"project_system_details"	"spb_load_type_6"	"text"			"YES"		322
+"project_system_details"	"spb_load_type_7"	"text"			"YES"		323
+"project_system_details"	"spb_load_type_8"	"text"			"YES"		324
+"project_system_details"	"spb_load_type_9"	"text"			"YES"		325
+"project_system_details"	"spb_load_type_10"	"text"			"YES"		326
+"project_system_details"	"spb_load_type_11"	"text"			"YES"		327
+"project_system_details"	"spb_load_type_12"	"text"			"YES"		328
+"project_system_details"	"spb_load_type_13"	"text"			"YES"		329
+"project_system_details"	"spb_load_type_14"	"text"			"YES"		330
+"project_system_details"	"spb_load_type_15"	"text"			"YES"		331
+"project_system_details"	"spb_load_type_16"	"text"			"YES"		332
+"project_system_details"	"spb_load_type_17"	"text"			"YES"		333
+"project_system_details"	"spb_load_type_18"	"text"			"YES"		334
+"project_system_details"	"spb_load_type_19"	"text"			"YES"		335
+"project_system_details"	"spb_load_type_20"	"text"			"YES"		336
+"project_system_details"	"spb_breaker_rating_1"	"text"			"YES"		337
+"project_system_details"	"spb_breaker_rating_2"	"text"			"YES"		338
+"project_system_details"	"spb_breaker_rating_3"	"text"			"YES"		339
+"project_system_details"	"spb_breaker_rating_4"	"text"			"YES"		340
+"project_system_details"	"spb_breaker_rating_5"	"text"			"YES"		341
+"project_system_details"	"spb_breaker_rating_6"	"text"			"YES"		342
+"project_system_details"	"spb_breaker_rating_7"	"text"			"YES"		343
+"project_system_details"	"spb_breaker_rating_8"	"text"			"YES"		344
+"project_system_details"	"spb_breaker_rating_9"	"text"			"YES"		345
+"project_system_details"	"spb_breaker_rating_10"	"text"			"YES"		346
+"project_system_details"	"spb_breaker_rating_11"	"text"			"YES"		347
+"project_system_details"	"spb_breaker_rating_12"	"text"			"YES"		348
+"project_system_details"	"spb_breaker_rating_13"	"text"			"YES"		349
+"project_system_details"	"spb_breaker_rating_14"	"text"			"YES"		350
+"project_system_details"	"spb_breaker_rating_15"	"text"			"YES"		351
+"project_system_details"	"spb_breaker_rating_16"	"text"			"YES"		352
+"project_system_details"	"spb_breaker_rating_17"	"text"			"YES"		353
+"project_system_details"	"spb_breaker_rating_18"	"text"			"YES"		354
+"project_system_details"	"spb_breaker_rating_19"	"text"			"YES"		355
+"project_system_details"	"spb_breaker_rating_20"	"text"			"YES"		356
+"project_system_details"	"rta_roofing_material"	"text"			"YES"		357
+"project_system_details"	"rta_framing_size"	"text"			"YES"		358
+"project_system_details"	"rta_framing_spacing"	"text"			"YES"		359
+"project_system_details"	"rta_rail_make"	"text"			"YES"		360
+"project_system_details"	"rta_rail_model"	"text"			"YES"		361
+"project_system_details"	"rta_rail_id"	"uuid"			"YES"		362
+"project_system_details"	"rta_attachment_make"	"text"			"YES"		363
+"project_system_details"	"rta_attachment_model"	"text"			"YES"		364
+"project_system_details"	"rta_attachment_id"	"uuid"			"YES"		365
+"project_system_details"	"rtb_roofing_material"	"text"			"YES"		366
+"project_system_details"	"rtb_framing_size"	"text"			"YES"		367
+"project_system_details"	"rtb_framing_spacing"	"text"			"YES"		368
+"project_system_details"	"rtb_rail_make"	"text"			"YES"		369
+"project_system_details"	"rtb_rail_model"	"text"			"YES"		370
+"project_system_details"	"rtb_rail_id"	"uuid"			"YES"		371
+"project_system_details"	"rtb_attachment_make"	"text"			"YES"		372
+"project_system_details"	"rtb_attachment_model"	"text"			"YES"		373
+"project_system_details"	"rtb_attachment_id"	"uuid"			"YES"		374
+"project_system_details"	"mp1_roof_type"	"text"			"YES"		375
+"project_system_details"	"mp1_stories"	"integer"		32	"YES"		376
+"project_system_details"	"mp1_pitch"	"integer"		32	"YES"		377
+"project_system_details"	"mp1_azimuth"	"integer"		32	"YES"		378
+"project_system_details"	"mp1_tilt_mount_azimuth"	"integer"		32	"YES"		379
+"project_system_details"	"mp1_tilt_mount_pitch"	"integer"		32	"YES"		380
+"project_system_details"	"mp2_roof_type"	"text"			"YES"		381
+"project_system_details"	"mp2_stories"	"integer"		32	"YES"		382
+"project_system_details"	"mp2_pitch"	"integer"		32	"YES"		383
+"project_system_details"	"mp2_azimuth"	"integer"		32	"YES"		384
+"project_system_details"	"mp2_tilt_mount_azimuth"	"integer"		32	"YES"		385
+"project_system_details"	"mp2_tilt_mount_pitch"	"integer"		32	"YES"		386
+"project_system_details"	"mp3_roof_type"	"text"			"YES"		387
+"project_system_details"	"mp3_stories"	"integer"		32	"YES"		388
+"project_system_details"	"mp3_pitch"	"integer"		32	"YES"		389
+"project_system_details"	"mp3_azimuth"	"integer"		32	"YES"		390
+"project_system_details"	"mp3_tilt_mount_azimuth"	"integer"		32	"YES"		391
+"project_system_details"	"mp3_tilt_mount_pitch"	"integer"		32	"YES"		392
+"project_system_details"	"mp4_roof_type"	"text"			"YES"		393
+"project_system_details"	"mp4_stories"	"integer"		32	"YES"		394
+"project_system_details"	"mp4_pitch"	"integer"		32	"YES"		395
+"project_system_details"	"mp4_azimuth"	"integer"		32	"YES"		396
+"project_system_details"	"mp4_tilt_mount_azimuth"	"integer"		32	"YES"		397
+"project_system_details"	"mp4_tilt_mount_pitch"	"integer"		32	"YES"		398
+"project_system_details"	"mp5_roof_type"	"text"			"YES"		399
+"project_system_details"	"mp5_stories"	"integer"		32	"YES"		400
+"project_system_details"	"mp5_pitch"	"integer"		32	"YES"		401
+"project_system_details"	"mp5_azimuth"	"integer"		32	"YES"		402
+"project_system_details"	"mp5_tilt_mount_azimuth"	"integer"		32	"YES"		403
+"project_system_details"	"mp5_tilt_mount_pitch"	"integer"		32	"YES"		404
+"project_system_details"	"mp6_roof_type"	"text"			"YES"		405
+"project_system_details"	"mp6_stories"	"integer"		32	"YES"		406
+"project_system_details"	"mp6_pitch"	"integer"		32	"YES"		407
+"project_system_details"	"mp6_azimuth"	"integer"		32	"YES"		408
+"project_system_details"	"mp6_tilt_mount_azimuth"	"integer"		32	"YES"		409
+"project_system_details"	"mp6_tilt_mount_pitch"	"integer"		32	"YES"		410
+"project_system_details"	"mp7_roof_type"	"text"			"YES"		411
+"project_system_details"	"mp7_stories"	"integer"		32	"YES"		412
+"project_system_details"	"mp7_pitch"	"integer"		32	"YES"		413
+"project_system_details"	"mp7_azimuth"	"integer"		32	"YES"		414
+"project_system_details"	"mp7_tilt_mount_azimuth"	"integer"		32	"YES"		415
+"project_system_details"	"mp7_tilt_mount_pitch"	"integer"		32	"YES"		416
+"project_system_details"	"mp8_roof_type"	"text"			"YES"		417
+"project_system_details"	"mp8_stories"	"integer"		32	"YES"		418
+"project_system_details"	"mp8_pitch"	"integer"		32	"YES"		419
+"project_system_details"	"mp8_azimuth"	"integer"		32	"YES"		420
+"project_system_details"	"mp8_tilt_mount_azimuth"	"integer"		32	"YES"		421
+"project_system_details"	"mp8_tilt_mount_pitch"	"integer"		32	"YES"		422
+"project_system_details"	"mp9_roof_type"	"text"			"YES"		423
+"project_system_details"	"mp9_stories"	"integer"		32	"YES"		424
+"project_system_details"	"mp9_pitch"	"integer"		32	"YES"		425
+"project_system_details"	"mp9_azimuth"	"integer"		32	"YES"		426
+"project_system_details"	"mp9_tilt_mount_azimuth"	"integer"		32	"YES"		427
+"project_system_details"	"mp9_tilt_mount_pitch"	"integer"		32	"YES"		428
+"project_system_details"	"mp10_roof_type"	"text"			"YES"		429
+"project_system_details"	"mp10_stories"	"integer"		32	"YES"		430
+"project_system_details"	"mp10_pitch"	"integer"		32	"YES"		431
+"project_system_details"	"mp10_azimuth"	"integer"		32	"YES"		432
+"project_system_details"	"mp10_tilt_mount_azimuth"	"integer"		32	"YES"		433
+"project_system_details"	"mp10_tilt_mount_pitch"	"integer"		32	"YES"		434
+"project_system_details"	"sys1_ap_hoy_wire_gauge"	"text"			"YES"		435
+"project_system_details"	"sys1_ap_hoy_breaker_size"	"text"			"YES"		436
+"project_system_details"	"sys2_ap_hoy_wire_gauge"	"text"			"YES"		437
+"project_system_details"	"sys2_ap_hoy_breaker_size"	"text"			"YES"		438
+"project_system_details"	"sys3_ap_hoy_wire_gauge"	"text"			"YES"		439
+"project_system_details"	"sys3_ap_hoy_breaker_size"	"text"			"YES"		440
+"project_system_details"	"sys4_ap_hoy_wire_gauge"	"text"			"YES"		441
+"project_system_details"	"sys4_ap_hoy_breaker_size"	"text"			"YES"		442
+"project_system_details"	"bsp_backup_feeder_location"	"text"			"YES"		443
+"project_system_details"	"spb_subpanel_b_feeder_location"	"text"			"YES"		444
+"project_system_details"	"mpa_bus_bar_existing"	"boolean"			"YES"		445
+"project_system_details"	"mpa_main_circuit_breaker_existing"	"boolean"			"YES"		446
+"project_system_details"	"mpa_mainpanela_acunit_amps"	"text"			"YES"		447
+"project_system_details"	"mpa_mainpanela_furnace_amps"	"text"			"YES"		448
+"project_system_details"	"bsp_backupload_mcbexisting"	"boolean"			"YES"		449
+"project_system_details"	"spb_subpanelb_mcbexisting"	"boolean"			"YES"		450
+"project_system_details"	"ele_utility_meter_behind_fence"	"boolean"			"YES"		451
+"project_system_details"	"ele_combine_positions"	"text"			"YES"		452
+"project_system_details"	"precombine_1_1_equipment_type"	"text"			"YES"		453
+"project_system_details"	"precombine_1_1_existing"	"boolean"			"YES"		454
+"project_system_details"	"precombine_1_1_make"	"text"			"YES"		455
+"project_system_details"	"precombine_1_1_model"	"text"			"YES"		456
+"project_system_details"	"precombine_1_1_equipment_master_id"	"uuid"			"YES"		457
+"project_system_details"	"precombine_2_1_equipment_type"	"text"			"YES"		458
+"project_system_details"	"precombine_2_1_existing"	"boolean"			"YES"		459
+"project_system_details"	"precombine_2_1_make"	"text"			"YES"		460
+"project_system_details"	"precombine_2_1_model"	"text"			"YES"		461
+"project_system_details"	"precombine_2_1_equipment_master_id"	"uuid"			"YES"		462
+"project_system_details"	"precombine_3_1_equipment_type"	"text"			"YES"		463
+"project_system_details"	"precombine_3_1_existing"	"boolean"			"YES"		464
+"project_system_details"	"precombine_3_1_make"	"text"			"YES"		465
+"project_system_details"	"precombine_3_1_model"	"text"			"YES"		466
+"project_system_details"	"precombine_3_1_equipment_master_id"	"uuid"			"YES"		467
+"project_system_details"	"postcombine_1_1_equipment_type"	"text"			"YES"		468
+"project_system_details"	"postcombine_1_1_existing"	"boolean"			"YES"		469
+"project_system_details"	"postcombine_1_1_make"	"text"			"YES"		470
+"project_system_details"	"postcombine_1_1_model"	"text"			"YES"		471
+"project_system_details"	"postcombine_1_1_equipment_master_id"	"uuid"			"YES"		472
+"project_system_details"	"postcombine_2_1_equipment_type"	"text"			"YES"		473
+"project_system_details"	"postcombine_2_1_existing"	"boolean"			"YES"		474
+"project_system_details"	"postcombine_2_1_make"	"text"			"YES"		475
+"project_system_details"	"postcombine_2_1_model"	"text"			"YES"		476
+"project_system_details"	"postcombine_2_1_equipment_master_id"	"uuid"			"YES"		477
+"project_system_details"	"postcombine_3_1_equipment_type"	"text"			"YES"		478
+"project_system_details"	"postcombine_3_1_existing"	"boolean"			"YES"		479
+"project_system_details"	"postcombine_3_1_make"	"text"			"YES"		480
+"project_system_details"	"postcombine_3_1_model"	"text"			"YES"		481
+"project_system_details"	"postcombine_3_1_equipment_master_id"	"uuid"			"YES"		482
+"project_system_details"	"precombine_1_2_equipment_type"	"text"			"YES"		483
+"project_system_details"	"precombine_1_2_existing"	"boolean"			"YES"		484
+"project_system_details"	"precombine_1_2_make"	"text"			"YES"		485
+"project_system_details"	"precombine_1_2_model"	"text"			"YES"		486
+"project_system_details"	"precombine_1_2_equipment_master_id"	"uuid"			"YES"		487
+"project_system_details"	"precombine_2_2_equipment_type"	"text"			"YES"		488
+"project_system_details"	"precombine_2_2_existing"	"boolean"			"YES"		489
+"project_system_details"	"precombine_2_2_make"	"text"			"YES"		490
+"project_system_details"	"precombine_2_2_model"	"text"			"YES"		491
+"project_system_details"	"precombine_2_2_equipment_master_id"	"uuid"			"YES"		492
+"project_system_details"	"precombine_3_2_equipment_type"	"text"			"YES"		493
+"project_system_details"	"precombine_3_2_existing"	"boolean"			"YES"		494
+"project_system_details"	"precombine_3_2_make"	"text"			"YES"		495
+"project_system_details"	"precombine_3_2_model"	"text"			"YES"		496
+"project_system_details"	"precombine_3_2_equipment_master_id"	"uuid"			"YES"		497
+"project_system_details"	"postcombine_1_2_equipment_type"	"text"			"YES"		498
+"project_system_details"	"postcombine_1_2_existing"	"boolean"			"YES"		499
+"project_system_details"	"postcombine_1_2_make"	"text"			"YES"		500
+"project_system_details"	"postcombine_1_2_model"	"text"			"YES"		501
+"project_system_details"	"postcombine_1_2_equipment_master_id"	"uuid"			"YES"		502
+"project_system_details"	"postcombine_2_2_equipment_type"	"text"			"YES"		503
+"project_system_details"	"postcombine_2_2_existing"	"boolean"			"YES"		504
+"project_system_details"	"postcombine_2_2_make"	"text"			"YES"		505
+"project_system_details"	"postcombine_2_2_model"	"text"			"YES"		506
+"project_system_details"	"postcombine_2_2_equipment_master_id"	"uuid"			"YES"		507
+"project_system_details"	"postcombine_3_2_equipment_type"	"text"			"YES"		508
+"project_system_details"	"postcombine_3_2_existing"	"boolean"			"YES"		509
+"project_system_details"	"postcombine_3_2_make"	"text"			"YES"		510
+"project_system_details"	"postcombine_3_2_model"	"text"			"YES"		511
+"project_system_details"	"postcombine_3_2_equipment_master_id"	"uuid"			"YES"		512
+"project_system_details"	"precombine_1_3_equipment_type"	"text"			"YES"		513
+"project_system_details"	"precombine_1_3_existing"	"boolean"			"YES"		514
+"project_system_details"	"precombine_1_3_make"	"text"			"YES"		515
+"project_system_details"	"precombine_1_3_model"	"text"			"YES"		516
+"project_system_details"	"precombine_1_3_equipment_master_id"	"uuid"			"YES"		517
+"project_system_details"	"precombine_2_3_equipment_type"	"text"			"YES"		518
+"project_system_details"	"precombine_2_3_existing"	"boolean"			"YES"		519
+"project_system_details"	"precombine_2_3_make"	"text"			"YES"		520
+"project_system_details"	"precombine_2_3_model"	"text"			"YES"		521
+"project_system_details"	"precombine_2_3_equipment_master_id"	"uuid"			"YES"		522
+"project_system_details"	"precombine_3_3_equipment_type"	"text"			"YES"		523
+"project_system_details"	"precombine_3_3_existing"	"boolean"			"YES"		524
+"project_system_details"	"precombine_3_3_make"	"text"			"YES"		525
+"project_system_details"	"precombine_3_3_model"	"text"			"YES"		526
+"project_system_details"	"precombine_3_3_equipment_master_id"	"uuid"			"YES"		527
+"project_system_details"	"postcombine_1_3_equipment_type"	"text"			"YES"		528
+"project_system_details"	"postcombine_1_3_existing"	"boolean"			"YES"		529
+"project_system_details"	"postcombine_1_3_make"	"text"			"YES"		530
+"project_system_details"	"postcombine_1_3_model"	"text"			"YES"		531
+"project_system_details"	"postcombine_1_3_equipment_master_id"	"uuid"			"YES"		532
+"project_system_details"	"postcombine_2_3_equipment_type"	"text"			"YES"		533
+"project_system_details"	"postcombine_2_3_existing"	"boolean"			"YES"		534
+"project_system_details"	"postcombine_2_3_make"	"text"			"YES"		535
+"project_system_details"	"postcombine_2_3_model"	"text"			"YES"		536
+"project_system_details"	"postcombine_2_3_equipment_master_id"	"uuid"			"YES"		537
+"project_system_details"	"postcombine_3_3_equipment_type"	"text"			"YES"		538
+"project_system_details"	"postcombine_3_3_existing"	"boolean"			"YES"		539
+"project_system_details"	"postcombine_3_3_make"	"text"			"YES"		540
+"project_system_details"	"postcombine_3_3_model"	"text"			"YES"		541
+"project_system_details"	"postcombine_3_3_equipment_master_id"	"uuid"			"YES"		542
+"project_system_details"	"sys1_system_combiner_panel1_mlo"	"text"			"YES"		543
+"project_system_details"	"sys2_system_combiner_panel2_mlo"	"text"			"YES"		544
+"project_system_details"	"sys3_system_combiner_panel3_mlo"	"text"			"YES"		545
+"project_system_details"	"sys4_system_combiner_panel4_mlo"	"text"			"YES"		546
+"project_system_details"	"utility_service_amps"	"text"			"YES"		547
+"project_system_details"	"roof_sq_ft"	"integer"		32	"YES"		548
+"project_system_details"	"roof_a_panel_count"	"integer"		32	"YES"		549
+"project_system_details"	"roof_b_panel_count"	"integer"		32	"YES"		550
+"project_system_details"	"mpa_tie_in_breaker_existing"	"boolean"			"YES"		551
+"project_system_details"	"mpa_tie_in_breaker_rating"	"text"			"YES"		552
+"project_system_details"	"panel_count_mp1"	"integer"		32	"YES"		553
+"project_system_details"	"panel_count_mp2"	"integer"		32	"YES"		554
+"project_system_details"	"panel_count_mp3"	"integer"		32	"YES"		555
+"project_system_details"	"panel_count_mp4"	"integer"		32	"YES"		556
+"project_system_details"	"panel_count_mp5"	"integer"		32	"YES"		557
+"project_system_details"	"panel_count_mp6"	"integer"		32	"YES"		558
+"project_system_details"	"panel_count_mp7"	"integer"		32	"YES"		559
+"project_system_details"	"panel_count_mp8"	"integer"		32	"YES"		560
+"project_system_details"	"panel_count_mp9"	"integer"		32	"YES"		561
+"project_system_details"	"panel_count_mp10"	"integer"		32	"YES"		562
+"project_system_details"	"ground_size_sys1"	"text"			"YES"		563
+"project_system_details"	"ground_size_sys2"	"text"			"YES"		564
+"project_system_details"	"ground_size_pos3"	"text"			"YES"		565
+"project_system_details"	"ground_size_pos4"	"text"			"YES"		566
+"project_system_details"	"tap_interior_exterior"	"text"			"YES"		567
+"project_system_details"	"sys1_sms_pv_1_input"	"text"			"YES"		568
+"project_system_details"	"sys1_sms1_pv_2_input"	"text"			"YES"		569
+"project_system_details"	"sys1_sms_pv_3_input"	"text"			"YES"		570
+"project_system_details"	"sys1_sms_ess_1_input"	"text"			"YES"		571
+"project_system_details"	"sys1_sms1_ess_2_input"	"text"			"YES"		572
+"project_system_details"	"sys1_sms_backup_load_sub_panel_input"	"text"			"YES"		573
+"project_system_details"	"sys1_sms_rsd_input"	"text"			"YES"		574
+"project_system_details"	"sys1_sms_1gen_1_input"	"text"			"YES"		575
+"project_system_details"	"sys1_backup_sp_tie_in_breaker_location"	"text"			"YES"		576
+"project_system_details"	"subpanelb_small_appliances"	"text"			"YES"		577
+"project_system_details"	"subpanelb_air_conditioning_amps"	"text"			"YES"		578
+"project_system_details"	"subpanelb_furnace_amps"	"text"			"YES"		579
+"project_system_details"	"rooftypea_rafter_truss"	"text"			"YES"		580
+"project_system_details"	"rooftypeb_rafter_truss"	"text"			"YES"		581
+"project_system_details"	"sys1_combinerpanel_bus_rating"	"text"			"YES"		582
+"project_system_details"	"sys2_combiner_panel_bus_rating"	"text"			"YES"		583
+"project_system_details"	"sys2_backup_load_sub_panel_make"	"text"			"YES"		584
+"project_system_details"	"sys2_backup_load_sub_panel_model"	"text"			"YES"		585
+"project_system_details"	"sys2_backuploadsubpanel_id"	"uuid"			"YES"		586
+"project_system_details"	"sys2_backuploadsubpanel_bus_new_existing"	"boolean"			"YES"		587
+"project_system_details"	"sys2_backuploadsubpanel_bus_rating"	"text"			"YES"		588
+"project_system_details"	"sys2_backuploadsubpanel_mcb_new_existing"	"boolean"			"YES"		589
+"project_system_details"	"sys2_backuploadpanel_mcb_rating"	"text"			"YES"		590
+"project_system_details"	"sys2_backuploadsubpanel_tie_in_breaker_rating"	"text"			"YES"		591
+"project_system_details"	"sys2_backuploadsubpanel_tie_in_breaker_location"	"text"			"YES"		592
+"project_system_details"	"sys2_battery_combiner_panel_make"	"text"			"YES"		593
+"project_system_details"	"sys2_battery_combiner_panel_model"	"text"			"YES"		594
+"project_system_details"	"sys2_batterycombinerpanel_id"	"uuid"			"YES"		595
+"project_system_details"	"sys2_batterycombinerpanel_bus_new_existing"	"boolean"			"YES"		596
+"project_system_details"	"sys2_batterycombinerpanel_bus_rating"	"text"			"YES"		597
+"project_system_details"	"sys2_batterycombinerpanel_mcb_new_existing"	"boolean"			"YES"		598
+"project_system_details"	"sys2_batterycombinerpanel_mcb_rating"	"text"			"YES"		599
+"project_system_details"	"sys2_batterycombinerpanel_tie_in_breaker_rating"	"text"			"YES"		600
+"project_system_details"	"sys2_batterycombinerpanel_tie_in_breaker_location"	"text"			"YES"		601
+"project_system_details"	"sys2_pv_1_input"	"text"			"YES"		602
+"project_system_details"	"sys2_pv_2_input"	"text"			"YES"		603
+"project_system_details"	"sys2_pv_3_input"	"text"			"YES"		604
+"project_system_details"	"sys2_ess_1_input"	"text"			"YES"		605
+"project_system_details"	"sys2_ess_2_input"	"text"			"YES"		606
+"project_system_details"	"sys2_backup_load_sub_panel_input"	"text"			"YES"		607
+"project_system_details"	"sys2_rsd_input"	"text"			"YES"		608
+"project_system_details"	"sys2_gen_1_input"	"text"			"YES"		609
+"project_system_details"	"sys2_pv1_overwrite"	"boolean"			"YES"		610
+"project_system_details"	"sys2_pv2_overwrite"	"boolean"			"YES"		611
+"project_system_details"	"sys2_pv3_overwrite"	"boolean"			"YES"		612
+"project_system_details"	"sys2_ess1_overwrite"	"boolean"			"YES"		613
+"project_system_details"	"sys2_ess2_overwrite"	"boolean"			"YES"		614
+"project_system_details"	"sys2_backloadtype1"	"text"			"YES"		615
+"project_system_details"	"sys2_backloadtype2"	"text"			"YES"		616
+"project_system_details"	"sys2_backloadtype3"	"text"			"YES"		617
+"project_system_details"	"sys2_backloadtype4"	"text"			"YES"		618
+"project_system_details"	"sys2_backloadtype5"	"text"			"YES"		619
+"project_system_details"	"sys2_backloadtype6"	"text"			"YES"		620
+"project_system_details"	"sys2_backloadtype7"	"text"			"YES"		621
+"project_system_details"	"sys2_backloadtype8"	"text"			"YES"		622
+"project_system_details"	"sys2_backloadtype9"	"text"			"YES"		623
+"project_system_details"	"sys2_backloadtype10"	"text"			"YES"		624
+"project_system_details"	"sys2_backloadtype11"	"text"			"YES"		625
+"project_system_details"	"sys2_backloadtype12"	"text"			"YES"		626
+"project_system_details"	"sys2_backloadtype13"	"text"			"YES"		627
+"project_system_details"	"sys2_backloadtype14"	"text"			"YES"		628
+"project_system_details"	"sys2_backloadtype15"	"text"			"YES"		629
+"project_system_details"	"sys2_backloadtype16"	"text"			"YES"		630
+"project_system_details"	"sys2_backloadtype17"	"text"			"YES"		631
+"project_system_details"	"sys2_backloadtype18"	"text"			"YES"		632
+"project_system_details"	"sys2_backloadtype19"	"text"			"YES"		633
+"project_system_details"	"sys2_backloadtype20"	"text"			"YES"		634
+"project_system_details"	"sys2_backup_load_rating_1"	"text"			"YES"		635
+"project_system_details"	"sys2_backup_load_rating_2"	"text"			"YES"		636
+"project_system_details"	"sys2_backup_load_rating_3"	"text"			"YES"		637
+"project_system_details"	"sys2_backup_load_rating_4"	"text"			"YES"		638
+"project_system_details"	"sys2_backup_load_rating_5"	"text"			"YES"		639
+"project_system_details"	"sys2_backup_load_rating_6"	"text"			"YES"		640
+"project_system_details"	"sys2_backup_load_rating_7"	"text"			"YES"		641
+"project_system_details"	"sys2_backup_load_rating_8"	"text"			"YES"		642
+"project_system_details"	"sys2_backup_load_rating_9"	"text"			"YES"		643
+"project_system_details"	"sys2_backup_load_rating_10"	"text"			"YES"		644
+"project_system_details"	"sys2_backup_load_rating_11"	"text"			"YES"		645
+"project_system_details"	"sys2_backup_load_rating_12"	"text"			"YES"		646
+"project_system_details"	"sys2_backup_load_rating_13"	"text"			"YES"		647
+"project_system_details"	"sys2_backup_load_rating_14"	"text"			"YES"		648
+"project_system_details"	"sys2_backup_load_rating_15"	"text"			"YES"		649
+"project_system_details"	"sys2_backup_load_rating_16"	"text"			"YES"		650
+"project_system_details"	"sys2_backup_load_rating_17"	"text"			"YES"		651
+"project_system_details"	"sys2_backup_load_rating_18"	"text"			"YES"		652
+"project_system_details"	"sys2_backup_load_rating_19"	"text"			"YES"		653
+"project_system_details"	"sys2_backup_load_rating_20"	"text"			"YES"		654
+"project_system_details"	"bos1c_amp_rating"	"text"			"YES"		655
+"project_system_details"	"bos1d_amp_rating"	"text"			"YES"		656
+"project_system_details"	"bos1e_amp_rating"	"text"			"YES"		657
+"project_system_details"	"bos1f_amp_rating"	"text"			"YES"		658
+"project_system_details"	"bos2c_amp_rating"	"text"			"YES"		659
+"project_system_details"	"bos2d_amp_rating"	"text"			"YES"		660
+"project_system_details"	"bos2e_amp_rating"	"text"			"YES"		661
+"project_system_details"	"bos2f_amp_rating"	"text"			"YES"		662
+"project_system_details"	"mount_type_a"	"text"			"YES"		663
+"project_system_details"	"mount_type_b"	"text"			"YES"		664
+"project_system_details"	"sys1_pcs_settings"	"boolean"			"YES"		665
+"project_system_details"	"pos_2_pcs_settings"	"text"			"YES"		666
+"project_system_details"	"house_stories"	"integer"		32	"YES"		667
+"project_system_details"	"system_combiner_panel_1_make"	"text"			"YES"		668
+"project_system_details"	"system_combiner_panel_1_model"	"text"			"YES"		669
+"project_system_details"	"system_combiner1_id"	"uuid"			"YES"		670
+"project_system_details"	"system_combiner_panel_1_amp_rating"	"text"			"YES"		671
+"project_system_details"	"breaker_rating"	"text"			"YES"		672
+"project_system_details"	"system_combiner_panel_2_make"	"text"			"YES"		673
+"project_system_details"	"system_combiner_panel_2_model"	"text"			"YES"		674
+"project_system_details"	"system_combiner2_id"	"uuid"			"YES"		675
+"project_system_details"	"system_combiner_panel_2_amp_rating"	"text"			"YES"		676
+"project_system_details"	"created_by"	"integer"		32	"YES"		677
+"project_system_details"	"sys1_selectedsystem"	"text"			"YES"		678
+"project_system_details"	"sys2_selectedsystem"	"text"			"YES"		679
+"project_system_details"	"sys3_selectedsystem"	"text"			"YES"		680
+"project_system_details"	"sys4_selectedsystem"	"text"			"YES"		681
+"project_system_details"	"sys1_combinerpanel_main_breaker_rating"	"text"			"YES"		682
+"project_system_details"	"sys1_sms_make"	"text"			"YES"		683
+"project_system_details"	"sys1_sms_model"	"text"			"YES"		684
+"project_system_details"	"sys1_sms_id"	"uuid"			"YES"		685
+"project_system_details"	"sys1_sms_breaker_rating"	"text"			"YES"		686
+"project_system_details"	"sys1_sms_backup_load_sub_panel_breaker_rating"	"text"			"YES"		687
+"project_system_details"	"sys1_sms_pv_breaker_rating_override"	"text"			"YES"		688
+"project_system_details"	"sys1_sms_ess_breaker_rating_override"	"text"			"YES"		689
+"project_system_details"	"sys1_sms_tie_in_breaker_rating_override"	"text"			"YES"		690
+"project_system_details"	"sys1_sms_rsd_enabled"	"boolean"			"YES"		691
+"project_system_details"	"sys1_battery_configuration"	"text"			"YES"		692
+"project_system_details"	"sys1_combinerpanel_existing"	"boolean"			"YES"		693
+"project_system_details"	"sys1_sms_existing"	"boolean"			"YES"		694
+"project_system_details"	"el_mpa_derated"	"boolean"			"YES"		695
+"project_system_details"	"el_spb_derated"	"boolean"			"YES"		696
+"project_system_details"	"el_spc_existing"	"boolean"			"YES"		697
+"project_system_details"	"el_spc_bus_rating"	"integer"		32	"YES"		698
+"project_system_details"	"el_spc_main_breaker_rating"	"integer"		32	"YES"		699
+"project_system_details"	"el_spc_feeder_location"	"text"			"YES"		700
+"project_system_details"	"el_spc_upstream_breaker_rating"	"integer"		32	"YES"		701
+"project_system_details"	"el_spc_upstream_breaker_location"	"text"			"YES"		702
+"project_system_details"	"el_spd_existing"	"boolean"			"YES"		703
+"project_system_details"	"el_spd_bus_rating"	"integer"		32	"YES"		704
+"project_system_details"	"el_spd_main_breaker_rating"	"integer"		32	"YES"		705
+"project_system_details"	"el_spd_feeder_location"	"text"			"YES"		706
+"project_system_details"	"el_spd_upstream_breaker_rating"	"integer"		32	"YES"		707
+"project_system_details"	"el_spd_upstream_breaker_location"	"text"			"YES"		708
+"project_system_details"	"el_poi_breaker_rating"	"integer"		32	"YES"		709
+"project_system_details"	"el_poi_disconnect_rating"	"integer"		32	"YES"		710
+"project_system_details"	"st_roof_a_area_sqft"	"integer"		32	"YES"		711
+"project_system_details"	"st_roof_b_area_sqft"	"integer"		32	"YES"		712
+"project_system_details"	"st_roof_a_framing_type"	"text"			"YES"		713
+"project_system_details"	"st_roof_b_framing_type"	"text"			"YES"		714
+"project_system_details"	"st_mp1_arrayqty_1"	"integer"		32	"YES"		715
+"project_system_details"	"st_mp1_arrayqty_2"	"integer"		32	"YES"		716
+"project_system_details"	"st_mp1_arrayqty_3"	"integer"		32	"YES"		717
+"project_system_details"	"st_mp1_arrayqty_4"	"integer"		32	"YES"		718
+"project_system_details"	"st_mp1_arrayqty_5"	"integer"		32	"YES"		719
+"project_system_details"	"st_mp1_arrayqty_6"	"integer"		32	"YES"		720
+"project_system_details"	"st_mp1_arrayqty_7"	"integer"		32	"YES"		721
+"project_system_details"	"st_mp1_arrayqty_8"	"integer"		32	"YES"		722
+"project_system_details"	"st_mp2_arrayqty_1"	"integer"		32	"YES"		723
+"project_system_details"	"st_mp2_arrayqty_2"	"integer"		32	"YES"		724
+"project_system_details"	"st_mp2_arrayqty_3"	"integer"		32	"YES"		725
+"project_system_details"	"st_mp2_arrayqty_4"	"integer"		32	"YES"		726
+"project_system_details"	"st_mp2_arrayqty_5"	"integer"		32	"YES"		727
+"project_system_details"	"st_mp2_arrayqty_6"	"integer"		32	"YES"		728
+"project_system_details"	"st_mp2_arrayqty_7"	"integer"		32	"YES"		729
+"project_system_details"	"st_mp2_arrayqty_8"	"integer"		32	"YES"		730
+"project_system_details"	"st_mp3_arrayqty_1"	"integer"		32	"YES"		731
+"project_system_details"	"st_mp3_arrayqty_2"	"integer"		32	"YES"		732
+"project_system_details"	"st_mp3_arrayqty_3"	"integer"		32	"YES"		733
+"project_system_details"	"st_mp3_arrayqty_4"	"integer"		32	"YES"		734
+"project_system_details"	"st_mp3_arrayqty_5"	"integer"		32	"YES"		735
+"project_system_details"	"st_mp3_arrayqty_6"	"integer"		32	"YES"		736
+"project_system_details"	"st_mp3_arrayqty_7"	"integer"		32	"YES"		737
+"project_system_details"	"st_mp3_arrayqty_8"	"integer"		32	"YES"		738
+"project_system_details"	"st_mp4_arrayqty_1"	"integer"		32	"YES"		739
+"project_system_details"	"st_mp4_arrayqty_2"	"integer"		32	"YES"		740
+"project_system_details"	"st_mp4_arrayqty_3"	"integer"		32	"YES"		741
+"project_system_details"	"st_mp4_arrayqty_4"	"integer"		32	"YES"		742
+"project_system_details"	"st_mp4_arrayqty_5"	"integer"		32	"YES"		743
+"project_system_details"	"st_mp4_arrayqty_6"	"integer"		32	"YES"		744
+"project_system_details"	"st_mp4_arrayqty_7"	"integer"		32	"YES"		745
+"project_system_details"	"st_mp4_arrayqty_8"	"integer"		32	"YES"		746
+"project_system_details"	"st_mp5_arrayqty_1"	"integer"		32	"YES"		747
+"project_system_details"	"st_mp5_arrayqty_2"	"integer"		32	"YES"		748
+"project_system_details"	"st_mp5_arrayqty_3"	"integer"		32	"YES"		749
+"project_system_details"	"st_mp5_arrayqty_4"	"integer"		32	"YES"		750
+"project_system_details"	"st_mp5_arrayqty_5"	"integer"		32	"YES"		751
+"project_system_details"	"st_mp5_arrayqty_6"	"integer"		32	"YES"		752
+"project_system_details"	"st_mp5_arrayqty_7"	"integer"		32	"YES"		753
+"project_system_details"	"st_mp5_arrayqty_8"	"integer"		32	"YES"		754
+"project_system_details"	"st_mp6_arrayqty_1"	"integer"		32	"YES"		755
+"project_system_details"	"st_mp6_arrayqty_2"	"integer"		32	"YES"		756
+"project_system_details"	"st_mp6_arrayqty_3"	"integer"		32	"YES"		757
+"project_system_details"	"st_mp6_arrayqty_4"	"integer"		32	"YES"		758
+"project_system_details"	"st_mp6_arrayqty_5"	"integer"		32	"YES"		759
+"project_system_details"	"st_mp6_arrayqty_6"	"integer"		32	"YES"		760
+"project_system_details"	"st_mp6_arrayqty_7"	"integer"		32	"YES"		761
+"project_system_details"	"st_mp6_arrayqty_8"	"integer"		32	"YES"		762
+"project_system_details"	"st_mp7_arrayqty_1"	"integer"		32	"YES"		763
+"project_system_details"	"st_mp7_arrayqty_2"	"integer"		32	"YES"		764
+"project_system_details"	"st_mp7_arrayqty_3"	"integer"		32	"YES"		765
+"project_system_details"	"st_mp7_arrayqty_4"	"integer"		32	"YES"		766
+"project_system_details"	"st_mp7_arrayqty_5"	"integer"		32	"YES"		767
+"project_system_details"	"st_mp7_arrayqty_6"	"integer"		32	"YES"		768
+"project_system_details"	"st_mp7_arrayqty_7"	"integer"		32	"YES"		769
+"project_system_details"	"st_mp7_arrayqty_8"	"integer"		32	"YES"		770
+"project_system_details"	"st_mp8_arrayqty_1"	"integer"		32	"YES"		771
+"project_system_details"	"st_mp8_arrayqty_2"	"integer"		32	"YES"		772
+"project_system_details"	"st_mp8_arrayqty_3"	"integer"		32	"YES"		773
+"project_system_details"	"st_mp8_arrayqty_4"	"integer"		32	"YES"		774
+"project_system_details"	"st_mp8_arrayqty_5"	"integer"		32	"YES"		775
+"project_system_details"	"st_mp8_arrayqty_6"	"integer"		32	"YES"		776
+"project_system_details"	"st_mp8_arrayqty_7"	"integer"		32	"YES"		777
+"project_system_details"	"st_mp8_arrayqty_8"	"integer"		32	"YES"		778
+"project_system_details"	"st_mp9_arrayqty_1"	"integer"		32	"YES"		779
+"project_system_details"	"st_mp9_arrayqty_2"	"integer"		32	"YES"		780
+"project_system_details"	"st_mp9_arrayqty_3"	"integer"		32	"YES"		781
+"project_system_details"	"st_mp9_arrayqty_4"	"integer"		32	"YES"		782
+"project_system_details"	"st_mp9_arrayqty_5"	"integer"		32	"YES"		783
+"project_system_details"	"st_mp9_arrayqty_6"	"integer"		32	"YES"		784
+"project_system_details"	"st_mp9_arrayqty_7"	"integer"		32	"YES"		785
+"project_system_details"	"st_mp9_arrayqty_8"	"integer"		32	"YES"		786
+"project_system_details"	"st_mp10_arrayqty_1"	"integer"		32	"YES"		787
+"project_system_details"	"st_mp10_arrayqty_2"	"integer"		32	"YES"		788
+"project_system_details"	"st_mp10_arrayqty_3"	"integer"		32	"YES"		789
+"project_system_details"	"st_mp10_arrayqty_4"	"integer"		32	"YES"		790
+"project_system_details"	"st_mp10_arrayqty_5"	"integer"		32	"YES"		791
+"project_system_details"	"st_mp10_arrayqty_6"	"integer"		32	"YES"		792
+"project_system_details"	"st_mp10_arrayqty_7"	"integer"		32	"YES"		793
+"project_system_details"	"st_mp10_arrayqty_8"	"integer"		32	"YES"		794
+"project_system_details"	"st_mp1_mode"	"text"			"YES"		795
+"project_system_details"	"st_mp2_mode"	"text"			"YES"		796
+"project_system_details"	"st_mp3_mode"	"text"			"YES"		797
+"project_system_details"	"st_mp4_mode"	"text"			"YES"		798
+"project_system_details"	"st_mp5_mode"	"text"			"YES"		799
+"project_system_details"	"st_mp6_mode"	"text"			"YES"		800
+"project_system_details"	"st_mp7_mode"	"text"			"YES"		801
+"project_system_details"	"st_mp8_mode"	"text"			"YES"		802
+"project_system_details"	"st_mp9_mode"	"text"			"YES"		803
+"project_system_details"	"st_mp10_mode"	"text"			"YES"		804
+"project_system_details"	"el_mca_system_back_feed"	"integer"		32	"YES"		805
+"project_system_details"	"house_sqft"	"integer"		32	"YES"		806
+"project_system_details"	"sys1_tesla_extensions"	"character varying"	10		"YES"		807
+"project_system_details"	"sys2_tesla_extensions"	"character varying"	10		"YES"		808
+"project_system_details"	"sys3_tesla_extensions"	"character varying"	10		"YES"		809
+"project_system_details"	"sys4_tesla_extensions"	"character varying"	10		"YES"		810
+"project_system_details"	"sys1_batteryonly"	"boolean"			"YES"	"false"	811
+"project_system_details"	"sys2_batteryonly"	"boolean"			"YES"	"false"	812
+"project_system_details"	"sys3_batteryonly"	"boolean"			"YES"	"false"	813
+"project_system_details"	"sys4_batteryonly"	"boolean"			"YES"	"false"	814
+"project_system_details"	"sys1_show_second_panel_type"	"boolean"			"YES"	"false"	815
+"project_system_details"	"sys1_solar_panel_type2_quantity"	"integer"		32	"YES"		816
+"project_system_details"	"sys1_solar_panel_type2_manufacturer"	"character varying"	255		"YES"		817
+"project_system_details"	"sys1_solar_panel_type2_model"	"character varying"	255		"YES"		818
+"project_system_details"	"sys1_solar_panel_type2_is_new"	"boolean"			"YES"	"true"	819
+"project_system_details"	"sys2_show_second_panel_type"	"boolean"			"YES"	"false"	820
+"project_system_details"	"sys2_solar_panel_type2_quantity"	"integer"		32	"YES"		821
+"project_system_details"	"sys2_solar_panel_type2_manufacturer"	"character varying"	255		"YES"		822
+"project_system_details"	"sys2_solar_panel_type2_model"	"character varying"	255		"YES"		823
+"project_system_details"	"sys2_solar_panel_type2_is_new"	"boolean"			"YES"	"true"	824
+"project_system_details"	"sys3_show_second_panel_type"	"boolean"			"YES"	"false"	825
+"project_system_details"	"sys3_solar_panel_type2_quantity"	"integer"		32	"YES"		826
+"project_system_details"	"sys3_solar_panel_type2_manufacturer"	"character varying"	255		"YES"		827
+"project_system_details"	"sys3_solar_panel_type2_model"	"character varying"	255		"YES"		828
+"project_system_details"	"sys3_solar_panel_type2_is_new"	"boolean"			"YES"	"true"	829
+"project_system_details"	"sys4_show_second_panel_type"	"boolean"			"YES"	"false"	830
+"project_system_details"	"sys4_solar_panel_type2_quantity"	"integer"		32	"YES"		831
+"project_system_details"	"sys4_solar_panel_type2_manufacturer"	"character varying"	255		"YES"		832
+"project_system_details"	"sys4_solar_panel_type2_model"	"character varying"	255		"YES"		833
+"project_system_details"	"sys4_solar_panel_type2_is_new"	"boolean"			"YES"	"true"	834
+"project_system_details"	"sys1_teslagatewaytype"	"text"			"YES"		835
+"project_system_details"	"sys2_teslagatewaytype"	"text"			"YES"		836
+"project_system_details"	"sys3_teslagatewaytype"	"text"			"YES"		837
+"project_system_details"	"sys4_teslagatewaytype"	"text"			"YES"		838
+"project_system_details"	"sys1_backupswitch_location"	"text"			"YES"		839
+"project_system_details"	"sys2_backupswitch_location"	"text"			"YES"		840
+"project_system_details"	"sys3_backupswitch_location"	"text"			"YES"		841
+"project_system_details"	"sys4_backupswitch_location"	"text"			"YES"		842
+"project_system_details"	"version_number"	"integer"		32	"NO"	"1"	843
+"project_system_details"	"last_generated_at"	"timestamp with time zone"			"YES"		844
+"project_system_details"	"last_generated_by"	"character varying"	100		"YES"		845
+"project_system_details"	"sys2_sms_make"	"text"			"YES"		846
+"project_system_details"	"sys2_sms_model"	"text"			"YES"		847
+"project_system_details"	"sys2_sms_id"	"uuid"			"YES"		848
+"project_system_details"	"sys2_sms_breaker_rating"	"text"			"YES"		849
+"project_system_details"	"sys2_sms_backup_load_sub_panel_breaker_rating"	"text"			"YES"		850
+"project_system_details"	"sys2_sms_pv_breaker_rating_override"	"text"			"YES"		851
+"project_system_details"	"sys2_sms_ess_breaker_rating_override"	"text"			"YES"		852
+"project_system_details"	"sys2_sms_tie_in_breaker_rating_override"	"text"			"YES"		853
+"project_system_details"	"sys2_sms_rsd_enabled"	"boolean"			"YES"		854
+"project_system_details"	"sys2_sms_pv_1_input"	"text"			"YES"		855
+"project_system_details"	"sys2_sms_pv_2_input"	"text"			"YES"		856
+"project_system_details"	"sys2_sms_pv_3_input"	"text"			"YES"		857
+"project_system_details"	"sys2_sms_ess_1_input"	"text"			"YES"		858
+"project_system_details"	"sys2_sms_ess_2_input"	"text"			"YES"		859
+"project_system_details"	"sys2_sms_backup_load_sub_panel_input"	"text"			"YES"		860
+"project_system_details"	"sys2_sms_rsd_input"	"text"			"YES"		861
+"project_system_details"	"sys2_sms_gen_1_input"	"text"			"YES"		862
+"project_system_details"	"sys2_battery_configuration"	"text"			"YES"		863
+"project_system_details"	"sys2_pcs_settings"	"boolean"			"YES"		864
+"project_system_details"	"sys2_combinerpanel_main_breaker_rating"	"text"			"YES"		865
+"project_system_details"	"sys2_combinerpanel_existing"	"boolean"			"YES"		866
+"project_system_details"	"sys2_combinerpanel_bus_rating"	"text"			"YES"		867
+"project_system_details"	"sys2_backup_sp_tie_in_breaker_location"	"text"			"YES"		868
+"project_system_details"	"sys2_stringing_type"	"text"			"YES"		869
+"project_system_details"	"sys3_sms_make"	"text"			"YES"		870
+"project_system_details"	"sys3_sms_model"	"text"			"YES"		871
+"project_system_details"	"sys3_sms_id"	"uuid"			"YES"		872
+"project_system_details"	"sys3_sms_existing"	"boolean"			"YES"		873
+"project_system_details"	"sys3_sms_breaker_rating"	"text"			"YES"		874
+"project_system_details"	"sys3_sms_backup_load_sub_panel_breaker_rating"	"text"			"YES"		875
+"project_system_details"	"sys3_sms_pv_breaker_rating_override"	"text"			"YES"		876
+"project_system_details"	"sys3_sms_ess_breaker_rating_override"	"text"			"YES"		877
+"project_system_details"	"sys3_sms_tie_in_breaker_rating_override"	"text"			"YES"		878
+"project_system_details"	"sys3_sms_rsd_enabled"	"boolean"			"YES"		879
+"project_system_details"	"sys3_sms_pv_1_input"	"text"			"YES"		880
+"project_system_details"	"sys3_sms_pv_2_input"	"text"			"YES"		881
+"project_system_details"	"sys3_sms_pv_3_input"	"text"			"YES"		882
+"project_system_details"	"sys3_sms_ess_1_input"	"text"			"YES"		883
+"project_system_details"	"sys3_sms_ess_2_input"	"text"			"YES"		884
+"project_system_details"	"sys3_sms_backup_load_sub_panel_input"	"text"			"YES"		885
+"project_system_details"	"sys3_sms_rsd_input"	"text"			"YES"		886
+"project_system_details"	"sys3_sms_gen_1_input"	"text"			"YES"		887
+"project_system_details"	"sys3_battery_configuration"	"text"			"YES"		888
+"project_system_details"	"sys3_pcs_settings"	"boolean"			"YES"		889
+"project_system_details"	"sys3_combinerpanel_main_breaker_rating"	"text"			"YES"		890
+"project_system_details"	"sys3_combinerpanel_existing"	"boolean"			"YES"		891
+"project_system_details"	"sys3_combinerpanel_bus_rating"	"text"			"YES"		892
+"project_system_details"	"sys3_backup_sp_tie_in_breaker_location"	"text"			"YES"		893
+"project_system_details"	"sys3_stringing_type"	"text"			"YES"		894
+"project_system_details"	"sys4_sms_make"	"text"			"YES"		895
+"project_system_details"	"sys4_sms_model"	"text"			"YES"		896
+"project_system_details"	"sys4_sms_id"	"uuid"			"YES"		897
+"project_system_details"	"sys4_sms_existing"	"boolean"			"YES"		898
+"project_system_details"	"sys4_sms_breaker_rating"	"text"			"YES"		899
+"project_system_details"	"sys4_sms_backup_load_sub_panel_breaker_rating"	"text"			"YES"		900
+"project_system_details"	"sys4_sms_pv_breaker_rating_override"	"text"			"YES"		901
+"project_system_details"	"sys4_sms_ess_breaker_rating_override"	"text"			"YES"		902
+"project_system_details"	"sys4_sms_tie_in_breaker_rating_override"	"text"			"YES"		903
+"project_system_details"	"sys4_sms_rsd_enabled"	"boolean"			"YES"		904
+"project_system_details"	"sys4_sms_pv_1_input"	"text"			"YES"		905
+"project_system_details"	"sys4_sms_pv_2_input"	"text"			"YES"		906
+"project_system_details"	"sys4_sms_pv_3_input"	"text"			"YES"		907
+"project_system_details"	"sys4_sms_ess_1_input"	"text"			"YES"		908
+"project_system_details"	"sys4_sms_ess_2_input"	"text"			"YES"		909
+"project_system_details"	"sys4_sms_backup_load_sub_panel_input"	"text"			"YES"		910
+"project_system_details"	"sys4_sms_rsd_input"	"text"			"YES"		911
+"project_system_details"	"sys4_sms_gen_1_input"	"text"			"YES"		912
+"project_system_details"	"sys4_battery_configuration"	"text"			"YES"		913
+"project_system_details"	"sys4_pcs_settings"	"boolean"			"YES"		914
+"project_system_details"	"sys4_combinerpanel_main_breaker_rating"	"text"			"YES"		915
+"project_system_details"	"sys4_combinerpanel_existing"	"boolean"			"YES"		916
+"project_system_details"	"sys4_combinerpanel_bus_rating"	"text"			"YES"		917
+"project_system_details"	"sys4_backup_sp_tie_in_breaker_location"	"text"			"YES"		918
+"project_system_details"	"sys4_stringing_type"	"text"			"YES"		919
+"project_system_details"	"bos_sys1_type1_equipment_type"	"text"			"YES"		920
+"project_system_details"	"bos_sys1_type1_make"	"text"			"YES"		921
+"project_system_details"	"bos_sys1_type1_model"	"text"			"YES"		922
+"project_system_details"	"bos_sys1_type1_amp_rating"	"text"			"YES"		923
+"project_system_details"	"bos_sys1_type1_is_new"	"boolean"			"YES"		924
+"project_system_details"	"bos_sys1_type1_active"	"boolean"			"YES"		925
+"project_system_details"	"bos_sys1_type2_equipment_type"	"text"			"YES"		926
+"project_system_details"	"bos_sys1_type2_make"	"text"			"YES"		927
+"project_system_details"	"bos_sys1_type2_model"	"text"			"YES"		928
+"project_system_details"	"bos_sys1_type2_amp_rating"	"text"			"YES"		929
+"project_system_details"	"bos_sys1_type2_is_new"	"boolean"			"YES"		930
+"project_system_details"	"bos_sys1_type2_active"	"boolean"			"YES"		931
+"project_system_details"	"bos_sys1_type3_equipment_type"	"text"			"YES"		932
+"project_system_details"	"bos_sys1_type3_make"	"text"			"YES"		933
+"project_system_details"	"bos_sys1_type3_model"	"text"			"YES"		934
+"project_system_details"	"bos_sys1_type3_amp_rating"	"text"			"YES"		935
+"project_system_details"	"bos_sys1_type3_is_new"	"boolean"			"YES"		936
+"project_system_details"	"bos_sys1_type3_active"	"boolean"			"YES"		937
+"project_system_details"	"bos_sys1_show_type1"	"boolean"			"YES"		938
+"project_system_details"	"bos_sys1_show_type2"	"boolean"			"YES"		939
+"project_system_details"	"bos_sys1_show_type3"	"boolean"			"YES"		940
+"project_system_details"	"bos_sys2_type1_equipment_type"	"text"			"YES"		941
+"project_system_details"	"bos_sys2_type1_make"	"text"			"YES"		942
+"project_system_details"	"bos_sys2_type1_model"	"text"			"YES"		943
+"project_system_details"	"bos_sys2_type1_amp_rating"	"text"			"YES"		944
+"project_system_details"	"bos_sys2_type1_is_new"	"boolean"			"YES"		945
+"project_system_details"	"bos_sys2_type1_active"	"boolean"			"YES"		946
+"project_system_details"	"bos_sys2_type2_equipment_type"	"text"			"YES"		947
+"project_system_details"	"bos_sys2_type2_make"	"text"			"YES"		948
+"project_system_details"	"bos_sys2_type2_model"	"text"			"YES"		949
+"project_system_details"	"bos_sys2_type2_amp_rating"	"text"			"YES"		950
+"project_system_details"	"bos_sys2_type2_is_new"	"boolean"			"YES"		951
+"project_system_details"	"bos_sys2_type2_active"	"boolean"			"YES"		952
+"project_system_details"	"bos_sys2_type3_equipment_type"	"text"			"YES"		953
+"project_system_details"	"bos_sys2_type3_make"	"text"			"YES"		954
+"project_system_details"	"bos_sys2_type3_model"	"text"			"YES"		955
+"project_system_details"	"bos_sys2_type3_amp_rating"	"text"			"YES"		956
+"project_system_details"	"bos_sys2_type3_is_new"	"boolean"			"YES"		957
+"project_system_details"	"bos_sys2_type3_active"	"boolean"			"YES"		958
+"project_system_details"	"bos_sys2_show_type1"	"boolean"			"YES"		959
+"project_system_details"	"bos_sys2_show_type2"	"boolean"			"YES"		960
+"project_system_details"	"bos_sys2_show_type3"	"boolean"			"YES"		961
+"project_system_details"	"bos_sys3_type1_equipment_type"	"text"			"YES"		962
+"project_system_details"	"bos_sys3_type1_make"	"text"			"YES"		963
+"project_system_details"	"bos_sys3_type1_model"	"text"			"YES"		964
+"project_system_details"	"bos_sys3_type1_amp_rating"	"text"			"YES"		965
+"project_system_details"	"bos_sys3_type1_is_new"	"boolean"			"YES"		966
+"project_system_details"	"bos_sys3_type1_active"	"boolean"			"YES"		967
+"project_system_details"	"bos_sys3_type2_equipment_type"	"text"			"YES"		968
+"project_system_details"	"bos_sys3_type2_make"	"text"			"YES"		969
+"project_system_details"	"bos_sys3_type2_model"	"text"			"YES"		970
+"project_system_details"	"bos_sys3_type2_amp_rating"	"text"			"YES"		971
+"project_system_details"	"bos_sys3_type2_is_new"	"boolean"			"YES"		972
+"project_system_details"	"bos_sys3_type2_active"	"boolean"			"YES"		973
+"project_system_details"	"bos_sys3_type3_equipment_type"	"text"			"YES"		974
+"project_system_details"	"bos_sys3_type3_make"	"text"			"YES"		975
+"project_system_details"	"bos_sys3_type3_model"	"text"			"YES"		976
+"project_system_details"	"bos_sys3_type3_amp_rating"	"text"			"YES"		977
+"project_system_details"	"bos_sys3_type3_is_new"	"boolean"			"YES"		978
+"project_system_details"	"bos_sys3_type3_active"	"boolean"			"YES"		979
+"project_system_details"	"bos_sys3_show_type1"	"boolean"			"YES"		980
+"project_system_details"	"bos_sys3_show_type2"	"boolean"			"YES"		981
+"project_system_details"	"bos_sys3_show_type3"	"boolean"			"YES"		982
+"project_system_details"	"bos_sys4_type1_equipment_type"	"text"			"YES"		983
+"project_system_details"	"bos_sys4_type1_make"	"text"			"YES"		984
+"project_system_details"	"bos_sys4_type1_model"	"text"			"YES"		985
+"project_system_details"	"bos_sys4_type1_amp_rating"	"text"			"YES"		986
+"project_system_details"	"bos_sys4_type1_is_new"	"boolean"			"YES"		987
+"project_system_details"	"bos_sys4_type1_active"	"boolean"			"YES"		988
+"project_system_details"	"bos_sys4_type2_equipment_type"	"text"			"YES"		989
+"project_system_details"	"bos_sys4_type2_make"	"text"			"YES"		990
+"project_system_details"	"bos_sys4_type2_model"	"text"			"YES"		991
+"project_system_details"	"bos_sys4_type2_amp_rating"	"text"			"YES"		992
+"project_system_details"	"bos_sys4_type2_is_new"	"boolean"			"YES"		993
+"project_system_details"	"bos_sys4_type2_active"	"boolean"			"YES"		994
+"project_system_details"	"bos_sys4_type3_equipment_type"	"text"			"YES"		995
+"project_system_details"	"bos_sys4_type3_make"	"text"			"YES"		996
+"project_system_details"	"bos_sys4_type3_model"	"text"			"YES"		997
+"project_system_details"	"bos_sys4_type3_amp_rating"	"text"			"YES"		998
+"project_system_details"	"bos_sys4_type3_is_new"	"boolean"			"YES"		999
+"project_system_details"	"bos_sys4_type3_active"	"boolean"			"YES"		1000
+"project_system_details"	"bos_sys4_show_type1"	"boolean"			"YES"		1001
+"project_system_details"	"bos_sys4_show_type2"	"boolean"			"YES"		1002
+"project_system_details"	"bos_sys4_show_type3"	"boolean"			"YES"		1003
+"project_system_details"	"sys1_stringing_type"	"text"			"YES"		1004
+"project_system_details"	"sys2_ele_breaker_location"	"character varying"	255		"YES"		1005
+"project_system_details"	"sys3_ele_breaker_location"	"character varying"	255		"YES"		1006
+"project_system_details"	"sys4_ele_breaker_location"	"character varying"	255		"YES"		1007
+"project_system_details"	"sys1_pcs_amps"	"integer"		32	"YES"		1008
+"project_system_details"	"sys2_pcs_amps"	"integer"		32	"YES"		1009
+"project_system_details"	"sys3_pcs_amps"	"integer"		32	"YES"		1010
+"project_system_details"	"sys4_pcs_amps"	"integer"		32	"YES"		1011
+"project_system_details"	"isacintegrated"	"boolean"			"YES"	"false"	1012
+"project_system_details"	"ele_bathroom_circuits"	"text"			"YES"		1013
+"project_system_details"	"ele_laundry_circuits"	"text"			"YES"		1014
+"project_system_details"	"ele_electric_vehicle_amps"	"text"			"YES"		1015
+"project_system_details"	"ele_hvac_air_handler_amps"	"text"			"YES"		1016
+"project_system_details"	"spb_floor_area"	"text"			"YES"		1017
+"project_system_details"	"spb_bathroom_circuits"	"text"			"YES"		1018
+"project_system_details"	"spb_laundry_circuits"	"text"			"YES"		1019
+"project_system_details"	"spb_electric_vehicle_amps"	"text"			"YES"		1020
+"project_system_details"	"spb_hvac_air_handler_amps"	"text"			"YES"		1021
+"project_system_details"	"spb_electrical_furnace_amps"	"text"			"YES"		1022
+"project_system_details"	"spb_ac_unit_amps"	"text"			"YES"		1023
+"project_system_details"	"special_scenario"	"character varying"	50		"NO"	"'none'::character varying"	1024
+"project_system_details"	"special_scenario_reason"	"text"			"YES"		1025
+"project_system_details"	"affected_systems"	"character varying"	20		"YES"		1026
+"project_system_details"	"ele_combine_systems"	"boolean"			"YES"	"false"	1027
+"project_system_details"	"ele_combine_active_systems"	"character varying"	20		"YES"		1028
+"project_system_details"	"ele_combine_system_desc"	"character varying"	50		"YES"		1029
+"project_system_details"	"sys1_landing_destination"	"character varying"	100		"YES"		1030
+"project_system_details"	"sys2_landing_destination"	"character varying"	100		"YES"		1031
+"project_system_details"	"sys3_landing_destination"	"character varying"	100		"YES"		1032
+"project_system_details"	"sys4_landing_destination"	"character varying"	100		"YES"		1033
+"project_system_details"	"bos_sys1_type4_equipment_type"	"character varying"	255		"YES"		1034
+"project_system_details"	"bos_sys1_type4_make"	"character varying"	255		"YES"		1035
+"project_system_details"	"bos_sys1_type4_model"	"character varying"	255		"YES"		1036
+"project_system_details"	"bos_sys1_type4_amp_rating"	"character varying"	50		"YES"		1037
+"project_system_details"	"bos_sys1_type4_is_new"	"boolean"			"YES"	"true"	1038
+"project_system_details"	"bos_sys1_type4_active"	"boolean"			"YES"	"false"	1039
+"project_system_details"	"bos_sys1_type5_equipment_type"	"character varying"	255		"YES"		1040
+"project_system_details"	"bos_sys1_type5_make"	"character varying"	255		"YES"		1041
+"project_system_details"	"bos_sys1_type5_model"	"character varying"	255		"YES"		1042
+"project_system_details"	"bos_sys1_type5_amp_rating"	"character varying"	50		"YES"		1043
+"project_system_details"	"bos_sys1_type5_is_new"	"boolean"			"YES"	"true"	1044
+"project_system_details"	"bos_sys1_type5_active"	"boolean"			"YES"	"false"	1045
+"project_system_details"	"bos_sys1_type6_equipment_type"	"character varying"	255		"YES"		1046
+"project_system_details"	"bos_sys1_type6_make"	"character varying"	255		"YES"		1047
+"project_system_details"	"bos_sys1_type6_model"	"character varying"	255		"YES"		1048
+"project_system_details"	"bos_sys1_type6_amp_rating"	"character varying"	50		"YES"		1049
+"project_system_details"	"bos_sys1_type6_is_new"	"boolean"			"YES"	"true"	1050
+"project_system_details"	"bos_sys1_type6_active"	"boolean"			"YES"	"false"	1051
+"project_system_details"	"bos_sys2_type4_equipment_type"	"character varying"	255		"YES"		1052
+"project_system_details"	"bos_sys2_type4_make"	"character varying"	255		"YES"		1053
+"project_system_details"	"bos_sys2_type4_model"	"character varying"	255		"YES"		1054
+"project_system_details"	"bos_sys2_type4_amp_rating"	"character varying"	50		"YES"		1055
+"project_system_details"	"bos_sys2_type4_is_new"	"boolean"			"YES"	"true"	1056
+"project_system_details"	"bos_sys2_type4_active"	"boolean"			"YES"	"false"	1057
+"project_system_details"	"bos_sys2_type5_equipment_type"	"character varying"	255		"YES"		1058
+"project_system_details"	"bos_sys2_type5_make"	"character varying"	255		"YES"		1059
+"project_system_details"	"bos_sys2_type5_model"	"character varying"	255		"YES"		1060
+"project_system_details"	"bos_sys2_type5_amp_rating"	"character varying"	50		"YES"		1061
+"project_system_details"	"bos_sys2_type5_is_new"	"boolean"			"YES"	"true"	1062
+"project_system_details"	"bos_sys2_type5_active"	"boolean"			"YES"	"false"	1063
+"project_system_details"	"bos_sys2_type6_equipment_type"	"character varying"	255		"YES"		1064
+"project_system_details"	"bos_sys2_type6_make"	"character varying"	255		"YES"		1065
+"project_system_details"	"bos_sys2_type6_model"	"character varying"	255		"YES"		1066
+"project_system_details"	"bos_sys2_type6_amp_rating"	"character varying"	50		"YES"		1067
+"project_system_details"	"bos_sys2_type6_is_new"	"boolean"			"YES"	"true"	1068
+"project_system_details"	"bos_sys2_type6_active"	"boolean"			"YES"	"false"	1069
+"project_system_details"	"bos_sys3_type4_equipment_type"	"character varying"	255		"YES"		1070
+"project_system_details"	"bos_sys3_type4_make"	"character varying"	255		"YES"		1071
+"project_system_details"	"bos_sys3_type4_model"	"character varying"	255		"YES"		1072
+"project_system_details"	"bos_sys3_type4_amp_rating"	"character varying"	50		"YES"		1073
+"project_system_details"	"bos_sys3_type4_is_new"	"boolean"			"YES"	"true"	1074
+"project_system_details"	"bos_sys3_type4_active"	"boolean"			"YES"	"false"	1075
+"project_system_details"	"bos_sys3_type5_equipment_type"	"character varying"	255		"YES"		1076
+"project_system_details"	"bos_sys3_type5_make"	"character varying"	255		"YES"		1077
+"project_system_details"	"bos_sys3_type5_model"	"character varying"	255		"YES"		1078
+"project_system_details"	"bos_sys3_type5_amp_rating"	"character varying"	50		"YES"		1079
+"project_system_details"	"bos_sys3_type5_is_new"	"boolean"			"YES"	"true"	1080
+"project_system_details"	"bos_sys3_type5_active"	"boolean"			"YES"	"false"	1081
+"project_system_details"	"bos_sys3_type6_equipment_type"	"character varying"	255		"YES"		1082
+"project_system_details"	"bos_sys3_type6_make"	"character varying"	255		"YES"		1083
+"project_system_details"	"bos_sys3_type6_model"	"character varying"	255		"YES"		1084
+"project_system_details"	"bos_sys3_type6_amp_rating"	"character varying"	50		"YES"		1085
+"project_system_details"	"bos_sys3_type6_is_new"	"boolean"			"YES"	"true"	1086
+"project_system_details"	"bos_sys3_type6_active"	"boolean"			"YES"	"false"	1087
+"project_system_details"	"bos_sys4_type4_equipment_type"	"character varying"	255		"YES"		1088
+"project_system_details"	"bos_sys4_type4_make"	"character varying"	255		"YES"		1089
+"project_system_details"	"bos_sys4_type4_model"	"character varying"	255		"YES"		1090
+"project_system_details"	"bos_sys4_type4_amp_rating"	"character varying"	50		"YES"		1091
+"project_system_details"	"bos_sys4_type4_is_new"	"boolean"			"YES"	"true"	1092
+"project_system_details"	"bos_sys4_type4_active"	"boolean"			"YES"	"false"	1093
+"project_system_details"	"bos_sys4_type5_equipment_type"	"character varying"	255		"YES"		1094
+"project_system_details"	"bos_sys4_type5_make"	"character varying"	255		"YES"		1095
+"project_system_details"	"bos_sys4_type5_model"	"character varying"	255		"YES"		1096
+"project_system_details"	"bos_sys4_type5_amp_rating"	"character varying"	50		"YES"		1097
+"project_system_details"	"bos_sys4_type5_is_new"	"boolean"			"YES"	"true"	1098
+"project_system_details"	"bos_sys4_type5_active"	"boolean"			"YES"	"false"	1099
+"project_system_details"	"bos_sys4_type6_equipment_type"	"character varying"	255		"YES"		1100
+"project_system_details"	"bos_sys4_type6_make"	"character varying"	255		"YES"		1101
+"project_system_details"	"bos_sys4_type6_model"	"character varying"	255		"YES"		1102
+"project_system_details"	"bos_sys4_type6_amp_rating"	"character varying"	50		"YES"		1103
+"project_system_details"	"bos_sys4_type6_is_new"	"boolean"			"YES"	"true"	1104
+"project_system_details"	"bos_sys4_type6_active"	"boolean"			"YES"	"false"	1105
+"project_system_details"	"bos_sys1_type1_trigger"	"character varying"	50		"YES"		1106
+"project_system_details"	"bos_sys1_type2_trigger"	"character varying"	50		"YES"		1107
+"project_system_details"	"bos_sys1_type3_trigger"	"character varying"	50		"YES"		1108
+"project_system_details"	"bos_sys1_type4_trigger"	"character varying"	50		"YES"		1109
+"project_system_details"	"bos_sys1_type5_trigger"	"character varying"	50		"YES"		1110
+"project_system_details"	"bos_sys1_type6_trigger"	"character varying"	50		"YES"		1111
+"project_system_details"	"bos_sys2_type1_trigger"	"character varying"	50		"YES"		1112
+"project_system_details"	"bos_sys2_type2_trigger"	"character varying"	50		"YES"		1113
+"project_system_details"	"bos_sys2_type3_trigger"	"character varying"	50		"YES"		1114
+"project_system_details"	"bos_sys2_type4_trigger"	"character varying"	50		"YES"		1115
+"project_system_details"	"bos_sys2_type5_trigger"	"character varying"	50		"YES"		1116
+"project_system_details"	"bos_sys2_type6_trigger"	"character varying"	50		"YES"		1117
+"project_system_details"	"bos_sys3_type1_trigger"	"character varying"	50		"YES"		1118
+"project_system_details"	"bos_sys3_type2_trigger"	"character varying"	50		"YES"		1119
+"project_system_details"	"bos_sys3_type3_trigger"	"character varying"	50		"YES"		1120
+"project_system_details"	"bos_sys3_type4_trigger"	"character varying"	50		"YES"		1121
+"project_system_details"	"bos_sys3_type5_trigger"	"character varying"	50		"YES"		1122
+"project_system_details"	"bos_sys3_type6_trigger"	"character varying"	50		"YES"		1123
+"project_system_details"	"bos_sys4_type1_trigger"	"character varying"	50		"YES"		1124
+"project_system_details"	"bos_sys4_type2_trigger"	"character varying"	50		"YES"		1125
+"project_system_details"	"bos_sys4_type3_trigger"	"character varying"	50		"YES"		1126
+"project_system_details"	"bos_sys4_type4_trigger"	"character varying"	50		"YES"		1127
+"project_system_details"	"bos_sys4_type5_trigger"	"character varying"	50		"YES"		1128
+"project_system_details"	"bos_sys4_type6_trigger"	"character varying"	50		"YES"		1129
+"project_system_details"	"post_sms_bos_sys1_type1_equipment_type"	"character varying"	255		"YES"		1130
+"project_system_details"	"post_sms_bos_sys1_type1_amp_rating"	"character varying"	50		"YES"		1131
+"project_system_details"	"post_sms_bos_sys1_type1_make"	"character varying"	255		"YES"		1132
+"project_system_details"	"post_sms_bos_sys1_type1_model"	"character varying"	255		"YES"		1133
+"project_system_details"	"post_sms_bos_sys1_type1_is_new"	"boolean"			"YES"	"true"	1134
+"project_system_details"	"post_sms_bos_sys1_type1_trigger"	"character varying"	100		"YES"		1135
+"project_system_details"	"post_sms_bos_sys1_type1_active"	"boolean"			"YES"	"false"	1136
+"project_system_details"	"post_sms_bos_sys2_type1_equipment_type"	"character varying"	255		"YES"		1137
+"project_system_details"	"post_sms_bos_sys2_type1_amp_rating"	"character varying"	50		"YES"		1138
+"project_system_details"	"post_sms_bos_sys2_type1_make"	"character varying"	255		"YES"		1139
+"project_system_details"	"post_sms_bos_sys2_type1_model"	"character varying"	255		"YES"		1140
+"project_system_details"	"post_sms_bos_sys2_type1_is_new"	"boolean"			"YES"	"true"	1141
+"project_system_details"	"post_sms_bos_sys2_type1_trigger"	"character varying"	100		"YES"		1142
+"project_system_details"	"post_sms_bos_sys2_type1_active"	"boolean"			"YES"	"false"	1143
+"project_system_details"	"post_sms_bos_sys3_type1_equipment_type"	"character varying"	255		"YES"		1144
+"project_system_details"	"post_sms_bos_sys3_type1_amp_rating"	"character varying"	50		"YES"		1145
+"project_system_details"	"post_sms_bos_sys3_type1_make"	"character varying"	255		"YES"		1146
+"project_system_details"	"post_sms_bos_sys3_type1_model"	"character varying"	255		"YES"		1147
+"project_system_details"	"post_sms_bos_sys3_type1_is_new"	"boolean"			"YES"	"true"	1148
+"project_system_details"	"post_sms_bos_sys3_type1_trigger"	"character varying"	100		"YES"		1149
+"project_system_details"	"post_sms_bos_sys3_type1_active"	"boolean"			"YES"	"false"	1150
+"project_system_details"	"post_sms_bos_sys4_type1_equipment_type"	"character varying"	255		"YES"		1151
+"project_system_details"	"post_sms_bos_sys4_type1_amp_rating"	"character varying"	50		"YES"		1152
+"project_system_details"	"post_sms_bos_sys4_type1_make"	"character varying"	255		"YES"		1153
+"project_system_details"	"post_sms_bos_sys4_type1_model"	"character varying"	255		"YES"		1154
+"project_system_details"	"post_sms_bos_sys4_type1_is_new"	"boolean"			"YES"	"true"	1155
+"project_system_details"	"post_sms_bos_sys4_type1_trigger"	"character varying"	100		"YES"		1156
+"project_system_details"	"post_sms_bos_sys4_type1_active"	"boolean"			"YES"	"false"	1157
+"project_system_details"	"post_sms_bos_sys1_type2_equipment_type"	"character varying"	255		"YES"		1158
+"project_system_details"	"post_sms_bos_sys1_type2_amp_rating"	"character varying"	50		"YES"		1159
+"project_system_details"	"post_sms_bos_sys1_type2_make"	"character varying"	255		"YES"		1160
+"project_system_details"	"post_sms_bos_sys1_type2_model"	"character varying"	255		"YES"		1161
+"project_system_details"	"post_sms_bos_sys1_type2_is_new"	"boolean"			"YES"	"true"	1162
+"project_system_details"	"post_sms_bos_sys1_type2_trigger"	"character varying"	100		"YES"		1163
+"project_system_details"	"post_sms_bos_sys1_type2_active"	"boolean"			"YES"	"false"	1164
+"project_system_details"	"post_sms_bos_sys2_type2_equipment_type"	"character varying"	255		"YES"		1165
+"project_system_details"	"post_sms_bos_sys2_type2_amp_rating"	"character varying"	50		"YES"		1166
+"project_system_details"	"post_sms_bos_sys2_type2_make"	"character varying"	255		"YES"		1167
+"project_system_details"	"post_sms_bos_sys2_type2_model"	"character varying"	255		"YES"		1168
+"project_system_details"	"post_sms_bos_sys2_type2_is_new"	"boolean"			"YES"	"true"	1169
+"project_system_details"	"post_sms_bos_sys2_type2_trigger"	"character varying"	100		"YES"		1170
+"project_system_details"	"post_sms_bos_sys2_type2_active"	"boolean"			"YES"	"false"	1171
+"project_system_details"	"post_sms_bos_sys3_type2_equipment_type"	"character varying"	255		"YES"		1172
+"project_system_details"	"post_sms_bos_sys3_type2_amp_rating"	"character varying"	50		"YES"		1173
+"project_system_details"	"post_sms_bos_sys3_type2_make"	"character varying"	255		"YES"		1174
+"project_system_details"	"post_sms_bos_sys3_type2_model"	"character varying"	255		"YES"		1175
+"project_system_details"	"post_sms_bos_sys3_type2_is_new"	"boolean"			"YES"	"true"	1176
+"project_system_details"	"post_sms_bos_sys3_type2_trigger"	"character varying"	100		"YES"		1177
+"project_system_details"	"post_sms_bos_sys3_type2_active"	"boolean"			"YES"	"false"	1178
+"project_system_details"	"post_sms_bos_sys4_type2_equipment_type"	"character varying"	255		"YES"		1179
+"project_system_details"	"post_sms_bos_sys4_type2_amp_rating"	"character varying"	50		"YES"		1180
+"project_system_details"	"post_sms_bos_sys4_type2_make"	"character varying"	255		"YES"		1181
+"project_system_details"	"post_sms_bos_sys4_type2_model"	"character varying"	255		"YES"		1182
+"project_system_details"	"post_sms_bos_sys4_type2_is_new"	"boolean"			"YES"	"true"	1183
+"project_system_details"	"post_sms_bos_sys4_type2_trigger"	"character varying"	100		"YES"		1184
+"project_system_details"	"post_sms_bos_sys4_type2_active"	"boolean"			"YES"	"false"	1185
+"project_system_details"	"post_sms_bos_sys1_type3_equipment_type"	"character varying"	255		"YES"		1186
+"project_system_details"	"post_sms_bos_sys1_type3_amp_rating"	"character varying"	50		"YES"		1187
+"project_system_details"	"post_sms_bos_sys1_type3_make"	"character varying"	255		"YES"		1188
+"project_system_details"	"post_sms_bos_sys1_type3_model"	"character varying"	255		"YES"		1189
+"project_system_details"	"post_sms_bos_sys1_type3_is_new"	"boolean"			"YES"	"true"	1190
+"project_system_details"	"post_sms_bos_sys1_type3_trigger"	"character varying"	100		"YES"		1191
+"project_system_details"	"post_sms_bos_sys1_type3_active"	"boolean"			"YES"	"false"	1192
+"project_system_details"	"post_sms_bos_sys2_type3_equipment_type"	"character varying"	255		"YES"		1193
+"project_system_details"	"post_sms_bos_sys2_type3_amp_rating"	"character varying"	50		"YES"		1194
+"project_system_details"	"post_sms_bos_sys2_type3_make"	"character varying"	255		"YES"		1195
+"project_system_details"	"post_sms_bos_sys2_type3_model"	"character varying"	255		"YES"		1196
+"project_system_details"	"post_sms_bos_sys2_type3_is_new"	"boolean"			"YES"	"true"	1197
+"project_system_details"	"post_sms_bos_sys2_type3_trigger"	"character varying"	100		"YES"		1198
+"project_system_details"	"post_sms_bos_sys2_type3_active"	"boolean"			"YES"	"false"	1199
+"project_system_details"	"post_sms_bos_sys3_type3_equipment_type"	"character varying"	255		"YES"		1200
+"project_system_details"	"post_sms_bos_sys3_type3_amp_rating"	"character varying"	50		"YES"		1201
+"project_system_details"	"post_sms_bos_sys3_type3_make"	"character varying"	255		"YES"		1202
+"project_system_details"	"post_sms_bos_sys3_type3_model"	"character varying"	255		"YES"		1203
+"project_system_details"	"post_sms_bos_sys3_type3_is_new"	"boolean"			"YES"	"true"	1204
+"project_system_details"	"post_sms_bos_sys3_type3_trigger"	"character varying"	100		"YES"		1205
+"project_system_details"	"post_sms_bos_sys3_type3_active"	"boolean"			"YES"	"false"	1206
+"project_system_details"	"post_sms_bos_sys4_type3_equipment_type"	"character varying"	255		"YES"		1207
+"project_system_details"	"post_sms_bos_sys4_type3_amp_rating"	"character varying"	50		"YES"		1208
+"project_system_details"	"post_sms_bos_sys4_type3_make"	"character varying"	255		"YES"		1209
+"project_system_details"	"post_sms_bos_sys4_type3_model"	"character varying"	255		"YES"		1210
+"project_system_details"	"post_sms_bos_sys4_type3_is_new"	"boolean"			"YES"	"true"	1211
+"project_system_details"	"post_sms_bos_sys4_type3_trigger"	"character varying"	100		"YES"		1212
+"project_system_details"	"post_sms_bos_sys4_type3_active"	"boolean"			"YES"	"false"	1213
+"project_system_details"	"bos_sys1_battery1_type1_equipment_type"	"character varying"	255		"YES"		1214
+"project_system_details"	"bos_sys1_battery1_type1_make"	"character varying"	255		"YES"		1215
+"project_system_details"	"bos_sys1_battery1_type1_model"	"character varying"	255		"YES"		1216
+"project_system_details"	"bos_sys1_battery1_type1_amp_rating"	"character varying"	50		"YES"		1217
+"project_system_details"	"bos_sys1_battery1_type1_is_new"	"boolean"			"YES"	"true"	1218
+"project_system_details"	"bos_sys1_battery1_type1_trigger"	"character varying"	100		"YES"		1219
+"project_system_details"	"bos_sys1_battery1_type2_equipment_type"	"character varying"	255		"YES"		1220
+"project_system_details"	"bos_sys1_battery1_type2_make"	"character varying"	255		"YES"		1221
+"project_system_details"	"bos_sys1_battery1_type2_model"	"character varying"	255		"YES"		1222
+"project_system_details"	"bos_sys1_battery1_type2_amp_rating"	"character varying"	50		"YES"		1223
+"project_system_details"	"bos_sys1_battery1_type2_is_new"	"boolean"			"YES"	"true"	1224
+"project_system_details"	"bos_sys1_battery1_type2_trigger"	"character varying"	100		"YES"		1225
+"project_system_details"	"bos_sys1_battery2_type1_equipment_type"	"character varying"	255		"YES"		1226
+"project_system_details"	"bos_sys1_battery2_type1_make"	"character varying"	255		"YES"		1227
+"project_system_details"	"bos_sys1_battery2_type1_model"	"character varying"	255		"YES"		1228
+"project_system_details"	"bos_sys1_battery2_type1_amp_rating"	"character varying"	50		"YES"		1229
+"project_system_details"	"bos_sys1_battery2_type1_is_new"	"boolean"			"YES"	"true"	1230
+"project_system_details"	"bos_sys1_battery2_type1_trigger"	"character varying"	100		"YES"		1231
+"project_system_details"	"bos_sys1_battery2_type2_equipment_type"	"character varying"	255		"YES"		1232
+"project_system_details"	"bos_sys1_battery2_type2_make"	"character varying"	255		"YES"		1233
+"project_system_details"	"bos_sys1_battery2_type2_model"	"character varying"	255		"YES"		1234
+"project_system_details"	"bos_sys1_battery2_type2_amp_rating"	"character varying"	50		"YES"		1235
+"project_system_details"	"bos_sys1_battery2_type2_is_new"	"boolean"			"YES"	"true"	1236
+"project_system_details"	"bos_sys1_battery2_type2_trigger"	"character varying"	100		"YES"		1237
+"project_system_details"	"bos_sys1_backup_type1_equipment_type"	"character varying"	255		"YES"		1238
+"project_system_details"	"bos_sys1_backup_type1_make"	"character varying"	255		"YES"		1239
+"project_system_details"	"bos_sys1_backup_type1_model"	"character varying"	255		"YES"		1240
+"project_system_details"	"bos_sys1_backup_type1_amp_rating"	"character varying"	50		"YES"		1241
+"project_system_details"	"bos_sys1_backup_type1_is_new"	"boolean"			"YES"	"true"	1242
+"project_system_details"	"bos_sys1_backup_type1_trigger"	"character varying"	100		"YES"		1243
+"project_system_details"	"bos_sys1_backup_type2_equipment_type"	"character varying"	255		"YES"		1244
+"project_system_details"	"bos_sys1_backup_type2_make"	"character varying"	255		"YES"		1245
+"project_system_details"	"bos_sys1_backup_type2_model"	"character varying"	255		"YES"		1246
+"project_system_details"	"bos_sys1_backup_type2_amp_rating"	"character varying"	50		"YES"		1247
+"project_system_details"	"bos_sys1_backup_type2_is_new"	"boolean"			"YES"	"true"	1248
+"project_system_details"	"bos_sys1_backup_type2_trigger"	"character varying"	100		"YES"		1249
+"project_system_details"	"bos_sys1_backup_type3_equipment_type"	"character varying"	255		"YES"		1250
+"project_system_details"	"bos_sys1_backup_type3_make"	"character varying"	255		"YES"		1251
+"project_system_details"	"bos_sys1_backup_type3_model"	"character varying"	255		"YES"		1252
+"project_system_details"	"bos_sys1_backup_type3_amp_rating"	"character varying"	50		"YES"		1253
+"project_system_details"	"bos_sys1_backup_type3_is_new"	"boolean"			"YES"	"true"	1254
+"project_system_details"	"bos_sys1_backup_type3_trigger"	"character varying"	100		"YES"		1255
+"project_system_details"	"bos_sys2_battery1_type1_equipment_type"	"character varying"	255		"YES"		1256
+"project_system_details"	"bos_sys2_battery1_type1_make"	"character varying"	255		"YES"		1257
+"project_system_details"	"bos_sys2_battery1_type1_model"	"character varying"	255		"YES"		1258
+"project_system_details"	"bos_sys2_battery1_type1_amp_rating"	"character varying"	50		"YES"		1259
+"project_system_details"	"bos_sys2_battery1_type1_is_new"	"boolean"			"YES"	"true"	1260
+"project_system_details"	"bos_sys2_battery1_type1_trigger"	"character varying"	100		"YES"		1261
+"project_system_details"	"bos_sys2_battery1_type2_equipment_type"	"character varying"	255		"YES"		1262
+"project_system_details"	"bos_sys2_battery1_type2_make"	"character varying"	255		"YES"		1263
+"project_system_details"	"bos_sys2_battery1_type2_model"	"character varying"	255		"YES"		1264
+"project_system_details"	"bos_sys2_battery1_type2_amp_rating"	"character varying"	50		"YES"		1265
+"project_system_details"	"bos_sys2_battery1_type2_is_new"	"boolean"			"YES"	"true"	1266
+"project_system_details"	"bos_sys2_battery1_type2_trigger"	"character varying"	100		"YES"		1267
+"project_system_details"	"bos_sys2_battery2_type1_equipment_type"	"character varying"	255		"YES"		1268
+"project_system_details"	"bos_sys2_battery2_type1_make"	"character varying"	255		"YES"		1269
+"project_system_details"	"bos_sys2_battery2_type1_model"	"character varying"	255		"YES"		1270
+"project_system_details"	"bos_sys2_battery2_type1_amp_rating"	"character varying"	50		"YES"		1271
+"project_system_details"	"bos_sys2_battery2_type1_is_new"	"boolean"			"YES"	"true"	1272
+"project_system_details"	"bos_sys2_battery2_type1_trigger"	"character varying"	100		"YES"		1273
+"project_system_details"	"bos_sys2_battery2_type2_equipment_type"	"character varying"	255		"YES"		1274
+"project_system_details"	"bos_sys2_battery2_type2_make"	"character varying"	255		"YES"		1275
+"project_system_details"	"bos_sys2_battery2_type2_model"	"character varying"	255		"YES"		1276
+"project_system_details"	"bos_sys2_battery2_type2_amp_rating"	"character varying"	50		"YES"		1277
+"project_system_details"	"bos_sys2_battery2_type2_is_new"	"boolean"			"YES"	"true"	1278
+"project_system_details"	"bos_sys2_battery2_type2_trigger"	"character varying"	100		"YES"		1279
+"project_system_details"	"bos_sys2_backup_type1_equipment_type"	"character varying"	255		"YES"		1280
+"project_system_details"	"bos_sys2_backup_type1_make"	"character varying"	255		"YES"		1281
+"project_system_details"	"bos_sys2_backup_type1_model"	"character varying"	255		"YES"		1282
+"project_system_details"	"bos_sys2_backup_type1_amp_rating"	"character varying"	50		"YES"		1283
+"project_system_details"	"bos_sys2_backup_type1_is_new"	"boolean"			"YES"	"true"	1284
+"project_system_details"	"bos_sys2_backup_type1_trigger"	"character varying"	100		"YES"		1285
+"project_system_details"	"bos_sys2_backup_type2_equipment_type"	"character varying"	255		"YES"		1286
+"project_system_details"	"bos_sys2_backup_type2_make"	"character varying"	255		"YES"		1287
+"project_system_details"	"bos_sys2_backup_type2_model"	"character varying"	255		"YES"		1288
+"project_system_details"	"bos_sys2_backup_type2_amp_rating"	"character varying"	50		"YES"		1289
+"project_system_details"	"bos_sys2_backup_type2_is_new"	"boolean"			"YES"	"true"	1290
+"project_system_details"	"bos_sys2_backup_type2_trigger"	"character varying"	100		"YES"		1291
+"project_system_details"	"bos_sys2_backup_type3_equipment_type"	"character varying"	255		"YES"		1292
+"project_system_details"	"bos_sys2_backup_type3_make"	"character varying"	255		"YES"		1293
+"project_system_details"	"bos_sys2_backup_type3_model"	"character varying"	255		"YES"		1294
+"project_system_details"	"bos_sys2_backup_type3_amp_rating"	"character varying"	50		"YES"		1295
+"project_system_details"	"bos_sys2_backup_type3_is_new"	"boolean"			"YES"	"true"	1296
+"project_system_details"	"bos_sys2_backup_type3_trigger"	"character varying"	100		"YES"		1297
+"project_system_details"	"bos_sys3_battery1_type1_equipment_type"	"character varying"	255		"YES"		1298
+"project_system_details"	"bos_sys3_battery1_type1_make"	"character varying"	255		"YES"		1299
+"project_system_details"	"bos_sys3_battery1_type1_model"	"character varying"	255		"YES"		1300
+"project_system_details"	"bos_sys3_battery1_type1_amp_rating"	"character varying"	50		"YES"		1301
+"project_system_details"	"bos_sys3_battery1_type1_is_new"	"boolean"			"YES"	"true"	1302
+"project_system_details"	"bos_sys3_battery1_type1_trigger"	"character varying"	100		"YES"		1303
+"project_system_details"	"bos_sys3_battery1_type2_equipment_type"	"character varying"	255		"YES"		1304
+"project_system_details"	"bos_sys3_battery1_type2_make"	"character varying"	255		"YES"		1305
+"project_system_details"	"bos_sys3_battery1_type2_model"	"character varying"	255		"YES"		1306
+"project_system_details"	"bos_sys3_battery1_type2_amp_rating"	"character varying"	50		"YES"		1307
+"project_system_details"	"bos_sys3_battery1_type2_is_new"	"boolean"			"YES"	"true"	1308
+"project_system_details"	"bos_sys3_battery1_type2_trigger"	"character varying"	100		"YES"		1309
+"project_system_details"	"bos_sys3_battery2_type1_equipment_type"	"character varying"	255		"YES"		1310
+"project_system_details"	"bos_sys3_battery2_type1_make"	"character varying"	255		"YES"		1311
+"project_system_details"	"bos_sys3_battery2_type1_model"	"character varying"	255		"YES"		1312
+"project_system_details"	"bos_sys3_battery2_type1_amp_rating"	"character varying"	50		"YES"		1313
+"project_system_details"	"bos_sys3_battery2_type1_is_new"	"boolean"			"YES"	"true"	1314
+"project_system_details"	"bos_sys3_battery2_type1_trigger"	"character varying"	100		"YES"		1315
+"project_system_details"	"bos_sys3_battery2_type2_equipment_type"	"character varying"	255		"YES"		1316
+"project_system_details"	"bos_sys3_battery2_type2_make"	"character varying"	255		"YES"		1317
+"project_system_details"	"bos_sys3_battery2_type2_model"	"character varying"	255		"YES"		1318
+"project_system_details"	"bos_sys3_battery2_type2_amp_rating"	"character varying"	50		"YES"		1319
+"project_system_details"	"bos_sys3_battery2_type2_is_new"	"boolean"			"YES"	"true"	1320
+"project_system_details"	"bos_sys3_battery2_type2_trigger"	"character varying"	100		"YES"		1321
+"project_system_details"	"bos_sys3_backup_type1_equipment_type"	"character varying"	255		"YES"		1322
+"project_system_details"	"bos_sys3_backup_type1_make"	"character varying"	255		"YES"		1323
+"project_system_details"	"bos_sys3_backup_type1_model"	"character varying"	255		"YES"		1324
+"project_system_details"	"bos_sys3_backup_type1_amp_rating"	"character varying"	50		"YES"		1325
+"project_system_details"	"bos_sys3_backup_type1_is_new"	"boolean"			"YES"	"true"	1326
+"project_system_details"	"bos_sys3_backup_type1_trigger"	"character varying"	100		"YES"		1327
+"project_system_details"	"bos_sys3_backup_type2_equipment_type"	"character varying"	255		"YES"		1328
+"project_system_details"	"bos_sys3_backup_type2_make"	"character varying"	255		"YES"		1329
+"project_system_details"	"bos_sys3_backup_type2_model"	"character varying"	255		"YES"		1330
+"project_system_details"	"bos_sys3_backup_type2_amp_rating"	"character varying"	50		"YES"		1331
+"project_system_details"	"bos_sys3_backup_type2_is_new"	"boolean"			"YES"	"true"	1332
+"project_system_details"	"bos_sys3_backup_type2_trigger"	"character varying"	100		"YES"		1333
+"project_system_details"	"bos_sys3_backup_type3_equipment_type"	"character varying"	255		"YES"		1334
+"project_system_details"	"bos_sys3_backup_type3_make"	"character varying"	255		"YES"		1335
+"project_system_details"	"bos_sys3_backup_type3_model"	"character varying"	255		"YES"		1336
+"project_system_details"	"bos_sys3_backup_type3_amp_rating"	"character varying"	50		"YES"		1337
+"project_system_details"	"bos_sys3_backup_type3_is_new"	"boolean"			"YES"	"true"	1338
+"project_system_details"	"bos_sys3_backup_type3_trigger"	"character varying"	100		"YES"		1339
+"project_system_details"	"bos_sys4_battery1_type1_equipment_type"	"character varying"	255		"YES"		1340
+"project_system_details"	"bos_sys4_battery1_type1_make"	"character varying"	255		"YES"		1341
+"project_system_details"	"bos_sys4_battery1_type1_model"	"character varying"	255		"YES"		1342
+"project_system_details"	"bos_sys4_battery1_type1_amp_rating"	"character varying"	50		"YES"		1343
+"project_system_details"	"bos_sys4_battery1_type1_is_new"	"boolean"			"YES"	"true"	1344
+"project_system_details"	"bos_sys4_battery1_type1_trigger"	"character varying"	100		"YES"		1345
+"project_system_details"	"bos_sys4_battery1_type2_equipment_type"	"character varying"	255		"YES"		1346
+"project_system_details"	"bos_sys4_battery1_type2_make"	"character varying"	255		"YES"		1347
+"project_system_details"	"bos_sys4_battery1_type2_model"	"character varying"	255		"YES"		1348
+"project_system_details"	"bos_sys4_battery1_type2_amp_rating"	"character varying"	50		"YES"		1349
+"project_system_details"	"bos_sys4_battery1_type2_is_new"	"boolean"			"YES"	"true"	1350
+"project_system_details"	"bos_sys4_battery1_type2_trigger"	"character varying"	100		"YES"		1351
+"project_system_details"	"bos_sys4_battery2_type1_equipment_type"	"character varying"	255		"YES"		1352
+"project_system_details"	"bos_sys4_battery2_type1_make"	"character varying"	255		"YES"		1353
+"project_system_details"	"bos_sys4_battery2_type1_model"	"character varying"	255		"YES"		1354
+"project_system_details"	"bos_sys4_battery2_type1_amp_rating"	"character varying"	50		"YES"		1355
+"project_system_details"	"bos_sys4_battery2_type1_is_new"	"boolean"			"YES"	"true"	1356
+"project_system_details"	"bos_sys4_battery2_type1_trigger"	"character varying"	100		"YES"		1357
+"project_system_details"	"bos_sys4_battery2_type2_equipment_type"	"character varying"	255		"YES"		1358
+"project_system_details"	"bos_sys4_battery2_type2_make"	"character varying"	255		"YES"		1359
+"project_system_details"	"bos_sys4_battery2_type2_model"	"character varying"	255		"YES"		1360
+"project_system_details"	"bos_sys4_battery2_type2_amp_rating"	"character varying"	50		"YES"		1361
+"project_system_details"	"bos_sys4_battery2_type2_is_new"	"boolean"			"YES"	"true"	1362
+"project_system_details"	"bos_sys4_battery2_type2_trigger"	"character varying"	100		"YES"		1363
+"project_system_details"	"bos_sys4_backup_type1_equipment_type"	"character varying"	255		"YES"		1364
+"project_system_details"	"bos_sys4_backup_type1_make"	"character varying"	255		"YES"		1365
+"project_system_details"	"bos_sys4_backup_type1_model"	"character varying"	255		"YES"		1366
+"project_system_details"	"bos_sys4_backup_type1_amp_rating"	"character varying"	50		"YES"		1367
+"project_system_details"	"bos_sys4_backup_type1_is_new"	"boolean"			"YES"	"true"	1368
+"project_system_details"	"bos_sys4_backup_type1_trigger"	"character varying"	100		"YES"		1369
+"project_system_details"	"bos_sys4_backup_type2_equipment_type"	"character varying"	255		"YES"		1370
+"project_system_details"	"bos_sys4_backup_type2_make"	"character varying"	255		"YES"		1371
+"project_system_details"	"bos_sys4_backup_type2_model"	"character varying"	255		"YES"		1372
+"project_system_details"	"bos_sys4_backup_type2_amp_rating"	"character varying"	50		"YES"		1373
+"project_system_details"	"bos_sys4_backup_type2_is_new"	"boolean"			"YES"	"true"	1374
+"project_system_details"	"bos_sys4_backup_type2_trigger"	"character varying"	100		"YES"		1375
+"project_system_details"	"bos_sys4_backup_type3_equipment_type"	"character varying"	255		"YES"		1376
+"project_system_details"	"bos_sys4_backup_type3_make"	"character varying"	255		"YES"		1377
+"project_system_details"	"bos_sys4_backup_type3_model"	"character varying"	255		"YES"		1378
+"project_system_details"	"bos_sys4_backup_type3_amp_rating"	"character varying"	50		"YES"		1379
+"project_system_details"	"bos_sys4_backup_type3_is_new"	"boolean"			"YES"	"true"	1380
+"project_system_details"	"bos_sys4_backup_type3_trigger"	"character varying"	100		"YES"		1381
+"project_system_details"	"bos_sys1_lastslot"	"integer"		32	"YES"		1382
+"project_system_details"	"bos_sys2_lastslot"	"integer"		32	"YES"		1383
+"project_system_details"	"bos_sys3_lastslot"	"integer"		32	"YES"		1384
+"project_system_details"	"bos_sys4_lastslot"	"integer"		32	"YES"		1385
+"project_system_details"	"bos_sys1_type1_block_name"	"character varying"	100		"YES"		1386
+"project_system_details"	"bos_sys1_type2_block_name"	"character varying"	100		"YES"		1387
+"project_system_details"	"bos_sys1_type3_block_name"	"character varying"	100		"YES"		1388
+"project_system_details"	"bos_sys1_type4_block_name"	"character varying"	100		"YES"		1389
+"project_system_details"	"bos_sys1_type5_block_name"	"character varying"	100		"YES"		1390
+"project_system_details"	"bos_sys1_type6_block_name"	"character varying"	100		"YES"		1391
+"project_system_details"	"bos_sys1_battery1_type1_block_name"	"character varying"	100		"YES"		1392
+"project_system_details"	"bos_sys1_battery1_type2_block_name"	"character varying"	100		"YES"		1393
+"project_system_details"	"bos_sys1_battery2_type1_block_name"	"character varying"	100		"YES"		1394
+"project_system_details"	"bos_sys1_battery2_type2_block_name"	"character varying"	100		"YES"		1395
+"project_system_details"	"bos_sys1_backup_type1_block_name"	"character varying"	100		"YES"		1396
+"project_system_details"	"bos_sys1_backup_type2_block_name"	"character varying"	100		"YES"		1397
+"project_system_details"	"bos_sys1_backup_type3_block_name"	"character varying"	100		"YES"		1398
+"project_system_details"	"post_sms_bos_sys1_type1_block_name"	"character varying"	100		"YES"		1399
+"project_system_details"	"post_sms_bos_sys1_type2_block_name"	"character varying"	100		"YES"		1400
+"project_system_details"	"post_sms_bos_sys1_type3_block_name"	"character varying"	100		"YES"		1401
+"project_system_details"	"bos_sys2_type1_block_name"	"character varying"	100		"YES"		1402
+"project_system_details"	"bos_sys2_type2_block_name"	"character varying"	100		"YES"		1403
+"project_system_details"	"bos_sys2_type3_block_name"	"character varying"	100		"YES"		1404
+"project_system_details"	"bos_sys2_type4_block_name"	"character varying"	100		"YES"		1405
+"project_system_details"	"bos_sys2_type5_block_name"	"character varying"	100		"YES"		1406
+"project_system_details"	"bos_sys2_type6_block_name"	"character varying"	100		"YES"		1407
+"project_system_details"	"bos_sys2_battery1_type1_block_name"	"character varying"	100		"YES"		1408
+"project_system_details"	"bos_sys2_battery1_type2_block_name"	"character varying"	100		"YES"		1409
+"project_system_details"	"bos_sys2_battery2_type1_block_name"	"character varying"	100		"YES"		1410
+"project_system_details"	"bos_sys2_battery2_type2_block_name"	"character varying"	100		"YES"		1411
+"project_system_details"	"bos_sys2_backup_type1_block_name"	"character varying"	100		"YES"		1412
+"project_system_details"	"bos_sys2_backup_type2_block_name"	"character varying"	100		"YES"		1413
+"project_system_details"	"bos_sys2_backup_type3_block_name"	"character varying"	100		"YES"		1414
+"project_system_details"	"post_sms_bos_sys2_type1_block_name"	"character varying"	100		"YES"		1415
+"project_system_details"	"post_sms_bos_sys2_type2_block_name"	"character varying"	100		"YES"		1416
+"project_system_details"	"post_sms_bos_sys2_type3_block_name"	"character varying"	100		"YES"		1417
+"project_system_details"	"bos_sys3_type1_block_name"	"character varying"	100		"YES"		1418
+"project_system_details"	"bos_sys3_type2_block_name"	"character varying"	100		"YES"		1419
+"project_system_details"	"bos_sys3_type3_block_name"	"character varying"	100		"YES"		1420
+"project_system_details"	"bos_sys3_type4_block_name"	"character varying"	100		"YES"		1421
+"project_system_details"	"bos_sys3_type5_block_name"	"character varying"	100		"YES"		1422
+"project_system_details"	"bos_sys3_type6_block_name"	"character varying"	100		"YES"		1423
+"project_system_details"	"bos_sys3_battery1_type1_block_name"	"character varying"	100		"YES"		1424
+"project_system_details"	"bos_sys3_battery1_type2_block_name"	"character varying"	100		"YES"		1425
+"project_system_details"	"bos_sys3_battery2_type1_block_name"	"character varying"	100		"YES"		1426
+"project_system_details"	"bos_sys3_battery2_type2_block_name"	"character varying"	100		"YES"		1427
+"project_system_details"	"bos_sys3_backup_type1_block_name"	"character varying"	100		"YES"		1428
+"project_system_details"	"bos_sys3_backup_type2_block_name"	"character varying"	100		"YES"		1429
+"project_system_details"	"bos_sys3_backup_type3_block_name"	"character varying"	100		"YES"		1430
+"project_system_details"	"post_sms_bos_sys3_type1_block_name"	"character varying"	100		"YES"		1431
+"project_system_details"	"post_sms_bos_sys3_type2_block_name"	"character varying"	100		"YES"		1432
+"project_system_details"	"post_sms_bos_sys3_type3_block_name"	"character varying"	100		"YES"		1433
+"project_system_details"	"bos_sys4_type1_block_name"	"character varying"	100		"YES"		1434
+"project_system_details"	"bos_sys4_type2_block_name"	"character varying"	100		"YES"		1435
+"project_system_details"	"bos_sys4_type3_block_name"	"character varying"	100		"YES"		1436
+"project_system_details"	"bos_sys4_type4_block_name"	"character varying"	100		"YES"		1437
+"project_system_details"	"bos_sys4_type5_block_name"	"character varying"	100		"YES"		1438
+"project_system_details"	"bos_sys4_type6_block_name"	"character varying"	100		"YES"		1439
+"project_system_details"	"bos_sys4_battery1_type1_block_name"	"character varying"	100		"YES"		1440
+"project_system_details"	"bos_sys4_battery1_type2_block_name"	"character varying"	100		"YES"		1441
+"project_system_details"	"bos_sys4_battery2_type1_block_name"	"character varying"	100		"YES"		1442
+"project_system_details"	"bos_sys4_battery2_type2_block_name"	"character varying"	100		"YES"		1443
+"project_system_details"	"bos_sys4_backup_type1_block_name"	"character varying"	100		"YES"		1444
+"project_system_details"	"bos_sys4_backup_type2_block_name"	"character varying"	100		"YES"		1445
+"project_system_details"	"bos_sys4_backup_type3_block_name"	"character varying"	100		"YES"		1446
+"project_system_details"	"post_sms_bos_sys4_type1_block_name"	"character varying"	100		"YES"		1447
+"project_system_details"	"post_sms_bos_sys4_type2_block_name"	"character varying"	100		"YES"		1448
+"project_system_details"	"post_sms_bos_sys4_type3_block_name"	"character varying"	100		"YES"		1449
+"project_system_details"	"selected_additional_services"	"text"			"YES"		1450
+"project_system_details"	"sys1_battery1_tie_in_location"	"text"			"YES"		1451
+"project_system_details"	"sys1_battery2_tie_in_location"	"text"			"YES"		1452
+"project_system_details"	"sys2_battery1_tie_in_location"	"text"			"YES"		1453
+"project_system_details"	"sys2_battery2_tie_in_location"	"text"			"YES"		1454
+"project_system_details"	"sys3_battery1_tie_in_location"	"text"			"YES"		1455
+"project_system_details"	"sys3_battery2_tie_in_location"	"text"			"YES"		1456
+"project_system_details"	"sys4_battery1_tie_in_location"	"text"			"YES"		1457
+"project_system_details"	"sys4_battery2_tie_in_location"	"text"			"YES"		1458
+"project_system_details"	"sys1_isacintegrated"	"boolean"			"YES"	"false"	1459
+"project_system_details"	"sys2_isacintegrated"	"boolean"			"YES"	"false"	1460
+"project_system_details"	"sys3_isacintegrated"	"boolean"			"YES"	"false"	1461
+"project_system_details"	"sys4_isacintegrated"	"boolean"			"YES"	"false"	1462

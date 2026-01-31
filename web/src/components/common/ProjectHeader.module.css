@@ -1,0 +1,23 @@
+.projectHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: 0;
+  margin-bottom: var(--spacing);
+}
+
+.headerLine {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.headerDivider {
+  height: 1px;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark)) 1;
+  margin-top: var(--spacing-xs);
+}

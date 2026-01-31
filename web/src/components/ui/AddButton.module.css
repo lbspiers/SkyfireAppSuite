@@ -1,0 +1,54 @@
+/* AddButton - Simple + button without divider line */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-tight) var(--spacing);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+  line-height: 1;
+  flex: 1;
+  min-width: 0;
+}
+
+.button:hover:not(.disabled):not(.active) {
+  color: #FF8A4D;
+  border-color: var(--color-primary);
+}
+
+.button.active {
+  background: var(--gradient-primary);
+  border: none;
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+  box-shadow: 0 4px 12px rgba(253, 115, 50, 0.3);
+}
+
+.button.active:hover {
+  background: var(--gradient-primary);
+  box-shadow: 0 6px 16px rgba(253, 115, 50, 0.4);
+}
+
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.plus {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  line-height: 1;
+}
+
+.label {
+  white-space: nowrap;
+}

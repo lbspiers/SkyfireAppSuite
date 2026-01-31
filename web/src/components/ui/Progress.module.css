@@ -1,0 +1,94 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  width: 100%;
+}
+
+.track {
+  flex: 1;
+  background: var(--bg-surface);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+/* Sizes */
+.sm { height: 4px; }
+.md { height: 8px; }
+.lg { height: 12px; }
+
+.bar {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+/* Variants */
+.primary { background: var(--gradient-primary); }
+.success { background: linear-gradient(90deg, var(--color-success), #059669); }
+.warning { background: linear-gradient(90deg, var(--color-warning), #D97706); }
+.error { background: linear-gradient(90deg, var(--color-error), var(--color-danger)); }
+.info { background: linear-gradient(90deg, var(--color-info), var(--color-accent-blue-dark)); }
+
+.striped {
+  background-image: linear-gradient(
+    45deg,
+    var(--border-default) 25%,
+    transparent 25%,
+    transparent 50%,
+    var(--border-default) 50%,
+    var(--border-default) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
+
+.animated {
+  animation: stripes 1s linear infinite;
+}
+
+@keyframes stripes {
+  from { background-position: 1rem 0; }
+  to { background-position: 0 0; }
+}
+
+.label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+  min-width: 3ch;
+  text-align: right;
+}
+
+/* Circular */
+.circular {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circularTrack {
+  fill: none;
+  stroke: var(--bg-surface);
+}
+
+.circularBar {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.circularBar.primary { stroke: var(--color-primary); }
+.circularBar.success { stroke: var(--color-success); }
+.circularBar.warning { stroke: var(--color-warning); }
+.circularBar.error { stroke: var(--color-error); }
+.circularBar.info { stroke: var(--color-info); }
+
+.circularLabel {
+  position: absolute;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}

@@ -1,0 +1,221 @@
+===========================================
+INVENTORY 30/70 SPLIT LAYOUT - IMPLEMENTATION GUIDE
+===========================================
+
+This file contains the complete code changes needed to convert the Inventory component
+from a collapsible sections layout to a 30/70 split panel layout.
+
+CHANGES ALREADY APPLIED:
+✅ 1. DrafterPortalPage.js - Added Inventory import and replaced placeholder
+✅ 2. Added selectedCategory state
+✅ 3. Added handleQuantityChange function
+✅ 4. Updated reset dropdowns to include quantity
+
+REMAINING CHANGE NEEDED:
+❌ Replace the entire render section (lines 500-628) with the new 30/70 split layout
+
+==========================================
+FULL REPLACEMENT FOR LINES 500-628
+==========================================
+
+Replace everything from line 500 (the opening of `<div className={styles.sectionsContainer}>`)
+to line 628 (the closing `</div>` before the Delete Modal) with this:
+
+```jsx
+        /* 30/70 Split Layout */
+        <div className={styles.splitLayout}>
+          {/* LEFT PANEL: Category Navigation + Add Form (30%) */}
+          <div className={styles.categoryPanel}>
+            <h3 className={styles.categoryPanelTitle}>Equipment Categories</h3>
+
+            <div className={styles.categoryList}>
+              {EQUIPMENT_CATEGORIES.map((category) => (
+                <button
+                  key={category.id}
+                  className={`${styles.categoryItem} ${selectedCategory === category.id ? styles.categoryItemSelected : ''}`}
+                  onClick={() => setSelectedCategory(category.id)}
+                  disabled={category.disabled}
+                >
+                  <span className={styles.categoryName}>{category.label}</span>
+                  {inventory[category.id]?.length > 0 && (
+                    <span className={styles.categoryBadge}>{inventory[category.id].length}</span>
+                  )}
+                  {category.comingSoon && (
+                    <span className={styles.comingSoonBadge}>Soon</span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Add Equipment Form for Selected Category */}
+            {selectedCategory && EQUIPMENT_CATEGORIES.find(c => c.id === selectedCategory && !c.disabled) && (
+              <div className={styles.addForm}>
+                <h4 className={styles.addFormTitle}>
+                  Add {EQUIPMENT_CATEGORIES.find(c => c.id === selectedCategory)?.label}
+                </h4>
+
+                {/* Wattage Filter (Solar Panels only) */}
+                {selectedCategory === 'solar-panels' && (
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel}>Filter by Wattage (optional)</label>
+                    <input
+                      type="number"
+                      value={watts}
+                      onChange={(e) => setWatts(e.target.value)}
+                      placeholder="e.g., 400"
+                      className={styles.formInput}
+                    />
+                  </div>
+                )}
+
+                {/* Manufacturer Dropdown */}
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Manufacturer *</label>
+                  <select
+                    value={dropdownState[selectedCategory]?.make || ''}
+                    onChange={(e) => handleMakeChange(selectedCategory, e.target.value)}
+                    className={styles.formSelect}
+                  >
+                    <option value="">Select Manufacturer</option>
+                    {(dropdownState[selectedCategory]?.makes || []).map((make) => (
+                      <option key={make.value} value={make.value}>
+                        {make.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Model Dropdown */}
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>
+                    Model {isModelOptional(selectedCategory) ? '(Optional)' : '*'}
+                  </label>
+                  <select
+                    value={dropdownState[selectedCategory]?.model || ''}
+                    onChange={(e) => handleModelChange(selectedCategory, e.target.value)}
+                    className={styles.formSelect}
+                    disabled={!dropdownState[selectedCategory]?.make}
+                  >
+                    <option value="">
+                      {dropdownState[selectedCategory]?.make ? 'Select Model' : 'Select Manufacturer First'}
+                    </option>
+                    {(dropdownState[selectedCategory]?.models || []).map((model) => (
+                      <option key={model.value} value={model.value}>
+                        {model.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Quantity on Hand Input (NEW) */}
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Qty on Hand (optional)</label>
+                  <input
+                    type="number"
+                    className={styles.formInput}
+                    value={dropdownState[selectedCategory]?.quantity || ''}
+                    onChange={(e) => handleQuantityChange(selectedCategory, e.target.value)}
+                    placeholder="0"
+                    min="0"
+                  />
+                  <span className={styles.formHint}>Note: Quantity tracking backend support coming soon</span>
+                </div>
+
+                {/* Add Button */}
+                <button
+                  className={styles.addButton}
+                  onClick={() => handleAddEquipment(selectedCategory)}
+                  disabled={
+                    savingEquipment[selectedCategory] ||
+                    !dropdownState[selectedCategory]?.make ||
+                    (!isModelOptional(selectedCategory) && !dropdownState[selectedCategory]?.model)
+                  }
+                >
+                  {savingEquipment[selectedCategory]
+                    ? 'Adding...'
+                    : `+ Add ${EQUIPMENT_CATEGORIES.find(c => c.id === selectedCategory)?.label?.slice(0, -1)}`}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT PANEL: Equipment Display Grid (70%) */}
+          <div className={styles.displayPanel}>
+            <h3 className={styles.displayPanelTitle}>
+              {EQUIPMENT_CATEGORIES.find(c => c.id === selectedCategory)?.label || 'Equipment'}
+            </h3>
+
+            {(inventory[selectedCategory] || []).length === 0 ? (
+              <div className={styles.emptyState}>
+                <p>
+                  No preferred {EQUIPMENT_CATEGORIES.find(c => c.id === selectedCategory)?.label?.toLowerCase() || 'equipment'} added yet.
+                </p>
+                <p className={styles.emptyHint}>Use the form on the left to add equipment.</p>
+              </div>
+            ) : (
+              <div className={styles.equipmentGrid}>
+                {(inventory[selectedCategory] || []).map((equipment) => (
+                  <div key={equipment.uuid} className={styles.equipmentCard}>
+                    <div className={styles.equipmentInfo}>
+                      <div className={styles.equipmentHeader}>
+                        <span className={styles.equipmentMake}>{equipment.make}</span>
+                        {equipment.is_default && (
+                          <span className={styles.defaultBadge}>Default</span>
+                        )}
+                      </div>
+                      {equipment.model && (
+                        <span className={styles.equipmentModel}>{equipment.model}</span>
+                      )}
+
+                      {/* Quantity on Hand Display (NEW) */}
+                      <div className={styles.qtyOnHand}>
+                        <span className={styles.qtyLabel}>In Stock:</span>
+                        <span className={styles.qtyValue}>
+                          {equipment.quantity_on_hand || 0}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.equipmentActions}>
+                      {!equipment.is_default && (
+                        <button
+                          className={styles.setDefaultButton}
+                          onClick={() => handleSetDefault(selectedCategory, equipment)}
+                        >
+                          Set Default
+                        </button>
+                      )}
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteClick(selectedCategory, equipment)}
+                        aria-label="Delete equipment"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+```
+
+Also need to add useEffect to load manufacturers when category changes.
+Add this after the existing useEffect for loadAllEquipment (around line 262):
+
+```javascript
+  // Load manufacturers when category changes
+  useEffect(() => {
+    if (selectedCategory && !dropdownState[selectedCategory]?.makes) {
+      loadManufacturers(selectedCategory);
+    }
+  }, [selectedCategory, dropdownState, loadManufacturers]);
+```
+
+==========================================
+NEXT FILE: Inventory.module.css
+==========================================
+
+The CSS file needs these new classes added. See INVENTORY_CSS_30_70.txt for the complete CSS updates.
+

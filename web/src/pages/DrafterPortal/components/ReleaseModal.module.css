@@ -1,0 +1,39 @@
+/* Warning Banner */
+.warningBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningIcon {
+  font-size: var(--text-2xl);
+  flex-shrink: 0;
+}
+
+.warningText {
+  color: #fecaca;
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.warningSubtext {
+  color: #fecaca;
+  font-size: var(--text-sm);
+  opacity: 0.9;
+}
+
+.warningSubtext strong {
+  font-weight: 700;
+}
+
+/* Content Section */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}

@@ -1,0 +1,267 @@
+/* ===== LIST VIEW CONTAINER ===== */
+.listViewContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.listHeader {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing) var(--spacing-loose);
+  background: var(--bg-panel);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerCell {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-right: var(--spacing);
+}
+
+/* ===== BODY ===== */
+.listBody {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing) var(--spacing-loose);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  transition: var(--transition-colors);
+  cursor: pointer;
+}
+
+.listRow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.listRow.selected {
+  background: rgba(253, 115, 50, 0.1);
+  border-left: 3px solid var(--color-primary);
+}
+
+.cell {
+  padding-right: var(--spacing);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== THUMBNAIL ===== */
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-base);
+  position: relative;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.thumbnail > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholderIcon {
+  color: var(--text-muted);
+}
+
+/* ===== FILENAME ===== */
+.filename {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+/* ===== SECTION ===== */
+.section {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+/* ===== TAG ===== */
+.tag {
+  display: flex;
+  align-items: center;
+}
+
+.tagBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-tight) var(--spacing);
+  background: rgba(253, 115, 50, 0.15);
+  border: var(--border-thin) solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.noTag {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ===== NOTES ===== */
+.note {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.noNote {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ===== EDIT FIELD ===== */
+.editField {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.editInput {
+  flex: 1;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-panel);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  outline: none;
+  transition: var(--transition-colors);
+}
+
+.editInput:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--ring-focus);
+}
+
+.editActions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.editSaveBtn,
+.editCancelBtn {
+  padding: var(--spacing-tight) var(--spacing);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.editSaveBtn {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.editSaveBtn:hover {
+  opacity: 0.9;
+}
+
+.editCancelBtn {
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  border: var(--border-thin) solid var(--border-subtle);
+}
+
+.editCancelBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ===== DATE ===== */
+.date {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.actionBtn:hover {
+  background: var(--bg-hover);
+  color: var(--color-primary);
+}
+
+/* ===== EMPTY STATE ===== */
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-loose);
+}
+
+.emptyText {
+  font-size: var(--text-md);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .headerCell,
+  .cell {
+    font-size: var(--text-xs);
+  }
+
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+}

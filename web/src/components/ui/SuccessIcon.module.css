@@ -1,0 +1,32 @@
+/* SuccessIcon - Design System Compliant */
+
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-success-light);
+  border-radius: var(--radius-circle);
+  color: var(--color-success);
+}
+
+.sm {
+  width: 40px;
+  height: 40px;
+  font-size: var(--text-xl);
+}
+
+.md {
+  width: 64px;
+  height: 64px;
+  font-size: var(--text-3xl);
+}
+
+.lg {
+  width: 80px;
+  height: 80px;
+  font-size: var(--text-4xl);
+}
+
+.checkmark {
+  line-height: 1;
+}

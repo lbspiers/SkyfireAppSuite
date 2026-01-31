@@ -1,0 +1,258 @@
+/**
+ * Add User Modal Styles
+ * Multi-step wizard with role selection
+ * Uses design tokens - no hardcoded values
+ */
+
+/* Progress Bar */
+.progressBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-loose);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.progressStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-circle);
+  background: var(--bg-elevated);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+}
+
+.progressStep.active .stepNumber {
+  background: var(--color-primary);
+  color: white;
+}
+
+.stepLabel {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  transition: var(--transition-base);
+}
+
+.progressStep.active .stepLabel {
+  color: var(--text-primary);
+}
+
+.progressLine {
+  width: 40px;
+  height: 2px;
+  background: var(--border-subtle);
+  margin: 0 var(--spacing-tight);
+  margin-bottom: var(--spacing-loose);
+}
+
+/* Step Content */
+.stepContent {
+  padding: var(--spacing-loose);
+}
+
+.stepHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-loose);
+}
+
+.stepHeader h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.stepHeader p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.optional {
+  font-weight: var(--font-normal);
+  color: var(--text-tertiary);
+}
+
+/* Role Grid */
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-tight);
+  margin-bottom: var(--spacing);
+}
+
+.roleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.roleCard:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+}
+
+.roleCard.roleSelected {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.roleIcon {
+  font-size: var(--text-2xl);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-tight);
+  transition: var(--transition-base);
+}
+
+.roleSelected .roleIcon {
+  color: var(--color-primary);
+}
+
+.roleName {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.roleDescription {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: var(--leading-normal);
+}
+
+.roleSelected .roleDescription {
+  color: var(--text-secondary);
+}
+
+/* Summary */
+.summary {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  margin-bottom: var(--spacing);
+}
+
+.summaryCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding-bottom: var(--spacing);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--spacing);
+}
+
+.summaryAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-circle);
+  background: var(--gradient-primary);
+  color: white;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summaryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.summaryName {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.summaryEmail {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.summaryRole {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summaryLabel {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+.summaryRoleValue {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.summaryRoleValue i {
+  color: var(--color-primary);
+}
+
+/* Notice */
+.notice {
+  display: flex;
+  gap: var(--spacing-tight);
+  background: var(--color-info-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  margin-bottom: var(--spacing);
+}
+
+.notice i {
+  font-size: var(--text-lg);
+  color: var(--color-info);
+  flex-shrink: 0;
+}
+
+.notice p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .roleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .progressLine {
+    width: 24px;
+  }
+}

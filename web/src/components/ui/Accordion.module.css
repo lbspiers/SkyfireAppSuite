@@ -1,0 +1,125 @@
+/* Accordion - Skyfire Design System */
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+/* Item */
+.item {
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: var(--transition-base);
+}
+
+.item:hover {
+  border-color: var(--border-elevated);
+}
+
+.item.open {
+  border-color: var(--color-primary);
+}
+
+/* Header */
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-colors);
+  text-align: left;
+}
+
+.header:hover {
+  background: var(--bg-hover);
+}
+
+.item.open .header {
+  background: var(--bg-elevated);
+}
+
+.title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  flex: 1;
+  line-height: var(--leading-normal);
+}
+
+/* Chevron */
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: transform var(--duration-base) var(--ease-out);
+  flex-shrink: 0;
+  margin-left: var(--spacing);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.item.open .chevron {
+  color: var(--color-primary);
+}
+
+/* Content */
+.content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-out);
+}
+
+.item.open .content {
+  grid-template-rows: 1fr;
+}
+
+.contentInner {
+  overflow: hidden;
+  padding: 0 var(--spacing);
+}
+
+.item.open .contentInner {
+  padding: 0 var(--spacing) var(--spacing) var(--spacing);
+}
+
+.contentInner p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.contentInner p:not(:last-child) {
+  margin-bottom: var(--spacing);
+}
+
+.contentInner ul,
+.contentInner ol {
+  margin: var(--spacing) 0;
+  padding-left: var(--spacing-loose);
+  color: var(--text-secondary);
+}
+
+.contentInner li {
+  margin-bottom: var(--spacing-tight);
+  line-height: var(--leading-normal);
+}
+
+.contentInner code {
+  background: var(--bg-elevated);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+}

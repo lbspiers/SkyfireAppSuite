@@ -1,0 +1,129 @@
+.uploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  margin-bottom: var(--spacing-tight);
+}
+
+.fileInput {
+  padding: var(--spacing-tight);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.fileInput:hover {
+  background: var(--bg-input-hover);
+  border-color: var(--border-default);
+}
+
+.fileInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.resultsTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  margin-bottom: var(--spacing-tight);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing);
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  font-size: var(--text-sm);
+}
+
+.successIcon {
+  font-size: var(--text-base);
+}
+
+.warningIcon {
+  font-size: var(--text-base);
+}
+
+.infoIcon {
+  font-size: var(--text-base);
+}
+
+.summaryLabel {
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.summaryValue {
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+  margin-left: auto;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding: var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.sectionTitle {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  margin-bottom: var(--spacing-xs);
+}
+
+.taskList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.taskItem {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-tight);
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+}
+
+.closeButtonContainer {
+  margin-top: var(--spacing);
+}

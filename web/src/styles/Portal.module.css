@@ -1,0 +1,216 @@
+/* Shared Portal Page Styles */
+/* Extracted from inline styles - Phase 3 cleanup */
+
+/* Header Section */
+.headerInfoContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.companyName {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+.customerName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.divider {
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: var(--text-disabled);
+}
+
+.address {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.projectId {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.ahj {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.utility {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.headerActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing);
+}
+
+/* Portal Navigation Pills */
+.portalNav {
+  display: flex;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.portalPill {
+  padding: var(--spacing) 0;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  transition: all 0.2s;
+  width: 85px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.portalPillInactive {
+  border: 1px solid var(--text-disabled);
+  color: var(--text-disabled);
+  background-color: transparent;
+}
+
+.portalPillActive {
+  border: none;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  cursor: default;
+  font-weight: 500;
+}
+
+/* Flame Icon Link */
+.flameIconLink {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+}
+
+/* Error State */
+.errorSection {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.errorContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.errorContent {
+  /* Inherits from parent */
+}
+
+.errorTitle {
+  margin: 0 0 var(--spacing) 0;
+  color: var(--color-error);
+}
+
+.errorMessage {
+  margin: 0;
+  color: #FCA5A5;
+}
+
+/* Menu Panel */
+.menuPanelContainer {
+  height: calc(100vh - 260px);
+}
+
+.menuContent {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.menuHeading {
+  /* Inherits default h3 */
+}
+
+.menuText {
+  /* Inherits default p */
+}
+
+/* Logout Button */
+.logoutButton {
+  margin-top: var(--spacing);
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-xl);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* QC Panel Overlay (Design Portal specific) */
+.qcPanelOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  z-index: 200;
+  background: rgba(10, 22, 40, 0.98);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Split Layout (Design Portal) */
+.splitLayoutRelative {
+  position: relative;
+}
+
+/* Grid Layout (Install/Sales/Permitting Portals) */
+.gridLayout {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  gap: var(--spacing);
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: visible;
+  padding-right: var(--spacing);
+}
+
+/* ChatterPanel Container */
+.chatterContainer {
+  padding: var(--spacing);
+  height: 100%;
+}
+
+/* Coming Soon State */
+.comingSoonContainer {
+  padding: var(--spacing);
+  text-align: center;
+  color: var(--text-disabled);
+}
+
+.comingSoonIcon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing);
+}
+
+.comingSoonHeading {
+  color: var(--text-muted);
+  margin-bottom: var(--spacing);
+}
+
+.comingSoonText {
+  /* Inherits from parent */
+}

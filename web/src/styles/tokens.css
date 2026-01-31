@@ -1,0 +1,266 @@
+/**
+ * SKYFIRE DESIGN SYSTEM - DESIGN TOKENS
+ *
+ * Import in index.css: @import './styles/tokens.css';
+ */
+
+:root {
+  /* ========================================
+     COLORS
+     ======================================== */
+
+  /* Brand */
+  --color-primary: #FD7332;
+  --color-primary-dark: #B92011;
+  --color-primary-light: #FF8C42;
+
+  /* Grayscale - Tailwind compatible */
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+
+  /* Accent - Chatter Blue */
+  --color-accent-blue: #3B82F6;
+  --color-accent-blue-dark: #2563EB;
+  --color-accent-blue-light: #60A5FA;
+
+  /* Backgrounds */
+  --bg-page: #0C1F3F;
+  --bg-panel: #0A1628;
+  --bg-surface: #111C2E;
+  --bg-elevated: #213454;
+  --bg-input: #0C1F3F;
+  --bg-input-hover: #2E4161;
+  --bg-input-disabled: rgba(30, 41, 59, 0.5);
+  --bg-glass: rgba(17, 24, 39, 0.7);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 255, 255, 0.1);
+
+  /* Text */
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-tertiary: #9CA3AF;
+  --text-muted: #9CA3AF;
+  --text-disabled: #6B7280;
+
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-default: rgba(255, 255, 255, 0.15);
+  --border-elevated: rgba(255, 255, 255, 0.2);
+  --border-focus: #FD7332;
+  --border-inactive: #888888;
+
+  /* Status */
+  --color-success: #10B981;
+  --color-info: #3B82F6;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+
+  /* Status Light Variants */
+  --color-success-light: rgba(16, 185, 129, 0.1);
+  --color-warning-light: rgba(245, 158, 11, 0.1);
+  --color-error-light: rgba(239, 68, 68, 0.1);
+  --color-info-light: rgba(59, 130, 246, 0.1);
+
+  /* Primary Variants */
+  --color-primary-light: rgba(253, 115, 50, 0.1);
+  --color-primary-lighter: rgba(253, 115, 50, 0.05);
+
+  /* Project Status Colors (matching mobile app) */
+  --status-pending: #94A3B8;
+  --status-sales: #E6C800;
+  --status-site-survey: #FFA300;
+  --status-design: #FD7332;
+  --status-revisions: #FF0000;
+  --status-permits: #7FDB51;
+  --status-install: #00B140;
+  --status-commissioning: #00B7C2;
+  --status-inspection: #00B7C2;
+  --status-pto: #6A0DAD;
+  --status-on-hold: #979797;
+  --status-canceled: #000000;
+
+  /* Semantic Colors */
+  --color-link: #0EA5E9;        /* Sky blue - for hyperlinks */
+  --color-danger: #DC2626;      /* Red-600 - delete/destructive actions */
+
+  /* Extended Accent Palette (for charts, maps, tabs, visualizations) */
+  --color-accent-pink: #EC4899;
+  --color-accent-indigo: #6366F1;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-cyan: #06B6D4;
+  --color-accent-yellow: #EAB308;
+
+  /* Overlay Tokens (for modals, backdrops, drawers) */
+  --overlay-light: rgba(0, 0, 0, 0.5);
+  --overlay-medium: rgba(0, 0, 0, 0.7);
+  --overlay-dark: rgba(0, 0, 0, 0.95);
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font Family - System fonts for cross-platform consistency */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px - DEFAULT */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.5rem;     /* 40px */
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ========================================
+     SPACING SYSTEM
+     ========================================
+
+     DEFAULT: var(--spacing) = 1rem (16px)
+
+     CONVENTIONS:
+     - Container padding: var(--spacing) all sides
+     - Vertical spacing: margin-bottom ONLY (never margin-top)
+     - Horizontal spacing: margin-right ONLY (never margin-left)
+     - Flex/Grid: Use gap: var(--spacing)
+
+     SCALE:
+     --spacing-xs:    0.25rem  (4px)  - Micro adjustments
+     --spacing-tight: 0.5rem   (8px)  - Compact: tabs, labels, icon gaps
+     --spacing:       1rem     (16px) - DEFAULT for everything
+     --spacing-loose: 1.5rem   (24px) - Section breaks
+     --spacing-wide:  2rem     (32px) - Major sections
+
+     EXCEPTIONS:
+     - Tab row gaps: var(--spacing-tight)
+     - Form label to input: var(--spacing-tight)
+     - Button/input internal padding: Component's own design
+     - AG Grid: Uses own spacing system
+     ======================================== */
+
+  /* The Core Scale - USE THESE */
+  --spacing-xxs: 0.375rem;      /* 6px  - Micro adjustments (portal pills, fine-tuning) */
+  --spacing-xs: 0.25rem;        /* 4px  - Micro adjustments */
+  --spacing-tight: 0.5rem;      /* 8px  - Compact: tabs, labels, icon gaps */
+  --spacing-sm: 0.75rem;        /* 12px - Small spacing (commonly needed) */
+  --spacing: 1rem;              /* 16px - DEFAULT for everything */
+  --spacing-md: 1.25rem;        /* 20px - Medium spacing (commonly needed) */
+  --spacing-loose: 1.5rem;      /* 24px - Section breaks */
+  --spacing-wide: 2rem;         /* 32px - Major sections */
+
+  /* Extra sizes (rare use) */
+  --spacing-2xl: 3rem;          /* 48px - Hero sections */
+  --spacing-3xl: 4rem;          /* 64px - Extra large sections */
+
+  /* Component-specific (derived from scale) */
+  --padding-panel: var(--spacing);
+  --padding-input: var(--spacing-tight) var(--spacing);
+  --padding-button: var(--spacing-tight) var(--spacing);
+  --padding-button-lg: var(--spacing) var(--spacing-loose);
+
+  /* ========================================
+     BORDERS
+     ======================================== */
+
+  --radius-sm: 0.25rem;     /* 4px */
+  --radius-md: 0.5rem;      /* 8px - DEFAULT */
+  --radius-lg: 0.75rem;     /* 12px */
+  --radius-xl: 1rem;        /* 16px */
+  --radius-pill: 9999px;
+  --radius-circle: 50%;
+
+  --border-thin: 1px;
+  --border-medium: 2px;
+
+  /* ========================================
+     SHADOWS
+     ======================================== */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  --glow-orange: 0 0 20px rgba(253, 115, 50, 0.4);
+  --glow-orange-strong: 0 4px 12px rgba(253, 115, 50, 0.5);
+  --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+  --glow-blue-strong: 0 4px 12px rgba(59, 130, 246, 0.4);
+
+  --shadow-tab: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  --ring-focus: 0 0 0 2px rgba(253, 115, 50, 0.3);
+
+  /* ========================================
+     GRADIENTS
+     ======================================== */
+
+  --gradient-primary: linear-gradient(180deg, #FD7332 0%, #B92011 100%);
+  --gradient-chatter: linear-gradient(180deg, #3B82F6 0%, #2563EB 100%);
+  --gradient-input: linear-gradient(180deg, #0C1F3F 0%, #2E4161 100%);
+  --gradient-page: linear-gradient(180deg, #0C1F3F 0%, #2E4161 100%);
+  --gradient-tab-inactive: linear-gradient(180deg, #213454 0%, #0C1F3F 100%);
+  --gradient-tab-hover: linear-gradient(180deg, #1a2f52 0%, #3A4F6E 100%);
+  --gradient-button-hover: linear-gradient(180deg, #2a3f62 0%, #1f2f4a 100%);
+  --gradient-header-expanded: linear-gradient(180deg, #2563EB 0%, #0C1F3F 100%);
+
+  /* ========================================
+     TRANSITIONS
+     ======================================== */
+
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --transition-base: all var(--duration-base) ease;
+  --transition-colors: background-color var(--duration-base), border-color var(--duration-base), color var(--duration-base);
+
+  /* ========================================
+     Z-INDEX
+     ======================================== */
+
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-tooltip: 50;
+  --z-sticky: 100;
+  --z-modal: 1000;
+  --z-toast: 9999;
+
+  /* ========================================
+     OPACITY
+     ======================================== */
+
+  --opacity-disabled: 0.5;
+  --opacity-hover: 0.8;
+  --opacity-muted: 0.6;
+
+  /* ========================================
+     COMPONENT TOKENS
+     ======================================== */
+
+  --touch-target-min: 44px;
+  --scrollbar-width: 8px;
+  --scrollbar-thumb: #FD7332;
+  --scrollbar-track: rgba(0, 0, 0, 0.2);
+}

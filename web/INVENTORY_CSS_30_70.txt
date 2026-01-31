@@ -1,0 +1,283 @@
+===========================================
+INVENTORY.MODULE.CSS - 30/70 SPLIT LAYOUT STYLES
+===========================================
+
+Add these new CSS classes to src/pages/Inventory/Inventory.module.css
+
+Replace the existing `.sectionsContainer` class (line 103-107) and add all new classes below.
+
+==========================================
+CSS CLASSES TO ADD/UPDATE
+==========================================
+
+/* 30/70 Split Layout Container */
+.splitLayout {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  gap: var(--spacing);
+  min-height: 600px;
+}
+
+/* LEFT PANEL: Category Navigation */
+.categoryPanel {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing);
+  border: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.categoryPanelTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: var(--spacing-tight);
+  border-bottom: 2px solid var(--border-default);
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-elevated);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-base);
+  text-align: left;
+}
+
+.categoryItem:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+}
+
+.categoryItem:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.categoryItemSelected {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+}
+
+.categoryName {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.categoryBadge {
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  min-width: 24px;
+  text-align: center;
+}
+
+.comingSoonBadge {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+/* RIGHT PANEL: Equipment Display */
+.displayPanel {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing);
+  border: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.displayPanelTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: var(--spacing-tight);
+  border-bottom: 2px solid var(--border-default);
+}
+
+/* Form Input (NEW for quantity field) */
+.formInput {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-base);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: var(--transition-colors);
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+
+.formInput:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  background: var(--bg-input-disabled);
+}
+
+.formHint {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+  font-style: italic;
+}
+
+/* Quantity on Hand Display (NEW) */
+.qtyOnHand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-tight);
+  padding-top: var(--spacing-tight);
+  border-top: 1px solid var(--border-default);
+}
+
+.qtyLabel {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.qtyValue {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+  background: var(--color-primary-lighter);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* Update Add Form for Left Panel */
+.addForm {
+  padding: var(--spacing);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  margin-top: auto; /* Push to bottom of left panel */
+}
+
+.addFormTitle {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing) 0;
+}
+
+/* Responsive: Mobile Stacking */
+@media (max-width: 768px) {
+  .splitLayout {
+    grid-template-columns: 1fr;
+    gap: var(--spacing);
+  }
+
+  .categoryPanel {
+    order: 1;
+  }
+
+  .displayPanel {
+    order: 2;
+  }
+
+  .categoryList {
+    max-height: 300px;
+  }
+}
+
+/* Responsive: Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .splitLayout {
+    grid-template-columns: 35% 65%;
+  }
+}
+
+==========================================
+CLASSES TO REMOVE/UPDATE
+==========================================
+
+REMOVE these classes (no longer needed):
+- .sectionsContainer (line 103-107)
+- .section (line 109-111)
+
+KEEP these classes (still used):
+- .container
+- .header
+- .companySelectorContainer
+- .loadingContainer
+- .equipmentGrid
+- .equipmentCard
+- .equipmentInfo
+- .equipmentHeader
+- .equipmentMake
+- .equipmentModel
+- .defaultBadge
+- .equipmentActions
+- .setDefaultButton
+- .deleteButton
+- .formGroup
+- .formLabel
+- .formSelect
+- .addButton
+- .emptyState
+- .emptyHint
+- .modal
+- .modalOverlay
+- All modal-related classes
+
+==========================================
+FINAL CHECKLIST
+==========================================
+
+Before testing:
+1. ✅ DrafterPortalPage.js updated (import + replace placeholder)
+2. ✅ Inventory/index.js - Added selectedCategory state
+3. ✅ Inventory/index.js - Added handleQuantityChange
+4. ✅ Inventory/index.js - Updated reset dropdowns
+5. ❌ Inventory/index.js - Replace render section (lines 500-628)
+6. ❌ Inventory/index.js - Add useEffect for loading manufacturers
+7. ❌ Inventory.module.css - Add all new 30/70 split classes
+8. ❌ Inventory.module.css - Remove old sectionsContainer class
+
+After applying changes:
+- Clear browser cache
+- Hard refresh (Ctrl+Shift+R)
+- Test from Dashboard flame → Inventory
+- Test from DrafterPortalPage flame → Inventory
+- Test from Project page → Inventory tab
+- Verify 30/70 split layout
+- Verify category navigation
+- Verify add form in left panel
+- Verify equipment grid in right panel
+- Verify quantity field (UI only, backend TBD)
+- Verify responsive mobile stacking
+

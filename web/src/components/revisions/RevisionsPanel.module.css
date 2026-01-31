@@ -1,0 +1,237 @@
+.revisionsPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.comingSoonOverlay {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-page);
+}
+
+.subTabContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  padding-left: calc(var(--spacing) + 1rem);
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.sectionTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  margin-bottom: var(--spacing-tight);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: var(--spacing) 0;
+}
+
+.listSection {
+  flex: 1;
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-loose);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.comingSoon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-loose);
+  min-height: 300px;
+}
+
+.comingSoonIcon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing);
+}
+
+.comingSoonTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-tight) 0;
+}
+
+.comingSoonText {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing) 0;
+  max-width: 400px;
+}
+
+.comingSoonHint {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 400px;
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing);
+  padding: var(--spacing-loose);
+  text-align: center;
+  color: var(--color-error);
+}
+
+.retryButton {
+  padding: var(--spacing-tight) var(--spacing);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retryButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+}
+
+/* Support Tickets Panel Styles */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing);
+}
+
+.ticketCount {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.ticketList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+}
+
+.ticketCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing);
+  transition: border-color 0.2s ease;
+}
+
+.ticketCard:hover {
+  border-color: var(--color-primary);
+}
+
+.ticketCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-tight);
+}
+
+.ticketCardTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  flex: 1;
+  min-width: 0;
+}
+
+.ticketFilename {
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.revisionTypeBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.revisionTypeBadge.ahj {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3B82F6;
+}
+
+.revisionTypeBadge.utility {
+  background: rgba(168, 85, 247, 0.2);
+  color: #A855F7;
+}
+
+.ticketCardMeta {
+  display: flex;
+  gap: var(--spacing);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-tight);
+  flex-wrap: wrap;
+}
+
+.ticketCardStatus {
+  font-size: var(--font-size-sm);
+}
+
+.statusMessage {
+  color: var(--text-secondary);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-loose);
+  min-height: 200px;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing);
+}
+
+.emptyText {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-tight);
+}
+
+.emptyHint {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.5;
+}

@@ -1,0 +1,7 @@
+/* PillToggle - Container for two PillButtons side by side */
+
+.toggleContainer {
+  display: flex;
+  gap: var(--spacing-xs);
+  width: fit-content;
+}

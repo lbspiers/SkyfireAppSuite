@@ -1,0 +1,44 @@
+.fieldRow {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  gap: var(--spacing);
+}
+
+.noBorder {
+  border-bottom: none;
+}
+
+.label {
+  flex: 0 0 30%;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight); /* Consistent spacing between buttons */
+}
+
+/* Input styling for text inputs inside FormFieldRow */
+.content input[type="text"],
+.content input[type="number"] {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  font-family: inherit;
+  text-align: left;
+  outline: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.content input::placeholder {
+  color: var(--text-disabled);
+}

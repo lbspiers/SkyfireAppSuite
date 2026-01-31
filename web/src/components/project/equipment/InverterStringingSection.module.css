@@ -1,0 +1,162 @@
+/* ===== COMPONENT WRAPPER ===== */
+.sectionWrapper {
+  margin-bottom: var(--spacing);
+}
+
+/* ===== AUTO NOTE PADDING ===== */
+.autoNotePadding {
+  padding: var(--spacing);
+}
+
+/* ===== CUSTOM SECTION ===== */
+.customSection {
+  padding: var(--spacing);
+}
+
+.infoAlert {
+  margin-bottom: var(--spacing);
+}
+
+.autoCalcButton {
+  margin-bottom: var(--spacing);
+}
+
+/* ===== HEADER ROW ===== */
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding-bottom: var(--spacing-tight);
+  border-bottom: 2px solid var(--border-default);
+  margin-bottom: var(--spacing-tight);
+}
+
+.headerFlex {
+  flex: 1;
+}
+
+.headerText {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.panelsRemaining {
+  font-weight: var(--font-bold);
+}
+
+.panelsRemainingComplete {
+  color: var(--color-success);
+}
+
+.panelsRemainingError {
+  color: var(--color-error);
+}
+
+.panelsRemainingWarning {
+  color: var(--color-primary);
+}
+
+.columnHeader {
+  width: 70px;
+  text-align: center;
+  font-weight: var(--font-bold);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.columnHeaderWide {
+  width: 80px;
+  text-align: center;
+  font-weight: var(--font-bold);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+/* ===== INPUT ROWS CONTAINER ===== */
+.inputRowsContainer {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ===== INPUT ROW ===== */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing-tight) 0;
+  min-height: 48px;
+}
+
+.inputLabel {
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* ===== STRINGS DROPDOWN ===== */
+.stringsSelect {
+  width: 70px;
+  padding: var(--spacing-tight);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.stringsSelectEmpty {
+  color: var(--gray-500);
+}
+
+/* ===== PANEL QTY INPUT ===== */
+.panelQtyInput {
+  width: 80px;
+  text-align: center;
+  padding: var(--spacing-tight);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.panelQtyInputError {
+  width: 80px;
+  text-align: center;
+  padding: var(--spacing-tight);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+/* ===== VALIDATION MESSAGES ===== */
+.validationContainer {
+  padding-left: calc(60px + var(--spacing) + 140px);
+  padding-bottom: var(--spacing-xs);
+  font-size: var(--text-xs);
+}
+
+.validationMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text-secondary);
+}
+
+.validationMessageError {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-error);
+}

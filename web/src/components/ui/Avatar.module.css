@@ -1,0 +1,99 @@
+.avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-weight: var(--font-semibold);
+}
+
+.circle {
+  border-radius: var(--radius-circle);
+}
+
+.square {
+  border-radius: var(--radius-md);
+}
+
+.clickable {
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.clickable:hover {
+  transform: scale(1.05);
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Sizes */
+.xs { width: 24px; height: 24px; font-size: var(--text-xs); }
+.sm { width: 32px; height: 32px; font-size: var(--text-xs); }
+.md { width: 40px; height: 40px; font-size: var(--text-sm); }
+.lg { width: 48px; height: 48px; font-size: var(--text-base); }
+.xl { width: 64px; height: 64px; font-size: var(--text-lg); }
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.initials {
+  color: var(--text-primary);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Color variations for initials */
+.color0 { background: linear-gradient(135deg, var(--color-info), var(--color-accent-blue-dark)); }
+.color1 { background: linear-gradient(135deg, var(--color-success), #059669); }
+.color2 { background: linear-gradient(135deg, var(--color-warning), #D97706); }
+.color3 { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+.color4 { background: linear-gradient(135deg, var(--color-error), var(--color-danger)); }
+
+.remaining {
+  background: var(--bg-elevated);
+  border: var(--border-thin) solid var(--border-subtle);
+}
+
+/* Status indicator */
+.status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25%;
+  height: 25%;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: var(--radius-circle);
+  border: 2px solid var(--bg-panel);
+}
+
+.status-online { background: var(--color-success); }
+.status-offline { background: var(--text-muted); }
+.status-busy { background: var(--color-error); }
+.status-away { background: var(--color-warning); }
+
+/* Avatar Group */
+.group {
+  display: flex;
+  align-items: center;
+}
+
+.groupItem {
+  margin-left: -8px;
+  position: relative;
+}
+
+.groupItem:first-child {
+  margin-left: 0;
+}
+
+.group .avatar {
+  border: 2px solid var(--bg-panel);
+}

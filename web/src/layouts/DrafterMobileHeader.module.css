@@ -1,0 +1,60 @@
+/* DrafterMobileHeader - Skyfire Design System */
+
+.header {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 98;
+  background: var(--bg-surface);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  padding: var(--spacing);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing);
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-tight);
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: var(--transition-colors);
+}
+
+.menuButton:hover {
+  background: var(--bg-hover);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  flex: 1;
+  justify-content: center;
+}
+
+.logoIcon {
+  font-size: var(--text-xl);
+}
+
+.logoText {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.spacer {
+  width: 40px;
+}
+
+/* Mobile Only */
+@media (max-width: 768px) {
+  .header {
+    display: flex;
+  }
+}

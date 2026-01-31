@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleDisplayName</key>
+    <string>skyfire</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(MARKETING_VERSION)</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleVersion</key>
+    <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+
+    <!-- ATS: Strict HTTPS only - no exceptions needed for valid SSL -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+      <false/>
+      <key>GMSApiKey</key>
+  <string>$(GOOGLE_MAPS_API_KEY)</string>
+</dict>
+
+    <!-- Required usage strings -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Your location is used to tag site surveys and show your position on the project map.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Camera is used to capture site photos and documentation for plan sets.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Photo library access lets you attach existing images to projects.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>We save captured photos to your library at your request.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Microphone enables voice notes during site capture.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Speech recognition converts voice notes to text within your project.</string>
+
+    <!-- Export compliance -->
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+      <string>arm64</string>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+      <string>UIInterfaceOrientationPortrait</string>
+      <string>UIInterfaceOrientationLandscapeLeft</string>
+      <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <false/>
+
+    <!-- fonts unchanged -->
+    <key>UIAppFonts</key>
+    <array>
+      <string>Inter_18pt-Black.ttf</string>
+      <string>Inter_18pt-BlackItalic.ttf</string>
+      <string>Inter_18pt-Bold.ttf</string>
+      <string>Inter_18pt-BoldItalic.ttf</string>
+      <string>Inter_18pt-ExtraBold.ttf</string>
+      <string>Inter_18pt-ExtraBoldItalic.ttf</string>
+      <string>Inter_18pt-ExtraLight.ttf</string>
+      <string>Inter_18pt-ExtraLightItalic.ttf</string>
+      <string>Inter_18pt-Italic.ttf</string>
+      <string>Inter_18pt-Light.ttf</string>
+      <string>Inter_18pt-LightItalic.ttf</string>
+      <string>Inter_18pt-Medium.ttf</string>
+      <string>Inter_18pt-MediumItalic.ttf</string>
+      <string>Inter_18pt-Regular.ttf</string>
+      <string>Inter_18pt-SemiBold.ttf</string>
+      <string>Inter_18pt-SemiBoldItalic.ttf</string>
+      <string>Inter_18pt-Thin.ttf</string>
+      <string>Inter_18pt-ThinItalic.ttf</string>
+      <string>Inter_24pt-Black.ttf</string>
+      <string>Inter_24pt-BlackItalic.ttf</string>
+      <string>Inter_24pt-Bold.ttf</string>
+      <string>Inter_24pt-BoldItalic.ttf</string>
+      <string>Inter_24pt-ExtraBold.ttf</string>
+      <string>Inter_24pt-ExtraBoldItalic.ttf</string>
+      <string>Inter_24pt-ExtraLight.ttf</string>
+      <string>Inter_24pt-ExtraLightItalic.ttf</string>
+      <string>Inter_24pt-Italic.ttf</string>
+      <string>Inter_24pt-Light.ttf</string>
+      <string>Inter_24pt-LightItalic.ttf</string>
+      <string>Inter_24pt-Medium.ttf</string>
+      <string>Inter_24pt-MediumItalic.ttf</string>
+      <string>Inter_24pt-Regular.ttf</string>
+      <string>Inter_24pt-SemiBold.ttf</string>
+      <string>Inter_24pt-SemiBoldItalic.ttf</string>
+      <string>Inter_24pt-Thin.ttf</string>
+      <string>Inter_24pt-ThinItalic.ttf</string>
+      <string>Inter_28pt-Black.ttf</string>
+      <string>Inter_28pt-BlackItalic.ttf</string>
+      <string>Inter_28pt-Bold.ttf</string>
+      <string>Inter_28pt-BoldItalic.ttf</string>
+      <string>Inter_28pt-ExtraBold.ttf</string>
+      <string>Inter_28pt-ExtraBoldItalic.ttf</string>
+      <string>Inter_28pt-ExtraLight.ttf</string>
+      <string>Inter_28pt-ExtraLightItalic.ttf</string>
+      <string>Inter_28pt-Italic.ttf</string>
+      <string>Inter_28pt-Light.ttf</string>
+      <string>Inter_28pt-LightItalic.ttf</string>
+      <string>Inter_28pt-Medium.ttf</string>
+      <string>Inter_28pt-MediumItalic.ttf</string>
+      <string>Inter_28pt-Regular.ttf</string>
+      <string>Inter_28pt-SemiBold.ttf</string>
+      <string>Inter_28pt-SemiBoldItalic.ttf</string>
+      <string>Inter_28pt-Thin.ttf</string>
+      <string>Inter_28pt-ThinItalic.ttf</string>
+      <string>Lato-Black 2.ttf</string>
+      <string>Lato-Black.ttf</string>
+      <string>Lato-BlackItalic 2.ttf</string>
+      <string>Lato-BlackItalic.ttf</string>
+      <string>Lato-Bold 2.ttf</string>
+      <string>Lato-Bold.ttf</string>
+      <string>Lato-BoldItalic 2.ttf</string>
+      <string>Lato-BoldItalic.ttf</string>
+      <string>Lato-Italic 2.ttf</string>
+      <string>Lato-Italic.ttf</string>
+      <string>Lato-Light 2.ttf</string>
+      <string>Lato-Light.ttf</string>
+      <string>Lato-LightItalic 2.ttf</string>
+      <string>Lato-LightItalic.ttf</string>
+      <string>Lato-Regular 2.ttf</string>
+      <string>Lato-Regular.ttf</string>
+      <string>Lato-Thin 2.ttf</string>
+      <string>Lato-Thin.ttf</string>
+      <string>Lato-ThinItalic 2.ttf</string>
+      <string>Lato-ThinItalic.ttf</string>
+    </array>
+    <key>GMSApiKey</key>
+  <string>$(GOOGLE_MAPS_API_KEY)</string>
+</dict>
+</plist>
+

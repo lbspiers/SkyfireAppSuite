@@ -1,0 +1,84 @@
+/* Keyboard Shortcuts Panel - Simple Table Layout */
+
+.container {
+  width: 100%;
+  padding: var(--spacing);
+}
+
+.container h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing) 0;
+}
+
+.shortcutsTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.shortcutsTable thead {
+  background: var(--bg-secondary);
+}
+
+.shortcutsTable th {
+  padding: var(--spacing-tight) var(--spacing);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.shortcutsTable tbody tr {
+  border-bottom: 1px solid var(--border-default);
+  transition: background 0.15s ease;
+}
+
+.shortcutsTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.shortcutsTable tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.shortcutsTable td {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.shortcutsTable td:first-child {
+  font-weight: var(--font-medium);
+}
+
+.shortcutsTable kbd {
+  display: inline-block;
+  padding: var(--spacing-xs) 6px;
+  font-family: var(--font-mono, 'SF Mono', 'Monaco', 'Consolas', monospace);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .shortcutsTable {
+    font-size: var(--text-xs);
+  }
+
+  .shortcutsTable th,
+  .shortcutsTable td {
+    padding: var(--spacing-xs) var(--spacing-tight);
+  }
+}

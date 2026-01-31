@@ -1,0 +1,88 @@
+.overviewDisplay {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  margin: var(--spacing) 0 0 0;
+  padding-bottom: var(--spacing-tight);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark)) 1;
+}
+
+.sectionHeader:first-child {
+  margin-top: 0;
+}
+
+.fieldRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+}
+
+.fieldRowMountingPlaneDivider {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark)) 1;
+}
+
+.fieldRow:last-child {
+  border-bottom: none;
+}
+
+.fieldLabel {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.fieldValue {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.fieldValueMissing {
+  color: var(--color-warning);
+  font-style: italic;
+  transition: var(--transition-colors);
+}
+
+.fieldValueMissing:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-wide);
+  gap: var(--spacing);
+}
+
+.emptyIcon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.emptyText {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-align: center;
+}

@@ -1,0 +1,41 @@
+/* ===== FORM NAVIGATION FOOTER ===== */
+/* Fixed at bottom of parent flex container, content scrolls above */
+
+.footer {
+  /* Using flex layout for positioning - not sticky */
+  position: relative;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--spacing-tight) 0;
+  z-index: var(--z-sticky);
+  /* Prevent shrinking - stays visible at bottom */
+  flex-shrink: 0;
+  /* Ensure minimum height */
+  min-height: 56px;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing);
+  padding: 0 var(--spacing-wide);
+  position: relative;
+}
+
+.centerButton {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Subtle gradient fade effect at top to indicate scroll behind */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: linear-gradient(to top, var(--bg-panel) 0%, transparent 100%);
+  pointer-events: none;
+}

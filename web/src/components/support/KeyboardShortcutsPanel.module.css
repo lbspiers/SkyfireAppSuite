@@ -1,0 +1,122 @@
+/* Keyboard Shortcuts - Compact Table with Categories */
+
+.container {
+  padding: var(--spacing);
+  max-width: 700px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.categorySection {
+  margin-bottom: var(--spacing-wide);
+}
+
+.categorySection:last-child {
+  margin-bottom: 0;
+}
+
+.categoryTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--spacing-tight) 0;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--border-default);
+  text-align: left;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table thead th {
+  padding: var(--spacing-xs) var(--spacing-tight);
+  text-align: left;
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody td {
+  padding: var(--spacing-tight);
+  color: var(--text-primary);
+  vertical-align: top;
+  text-align: left;
+}
+
+.table tbody td:first-child {
+  width: 50%;
+}
+
+.actionName {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  text-align: left;
+}
+
+.actionDesc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
+  text-align: left;
+}
+
+.table kbd {
+  display: inline-block;
+  padding: var(--spacing-xs) 6px;
+  font-family: var(--font-mono, 'SF Mono', 'Monaco', monospace);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  min-width: 40px;
+  text-align: left;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container {
+    padding: var(--spacing-tight);
+  }
+
+  .table {
+    font-size: var(--text-xs);
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: var(--spacing-xs);
+  }
+
+  .table kbd {
+    font-size: 9px;
+    padding: 1px 4px;
+    min-width: 35px;
+  }
+}

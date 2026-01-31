@@ -1,0 +1,329 @@
+// src/components/CustomKeyboard/KeyboardKey.tsx
+import React, { useState, useRef, useCallback } from 'react';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Animated,
+  Platform,
+  Image,
+  View,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { moderateScale, verticalScale } from '../../utils/responsive';
+import { KeyData, KeyType, ReturnKeyType, KeyboardTheme } from './types';
+import { ORANGE_TB, BLUE_2C_BT } from '../../styles/gradient';
+
+interface KeyboardKeyProps {
+  keyData: KeyData;
+  onPress: (key: string, keyType: KeyType) => void;
+  screenWidth: number;
+  isShiftActive: boolean;
+  isCapsLock: boolean;
+  isSymbolMode: boolean;
+  returnKeyType: ReturnKeyType;
+  theme: KeyboardTheme;
+}
+
+const BRAND_ORANGE = "#FD7332";
+const BRAND_BLUE = "#0C1F3F";
+// const KEY_GRADIENT_NORMAL = ["#4A5568", "#2D3748"]; // Commented out to try BLUE_2C_BT
+const KEY_GRADIENT_NORMAL = BLUE_2C_BT.colors; // Using BLUE_2C_BT gradient
+const KEY_GRADIENT_PRESSED = ["#FD7332", "#E53E3E"];
+const KEY_GRADIENT_SPECIAL = ["#FD7332", "#DD6B20"];
+const ORANGE_GRADIENT = ORANGE_TB.colors; // Using ORANGE_TB gradient
+
+export default function KeyboardKey({
+  keyData,
+  onPress,
+  screenWidth,
+  isShiftActive,
+  isCapsLock,
+  isSymbolMode,
+  returnKeyType,
+  theme,
+}: KeyboardKeyProps) {
+  const [isPressed, setIsPressed] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Calculate key width based on screen width and key data - edge to edge responsive
+  const totalHorizontalPadding = moderateScale(12); // Total padding for keyboard container
+  const keyGap = moderateScale(4); // Gap between keys
+  const availableWidth = screenWidth - totalHorizontalPadding - (keyGap * 9);
+  const baseKeyWidth = availableWidth / 10; // Base for 10 keys per row
+
+  // Responsive key width with min/max constraints
+  const minKeyWidth = screenWidth < 350 ? 28 : 32; // Smaller min for very small screens
+  const maxKeyWidth = screenWidth > 500 ? 60 : 50; // Larger max for tablets
+
+  // Special case for space bar, backspace, and caps lock - allow them to be larger than normal max
+  const keyWidth = ['space', 'backspace', 'caps'].includes(keyData.type)
+    ? Math.max(baseKeyWidth * (keyData.width || 1), minKeyWidth)
+    : Math.min(Math.max(baseKeyWidth * (keyData.width || 1), minKeyWidth), maxKeyWidth);
+
+  const getDisplayText = useCallback(() => {
+    // For special keys with labels
+    if (keyData.label) {
+      if (keyData.type === 'enter') {
+        const labels = {
+          done: 'Done',
+          send: 'Send',
+          search: 'Search',
+          next: 'Next',
+          go: 'Go',
+        };
+        return labels[returnKeyType] || 'Done';
+      }
+      return keyData.label;
+    }
+
+    // For shift key, show state
+    if (keyData.type === 'shift') {
+      return isCapsLock ? 'CAPS' : isShiftActive ? 'SHIFT' : 'shift';
+    }
+
+    // For caps lock key
+    if (keyData.type === 'caps') {
+      return keyData.label || '⬆';
+    }
+
+    // For symbol key
+    if (keyData.type === 'symbol') {
+      return isSymbolMode ? 'ABC' : (keyData.label || '#@$');
+    }
+
+    // For character keys
+    if (keyData.secondary && (isShiftActive || isCapsLock || isSymbolMode)) {
+      return keyData.secondary;
+    }
+
+    return keyData.primary;
+  }, [keyData, isShiftActive, isCapsLock, isSymbolMode, returnKeyType]);
+
+  const getKeyGradient = useCallback(() => {
+    if (isPressed) {
+      return KEY_GRADIENT_PRESSED;
+    }
+
+    // Special styling for certain key types
+    switch (keyData.type) {
+      case 'caps':
+        return isCapsLock ? ORANGE_TB.colors : KEY_GRADIENT_NORMAL;
+      case 'symbol':
+      case 'enter':
+        return ORANGE_TB.colors; // Use ORANGE_TB gradient for these special keys
+      case 'backspace':
+        return ["#E53E3E", "#C53030"];
+      default:
+        return KEY_GRADIENT_NORMAL;
+    }
+  }, [isPressed, keyData.type, isShiftActive, isCapsLock]);
+
+  const getTextColor = useCallback(() => {
+    if (keyData.type === 'caps' && isCapsLock) {
+      return '#FFFFFF';
+    }
+    if (['symbol', 'enter', 'backspace', 'caps'].includes(keyData.type)) {
+      return '#FFFFFF';
+    }
+    return '#FFFFFF';
+  }, [keyData.type, isCapsLock]);
+
+  const handlePressIn = useCallback(() => {
+    setIsPressed(true);
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 3,
+    }).start();
+
+    // Handle long press for backspace
+    if (keyData.type === 'backspace') {
+      longPressTimer.current = setTimeout(() => {
+        // Start repeating backspace
+        const repeatBackspace = () => {
+          onPress(keyData.primary, keyData.type);
+          longPressTimer.current = setTimeout(repeatBackspace, 100);
+        };
+        repeatBackspace();
+      }, 500);
+    }
+  }, [scaleAnim, keyData, onPress]);
+
+  const handlePressOut = useCallback(() => {
+    setIsPressed(false);
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 3,
+    }).start();
+
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, [scaleAnim]);
+
+  const handlePress = useCallback(() => {
+    const keyToSend = keyData.secondary && (isShiftActive || isCapsLock || isSymbolMode)
+      ? keyData.secondary
+      : keyData.primary;
+
+    onPress(keyToSend, keyData.type);
+  }, [keyData, isShiftActive, isCapsLock, isSymbolMode, onPress]);
+
+  const renderKeyContent = () => {
+    // For backspace, show arrow icon (no rotation, facing left)
+    if (keyData.type === 'backspace') {
+      return (
+        <View style={styles.iconContainer}>
+          <Image
+            source={require('../../assets/Images/icons/Arrow_2_White_FFFFFF.png')}
+            style={[
+              styles.backspaceIcon,
+              {
+                tintColor: '#FFFFFF', // White tint for visibility
+              }
+            ]}
+          />
+        </View>
+      );
+    }
+
+    // For caps lock, show rotated arrow icon
+    if (keyData.type === 'caps') {
+      const rotation = isCapsLock ? '270deg' : '90deg'; // Down when on (270°), up when off (90°)
+      return (
+        <View style={styles.iconContainer}>
+          <Image
+            source={require('../../assets/Images/icons/Arrow_2_White_FFFFFF.png')}
+            style={[
+              styles.capsIcon,
+              {
+                transform: [{ rotate: rotation }],
+                tintColor: '#FFFFFF', // White tint for visibility
+              }
+            ]}
+          />
+        </View>
+      );
+    }
+
+    return (
+      <Text
+        style={[
+          styles.keyText,
+          {
+            color: getTextColor(),
+            fontSize: keyData.type === 'caps' ? moderateScale(24) :
+                     keyData.type === 'character' ? moderateScale(20) :
+                     keyData.type === 'space' ? moderateScale(18) :
+                     keyData.type === 'symbol' ? moderateScale(18) :
+                     keyData.type === 'punctuation' ? moderateScale(22) : moderateScale(16),
+            fontWeight: ['symbol', 'enter', 'caps'].includes(keyData.type) ? '600' : '400',
+          }
+        ]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {getDisplayText()}
+      </Text>
+    );
+  };
+
+  return (
+    <Animated.View
+      style={[
+        styles.keyContainer,
+        {
+          width: keyWidth,
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
+    >
+      <TouchableOpacity
+        style={styles.touchable}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={handlePress}
+        activeOpacity={1}
+        accessible={true}
+        accessibilityLabel={getDisplayText()}
+        accessibilityRole="button"
+      >
+        <LinearGradient
+          colors={getKeyGradient()}
+          style={[
+            styles.keyButton,
+            {
+              borderColor: isPressed ? BRAND_ORANGE : ORANGE_TB.colors[0], // Using light orange from ORANGE_TB gradient
+            },
+          ]}
+          start={BLUE_2C_BT.start}
+          end={BLUE_2C_BT.end}
+        >
+          {renderKeyContent()}
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  keyContainer: {
+    height: Math.max(verticalScale(42), 40), // Minimum 40px height, responsive scaling
+    minHeight: 40,
+    overflow: 'visible',
+  },
+  touchable: {
+    flex: 1,
+    overflow: 'visible',
+  },
+  keyButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: moderateScale(6),
+    borderWidth: 1,
+    paddingHorizontal: moderateScale(8),
+    paddingVertical: moderateScale(4),
+    overflow: 'visible',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  keyText: {
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  keyIcon: {
+    width: moderateScale(20),
+    height: moderateScale(20),
+    tintColor: '#FFFFFF',
+  },
+  backspaceIcon: {
+    width: moderateScale(22),
+    height: moderateScale(22),
+    resizeMode: 'contain',
+  },
+  capsIcon: {
+    width: moderateScale(20),
+    height: moderateScale(20),
+    resizeMode: 'contain',
+  },
+  iconContainer: {
+    width: moderateScale(28),
+    height: moderateScale(28),
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
+  },
+});
