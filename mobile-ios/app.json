@@ -1,0 +1,32 @@
+﻿{
+  "name": "skyfire",
+  "displayName": "Skyfire Solar Design",
+  "expo": {
+    "name": "Skyfire Solar Design",
+    "slug": "skyfire-ios",
+    "version": "3.1.1",
+    "platforms": [
+      "ios"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.skyfire.solarapp",
+      "buildNumber": "107",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses location for mapping solar installations.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses location for mapping solar installations.",
+        "NSCameraUsageDescription": "This app uses the camera to capture site survey photos.",
+        "NSPhotoLibraryUsageDescription": "This app accesses photos for site documentation.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone for voice notes."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyBTIEUeUnP1QWoLBzmdWE1x0R_N4UlN4dQ"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2ff8d3eb-4a9a-4f88-95ca-dce573faf6eb"
+      }
+    }
+  }
+}

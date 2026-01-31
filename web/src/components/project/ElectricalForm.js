@@ -4,6 +4,7 @@ import MainPanelASection from './electrical/MainPanelASection';
 import SubPanelBSection from './electrical/SubPanelBSection';
 import SubPanelCSection from './electrical/SubPanelCSection';
 import SubPanelDSection from './electrical/SubPanelDSection';
+import BackupConfigurationSection from './electrical/BackupConfigurationSection';
 import PointOfInterconnectionSection from './electrical/PointOfInterconnectionSection';
 import FormNavigationFooter from './FormNavigationFooter';
 import { SectionHeader } from '../ui';
@@ -508,6 +509,22 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         ele_main_circuit_breaker_rating: 'MLO',
         ele_feeder_location_on_bus_bar: '',
         el_mpa_derated: false,
+        backup_option: '',
+        backup_loads_landing: '',
+        backup_system_size: '',
+        backup_panel_make: '',
+        backup_panel_model: '',
+        backup_panel_bus_amps: '',
+        backup_panel_main_breaker: 'MLO',
+        backup_panel_tie_in_breaker: '',
+        backup_panel_isnew: true,
+        backup_sp_tie_in_breaker_location: '',
+        combiner_panel_make: '',
+        combiner_panel_model: '',
+        sms_equipment_type: '',
+        sms_make: '',
+        sms_model: '',
+        sms_isnew: true,
         show_sub_panel_b: false,
         spb_activated: false,
         spb_subpanel_existing: false,
@@ -580,6 +597,24 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       ele_main_circuit_breaker_rating: getField('ele_main_circuit_breaker_rating', 'MLO'),
       ele_feeder_location_on_bus_bar: getField('ele_feeder_location_on_bus_bar', ''),
       el_mpa_derated: getField('el_mpa_derated', false),
+
+      // Backup Configuration
+      backup_option: getField('sys1_backup_option', ''),
+      backup_loads_landing: getField('backup_loads_landing', ''),
+      backup_system_size: getField('utility_service_amps', ''),
+      backup_panel_make: getField('backup_panel_make', ''),
+      backup_panel_model: getField('backup_panel_model', ''),
+      backup_panel_bus_amps: getField('backup_panel_bus_amps', ''),
+      backup_panel_main_breaker: getField('backup_panel_main_breaker', 'MLO'),
+      backup_panel_tie_in_breaker: getField('backup_panel_tie_in_breaker', ''),
+      backup_panel_isnew: getField('backup_panel_isnew', true),
+      backup_sp_tie_in_breaker_location: getField('backup_sp_tie_in_breaker_location', ''),
+      combiner_panel_make: getField('combiner_panel_make', ''),
+      combiner_panel_model: getField('combiner_panel_model', ''),
+      sms_equipment_type: getField('sms_equipment_type', ''),
+      sms_make: getField('sms_make', ''),
+      sms_model: getField('sms_model', ''),
+      sms_isnew: getField('sms_isnew', true),
 
       // Sub Panel B
       show_sub_panel_b: getField('show_sub_panel_b', false),
@@ -688,6 +723,21 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
           onChange={handleFieldChange}
           projectData={projectData}
         />
+
+        {/* Backup Configuration - Only show when backup option is Whole Home or Partial Home */}
+        {(formData.backup_option === 'Whole Home' || formData.backup_option === 'Partial Home') && (
+          <BackupConfigurationSection
+            formData={formData}
+            onChange={handleFieldChange}
+            onActivateSubPanelB={() => {
+              handleFieldChange('show_sub_panel_b', true);
+              handleFieldChange('spb_activated', true);
+            }}
+            backupSystemSize={getField('utility_service_amps')}
+            maxContinuousOutputAmps={combinedSystemMaxOutput || sys1InvMaxOutput}
+            loadingMaxOutput={loading}
+          />
+        )}
 
         {/* Main Panel A */}
         <MainPanelASection

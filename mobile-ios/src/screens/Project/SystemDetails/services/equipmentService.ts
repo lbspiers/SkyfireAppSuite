@@ -1,0 +1,672 @@
+// src/screens/Project/SystemDetails/services/equipmentService.ts
+
+import { equipmentManufacturers } from "../../../../api/project.service";
+import { GetModelNumber, GetBatteryModels } from "../../../../api/inventry.service";
+import { omitNullValues } from "../../../../utils/utlityFunc";
+import {
+  fetchSystemDetails as _fetchSystemDetails,
+  saveSystemDetails,
+} from "../../../../api/systemDetails.service";
+import { coerceEquipmentType } from "../../../../constants/equipmentTypes";
+import { getBatteryModelsFromLocal } from "../../../../utils/equipmentCsvFallback";
+
+/** Toggleable debug logging. */
+let debug = true;
+export const setDebug = (v: boolean) => {
+  debug = v;
+};
+const log = (...args: any[]) => {
+  if (debug || __DEV__) {
+    // eslint-disable-next-line no-console
+    console.log("[equipmentService]", ...args);
+  }
+};
+const warn = (...args: any[]) => {
+  if (debug || __DEV__) {
+    // eslint-disable-next-line no-console
+    console.warn("[equipmentService]", ...args);
+  }
+};
+
+/** In-memory cache for manufacturers & models */
+const cache: {
+  manufacturers: Record<string, any[]>;
+  models: Record<string, Record<string, any[]>>;
+} = {
+  manufacturers: {},
+  models: {},
+};
+
+/** Last successfully-sent values per project (simple session dedupe). */
+const lastSentByProject: Record<string, Record<string, any>> = Object.create(
+  null
+);
+
+/** NEW: Server baseline snapshot (what the DB currently has). */
+const serverBaselineByProject: Record<
+  string,
+  Record<string, any>
+> = Object.create(null);
+
+/** Public utility to clear caches (optional use in dev screens) */
+export function resetEquipmentCaches() {
+  cache.manufacturers = {};
+  cache.models = {};
+}
+
+/** Public utility to clear project snapshots (e.g., on logout/switch) */
+export function clearProjectSnapshots(projectUuid: string) {
+  delete lastSentByProject[projectUuid];
+  delete serverBaselineByProject[projectUuid];
+}
+
+/** Helpers */
+const isEmptyObject = (v: any) =>
+  v &&
+  typeof v === "object" &&
+  !Array.isArray(v) &&
+  Object.keys(v).length === 0;
+
+/**
+ * Remove undefined and empty objects. For "exact" saves, keep nulls (clear intent).
+ * For "partial" saves, drop nulls as well.
+ */
+function sanitizePayload(
+  fields: Record<string, any>,
+  { exact }: { exact: boolean }
+) {
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(fields || {})) {
+    if (v === undefined) continue;
+    if (isEmptyObject(v)) continue; // guard against {} (caused 400s in logs)
+    if (!exact && v === null) continue; // legacy partial behavior
+    out[k] = v;
+  }
+  return out;
+}
+
+/** Compose current snapshot = server baseline overlaid with what we've already sent this session */
+function currentSnapshot(projectUuid: string): Record<string, any> {
+  return {
+    ...(serverBaselineByProject[projectUuid] || {}),
+    ...(lastSentByProject[projectUuid] || {}),
+  };
+}
+
+/** Diff against the composed snapshot, not just last-sent */
+function diffAgainstSnapshot(
+  projectUuid: string,
+  next: Record<string, any>
+): Record<string, any> {
+  const prev = currentSnapshot(projectUuid);
+  const changed: Record<string, any> = {};
+  for (const [k, v] of Object.entries(next)) {
+    if (prev[k] !== v) {
+      changed[k] = v;
+    }
+  }
+  return changed;
+}
+
+/** Merge into the session snapshot after a successful (or benign) save */
+function commitLastSent(projectUuid: string, applied: Record<string, any>) {
+  if (!lastSentByProject[projectUuid]) {
+    lastSentByProject[projectUuid] = {};
+  }
+  Object.assign(lastSentByProject[projectUuid], applied);
+
+  // Also advance the server baseline so future diffs are accurate this session
+  if (!serverBaselineByProject[projectUuid]) {
+    serverBaselineByProject[projectUuid] = {};
+  }
+  Object.assign(serverBaselineByProject[projectUuid], applied);
+}
+
+/** 404-safe wrapper that also seeds the server baseline */
+export async function fetchSystemDetailsSafe(
+  projectUuid: string
+): Promise<any | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await _fetchSystemDetails(projectUuid);
+    const snap = d ?? null;
+
+    if (snap) {
+      serverBaselineByProject[projectUuid] = snap;
+    } else {
+      delete serverBaselineByProject[projectUuid];
+    }
+
+    return snap;
+  } catch (err: any) {
+    const status = err?.response?.status;
+    if (status === 404) {
+      // treat as "no system yet" quietly
+      log("fetchSystemDetailsSafe: 404 (no system yet) → returning null");
+      delete serverBaselineByProject[projectUuid];
+      return null;
+    }
+    warn("fetchSystemDetailsSafe error:", err?.message || err);
+    throw err;
+  }
+}
+
+/**
+ * Fetch & cache manufacturer list for a given equipment type.
+ * Normalizes sloppy inputs (e.g., "Battery" → "Battery Storage").
+ * NOTE: type can contain spaces; downstream API call URL-encodes it.
+ */
+export async function fetchManufacturersByType(type: string, forceRefresh = false): Promise<any[]> {
+  const t = (coerceEquipmentType(type) ?? type).trim(); // canonicalize + normalize
+  if (!cache.manufacturers[t] || forceRefresh) {
+    const resp = await equipmentManufacturers(t);
+    const list = resp?.data?.data || [];
+    cache.manufacturers[t] = list;
+    log(`Fetched ${list.length} manufacturers for "${t}"${forceRefresh ? ' (forced refresh)' : ''}`);
+  }
+  return cache.manufacturers[t];
+}
+
+/**
+ * Fetch & cache model list for a given equipment type + manufacturer.
+ * Normalizes sloppy inputs (e.g., "Battery" → "Battery Storage").
+ * Both params are URL-encoded by the API layer.
+ * Uses dedicated battery endpoint for Battery/Battery Storage types.
+ */
+export async function fetchModelsFor(
+  type: string,
+  manufacturer: string
+): Promise<any[]> {
+  const t = (coerceEquipmentType(type) ?? type).trim(); // canonicalize + normalize
+  const m = (manufacturer || "").trim();
+  if (!m) return [];
+
+  if (!cache.models[t]) {
+    cache.models[t] = {};
+  }
+  if (!cache.models[t][m]) {
+    // Use dedicated battery endpoint for Battery Storage/Battery types
+    const isBattery = t === "Battery Storage" || t === "Battery";
+    const resp = isBattery
+      ? await GetBatteryModels(m)
+      : await GetModelNumber(t, m);
+    let list = resp?.data?.data || [];
+
+    // Fallback to local data if API returns 0 results for batteries
+    if (isBattery && list.length === 0) {
+      log(`API returned 0 models for "${t}" / "${m}" - trying local fallback data`);
+      const localModels = getBatteryModelsFromLocal(m);
+      if (localModels.length > 0) {
+        list = localModels;
+        log(`✅ Using ${list.length} models from local fallback for "${m}"`);
+      } else {
+        log(`❌ No local fallback data available for "${m}"`);
+      }
+    }
+
+    cache.models[t][m] = list;
+    log(`Fetched ${list.length} models for "${t}" / "${m}"${isBattery ? ' (battery endpoint)' : ''}`);
+  }
+  return cache.models[t][m];
+}
+
+/**
+ * Partial update (PUT) with null/empty stripped (legacy behavior),
+ * now with baseline+session diff and benign-400 handling.
+ */
+export async function saveSystemDetailsPartial(
+  projectUuid: string,
+  fields: Record<string, any>
+) {
+  if (!projectUuid) throw new Error("Missing projectUuid");
+
+  const sanitized = sanitizePayload(fields, { exact: false });
+  const toSend = diffAgainstSnapshot(projectUuid, sanitized);
+
+  if (Object.keys(toSend).length === 0) {
+    log("saveSystemDetailsPartial: no changes to send — skipped");
+    return { data: { success: true, skipped: true }, status: 204 } as any;
+  }
+
+  const payload = omitNullValues(toSend);
+  log(`saveSystemDetailsPartial for ${projectUuid}`, payload);
+
+  try {
+    const resp = await saveSystemDetails(projectUuid, payload);
+    commitLastSent(projectUuid, payload);
+    return resp;
+  } catch (err: any) {
+    const status = err?.response?.status;
+    const msg = err?.response?.data?.error || err?.message || "";
+    if (status === 400 && /No valid fields/i.test(msg)) {
+      log("saveSystemDetailsPartial: benign 400 → treating as skipped success");
+      commitLastSent(projectUuid, payload);
+      return {
+        data: { success: true, skipped: true, reason: "no-op" },
+        status: 204,
+      } as any;
+    }
+    warn("saveSystemDetailsPartial error:", msg);
+    throw err;
+  }
+}
+
+/**
+ * Partial update (PUT) that keeps nulls — use when you intend to clear columns.
+ * Still avoids resending identical values in the same session.
+ */
+export async function saveSystemDetailsPartialExact(
+  projectUuid: string,
+  fields: Record<string, any>
+) {
+  if (!projectUuid) throw new Error("Missing projectUuid");
+
+  console.log('[AUTO-BOS-DEBUG] ========================================');
+  console.log('[AUTO-BOS-DEBUG] saveSystemDetailsPartialExact CALLED');
+  console.log('[AUTO-BOS-DEBUG] ========================================');
+  console.log('[AUTO-BOS-DEBUG] Input fields count:', Object.keys(fields).length);
+  console.log('[AUTO-BOS-DEBUG] Input trigger fields:', Object.keys(fields).filter(k => k.includes('trigger')));
+  console.log('[AUTO-BOS-DEBUG] Input active fields:', Object.keys(fields).filter(k => k.includes('active')));
+
+  const sanitized = sanitizePayload(fields, { exact: true });
+  console.log('[AUTO-BOS-DEBUG] After sanitize count:', Object.keys(sanitized).length);
+  console.log('[AUTO-BOS-DEBUG] Sanitized trigger fields:', Object.keys(sanitized).filter(k => k.includes('trigger')));
+  console.log('[AUTO-BOS-DEBUG] Sanitized active fields:', Object.keys(sanitized).filter(k => k.includes('active')));
+
+  const toSend = diffAgainstSnapshot(projectUuid, sanitized);
+  console.log('[AUTO-BOS-DEBUG] After diff count:', Object.keys(toSend).length);
+  console.log('[AUTO-BOS-DEBUG] Final trigger fields to send:', Object.keys(toSend).filter(k => k.includes('trigger')));
+  console.log('[AUTO-BOS-DEBUG] Final active fields to send:', Object.keys(toSend).filter(k => k.includes('active')));
+
+  if (Object.keys(toSend).length === 0) {
+    log("saveSystemDetailsPartialExact: no changes to send — skipped");
+    console.log('[AUTO-BOS-DEBUG] NO CHANGES TO SEND - all filtered out by diff!');
+    return { data: { success: true, skipped: true }, status: 204 } as any;
+  }
+
+  log(`saveSystemDetailsPartialExact for ${projectUuid}`, toSend);
+
+  try {
+    console.log('[AUTO-BOS-DEBUG] Calling API with', Object.keys(toSend).length, 'fields...');
+    const resp = await saveSystemDetails(projectUuid, toSend);
+    console.log('[AUTO-BOS-DEBUG] API Response status:', resp?.status);
+    console.log('[AUTO-BOS-DEBUG] API Response data keys:', Object.keys(resp?.data || {}));
+    console.log('[AUTO-BOS-DEBUG] API ignoredFields:', resp?.data?.ignoredFields);
+
+    commitLastSent(projectUuid, toSend);
+    console.log('[AUTO-BOS-DEBUG] Committed to snapshot');
+    return resp;
+  } catch (err: any) {
+    const status = err?.response?.status;
+    const msg = err?.response?.data?.error || err?.message || "";
+    console.log('[AUTO-BOS-DEBUG] ERROR during save:', status, msg);
+    if (status === 400 && /No valid fields/i.test(msg)) {
+      log(
+        "saveSystemDetailsPartialExact: benign 400 → treating as skipped success"
+      );
+      commitLastSent(projectUuid, toSend);
+      return {
+        data: { success: true, skipped: true, reason: "no-op" },
+        status: 204,
+      } as any;
+    }
+    warn("saveSystemDetailsPartialExact error:", msg);
+    throw err;
+  }
+}
+
+/** --------------------------------------------------------------------
+ *  System-level tiny helpers (what the UI actually needs to flip sections)
+ * ---------------------------------------------------------------------*/
+
+export type SystemType = "microinverter" | "inverter";
+
+/** Read & validate the system type from a DB row */
+export function readSelectedSystem(row: any): SystemType | "" {
+  const v = row?.sys1_selectedsystem;
+  return v === "microinverter" || v === "inverter" ? v : "";
+}
+
+/** Persist system type using the partial-save path + diff guard */
+export async function saveSelectedSystem(
+  projectUuid: string,
+  value: SystemType
+) {
+  if (!projectUuid || !value) return;
+  return saveSystemDetailsPartial(projectUuid, { sys1_selectedsystem: value });
+}
+
+/** Backup option small helpers, since you’re already using this in UI */
+export type BackupOption = "whole" | "partial" | "none";
+export function readBackupOption(row: any): BackupOption | "" {
+  const v = row?.sys1_backup_option;
+  return v === "whole" || v === "partial" || v === "none" ? v : "";
+}
+export async function saveBackupOption(
+  projectUuid: string,
+  value: BackupOption
+) {
+  if (!projectUuid || !value) return;
+  return saveSystemDetailsPartial(projectUuid, { sys1_backup_option: value });
+}
+
+/** -------------------------------------------------------
+ *  System 1 — Battery configuration (global) + PCS setting
+ * ------------------------------------------------------- */
+export type BatteryConfiguration =
+  | ""
+  | "Daisy Chain"
+  | "Battery Combiner Panel";
+
+/** Read battery configuration from a raw DB row */
+export function readBatteryConfiguration(row: any): BatteryConfiguration {
+  const v = (row?.sys1_battery_configuration ?? "") as string;
+  return v === "Daisy Chain" || v === "Battery Combiner Panel" ? v : "";
+}
+
+/** Fetch battery configuration (404-safe) */
+export async function fetchBatteryConfigurationFromSystemDetails(
+  projectUuid: string
+): Promise<BatteryConfiguration> {
+  const d = await fetchSystemDetailsSafe(projectUuid);
+  return readBatteryConfiguration(d);
+}
+
+/** Save battery configuration (keeps nulls so you can clear) */
+export async function saveBatteryConfiguration(
+  projectUuid: string,
+  value: BatteryConfiguration | null
+) {
+  if (!projectUuid) throw new Error("Missing projectUuid");
+  return saveSystemDetailsPartialExact(projectUuid, {
+    sys1_battery_configuration: value ?? null,
+  });
+}
+
+/** Read PCS setting (boolean) for a specific system */
+export function readPcsSetting(row: any, systemPrefix: string = 'sys1_'): boolean {
+  const fieldName = `${systemPrefix}pcs_settings`;
+  return !!row?.[fieldName];
+}
+
+/** Save PCS setting (keeps nulls so you can clear) for a specific system */
+export async function savePcsSetting(
+  projectUuid: string,
+  enabled: boolean | null,
+  systemPrefix: string = 'sys1_'
+) {
+  if (!projectUuid) throw new Error("Missing projectUuid");
+  const fieldName = `${systemPrefix}pcs_settings`;
+  return saveSystemDetailsPartialExact(projectUuid, {
+    [fieldName]: enabled === null ? null : !!enabled,
+  });
+}
+
+/** -------------------------------------------------------
+ *  “from system_details” fetch & shape helpers
+ *  (All use fetchSystemDetailsSafe to ignore initial 404)
+ * ------------------------------------------------------- */
+
+export interface SolarFromSystemDetails {
+  id?: string;
+  qty?: number;
+  make: string;
+  model: string;
+}
+export async function fetchSolarPanelFromSystemDetails(
+  projectUuid: string
+): Promise<SolarFromSystemDetails | null> {
+  if (!projectUuid) {
+    log("missing projectUuid for solar");
+    return null;
+  }
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_solarpanel_id ?? undefined,
+      qty: d.sys1_solar_panel_qty ?? 0,
+      make: d.sys1_solar_panel_make ?? "",
+      model: d.sys1_solar_panel_model ?? "",
+    };
+  } catch (err: any) {
+    warn("fetchSolarPanel error:", err?.message || err);
+    return null;
+  }
+}
+
+export interface MicroFromSystemDetails {
+  id?: string;
+  qty?: number;
+  make: string;
+  model: string;
+}
+export async function fetchMicroFromSystemDetails(
+  projectUuid: string
+): Promise<MicroFromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_micro_inverter_id ?? undefined,
+      qty: d.sys1_micro_inverter_qty ?? 0,
+      make: d.sys1_micro_inverter_make ?? "",
+      model: d.sys1_micro_inverter_model ?? "",
+    };
+  } catch (err) {
+    warn("fetchMicro error:", (err as any)?.message || err);
+    return null;
+  }
+}
+
+export interface CombinerFromSystemDetails {
+  id?: string;
+  make: string;
+  model: string;
+  busAmps: string;
+  mainBreaker: string;
+}
+export async function fetchCombinerFromSystemDetails(
+  projectUuid: string
+): Promise<CombinerFromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_combinerpanel_id ?? undefined,
+      make: d.sys1_combiner_panel_make ?? "",
+      model: d.sys1_combiner_panel_model ?? "",
+      busAmps: d.sys1_combinerpanel_bus_rating ?? "",
+      mainBreaker: d.sys1_combinerpanel_main_breaker_rating ?? "",
+    };
+  } catch (err) {
+    warn("fetchCombiner error:", (err as any)?.message || err);
+    return null;
+  }
+}
+
+export interface InverterFromSystemDetails {
+  id?: string;
+  make: string;
+  model: string;
+  maxContinuousOutput: string;
+  hybrid?: string;
+}
+export async function fetchInverterFromSystemDetails(
+  projectUuid: string
+): Promise<InverterFromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_micro_inverter_id ?? undefined,
+      make: d.sys1_micro_inverter_make ?? "",
+      model: d.sys1_micro_inverter_model ?? "",
+      maxContinuousOutput: d.sys1_inv_max_continuous_output ?? "",
+      hybrid: d.sys1_inverter_hybrid ?? undefined,
+    };
+  } catch (err) {
+    warn("fetchInverter error:", (err as any)?.message || err);
+    return null;
+  }
+}
+
+export interface EssFromSystemDetails {
+  id?: string;
+  make: string;
+  model: string;
+  mainBreaker: string;
+  upstreamBreaker: string;
+  upstreamLocation: string;
+}
+export async function fetchEssFromSystemDetails(
+  projectUuid: string
+): Promise<EssFromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_ess_id ?? undefined,
+      make: d.sys1_ess_make ?? "",
+      model: d.sys1_ess_model ?? "",
+      mainBreaker: d.sys1_ess_main_breaker_rating ?? "",
+      upstreamBreaker: d.sys1_ess_upstream_breaker_rating ?? "",
+      upstreamLocation: d.sys1_ess_upstream_breaker_location ?? "",
+    };
+  } catch (err) {
+    warn("fetchEss error:", (err as any)?.message || err);
+    return null;
+  }
+}
+
+export interface Battery1FromSystemDetails {
+  id?: string;
+  qty?: number;
+  make: string;
+  model: string;
+}
+export async function fetchBattery1FromSystemDetails(
+  projectUuid: string
+): Promise<Battery1FromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_battery1_id ?? undefined,
+      qty: d.sys1_battery_1_qty ?? 0,
+      make: d.sys1_battery_1_make ?? "",
+      model: d.sys1_battery_1_model ?? "",
+    };
+  } catch (err) {
+    warn("fetchBattery1 error:", (err as any)?.message || err);
+    return null;
+  }
+}
+
+/**
+ * SMS — uses your new explicit columns and separates RSD from "no SMS".
+ */
+export interface SmsFromSystemDetails {
+  id?: string;
+  make: string;
+  model: string;
+
+  hasRsd: boolean; // maps to sys1_sms_rsd_enabled
+
+  mainBreaker: string; // sys1_sms_breaker_rating
+  backupPanel: string; // sys1_sms_backup_load_sub_panel_breaker_rating
+
+  // optional: explicit overrides (exposed if you want to use them in UI)
+  pvBreakerOverride?: string; // sys1_sms_pv_breaker_rating_override
+  essBreakerOverride?: string; // sys1_sms_ess_breaker_rating_override
+  tieInBreakerOverride?: string; // sys1_sms_tie_in_breaker_rating_override
+}
+export async function fetchSmsFromSystemDetails(
+  projectUuid: string
+): Promise<SmsFromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_sms_id ?? undefined,
+      make: d.sys1_sms_make ?? "",
+      model: d.sys1_sms_model ?? "",
+
+      hasRsd: !!d.sys1_sms_rsd_enabled,
+
+      mainBreaker: d.sys1_sms_breaker_rating ?? "",
+      backupPanel: d.sys1_sms_backup_load_sub_panel_breaker_rating ?? "",
+
+      pvBreakerOverride: d.sys1_sms_pv_breaker_rating_override ?? "",
+      essBreakerOverride: d.sys1_sms_ess_breaker_rating_override ?? "",
+      tieInBreakerOverride: d.sys1_sms_tie_in_breaker_rating_override ?? "",
+    };
+  } catch (err) {
+    warn("fetchSms error:", (err as any)?.message || err);
+    return null;
+  }
+}
+
+/**
+ * Backup Subpanel — mapped to bls1_* columns per schema.
+ */
+export interface BackupSubpanelFromSystemDetails {
+  id?: string;
+  make: string;
+  model: string;
+  busAmps: string;
+  mainBreaker: string;
+  upstreamBreaker?: string;
+}
+export async function fetchBackupSubpanelFromSystemDetails(
+  projectUuid: string
+): Promise<BackupSubpanelFromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.bls1_backupload_sub_panel_id ?? undefined,
+      make: d.bls1_backup_load_sub_panel_make ?? "",
+      model: d.bls1_backup_load_sub_panel_model ?? "",
+      busAmps: d.bls1_backuploader_bus_bar_rating ?? "",
+      mainBreaker: d.bls1_backuploader_main_breaker_rating ?? "",
+      upstreamBreaker: d.bls1_backuploader_upstream_breaker_rating ?? "",
+    };
+  } catch (err) {
+    warn("fetchBackupSubpanel error:", (err as any)?.message || err);
+    return null;
+  }
+}
+// --- Battery 2 ---------------------------------------------------------------
+export interface Battery2FromSystemDetails {
+  id?: string;
+  qty?: number;
+  make: string;
+  model: string;
+}
+
+export async function fetchBattery2FromSystemDetails(
+  projectUuid: string
+): Promise<Battery2FromSystemDetails | null> {
+  if (!projectUuid) return null;
+  try {
+    const d = await fetchSystemDetailsSafe(projectUuid);
+    if (!d) return null;
+    return {
+      id: d.sys1_battery2_id ?? undefined,
+      qty: d.sys1_battery_2_qty ?? 0,
+      make: d.sys1_battery_2_make ?? "",
+      model: d.sys1_battery_2_model ?? "",
+    };
+  } catch (err) {
+    warn("fetchBattery2 error:", (err as any)?.message || err);
+    return null;
+  }
+}

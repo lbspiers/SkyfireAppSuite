@@ -3339,16 +3339,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 />
               )}
 
-              {/* Backup Load Sub Panel - Show for Whole/Partial Home (NOT PowerWall) */}
-              {(mergedFormData.backup_option === 'Whole Home' || mergedFormData.backup_option === 'Partial Home') && !systemIsPowerWall && (
-                <BackupLoadSubPanelSection
-                  formData={mergedFormData}
-                  onChange={handleSystemFieldChange}
-                  backupSystemSize={mergedFormData.backup_system_size}
-                  maxContinuousOutputAmps={postSMSMinAmpFilter}
-                  loadingMaxOutput={loadingMaxOutput}
-                />
-              )}
+              {/* Backup Load Sub Panel - MOVED TO ELECTRICAL TAB */}
 
               {/* Battery Combiner Panel - Show when battery1 configuration = "Battery Combiner Panel" AND (qty > 1 OR battery2 exists) */}
               {mergedFormData.battery1_configuration === 'Battery Combiner Panel' &&

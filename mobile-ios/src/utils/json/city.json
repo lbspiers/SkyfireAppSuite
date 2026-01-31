@@ -1,0 +1,362 @@
+// {
+//     "stateCityZip": [
+//       {
+//         "Alabama": ["Birmingham", "Montgomery", "Huntsville", "Mobile"],
+//         "Abrivation":"AL"
+//       },
+//       {
+//         "Alaska": ["Anchorage", "Juneau", "Fairbanks"]
+//       },
+//       {
+//         "Arizona": ["Phoenix", "Tucson", "Mesa", "Chandler"]
+//       },
+//       {
+//         "Arkansas": ["Little Rock", "Fort Smith", "Fayetteville"]
+//       },
+//       {
+//         "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento"]
+//       },
+//       {
+//         "Colorado": ["Denver", "Colorado Springs", "Aurora"]
+//       },
+//       {
+//         "Connecticut": ["Hartford", "New Haven", "Stamford"]
+//       },
+//       {
+//         "Delaware": ["Wilmington", "Dover", "Newark"]
+//       },
+//       {
+//         "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville"]
+//       },
+//       {
+//         "Georgia": ["Atlanta", "Savannah", "Augusta", "Macon"]
+//       },
+//       {
+//         "Hawaii": ["Honolulu", "Hilo", "Kailua"]
+//       },
+//       {
+//         "Idaho": ["Boise", "Meridian", "Idaho Falls"]
+//       },
+//       {
+//         "Illinois": ["Chicago", "Springfield", "Peoria"]
+//       },
+//       {
+//         "Indiana": ["Indianapolis", "Fort Wayne", "Evansville"]
+//       },
+//       {
+//         "Iowa": ["Des Moines", "Cedar Rapids", "Davenport"]
+//       },
+//       {
+//         "Kansas": ["Wichita", "Overland Park", "Kansas City"]
+//       },
+//       {
+//         "Kentucky": ["Louisville", "Lexington", "Bowling Green"]
+//       },
+//       {
+//         "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport"]
+//       },
+//       {
+//         "Maine": ["Portland", "Augusta", "Bangor"]
+//       },
+//       {
+//         "Maryland": ["Baltimore", "Annapolis", "Frederick"]
+//       },
+//       {
+//         "Massachusetts": ["Boston", "Worcester", "Springfield"]
+//       },
+//       {
+//         "Michigan": ["Detroit", "Grand Rapids", "Ann Arbor"]
+//       },
+//       {
+//         "Minnesota": ["Minneapolis", "Saint Paul", "Rochester"]
+//       },
+//       {
+//         "Mississippi": ["Jackson", "Gulfport", "Biloxi"]
+//       },
+//       {
+//         "Missouri": ["Kansas City", "Saint Louis", "Springfield"]
+//       },
+//       {
+//         "Montana": ["Billings", "Missoula", "Great Falls"]
+//       },
+//       {
+//         "Nebraska": ["Omaha", "Lincoln", "Bellevue"]
+//       },
+//       {
+//         "Nevada": ["Las Vegas", "Reno", "Henderson"]
+//       },
+//       {
+//         "New Hampshire": ["Manchester", "Concord", "Nashua"]
+//       },
+//       {
+//         "New Jersey": ["Newark", "Jersey City", "Paterson"]
+//       },
+//       {
+//         "New Mexico": ["Albuquerque", "Santa Fe", "Las Cruces"]
+//       },
+//       {
+//         "New York": ["New York City", "Buffalo", "Rochester", "Albany"]
+//       },
+//       {
+//         "North Carolina": ["Charlotte", "Raleigh", "Greensboro"]
+//       },
+//       {
+//         "North Dakota": ["Fargo", "Bismarck", "Grand Forks"]
+//       },
+//       {
+//         "Ohio": ["Columbus", "Cleveland", "Cincinnati"]
+//       },
+//       {
+//         "Oklahoma": ["Oklahoma City", "Tulsa", "Norman"]
+//       },
+//       {
+//         "Oregon": ["Portland", "Salem", "Eugene"]
+//       },
+//       {
+//         "Pennsylvania": ["Philadelphia", "Pittsburgh", "Harrisburg"]
+//       },
+//       {
+//         "Rhode Island": ["Providence", "Warwick", "Cranston"]
+//       },
+//       {
+//         "South Carolina": ["Charleston", "Columbia", "Greenville"]
+//       },
+//       {
+//         "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen"]
+//       },
+//       {
+//         "Tennessee": ["Nashville", "Memphis", "Knoxville"]
+//       },
+//       {
+//         "Texas": ["Houston", "Dallas", "Austin", "San Antonio"]
+//       },
+//       {
+//         "Utah": ["Salt Lake City", "Provo", "West Valley City"]
+//       },
+//       {
+//         "Vermont": ["Burlington", "Montpelier", "Rutland"]
+//       },
+//       {
+//         "Virginia": ["Virginia Beach", "Richmond", "Norfolk"]
+//       },
+//       {
+//         "Washington": ["Seattle", "Spokane", "Tacoma"]
+//       },
+//       {
+//         "West Virginia": ["Charleston", "Morgantown", "Huntington"]
+//       },
+//       {
+//         "Wisconsin": ["Milwaukee", "Madison", "Green Bay"]
+//       },
+//       {
+//         "Wyoming": ["Cheyenne", "Casper", "Laramie"]
+//       }
+//     ]
+//   }
+
+{
+    "stateCityZip": [
+      {
+        "Alabama": ["Birmingham", "Montgomery", "Huntsville", "Mobile"],
+        "Abbreviation": "AL"
+      },
+      {
+        "Alaska": ["Anchorage", "Juneau", "Fairbanks"],
+        "Abbreviation": "AK"
+      },
+      {
+        "Arizona": ["Phoenix", "Tucson", "Mesa", "Chandler"],
+        "Abbreviation": "AZ"
+      },
+      {
+        "Arkansas": ["Little Rock", "Fort Smith", "Fayetteville"],
+        "Abbreviation": "AR"
+      },
+      {
+        "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento"],
+        "Abbreviation": "CA"
+      },
+      {
+        "Colorado": ["Denver", "Colorado Springs", "Aurora"],
+        "Abbreviation": "CO"
+      },
+      {
+        "Connecticut": ["Hartford", "New Haven", "Stamford"],
+        "Abbreviation": "CT"
+      },
+      {
+        "Delaware": ["Wilmington", "Dover", "Newark"],
+        "Abbreviation": "DE"
+      },
+      {
+        "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville"],
+        "Abbreviation": "FL"
+      },
+      {
+        "Georgia": ["Atlanta", "Savannah", "Augusta", "Macon"],
+        "Abbreviation": "GA"
+      },
+      {
+        "Hawaii": ["Honolulu", "Hilo", "Kailua"],
+        "Abbreviation": "HI"
+      },
+      {
+        "Idaho": ["Boise", "Meridian", "Idaho Falls"],
+        "Abbreviation": "ID"
+      },
+      {
+        "Illinois": ["Chicago", "Springfield", "Peoria"],
+        "Abbreviation": "IL"
+      },
+      {
+        "Indiana": ["Indianapolis", "Fort Wayne", "Evansville"],
+        "Abbreviation": "IN"
+      },
+      {
+        "Iowa": ["Des Moines", "Cedar Rapids", "Davenport"],
+        "Abbreviation": "IA"
+      },
+      {
+        "Kansas": ["Wichita", "Overland Park", "Kansas City"],
+        "Abbreviation": "KS"
+      },
+      {
+        "Kentucky": ["Louisville", "Lexington", "Bowling Green"],
+        "Abbreviation": "KY"
+      },
+      {
+        "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport"],
+        "Abbreviation": "LA"
+      },
+      {
+        "Maine": ["Portland", "Augusta", "Bangor"],
+        "Abbreviation": "ME"
+      },
+      {
+        "Maryland": ["Baltimore", "Annapolis", "Frederick"],
+        "Abbreviation": "MD"
+      },
+      {
+        "Massachusetts": ["Boston", "Worcester", "Springfield"],
+        "Abbreviation": "MA"
+      },
+      {
+        "Michigan": ["Detroit", "Grand Rapids", "Ann Arbor"],
+        "Abbreviation": "MI"
+      },
+      {
+        "Minnesota": ["Minneapolis", "Saint Paul", "Rochester"],
+        "Abbreviation": "MN"
+      },
+      {
+        "Mississippi": ["Jackson", "Gulfport", "Biloxi"],
+        "Abbreviation": "MS"
+      },
+      {
+        "Missouri": ["Kansas City", "Saint Louis", "Springfield"],
+        "Abbreviation": "MO"
+      },
+      {
+        "Montana": ["Billings", "Missoula", "Great Falls"],
+        "Abbreviation": "MT"
+      },
+      {
+        "Nebraska": ["Omaha", "Lincoln", "Bellevue"],
+        "Abbreviation": "NE"
+      },
+      {
+        "Nevada": ["Las Vegas", "Reno", "Henderson"],
+        "Abbreviation": "NV"
+      },
+      {
+        "New Hampshire": ["Manchester", "Concord", "Nashua"],
+        "Abbreviation": "NH"
+      },
+      {
+        "New Jersey": ["Newark", "Jersey City", "Paterson"],
+        "Abbreviation": "NJ"
+      },
+      {
+        "New Mexico": ["Albuquerque", "Santa Fe", "Las Cruces"],
+        "Abbreviation": "NM"
+      },
+      {
+        "New York": ["New York City", "Buffalo", "Rochester", "Albany"],
+        "Abbreviation": "NY"
+      },
+      {
+        "North Carolina": ["Charlotte", "Raleigh", "Greensboro"],
+        "Abbreviation": "NC"
+      },
+      {
+        "North Dakota": ["Fargo", "Bismarck", "Grand Forks"],
+        "Abbreviation": "ND"
+      },
+      {
+        "Ohio": ["Columbus", "Cleveland", "Cincinnati"],
+        "Abbreviation": "OH"
+      },
+      {
+        "Oklahoma": ["Oklahoma City", "Tulsa", "Norman"],
+        "Abbreviation": "OK"
+      },
+      {
+        "Oregon": ["Portland", "Salem", "Eugene"],
+        "Abbreviation": "OR"
+      },
+      {
+        "Pennsylvania": ["Philadelphia", "Pittsburgh", "Harrisburg"],
+        "Abbreviation": "PA"
+      },
+      {
+        "Rhode Island": ["Providence", "Warwick", "Cranston"],
+        "Abbreviation": "RI"
+      },
+      {
+        "South Carolina": ["Charleston", "Columbia", "Greenville"],
+        "Abbreviation": "SC"
+      },
+      {
+        "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen"],
+        "Abbreviation": "SD"
+      },
+      {
+        "Tennessee": ["Nashville", "Memphis", "Knoxville"],
+        "Abbreviation": "TN"
+      },
+      {
+        "Texas": ["Houston", "Dallas", "Austin", "San Antonio"],
+        "Abbreviation": "TX"
+      },
+      {
+        "Utah": ["Salt Lake City", "Provo", "West Valley City"],
+        "Abbreviation": "UT"
+      },
+      {
+        "Vermont": ["Burlington", "Montpelier", "Rutland"],
+        "Abbreviation": "VT"
+      },
+      {
+        "Virginia": ["Virginia Beach", "Richmond", "Norfolk"],
+        "Abbreviation": "VA"
+      },
+      {
+        "Washington": ["Seattle", "Spokane", "Tacoma"],
+        "Abbreviation": "WA"
+      },
+      {
+        "West Virginia": ["Charleston", "Morgantown", "Huntington"],
+        "Abbreviation": "WV"
+      },
+      {
+        "Wisconsin": ["Milwaukee", "Madison", "Green Bay"],
+        "Abbreviation": "WI"
+      },
+      {
+        "Wyoming": ["Cheyenne", "Casper", "Laramie"],
+        "Abbreviation": "WY"
+      }
+    ]
+  }
+  
+  

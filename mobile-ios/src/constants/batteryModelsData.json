@@ -1,0 +1,1165 @@
+{
+  "BYD": [
+    {
+      "id": 357,
+      "model": "Battery-BOX H 5.0",
+      "model_number": "Battery-BOX H 5.0",
+      "make_model": "BYD Battery-BOX H 5.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "a527fc65-0800-4e04-97f5-c00f563dd124"
+    },
+    {
+      "id": 360,
+      "model": "Battery-BOX H 10.0",
+      "model_number": "Battery-BOX H 10.0",
+      "make_model": "BYD Battery-BOX H 10.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "8649e13d-ff71-4ea9-9a2e-d6461391955b"
+    },
+    {
+      "id": 361,
+      "model": "Battery-BOX H 7.5",
+      "model_number": "Battery-BOX H 7.5",
+      "make_model": "BYD Battery-BOX H 7.5",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "b38ab620-3b63-4685-b162-cbbaf18c549c"
+    },
+    {
+      "id": 362,
+      "model": "BCO274-C15H1000V-U-R1M00",
+      "model_number": "BCO274-C15H1000V-U-R1M00",
+      "make_model": "BYD BCO274-C15H1000V-U-R1M00",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "827e1274-c397-49d3-881b-950429bc5bd3"
+    },
+    {
+      "id": 363,
+      "model": "BCO274-C15H1000V-U-R1M01",
+      "model_number": "BCO274-C15H1000V-U-R1M01",
+      "make_model": "BYD BCO274-C15H1000V-U-R1M01",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "df43ab33-f2cf-4665-8048-6360542e240d"
+    },
+    {
+      "id": 364,
+      "model": "BCO274-C15H1000V-U-R1M02",
+      "model_number": "BCO274-C15H1000V-U-R1M02",
+      "make_model": "BYD BCO274-C15H1000V-U-R1M02",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "a9615564-9e68-4445-bfcd-31a9dc04ff93"
+    },
+    {
+      "id": 365,
+      "model": "BCO274-C15H1000V-U-R2M00",
+      "model_number": "BCO274-C15H1000V-U-R2M00",
+      "make_model": "BYD BCO274-C15H1000V-U-R2M00",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "0e85c222-6c91-4e04-b7de-1579cec33b33"
+    },
+    {
+      "id": 366,
+      "model": "HVL 12.0",
+      "model_number": "HVL 12.0",
+      "make_model": "BYD HVL 12.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "c6348739-60fc-4384-b540-5d57119e8535"
+    },
+    {
+      "id": 367,
+      "model": "BCO274-C15H1000V-U-R2M0",
+      "model_number": "BCO274-C15H1000V-U-R2M0",
+      "make_model": "BYD BCO274-C15H1000V-U-R2M0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "ba95eabb-be52-453e-bc17-7a10bcdc9968"
+    },
+    {
+      "id": 368,
+      "model": "BCO274-C15H1000V-U-R2M01",
+      "model_number": "BCO274-C15H1000V-U-R2M01",
+      "make_model": "BYD BCO274-C15H1000V-U-R2M01",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "c4da9e49-dc5e-4baf-8894-f8b54638937e"
+    },
+    {
+      "id": 369,
+      "model": "HVL 16.0",
+      "model_number": "HVL 16.0",
+      "make_model": "BYD HVL 16.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "65529073-65ee-4cb4-bbc4-23d50752da36"
+    },
+    {
+      "id": 370,
+      "model": "HVL 20.0",
+      "model_number": "HVL 20.0",
+      "make_model": "BYD HVL 20.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "841e8a0a-5ff7-46bf-ad8f-5722b27c625a"
+    },
+    {
+      "id": 371,
+      "model": "HVL 24.0",
+      "model_number": "HVL 24.0",
+      "make_model": "BYD HVL 24.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "3d0d002b-8665-4514-a5a7-9616d13508be"
+    },
+    {
+      "id": 372,
+      "model": "HVL 28.0",
+      "model_number": "HVL 28.0",
+      "make_model": "BYD HVL 28.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "4aa8a26e-abcd-477b-8c81-96ee2dfd4544"
+    },
+    {
+      "id": 373,
+      "model": "HVL 32.0",
+      "model_number": "HVL 32.0",
+      "make_model": "BYD HVL 32.0",
+      "manufacturer": "BYD",
+      "equipment_type": "Battery",
+      "uuid": "c5c4cd30-ae14-478c-b9d1-7671dc2f44e5"
+    }
+  ],
+  "Alpha ESS": [
+    {
+      "id": 358,
+      "model": "SMILE-BAT-8.2PHA",
+      "model_number": "SMILE-BAT-8.2PHA",
+      "make_model": "Alpha ESS SMILE-BAT-8.2PHA",
+      "manufacturer": "Alpha ESS",
+      "equipment_type": "Battery",
+      "uuid": "008a8fcc-b49c-4b3b-9aab-73cc56f4da9f"
+    }
+  ],
+  "ARK Battery": [
+    {
+      "id": 359,
+      "model": "16IFR51.2-100-Y",
+      "model_number": "16IFR51.2-100-Y",
+      "make_model": "ARK Battery 16IFR51.2-100-Y",
+      "manufacturer": "ARK Battery",
+      "equipment_type": "Battery",
+      "uuid": "2263380f-4881-4608-a2bb-ffa36d66f8f1"
+    }
+  ],
+  "Discover Energy": [
+    {
+      "id": 374,
+      "model": "42-48-6650",
+      "model_number": "42-48-6650",
+      "make_model": "Discover Energy 42-48-6650",
+      "manufacturer": "Discover Energy",
+      "equipment_type": "Battery",
+      "uuid": "953849af-f64f-41a0-bd81-bb7d7c3a83ea"
+    },
+    {
+      "id": 377,
+      "model": "44-24-2800",
+      "model_number": "44-24-2800",
+      "make_model": "Discover Energy 44-24-2800",
+      "manufacturer": "Discover Energy",
+      "equipment_type": "Battery",
+      "uuid": "a55d2e88-5623-4a3b-bd5e-a7bc34400558"
+    }
+  ],
+  "Darfon Electronics": [
+    {
+      "id": 375,
+      "model": "B07ULF-xxx",
+      "model_number": "B07ULF-xxx",
+      "make_model": "Darfon Electronics B07ULF-xxx",
+      "manufacturer": "Darfon Electronics",
+      "equipment_type": "Battery",
+      "uuid": "5b090091-d1e0-4029-b4ce-0a6b5e2698f1"
+    },
+    {
+      "id": 376,
+      "model": "B09ULF-xxx",
+      "model_number": "B09ULF-xxx",
+      "make_model": "Darfon Electronics B09ULF-xxx",
+      "manufacturer": "Darfon Electronics",
+      "equipment_type": "Battery",
+      "uuid": "780db311-989a-4158-82c8-455c2a6da970"
+    }
+  ],
+  "Enphase": [
+    {
+      "id": 378,
+      "model": "Encharge-3-1-P-NA",
+      "model_number": "Encharge-3-1-P-NA",
+      "make_model": "Enphase Encharge-3-1-P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "dd4d4f85-c5ad-406e-9f9d-0dc798ef247b"
+    },
+    {
+      "id": 379,
+      "model": "Encharge-3T-1-P-NA",
+      "model_number": "Encharge-3T-1-P-NA",
+      "make_model": "Enphase Encharge-3T-1-P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "c02dd477-f1e5-4272-92fc-0092e4c6c1a1"
+    },
+    {
+      "id": 382,
+      "model": "Encharge-4T-1-P-NA",
+      "model_number": "Encharge-4T-1-P-NA",
+      "make_model": "Enphase Encharge-4T-1-P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "1e45b550-9ca7-4e6b-aa1e-c81b451b4aba"
+    },
+    {
+      "id": 384,
+      "model": "Encharge-4-1-P-NA",
+      "model_number": "Encharge-4-1-P-NA",
+      "make_model": "Enphase Encharge-4-1-P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "1c6c2776-d441-40f2-8dfd-1e163386cecc"
+    },
+    {
+      "id": 19377,
+      "model": "ENCHARGE-10-1P-NA",
+      "model_number": "ENCHARGE-10-1P-NA",
+      "make_model": "Enphase ENCHARGE-10-1P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "daa07b7d-0a13-407c-8fb7-c8729599a431"
+    },
+    {
+      "id": 19394,
+      "model": "B05-T02-US00-1-3",
+      "model_number": "B05-T02-US00-1-3",
+      "make_model": "Enphase B05-T02-US00-1-3",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "ab41ec3b-6870-4f38-a8fb-25d654dff036"
+    },
+    {
+      "id": 19483,
+      "model": "Encharge B03-T01-US00-1-3",
+      "model_number": "Encharge B03-T01-US00-1-3",
+      "make_model": "Enphase Encharge B03-T01-US00-1-3",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "43287e8d-95c5-4260-af21-0b046c6b856c"
+    },
+    {
+      "id": 19521,
+      "model": "IQBATTERY-5P-1P-NA",
+      "model_number": "IQBATTERY-5P-1P-NA",
+      "make_model": "Enphase IQBATTERY-5P-1P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "f14976e9-6fb2-4eeb-a472-bad3c5468996"
+    },
+    {
+      "id": 19559,
+      "model": "IQBATTERY-10C-1P-NA",
+      "model_number": "IQBATTERY-10C-1P-NA",
+      "make_model": "Enphase IQBATTERY-10C-1P-NA",
+      "manufacturer": "Enphase",
+      "equipment_type": "Battery",
+      "uuid": "604c7fab-a103-4efe-991e-e2af3c1e93ec"
+    }
+  ],
+  "EndurEnergy Systems": [
+    {
+      "id": 380,
+      "model": "ESP-5100",
+      "model_number": "ESP-5100",
+      "make_model": "EndurEnergy Systems ESP-5100",
+      "manufacturer": "EndurEnergy Systems",
+      "equipment_type": "Battery",
+      "uuid": "a85e9d4a-c631-40b4-8bb9-2824800f3e42"
+    }
+  ],
+  "e-ON Batteries": [
+    {
+      "id": 381,
+      "model": "EB48125F-T110A",
+      "model_number": "EB48125F-T110A",
+      "make_model": "e-ON Batteries EB48125F-T110A",
+      "manufacturer": "e-ON Batteries",
+      "equipment_type": "Battery",
+      "uuid": "80dc9c0a-6cc8-4755-a54c-2ff22db627d6"
+    },
+    {
+      "id": 383,
+      "model": "EBR-P48192EDA1",
+      "model_number": "EBR-P48192EDA1",
+      "make_model": "e-ON Batteries EBR-P48192EDA1",
+      "manufacturer": "e-ON Batteries",
+      "equipment_type": "Battery",
+      "uuid": "63160e43-996a-4011-8ec5-c634d3623cfd"
+    }
+  ],
+  "FNS Power": [
+    {
+      "id": 385,
+      "model": "SSIF2P15S48100C",
+      "model_number": "SSIF2P15S48100C",
+      "make_model": "FNS Power SSIF2P15S48100C",
+      "manufacturer": "FNS Power",
+      "equipment_type": "Battery",
+      "uuid": "e751bfc9-c51c-45b2-aacd-4fd2d42d5be2"
+    },
+    {
+      "id": 388,
+      "model": "FCIFP48100A",
+      "model_number": "FCIFP48100A",
+      "make_model": "FNS Power FCIFP48100A",
+      "manufacturer": "FNS Power",
+      "equipment_type": "Battery",
+      "uuid": "a20d4cba-f29f-4b6b-aace-52f860e768ae"
+    }
+  ],
+  "EVE POWER": [
+    {
+      "id": 386,
+      "model": "LF50K",
+      "model_number": "LF50K",
+      "make_model": "EVE POWER LF50K",
+      "manufacturer": "EVE POWER",
+      "equipment_type": "Battery",
+      "uuid": "ee858d7d-f4c4-4be2-be23-dcb171f74747"
+    },
+    {
+      "id": 387,
+      "model": "LF280K",
+      "model_number": "LF280K",
+      "make_model": "EVE POWER LF280K",
+      "manufacturer": "EVE POWER",
+      "equipment_type": "Battery",
+      "uuid": "263d5341-d58f-477d-90dd-60bc879d1dc9"
+    }
+  ],
+  "GoodWe": [
+    {
+      "id": 389,
+      "model": "LX F12.8-30",
+      "model_number": "LX F12.8-30",
+      "make_model": "GoodWe LX F12.8-30",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "89cb361b-a637-48a9-94b4-df01d21ae855"
+    },
+    {
+      "id": 390,
+      "model": "LX F16.0-30",
+      "model_number": "LX F16.0-30",
+      "make_model": "GoodWe LX F16.0-30",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "f705b9d1-6534-4585-aa84-531dac684857"
+    },
+    {
+      "id": 393,
+      "model": "LX F19.2-30",
+      "model_number": "LX F19.2-30",
+      "make_model": "GoodWe LX F19.2-30",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "299e673b-bed7-412c-885a-580f95090777"
+    },
+    {
+      "id": 394,
+      "model": "SECU-S10",
+      "model_number": "SECU-S10",
+      "make_model": "GoodWe SECU-S10",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "547ac869-ca33-4291-b912-e786a03b50ff"
+    },
+    {
+      "id": 395,
+      "model": "SECU-S13",
+      "model_number": "SECU-S13",
+      "make_model": "GoodWe SECU-S13",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "0676458b-98d1-4b09-87d0-9d6a037f6b04"
+    },
+    {
+      "id": 396,
+      "model": "LX F9.6-30",
+      "model_number": "LX F9.6-30",
+      "make_model": "GoodWe LX F9.6-30",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "40e27c62-4c66-4f22-863a-2beb6f57a495"
+    },
+    {
+      "id": 397,
+      "model": "SECU-S15",
+      "model_number": "SECU-S15",
+      "make_model": "GoodWe SECU-S15",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "d1c5c013-be8e-44ec-92f4-0828d283f579"
+    },
+    {
+      "id": 398,
+      "model": "SECU-S2.5",
+      "model_number": "SECU-S2.5",
+      "make_model": "GoodWe SECU-S2.5",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "02566ec3-a02a-4f5f-a369-a25c29474d24"
+    },
+    {
+      "id": 399,
+      "model": "SECU-S18",
+      "model_number": "SECU-S18",
+      "make_model": "GoodWe SECU-S18",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "8785a82a-925e-4b56-8787-6bdfef1e99b7"
+    },
+    {
+      "id": 400,
+      "model": "SECU-S20",
+      "model_number": "SECU-S20",
+      "make_model": "GoodWe SECU-S20",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "9ed965a7-9589-46ae-9bc5-7cdbfae275a1"
+    },
+    {
+      "id": 401,
+      "model": "SECU-S7.5",
+      "model_number": "SECU-S7.5",
+      "make_model": "GoodWe SECU-S7.5",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "1a73e99e-08b5-4ab7-a085-e906e681dc67"
+    },
+    {
+      "id": 402,
+      "model": "SECU-S5",
+      "model_number": "SECU-S5",
+      "make_model": "GoodWe SECU-S5",
+      "manufacturer": "GoodWe",
+      "equipment_type": "Battery",
+      "uuid": "17fbe0f8-7724-465e-ade3-ee41213ce0dc"
+    }
+  ],
+  "Fortress Power": [
+    {
+      "id": 391,
+      "model": "eVaultMax",
+      "model_number": "eVaultMax",
+      "make_model": "Fortress Power eVaultMax",
+      "manufacturer": "Fortress Power",
+      "equipment_type": "Battery",
+      "uuid": "3657d6f8-966c-4e59-9dda-65a7d0e36c8a"
+    },
+    {
+      "id": 392,
+      "model": "eFlex 5.4",
+      "model_number": "eFlex 5.4",
+      "make_model": "Fortress Power eFlex 5.4",
+      "manufacturer": "Fortress Power",
+      "equipment_type": "Battery",
+      "uuid": "e4a34f52-8ea4-4c83-a9de-d8a6364803c4"
+    }
+  ],
+  "Growatt": [
+    {
+      "id": 403,
+      "model": "ARO 13.2H-C1-US",
+      "model_number": "ARO 13.2H-C1-US",
+      "make_model": "Growatt ARO 13.2H-C1-US",
+      "manufacturer": "Growatt",
+      "equipment_type": "Battery",
+      "uuid": "9eab13bf-44bd-453c-9fb6-852980541826"
+    },
+    {
+      "id": 404,
+      "model": "ARO 16.5H-C1-US",
+      "model_number": "ARO 16.5H-C1-US",
+      "make_model": "Growatt ARO 16.5H-C1-US",
+      "manufacturer": "Growatt",
+      "equipment_type": "Battery",
+      "uuid": "6e1a4b4f-e6aa-49c4-be15-da029c2efdcd"
+    },
+    {
+      "id": 405,
+      "model": "ARO 19.8H-C1-US",
+      "model_number": "ARO 19.8H-C1-US",
+      "make_model": "Growatt ARO 19.8H-C1-US",
+      "manufacturer": "Growatt",
+      "equipment_type": "Battery",
+      "uuid": "570eae18-b98d-4c6f-8f8d-80538e5510e6"
+    },
+    {
+      "id": 407,
+      "model": "ARO 9.9H-C1-US",
+      "model_number": "ARO 9.9H-C1-US",
+      "make_model": "Growatt ARO 9.9H-C1-US",
+      "manufacturer": "Growatt",
+      "equipment_type": "Battery",
+      "uuid": "829bb282-681b-4865-9830-db88f61b305a"
+    },
+    {
+      "id": 408,
+      "model": "ARO 6.6H-C1-US",
+      "model_number": "ARO 6.6H-C1-US",
+      "make_model": "Growatt ARO 6.6H-C1-US",
+      "manufacturer": "Growatt",
+      "equipment_type": "Battery",
+      "uuid": "6ff5a093-265e-4677-a490-3d0d8e68c24b"
+    }
+  ],
+  "GSL Energy": [
+    {
+      "id": 406,
+      "model": "GSL051200A-B-GBP2",
+      "model_number": "GSL051200A-B-GBP2",
+      "make_model": "GSL Energy GSL051200A-B-GBP2",
+      "manufacturer": "GSL Energy",
+      "equipment_type": "Battery",
+      "uuid": "b2f40883-f7ac-4fdf-8b7d-5e3167dc4aca"
+    },
+    {
+      "id": 410,
+      "model": "GSL051280A-B-GBP2",
+      "model_number": "GSL051280A-B-GBP2",
+      "make_model": "GSL Energy GSL051280A-B-GBP2",
+      "manufacturer": "GSL Energy",
+      "equipment_type": "Battery",
+      "uuid": "b4c53645-5ecf-4a5b-8a0e-e434aa9a08e7"
+    }
+  ],
+  "Humless": [
+    {
+      "id": 409,
+      "model": "LFP48100-P5KWH",
+      "model_number": "LFP48100-P5KWH",
+      "make_model": "Humless LFP48100-P5KWH",
+      "manufacturer": "Humless",
+      "equipment_type": "Battery",
+      "uuid": "bba2b79a-c822-4e49-9c8a-d5f16662287e"
+    },
+    {
+      "id": 411,
+      "model": "LFP48100-5KWH",
+      "model_number": "LFP48100-5KWH",
+      "make_model": "Humless LFP48100-5KWH",
+      "manufacturer": "Humless",
+      "equipment_type": "Battery",
+      "uuid": "9fb092e6-0b63-4fab-a6de-2403be79f0ff"
+    },
+    {
+      "id": 413,
+      "model": "W48100B-IP65",
+      "model_number": "W48100B-IP65",
+      "make_model": "Humless W48100B-IP65",
+      "manufacturer": "Humless",
+      "equipment_type": "Battery",
+      "uuid": "b8427415-6063-4cb5-b267-d5381b1f7c05"
+    }
+  ],
+  "Holu Hou Energy": [
+    {
+      "id": 412,
+      "model": "HH8200H-EB",
+      "model_number": "HH8200H-EB",
+      "make_model": "Holu Hou Energy HH8200H-EB",
+      "manufacturer": "Holu Hou Energy",
+      "equipment_type": "Battery",
+      "uuid": "bbe492ba-5964-4a69-8273-e5b91a2f0db4"
+    }
+  ],
+  "KORE Power": [
+    {
+      "id": 414,
+      "model": "KORE-M1-ESR1500N",
+      "model_number": "KORE-M1-ESR1500N",
+      "make_model": "KORE Power KORE-M1-ESR1500N",
+      "manufacturer": "KORE Power",
+      "equipment_type": "Battery",
+      "uuid": "8485a71f-c37c-450f-9cc4-bfd1d1cbe018"
+    }
+  ],
+  "LG Energy": [
+    {
+      "id": 415,
+      "model": "RESU 16H Prime",
+      "model_number": "RESU 16H Prime",
+      "make_model": "LG Energy RESU 16H Prime",
+      "manufacturer": "LG Energy",
+      "equipment_type": "Battery",
+      "uuid": "6dc64f6d-ed1f-4946-a202-8507b6fec3c8"
+    },
+    {
+      "id": 416,
+      "model": "RESU 10H Prime",
+      "model_number": "RESU 10H Prime",
+      "make_model": "LG Energy RESU 10H Prime",
+      "manufacturer": "LG Energy",
+      "equipment_type": "Battery",
+      "uuid": "ee233686-318c-468e-85a8-227abbc117ad"
+    },
+    {
+      "id": 417,
+      "model": "SR22F617F_G16D1",
+      "model_number": "SR22F617F_G16D1",
+      "make_model": "LG Energy SR22F617F_G16D1",
+      "manufacturer": "LG Energy",
+      "equipment_type": "Battery",
+      "uuid": "e5f61878-dec5-466e-a09f-9b17b6b2d5fc"
+    }
+  ],
+  "MeriTech Power": [
+    {
+      "id": 418,
+      "model": "MERITSUN LFP48V100AH",
+      "model_number": "MERITSUN LFP48V100AH",
+      "make_model": "MeriTech Power MERITSUN LFP48V100AH",
+      "manufacturer": "MeriTech Power",
+      "equipment_type": "Battery",
+      "uuid": "2d861c6b-739c-4ff2-a923-5a9a0156c677"
+    },
+    {
+      "id": 420,
+      "model": "MERITSUN LFP51.2V100AH",
+      "model_number": "MERITSUN LFP51.2V100AH",
+      "make_model": "MeriTech Power MERITSUN LFP51.2V100AH",
+      "manufacturer": "MeriTech Power",
+      "equipment_type": "Battery",
+      "uuid": "73127709-8297-4e9c-bdd8-360cedefadd1"
+    }
+  ],
+  "Polarium": [
+    {
+      "id": 419,
+      "model": "810-00046",
+      "model_number": "810-00046",
+      "make_model": "Polarium 810-00046",
+      "manufacturer": "Polarium",
+      "equipment_type": "Battery",
+      "uuid": "d9ecdac2-a0ce-4def-a5d9-a0eafac30a75"
+    },
+    {
+      "id": 421,
+      "model": "810-00164",
+      "model_number": "810-00164",
+      "make_model": "Polarium 810-00164",
+      "manufacturer": "Polarium",
+      "equipment_type": "Battery",
+      "uuid": "5f991d5f-b019-4b99-bc5b-94de81484b87"
+    },
+    {
+      "id": 422,
+      "model": "SLB48-200-228-1U",
+      "model_number": "SLB48-200-228-1U",
+      "make_model": "Polarium SLB48-200-228-1U",
+      "manufacturer": "Polarium",
+      "equipment_type": "Battery",
+      "uuid": "079bb9a3-dc8b-4ade-86ed-39f51049934f"
+    },
+    {
+      "id": 423,
+      "model": "810-00061",
+      "model_number": "810-00061",
+      "make_model": "Polarium 810-00061",
+      "manufacturer": "Polarium",
+      "equipment_type": "Battery",
+      "uuid": "a2357c5a-1cf4-45a2-ad9c-0adcbc2615b6"
+    }
+  ],
+  "PYTES": [
+    {
+      "id": 424,
+      "model": "E-BOX 48100R",
+      "model_number": "E-BOX 48100R",
+      "make_model": "PYTES E-BOX 48100R",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "c53e2008-412c-415d-aaec-c794439d206b"
+    },
+    {
+      "id": 425,
+      "model": "HVL 24.0",
+      "model_number": "HVL 24.0",
+      "make_model": "PYTES HVL 24.0",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "b2fa7c52-1f57-4fbe-ace1-8f2826be9301"
+    },
+    {
+      "id": 426,
+      "model": "HVL 12.0",
+      "model_number": "HVL 12.0",
+      "make_model": "PYTES HVL 12.0",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "94680fae-eff8-46c7-944a-68717c54589c"
+    },
+    {
+      "id": 427,
+      "model": "HVL 20.0",
+      "model_number": "HVL 20.0",
+      "make_model": "PYTES HVL 20.0",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "13614ddd-145b-4814-ac29-2595fad04a18"
+    },
+    {
+      "id": 428,
+      "model": "HVL 16.0",
+      "model_number": "HVL 16.0",
+      "make_model": "PYTES HVL 16.0",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "99fc9b51-ea91-438f-ae48-cdd84207a93b"
+    },
+    {
+      "id": 429,
+      "model": "HVL 32.0",
+      "model_number": "HVL 32.0",
+      "make_model": "PYTES HVL 32.0",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "525a4ea6-4a00-4749-b4f8-f8fab70e624f"
+    },
+    {
+      "id": 431,
+      "model": "HVL 28.0",
+      "model_number": "HVL 28.0",
+      "make_model": "PYTES HVL 28.0",
+      "manufacturer": "PYTES",
+      "equipment_type": "Battery",
+      "uuid": "0b9236b4-7579-4dfd-9105-431d9605a7f6"
+    }
+  ],
+  "Sacred Sun": [
+    {
+      "id": 430,
+      "model": "FCIFP48100A",
+      "model_number": "FCIFP48100A",
+      "make_model": "Sacred Sun FCIFP48100A",
+      "manufacturer": "Sacred Sun",
+      "equipment_type": "Battery",
+      "uuid": "01510dd7-413b-42f4-bec1-233914f4f117"
+    },
+    {
+      "id": 435,
+      "model": "SSIF2P15S48100C",
+      "model_number": "SSIF2P15S48100C",
+      "make_model": "Sacred Sun SSIF2P15S48100C",
+      "manufacturer": "Sacred Sun",
+      "equipment_type": "Battery",
+      "uuid": "8861ed5c-d382-4e92-9971-2c7c557681bb"
+    }
+  ],
+  "PYTES Energy": [
+    {
+      "id": 432,
+      "model": "E-BOX 48100R",
+      "model_number": "E-BOX 48100R",
+      "make_model": "PYTES Energy E-BOX 48100R",
+      "manufacturer": "PYTES Energy",
+      "equipment_type": "Battery",
+      "uuid": "29fd3270-1f18-4aa6-a7ca-121d433f466d"
+    }
+  ],
+  "SimpliPhi Power": [
+    {
+      "id": 433,
+      "model": "PHI3.8 48V 60 VTE BRK",
+      "model_number": "PHI3.8 48V 60 VTE BRK",
+      "make_model": "SimpliPhi Power PHI3.8 48V 60 VTE BRK",
+      "manufacturer": "SimpliPhi Power",
+      "equipment_type": "Battery",
+      "uuid": "180b2fcd-c58a-40b0-901f-6aa6441fa0ad"
+    },
+    {
+      "id": 434,
+      "model": "AmpliPHI3.8-48",
+      "model_number": "AmpliPHI3.8-48",
+      "make_model": "SimpliPhi Power AmpliPHI3.8-48",
+      "manufacturer": "SimpliPhi Power",
+      "equipment_type": "Battery",
+      "uuid": "56f42ac0-0523-48fb-8792-53dbfbdd0467"
+    },
+    {
+      "id": 436,
+      "model": "PHI3.8 24V 60 VTE BRK",
+      "model_number": "PHI3.8 24V 60 VTE BRK",
+      "make_model": "SimpliPhi Power PHI3.8 24V 60 VTE BRK",
+      "manufacturer": "SimpliPhi Power",
+      "equipment_type": "Battery",
+      "uuid": "c7f62af0-930c-463c-8bc3-a2dd2d974f0a"
+    },
+    {
+      "id": 440,
+      "model": "SPHI-B-4.9",
+      "model_number": "SPHI-B-4.9",
+      "make_model": "SimpliPhi Power SPHI-B-4.9",
+      "manufacturer": "SimpliPhi Power",
+      "equipment_type": "Battery",
+      "uuid": "0e82a160-9687-4ed4-a0dc-ce6a55fdb0da"
+    }
+  ],
+  "SolarEdge": [
+    {
+      "id": 437,
+      "model": "BAT-10K1P",
+      "model_number": "BAT-10K1P",
+      "make_model": "SolarEdge BAT-10K1P",
+      "manufacturer": "SolarEdge",
+      "equipment_type": "Battery",
+      "uuid": "b5f6fd49-f2fb-4fd3-b96c-8ff5b23bc70c"
+    },
+    {
+      "id": 18924,
+      "model": "TSB-14-US",
+      "model_number": "TSB-14-US",
+      "make_model": "SolarEdge TSB-14-US",
+      "manufacturer": "SolarEdge",
+      "equipment_type": "Battery",
+      "uuid": "05b676b9-f3c1-4cf1-bca0-beefdcd650f4"
+    },
+    {
+      "id": 18978,
+      "model": "BAT-10K1PS0B-02",
+      "model_number": "BAT-10K1PS0B-02",
+      "make_model": "SolarEdge BAT-10K1PS0B-02",
+      "manufacturer": "SolarEdge",
+      "equipment_type": "Battery",
+      "uuid": "cac1848f-de47-4415-85b1-15fa97c9b0e5"
+    }
+  ],
+  "SolaX Power": [
+    {
+      "id": 438,
+      "model": "T-BAT H 15.0",
+      "model_number": "T-BAT H 15.0",
+      "make_model": "SolaX Power T-BAT H 15.0",
+      "manufacturer": "SolaX Power",
+      "equipment_type": "Battery",
+      "uuid": "230bc610-651c-4e9b-8336-60c8264f2ca8"
+    },
+    {
+      "id": 439,
+      "model": "T-BAT H 10.0",
+      "model_number": "T-BAT H 10.0",
+      "make_model": "SolaX Power T-BAT H 10.0",
+      "manufacturer": "SolaX Power",
+      "equipment_type": "Battery",
+      "uuid": "f8f640ed-b5d4-4afd-b082-0fc6c54055a4"
+    },
+    {
+      "id": 442,
+      "model": "T-BAT H 20.0",
+      "model_number": "T-BAT H 20.0",
+      "make_model": "SolaX Power T-BAT H 20.0",
+      "manufacturer": "SolaX Power",
+      "equipment_type": "Battery",
+      "uuid": "cd3d0412-9922-47c2-ac26-7a0cd35eab2b"
+    }
+  ],
+  "Stored Energy": [
+    {
+      "id": 441,
+      "model": "C1-LFP19200-1A01",
+      "model_number": "C1-LFP19200-1A01",
+      "make_model": "Stored Energy C1-LFP19200-1A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "758c0fad-94bb-42a9-94f6-364e912f8122"
+    },
+    {
+      "id": 443,
+      "model": "PF5-LFP14400-2A01",
+      "model_number": "PF5-LFP14400-2A01",
+      "make_model": "Stored Energy PF5-LFP14400-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "3666d7d3-8494-40f3-bcf0-cb4842c73cd8"
+    },
+    {
+      "id": 444,
+      "model": "PF5-LFP09600-2A01",
+      "model_number": "PF5-LFP09600-2A01",
+      "make_model": "Stored Energy PF5-LFP09600-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "2bde1ab6-9db8-4462-9e97-f59cf7680d14"
+    },
+    {
+      "id": 445,
+      "model": "PF5-LFP24000-2A01",
+      "model_number": "PF5-LFP24000-2A01",
+      "make_model": "Stored Energy PF5-LFP24000-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "4db64456-30f1-4d85-a281-f630627683ef"
+    },
+    {
+      "id": 446,
+      "model": "PF5-LFP28800-2A01",
+      "model_number": "PF5-LFP28800-2A01",
+      "make_model": "Stored Energy PF5-LFP28800-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "bd6a4638-519a-483b-92a6-24717eb62d90"
+    },
+    {
+      "id": 447,
+      "model": "PF5-LFP33600-2A01",
+      "model_number": "PF5-LFP33600-2A01",
+      "make_model": "Stored Energy PF5-LFP33600-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "a72bc582-b26e-42b2-bbe5-49f4f012f97f"
+    },
+    {
+      "id": 448,
+      "model": "PF5-LFP19200-2A01",
+      "model_number": "PF5-LFP19200-2A01",
+      "make_model": "Stored Energy PF5-LFP19200-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "b0919400-3e20-4077-9ec2-b3bd1ba27f87"
+    },
+    {
+      "id": 452,
+      "model": "PF5-LFP38400-2A01",
+      "model_number": "PF5-LFP38400-2A01",
+      "make_model": "Stored Energy PF5-LFP38400-2A01",
+      "manufacturer": "Stored Energy",
+      "equipment_type": "Battery",
+      "uuid": "b7d24b5b-5ddc-49e4-9564-79598a881541"
+    }
+  ],
+  "Storz Power": [
+    {
+      "id": 449,
+      "model": "SP5.12-LFPv4",
+      "model_number": "SP5.12-LFPv4",
+      "make_model": "Storz Power SP5.12-LFPv4",
+      "manufacturer": "Storz Power",
+      "equipment_type": "Battery",
+      "uuid": "89899683-09e5-4370-9bb2-2b5bdfcbba0d"
+    }
+  ],
+  "Tigo Energy": [
+    {
+      "id": 450,
+      "model": "TSB-10-US",
+      "model_number": "TSB-10-US",
+      "make_model": "Tigo Energy TSB-10-US",
+      "manufacturer": "Tigo Energy",
+      "equipment_type": "Battery",
+      "uuid": "0750b75c-f3b2-49b9-a213-3193d7fadd73"
+    },
+    {
+      "id": 451,
+      "model": "TSB-14-US",
+      "model_number": "TSB-14-US",
+      "make_model": "Tigo Energy TSB-14-US",
+      "manufacturer": "Tigo Energy",
+      "equipment_type": "Battery",
+      "uuid": "a76e32b6-c216-4fb5-90fc-77f830a64028"
+    },
+    {
+      "id": 453,
+      "model": "TSB-7-US",
+      "model_number": "TSB-7-US",
+      "make_model": "Tigo Energy TSB-7-US",
+      "manufacturer": "Tigo Energy",
+      "equipment_type": "Battery",
+      "uuid": "250c057b-0ca6-4061-8c7b-9aaef450a6e7"
+    },
+    {
+      "id": 454,
+      "model": "TSB-20-US",
+      "model_number": "TSB-20-US",
+      "make_model": "Tigo Energy TSB-20-US",
+      "manufacturer": "Tigo Energy",
+      "equipment_type": "Battery",
+      "uuid": "612d955e-04f9-4837-a3bf-b66f3989088c"
+    },
+    {
+      "id": 455,
+      "model": "TSB-17-US",
+      "model_number": "TSB-17-US",
+      "make_model": "Tigo Energy TSB-17-US",
+      "manufacturer": "Tigo Energy",
+      "equipment_type": "Battery",
+      "uuid": "73f22243-10b0-428a-a36b-05ff0f329911"
+    }
+  ],
+  "TROES": [
+    {
+      "id": 456,
+      "model": "TR-S138-6P9",
+      "model_number": "TR-S138-6P9",
+      "make_model": "TROES TR-S138-6P9",
+      "manufacturer": "TROES",
+      "equipment_type": "Battery",
+      "uuid": "560c5fdd-9611-466c-91c3-df6f14a25825"
+    },
+    {
+      "id": 458,
+      "model": "TR-S138-8P9",
+      "model_number": "TR-S138-8P9",
+      "make_model": "TROES TR-S138-8P9",
+      "manufacturer": "TROES",
+      "equipment_type": "Battery",
+      "uuid": "3c2321ba-83b5-4085-8eff-2e5f619bcab2"
+    },
+    {
+      "id": 459,
+      "model": "TR-S138-7P9",
+      "model_number": "TR-S138-7P9",
+      "make_model": "TROES TR-S138-7P9",
+      "manufacturer": "TROES",
+      "equipment_type": "Battery",
+      "uuid": "6573e9c3-5af3-4227-bb2a-db207f53348c"
+    }
+  ],
+  "Yotta Energy": [
+    {
+      "id": 457,
+      "model": "SL-1000",
+      "model_number": "SL-1000",
+      "make_model": "Yotta Energy SL-1000",
+      "manufacturer": "Yotta Energy",
+      "equipment_type": "Battery",
+      "uuid": "d0230bcf-b8c9-40ba-91c6-0ccaf138ee8b"
+    }
+  ],
+  "Franklin": [
+    {
+      "id": 18934,
+      "model": "aPower",
+      "model_number": "aPower",
+      "make_model": "Franklin aPower",
+      "manufacturer": "Franklin",
+      "equipment_type": "Battery",
+      "uuid": "dabfe2ad-2440-4c51-9f30-2f90ce4774be"
+    }
+  ],
+  "Tesla": [
+    {
+      "id": 18947,
+      "model": "PowerWall",
+      "model_number": "PowerWall",
+      "make_model": "Tesla PowerWall",
+      "manufacturer": "Tesla",
+      "equipment_type": "Battery",
+      "uuid": "da9875e5-e1db-4897-83fd-a4f8ab0294d1"
+    },
+    {
+      "id": 18948,
+      "model": "PowerWall 2",
+      "model_number": "PowerWall 2",
+      "make_model": "Tesla PowerWall 2",
+      "manufacturer": "Tesla",
+      "equipment_type": "Battery",
+      "uuid": "90aaf30d-2f5d-4609-8209-7e0093af58ec"
+    },
+    {
+      "id": 18950,
+      "model": "PowerWall +",
+      "model_number": "PowerWall +",
+      "make_model": "Tesla PowerWall +",
+      "manufacturer": "Tesla",
+      "equipment_type": "Battery",
+      "uuid": "28b47e8a-9e59-47cf-8ddc-b36ac72399bf"
+    },
+    {
+      "id": 18951,
+      "model": "PowerWall 1",
+      "model_number": "PowerWall 1",
+      "make_model": "Tesla PowerWall 1",
+      "manufacturer": "Tesla",
+      "equipment_type": "Battery",
+      "uuid": "9456e526-84db-45ec-8359-093ac4b10915"
+    },
+    {
+      "id": 19367,
+      "model": "PowerWall2.1",
+      "model_number": "PowerWall2.1",
+      "make_model": "Tesla PowerWall2.1",
+      "manufacturer": "Tesla",
+      "equipment_type": "Battery",
+      "uuid": "e86d6384-0ddc-4af1-a323-5383ac7f8310"
+    }
+  ],
+  "Generac": [
+    {
+      "id": 18956,
+      "model": "PWRCell-3.0kWh DCB Battery Module",
+      "model_number": "PWRCell-3.0kWh DCB Battery Module",
+      "make_model": "Generac PWRCell-3.0kWh DCB Battery Module",
+      "manufacturer": "Generac",
+      "equipment_type": "Battery",
+      "uuid": "eb275396-c13f-42d0-980a-29c043cb1fb2"
+    }
+  ],
+  "Storz": [
+    {
+      "id": 18974,
+      "model": "Batt Cabinet 10328",
+      "model_number": "Batt Cabinet 10328",
+      "make_model": "Storz Batt Cabinet 10328",
+      "manufacturer": "Storz",
+      "equipment_type": "Battery",
+      "uuid": "94aa8c2d-d8b9-4c85-8bd1-93fe7ad2a15e"
+    }
+  ],
+  "EG4": [
+    {
+      "id": 19073,
+      "model": "WallMount All Weather",
+      "model_number": "WallMount All Weather",
+      "make_model": "EG4 WallMount All Weather",
+      "manufacturer": "EG4",
+      "equipment_type": "Battery",
+      "uuid": "d59f2d67-b471-44ab-9a24-5245713f3a1b"
+    },
+    {
+      "id": 19297,
+      "model": "PP-16/280A1-18K1-AWLL",
+      "model_number": "PP-16/280A1-18K1-AWLL",
+      "make_model": "EG4 PP-16/280A1-18K1-AWLL",
+      "manufacturer": "EG4",
+      "equipment_type": "Battery",
+      "uuid": "157c8cbb-2f3d-40ba-9173-b614e9798e90"
+    }
+  ],
+  "HomeGrid": [
+    {
+      "id": 19469,
+      "model": "HG-FS48100-15OSJ1-H",
+      "model_number": "HG-FS48100-15OSJ1-H",
+      "make_model": "HomeGrid HG-FS48100-15OSJ1-H",
+      "manufacturer": "HomeGrid",
+      "equipment_type": "Battery",
+      "uuid": "1e998a59-c8b2-48fa-9c0d-c44a17b257db"
+    }
+  ]
+}

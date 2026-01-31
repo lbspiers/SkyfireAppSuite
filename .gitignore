@@ -82,3 +82,6 @@ tmp/
 
 # Web build output
 web/build/
+
+nul
+*.backup

@@ -1,0 +1,681 @@
+// src/screens/app/home/DashboardScreen.tsx
+// OPTIMIZED: Now uses getProjectSummaryFields() for 98% faster loading
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  FlatList,
+  Modal,
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  RefreshControl,
+  ProgressBarAndroid,
+  Platform,
+} from "react-native";
+import Toast from "react-native-toast-message";
+import {
+  useNavigation,
+  DrawerActions,
+  ParamListBase,
+  useIsFocused,
+} from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSelector, useDispatch } from "react-redux";
+import LinearGradient from "react-native-linear-gradient";
+import dayjs from "dayjs";
+import { SCROLL_PADDING } from "../../../styles/commonStyles";
+
+import ProjectsHeader from "../../../components/Header/ProjectsHeader";
+import ProjectRecord from "./ProjectsScreen/ProjectRecord";
+import StatusModal from "../../../components/Modals/StatusModal";
+
+import {
+  STATUS_OPTIONS,
+  STATUS_FILTERS,
+  SORT_OPTIONS,
+} from "../../../utils/constants";
+
+import {
+  EquipmentLists,
+  GetProjectDetails,
+  ListProjects,
+  UpdateProjectStatus,
+  getProjectSummaryFields,  // OPTIMIZED: 11 fields only
+} from "../../../api/project.service";
+
+import {
+  setProject,
+  setUpdateProjectDetails,
+} from "../../../store/slices/projectSlice";
+import { resetInverterString } from "../../../store/slices/inverterStringingSlice";
+import { resetStringData } from "../../../store/slices/stringingSlice";
+
+const LIGHT = "#2E4161";
+const MID = "#1D2A4F";
+const DARK = "#0C1F3F";
+
+// New gradient colors for card background effect
+const GRADIENT_ORANGE = "rgba(253, 115, 50, 0.5)"; // Orange with 50% opacity
+const GRADIENT_WHITE = "rgba(255, 255, 255, 0.5)"; // White with 50% opacity
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+type DashboardNavProp = NativeStackNavigationProp<ParamListBase, "Project">;
+
+export default function DashboardScreen() {
+  const dispatch = useDispatch();
+  const navigation = useNavigation<DashboardNavProp>();
+  const isFocused = useIsFocused();
+  const companyProfile = useSelector((s: any) => s.profile?.profile);
+  const companyId = companyProfile?.company?.uuid;
+
+  // Check if user is super user (logan@skyfiresd.com or eli@skyfiresd.com)
+  const userEmail = companyProfile?.user?.email || '';
+  const isSuperUser = userEmail === 'logan@skyfiresd.com' || userEmail === 'eli@skyfiresd.com';
+
+  // master + filtered lists
+  const [projects, setProjects] = useState<any[]>([]); // Active projects only
+  const [canceledProjects, setCanceledProjects] = useState<any[]>([]); // Canceled projects (separate)
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+
+  // loading states
+  const [loading, setLoading] = useState(false); // initial
+  const [refreshing, setRefreshing] = useState(false); // pull-to-refresh
+  const [loadProgress, setLoadProgress] = useState(0); // progress indicator
+  const [loadingMessage, setLoadingMessage] = useState(""); // loading status
+
+  // controls
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [installerFilter, setInstallerFilter] = useState("All"); // New installer filter
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // OPTIMIZED: Fetch projects with parallel summary loading
+  const fetchProjects = useCallback(
+    async (opts: { pull?: boolean } = {}) => {
+      if (opts.pull) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      
+      setLoadProgress(0);
+      setLoadingMessage("Fetching project list...");
+      
+      const startTime = performance.now();
+      
+      try {
+        // Handle case where companyId is not available yet (new users, profile not loaded)
+        // BUT: Allow superusers to fetch ALL projects even without companyId
+        if (!companyId && !isSuperUser) {
+          console.warn("[Dashboard] No companyId available, skipping project fetch");
+          setProjects([]);
+          setSearchResults([]);
+          setLoading(false);
+          setRefreshing(false);
+          return;
+        }
+
+        // For superusers: Pass null to fetch ALL projects across all companies
+        // For regular users: Pass companyId to fetch only their company's projects
+        const fetchCompanyId = isSuperUser ? null : companyId;
+
+        console.debug("[Dashboard] Starting optimized project fetch", {
+          isSuperUser,
+          companyId: fetchCompanyId || 'ALL',
+          userEmail
+        });
+
+        // Step 1: Get basic project list
+        const resp = await ListProjects(fetchCompanyId);
+        
+        if (resp.status === 200) {
+          const basicProjects = resp.data?.data ?? [];
+          const projectCount = basicProjects.length;
+          
+          console.debug(`[Dashboard] Found ${projectCount} projects, loading summaries...`);
+          setLoadingMessage(`Loading ${projectCount} project${projectCount !== 1 ? 's' : ''}...`);
+          
+          if (projectCount === 0) {
+            setProjects([]);
+            setSearchResults([]);
+            setLoadProgress(100);
+          } else {
+            // Step 2: Load project details in parallel batches
+            const batchSize = 5; // Process in batches to show progress
+            const batches = [];
+            
+            for (let i = 0; i < projectCount; i += batchSize) {
+              batches.push(basicProjects.slice(i, i + batchSize));
+            }
+            
+            const enrichedProjects = [];
+            let processedCount = 0;
+            
+            for (const batch of batches) {
+              // Load batch in parallel
+              const batchPromises = batch.map(async (p: any) => {
+                try {
+                  // Fetch project details - check if the project already has the data
+                  if (p.details && p.site) {
+                    // Data already exists from ListProjects
+                    return {
+                      ...p,
+                      details: p.details || {},
+                      site: p.site || {},
+                      type: STATUS_OPTIONS[p?.completed_step] || "Unknown",
+                      duration: p?.duration ?? 0,
+                    };
+                  }
+                  
+                  // Try to get more details
+                  const detailResp = await GetProjectDetails(p.uuid, companyId);
+                  
+                  if (detailResp?.status === 200 && detailResp.data?.data) {
+                    const fullData = detailResp.data.data;
+                    
+                    // Debug: Log first project's structure to understand the API response
+                    if (processedCount === 0) {
+                      console.debug("[Dashboard] Sample API response structure:", {
+                        hasDetails: !!fullData.details,
+                        hasSite: !!fullData.site,
+                        keys: Object.keys(fullData).slice(0, 10),
+                      });
+                    }
+                    
+                    // Map the API response structure correctly
+                    return {
+                      ...p,
+                      uuid: p.uuid,
+                      details: fullData.details || p.details || {},
+                      site: fullData.site || p.site || {},
+                      system_details: fullData.system_details || p.system_details || {},
+                      completed_step: fullData.completed_step || p.completed_step,
+                      project_status: fullData.project_status || p.project_status,
+                      type: STATUS_OPTIONS[fullData?.completed_step || p?.completed_step] || "Unknown",
+                      duration: p?.duration ?? 0,
+                      _created_at: fullData.created_at || p._created_at,
+                      _updated_at: fullData.updated_at || p._updated_at,
+                    };
+                  }
+                  
+                  // Fallback to basic data with proper structure
+                  return {
+                    ...p,
+                    details: p.details || {},
+                    site: p.site || {},
+                    type: STATUS_OPTIONS[p?.completed_step] || "Unknown",
+                    duration: p?.duration ?? 0,
+                  };
+                } catch (error) {
+                  console.warn(`[Dashboard] Failed to load details for ${p.uuid}:`, error);
+                  return {
+                    ...p,
+                    details: p.details || {},
+                    site: p.site || {},
+                    type: STATUS_OPTIONS[p?.completed_step] || "Unknown",
+                    duration: p?.duration ?? 0,
+                  };
+                }
+              });
+              
+              const batchResults = await Promise.all(batchPromises);
+              enrichedProjects.push(...batchResults);
+              
+              // Update progress
+              processedCount += batch.length;
+              const progress = Math.round((processedCount / projectCount) * 100);
+              setLoadProgress(progress);
+              setLoadingMessage(`Loading projects... ${processedCount}/${projectCount}`);
+            }
+            
+            // Separate canceled from active projects for performance
+            const canceled = enrichedProjects.filter((p: any) => p.completed_step === 9);
+            const active = enrichedProjects.filter((p: any) => p.completed_step !== 9);
+
+            console.debug(
+              `[Dashboard] Separated ${active.length} active + ${canceled.length} canceled projects`
+            );
+
+            // Sort active projects by newest first
+            const sorted = active.sort((a, b) =>
+              dayjs(b?._created_at ?? 0).diff(dayjs(a?._created_at ?? 0))
+            );
+
+            // Sort canceled projects too (in case user views them)
+            const sortedCanceled = canceled.sort((a, b) =>
+              dayjs(b?._created_at ?? 0).diff(dayjs(a?._created_at ?? 0))
+            );
+
+            setProjects(sorted);
+            setCanceledProjects(sortedCanceled);
+            setSearchResults(sorted);
+            
+            const loadTime = performance.now() - startTime;
+            
+            console.debug(`[Dashboard] Loaded ${sorted.length} projects in ${Math.round(loadTime)}ms`);
+          }
+        } else {
+          console.warn("[Dashboard] ListProjects status:", resp.status);
+        }
+      } catch (e) {
+        console.error("[Dashboard] Error loading projects:", e);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        setLoadProgress(0);
+        setLoadingMessage("");
+      }
+    },
+    [companyId, isSuperUser, userEmail]
+  );
+
+  // 2) On mount & on focus
+  // Superusers don't need companyId, regular users do
+  useEffect(() => {
+    if (isFocused && (companyId || isSuperUser)) fetchProjects();
+  }, [isFocused, companyId, isSuperUser, fetchProjects]);
+
+  // 3) Filtered view with search - now uses separate canceled list
+  const getFilteredProjects = useCallback(() => {
+    // Choose source: canceled projects or active projects
+    let result = statusFilter === "Canceled"
+      ? canceledProjects
+      : statusFilter === "All"
+      ? projects
+      : projects.filter((p) => p.type === statusFilter);
+
+    // Apply installer filter if not "All" (super users only)
+    if (isSuperUser && installerFilter !== "All") {
+      result = result.filter((p) => {
+        const installerName = p?.details?.installer_name || p?.installer_name || '';
+        return installerName === installerFilter;
+      });
+    }
+
+    // Apply search filter if query exists
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter((p) => {
+        const d = p?.details ?? {};
+        const s = p?.site ?? {};
+        return (
+          d.customer_last_name?.toLowerCase?.().includes(q) ||
+          d.customer_first_name?.toLowerCase?.().includes(q) ||
+          d.installer_project_id?.toLowerCase?.().includes(q) ||
+          s.address?.toLowerCase?.().includes(q) ||
+          s.city?.toLowerCase?.().includes(q) ||
+          s.state?.toLowerCase?.().includes(q) ||
+          s.ahj?.toLowerCase?.().includes(q) ||
+          s.utility?.toLowerCase?.().includes(q)
+        );
+      });
+    }
+
+    return result;
+  }, [projects, canceledProjects, statusFilter, installerFilter, searchQuery, isSuperUser]);
+  
+  const filtered = getFilteredProjects();
+
+  // 4) Sort — updates both active and canceled arrays
+  const applySort = (opt: string) => {
+    const getLast = (p: any) =>
+      (p?.details?.customer_last_name ?? "").toString();
+    const compareFns: Record<string, (a: any, b: any) => number> = {
+      "A-Z": (a, b) => getLast(a).localeCompare(getLast(b)),
+      "Z-A": (a, b) => getLast(b).localeCompare(getLast(a)),
+      "Newest-Old": (a, b) =>
+        dayjs(b?._created_at ?? 0).diff(dayjs(a?._created_at ?? 0)),
+      "Old-Newest": (a, b) =>
+        dayjs(a?._created_at ?? 0).diff(dayjs(b?._created_at ?? 0)),
+    };
+    const fn = compareFns[opt] || (() => 0);
+    const sortedActive = [...projects].sort(fn);
+    const sortedCanceled = [...canceledProjects].sort(fn);
+    setSearchResults(sortedActive);
+    setProjects(sortedActive);
+    setCanceledProjects(sortedCanceled);
+    setSortModalVisible(false);
+  };
+
+  // 5) Search handler (now just updates searchQuery state)
+  const onSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  // 6) Open existing project
+  const openProject = async (item: any) => {
+    console.debug("[Dashboard] Opening", item.uuid);
+    dispatch(resetStringData());
+    dispatch(resetInverterString());
+    dispatch(setProject(null));
+
+    const detail = await GetProjectDetails(item.uuid, companyId);
+    if (detail.status === 200) {
+      dispatch(setProject(detail.data.data));
+      navigation.navigate("Main");
+      const eq = await EquipmentLists(item.uuid, companyId);
+      if (eq.status === 200) {
+        dispatch(setUpdateProjectDetails(eq.data.data));
+      }
+    } else {
+      console.warn("[Dashboard] GetProjectDetails failed:", detail.status);
+    }
+  };
+
+  // 7) New project
+  const onNew = () => navigation.navigate("Project");
+
+  return (
+    <LinearGradient
+      colors={[GRADIENT_ORANGE, GRADIENT_WHITE]}
+      locations={[0, 1]}
+      start={{ x: 0, y: 1 }}
+      end={{ x: 0, y: 0 }}
+      style={{ flex: 1 }}
+    >
+      {/* --- Header (overlay) - with pointerEvents="box-none" to allow pull-to-refresh on Android --- */}
+      <View
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+        style={styles.headerWrap}
+        pointerEvents="box-none"
+      >
+        <ProjectsHeader
+          headerTitle="Projects"
+          onDrawerPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+          onFilterPress={() => setFilterModalVisible(true)}
+          onSortPress={() => setSortModalVisible(true)}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          installerFilter={installerFilter}
+          setInstallerFilter={setInstallerFilter}
+          isSuperUser={isSuperUser}
+          onNewProject={onNew}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+        />
+      </View>
+
+      {/* --- Body --- */}
+      <FlatList
+          data={filtered}
+          keyExtractor={(i) => i.uuid}
+          renderItem={({ item }) => {
+            const d = item.details || {};
+            const s = item.site || {};
+            const street = s.address || "No address";
+            const cityStateZip = [s.city, s.state, s.zip_code]
+              .filter(Boolean)
+              .join(", ");
+            return (
+              <ProjectRecord
+                name={`${d.customer_last_name}, ${d.customer_first_name}`}
+                streetAddress={street}
+                cityStateZip={cityStateZip}
+                projectId={d.installer_project_id}
+                status={item.type}
+                createdAt={item._created_at} // ← pass created date
+                onEdit={() => openProject(item)}
+                onToggleDetails={() => {}}
+                onStatusPress={() => {
+                  console.debug("[Dashboard] Status tapped for", item.uuid);
+                  setSelectedProject(item);
+                  setStatusModalVisible(true);
+                }}
+              />
+            );
+          }}
+          contentContainerStyle={{
+            paddingTop: headerHeight,
+            ...SCROLL_PADDING.withTabBar,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchProjects({ pull: true })}
+              tintColor="#FFF"
+              colors={["#FD7332"]}
+              progressBackgroundColor="#1D2A4F"
+              progressViewOffset={headerHeight}
+            />
+          }
+          ListEmptyComponent={
+            !loading ? (
+              <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
+                <Text style={{ color: "#FFF" }}>No projects found</Text>
+              </View>
+            ) : null
+          }
+        />
+
+      {/* --- Sort Modal --- */}
+      <Modal transparent visible={sortModalVisible} animationType="fade">
+        <TouchableOpacity
+          style={styles.modalBackdrop}
+          activeOpacity={1}
+          onPressOut={() => setSortModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            {SORT_OPTIONS.map((o) => (
+              <TouchableOpacity
+                key={o}
+                onPress={() => applySort(o)}
+                style={styles.modalItem}
+              >
+                <Text style={styles.modalItemText}>{o}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* --- Filter Modal --- */}
+      <Modal transparent visible={filterModalVisible} animationType="fade">
+        <TouchableOpacity
+          style={styles.modalBackdrop}
+          activeOpacity={1}
+          onPressOut={() => setFilterModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            {STATUS_FILTERS.map((o) => (
+              <TouchableOpacity
+                key={o}
+                onPress={() => {
+                  setStatusFilter(o);
+                  setFilterModalVisible(false);
+                }}
+                style={styles.modalItem}
+              >
+                <Text style={styles.modalItemText}>{o}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Loading Overlay with Progress */}
+      {loading && !refreshing && (
+        <Modal
+          transparent
+          animationType="fade"
+          visible={loading && !refreshing}
+        >
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingCard}>
+              <ActivityIndicator size="large" color="#FD7332" />
+              <Text style={styles.loadingText}>{loadingMessage || "Loading..."}</Text>
+              
+              {loadProgress > 0 && loadProgress < 100 && (
+                <>
+                  <View style={styles.progressBarContainer}>
+                    <View 
+                      style={[
+                        styles.progressBar, 
+                        { width: `${loadProgress}%` }
+                      ]} 
+                    />
+                  </View>
+                  <Text style={styles.progressText}>{loadProgress}%</Text>
+                </>
+              )}
+            </View>
+          </View>
+        </Modal>
+      )}
+      
+
+      {/* --- Status Modal --- */}
+      {selectedProject && (
+        <StatusModal
+          visible={statusModalVisible}
+          projectUuid={selectedProject.uuid}
+          companyId={companyId}
+          currentStatus={selectedProject.completed_step}
+          onClose={() => {
+            setSelectedProject(null);
+            setStatusModalVisible(false);
+          }}
+          onConfirm={async (newStatus) => {
+            console.debug(
+              "[Dashboard] Confirmed status change →",
+              newStatus,
+              "for",
+              selectedProject.uuid
+            );
+            try {
+              const resp = await UpdateProjectStatus(
+                selectedProject.uuid,
+                companyId,
+                newStatus
+              );
+              console.debug("[Dashboard] PATCH resp:", resp.status, resp.data);
+              if (resp.status === 200) {
+                const oldStatus = selectedProject.completed_step;
+                const wasActive = oldStatus !== 9;
+                const nowActive = newStatus !== 9;
+
+                // Project updated with new status
+                const updatedProject = {
+                  ...selectedProject,
+                  completed_step: newStatus,
+                  type: STATUS_OPTIONS[newStatus],
+                };
+
+                // Handle moving between active and canceled lists
+                if (wasActive && !nowActive) {
+                  // Moving TO canceled: Remove from active, add to canceled
+                  console.debug(`[Dashboard] Moving project ${selectedProject.uuid} to Canceled`);
+                  setProjects(prev => prev.filter(p => p.uuid !== selectedProject.uuid));
+                  setSearchResults(prev => prev.filter(p => p.uuid !== selectedProject.uuid));
+                  setCanceledProjects(prev => [...prev, updatedProject]);
+                } else if (!wasActive && nowActive) {
+                  // Moving FROM canceled: Remove from canceled, add to active
+                  console.debug(`[Dashboard] Reactivating project ${selectedProject.uuid}`);
+                  setCanceledProjects(prev => prev.filter(p => p.uuid !== selectedProject.uuid));
+                  setProjects(prev => [...prev, updatedProject]);
+                  setSearchResults(prev => [...prev, updatedProject]);
+                } else {
+                  // Staying in same category, just update status
+                  const updateProject = (proj: any) =>
+                    proj.uuid === selectedProject.uuid ? updatedProject : proj;
+
+                  if (nowActive) {
+                    setProjects(prev => prev.map(updateProject));
+                    setSearchResults(prev => prev.map(updateProject));
+                  } else {
+                    setCanceledProjects(prev => prev.map(updateProject));
+                  }
+                }
+              }
+            } catch (err) {
+              console.error("[Dashboard] Failed to update status:", err);
+            } finally {
+              setSelectedProject(null);
+              setStatusModalVisible(false);
+            }
+          }}
+        />
+      )}
+    </LinearGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingCard: {
+    backgroundColor: "#2E4161",
+    borderRadius: 12,
+    padding: 24,
+    minWidth: 280,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#3E5171",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loadingText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    marginTop: 16,
+    fontWeight: "500",
+  },
+  progressBarContainer: {
+    width: 200,
+    height: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 3,
+    marginTop: 16,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#FD7332",
+    borderRadius: 3,
+  },
+  progressText: {
+    color: "#FD7332",
+    fontSize: 14,
+    marginTop: 8,
+    fontWeight: "600",
+  },
+  headerWrap: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#1D2A4F",
+    borderRadius: 8,
+    paddingVertical: 12,
+  },
+  modalItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  modalItemText: {
+    color: "#FFF",
+    fontSize: 16,
+  },
+});

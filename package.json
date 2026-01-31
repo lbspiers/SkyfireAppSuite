@@ -3,12 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "Skyfire Unified Apps - Web, Android, and iOS",
-  "workspaces": [
-    "web",
-    "mobile-android",
-    "mobile-ios",
-    "shared/*"
-  ],
   "scripts": {
     "web": "npm run start --workspace=web",
     "android": "npm run start --workspace=mobile-android",
