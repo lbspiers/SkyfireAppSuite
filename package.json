@@ -1,0 +1,24 @@
+{
+  "name": "skyfire-apps",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Skyfire Unified Apps - Web, Android, and iOS",
+  "workspaces": [
+    "web",
+    "mobile-android",
+    "mobile-ios",
+    "shared/*"
+  ],
+  "scripts": {
+    "web": "npm run start --workspace=web",
+    "android": "npm run start --workspace=mobile-android",
+    "ios": "npm run start --workspace=mobile-ios",
+    "shared:build": "npm run build --workspaces --if-present"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lbspiers/SkyfireAppSuite.git"
+  },
+  "author": "Logan Spiers",
+  "license": "UNLICENSED"
+}
