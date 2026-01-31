@@ -10,6 +10,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../../utils/responsive";
+import { colors, radius } from "../../theme/tokens/tokens";
 
 interface DropdownItem {
   label: string;
@@ -31,9 +32,9 @@ interface ThemedDropdownProps {
   disabled?: boolean;
 }
 
-const BLUE_GRADIENT = ["#0C1F3F", "#2E4161"];
-const ORANGE = "#FD7332";
-const BORDER_GREY = "#445066";
+const BLUE_GRADIENT = [colors.bgInput, colors.bgInputHover];
+const ORANGE = colors.primary;
+const BORDER_GREY = colors.borderDefault;
 
 const ThemedDropdown: React.FC<ThemedDropdownProps> = ({
   label,
@@ -42,7 +43,7 @@ const ThemedDropdown: React.FC<ThemedDropdownProps> = ({
   onChangeValue,
   error,
   placeholder,
-  placeholderColor = "#AAAAAA",
+  placeholderColor = colors.textMuted,
   containerStyle,
   labelStyle,
   loading = false,
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: moderateScale(16),
-    color: "#FFFFFF",
+    color: colors.textPrimary,
     fontWeight: "600",
     marginBottom: verticalScale(4),
   },
@@ -167,11 +168,11 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   dropdown: {
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     height: verticalScale(32),
   },
   dropdownList: {
-    backgroundColor: "#2E4161",
+    backgroundColor: colors.bgInputHover,
     borderWidth: moderateScale(1),
     borderColor: BORDER_GREY,
     borderRadius: moderateScale(8),
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: moderateScale(16),
-    color: "#FFFFFF",
+    color: colors.textPrimary,
   },
   inputSearchStyle: {
     height: verticalScale(40),
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
   iconStyle: {
     width: moderateScale(18),
     height: moderateScale(18),
-    tintColor: "#FFFFFF",
+    tintColor: colors.white,
   },
   itemContainerStyle: {
     paddingVertical: verticalScale(10),
@@ -199,22 +200,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: moderateScale(0.5),
   },
   selectedItemBackground: {
-    backgroundColor: "rgba(253, 115, 50, 0.25)",
+    backgroundColor: colors.primaryLighter,
   },
   selectedItemText: {
-    color: "#000000",
+    color: colors.black,
   },
   itemTextStyle: {
     fontSize: moderateScale(15),
-    color: "#FFFFFF",
+    color: colors.textPrimary,
   },
   disabledTextStyle: {
     fontSize: moderateScale(14),
-    color: "#AAAAAA",
+    color: colors.textMuted,
     fontStyle: "italic",
   },
   errorText: {
-    color: "red",
+    color: colors.error,
     fontSize: moderateScale(12),
     marginTop: verticalScale(6),
   },
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginLeft: moderateScale(8),
-    color: "#CCCCCC",
+    color: colors.textSecondary,
     fontSize: moderateScale(14),
   },
 });
