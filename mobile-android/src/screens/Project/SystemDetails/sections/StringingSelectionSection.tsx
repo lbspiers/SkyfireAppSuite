@@ -1,12 +1,21 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, Text } from "react-native";
+import { colors } from "../../../../theme/tokens/tokens";
 import { useSelector } from "react-redux";
+import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
+import { colors } from "../../../../theme/tokens/tokens";
 import InlineCustomStringing from "../../../../components/sections/InlineCustomStringing";
+import { colors } from "../../../../theme/tokens/tokens";
 import { StringingConfiguration } from "../hooks/useEquipmentDetails";
+import { colors } from "../../../../theme/tokens/tokens";
 import axiosInstance from "../../../../api/axiosInstance";
+import { colors } from "../../../../theme/tokens/tokens";
 import apiEndpoints from "../../../../config/apiEndPoint";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   moderateScale,
   verticalScale,
@@ -209,7 +218,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   labelText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     flex: 1,

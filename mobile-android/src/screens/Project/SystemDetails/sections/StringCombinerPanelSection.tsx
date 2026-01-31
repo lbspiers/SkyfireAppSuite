@@ -1,5 +1,6 @@
 // src/screens/Project/SystemDetails/sections/StringCombinerPanelSection.tsx
 import React, { useState, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   View,
   StyleSheet,
@@ -8,17 +9,29 @@ import {
   Text as RNText,
 } from "react-native";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import NewExistingToggle from "../../../../components/NewExistingToggle";
+import { colors } from "../../../../theme/tokens/tokens";
 import Dropdown from "../../../../components/Dropdown";
+import { colors } from "../../../../theme/tokens/tokens";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
+import { colors } from "../../../../theme/tokens/tokens";
 import RadialButton from "../../../../components/Button/RadialButton";
+import { colors } from "../../../../theme/tokens/tokens";
 import SystemButton from "../../../../components/Button/SystemButton";
+import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
+import { colors } from "../../../../theme/tokens/tokens";
 import InlineCustomStringing from "../../../../components/sections/InlineCustomStringing";
+import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
+import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
+import { colors } from "../../../../theme/tokens/tokens";
 import { DEFAULT_ELECTRICAL_PHOTO_TAGS, BUS_BAR_RATING, STRING_COMBINER_MODELS, HOYMILES_STRINGING_SPECS } from "../../../../utils/constants";
+import { colors } from "../../../../theme/tokens/tokens";
 import { moderateScale, verticalScale, widthPercentageToDP as wp } from "../../../../utils/responsive";
+import { colors } from "../../../../theme/tokens/tokens";
 
 // Icons
 const pencilIcon = require("../../../../assets/Images/icons/pencil_icon_white.png");
@@ -411,19 +424,19 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(8),
   },
   specsLabel: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: moderateScale(16),
     fontWeight: "400",
     marginBottom: verticalScale(4),
   },
   noteLabel: {
-    color: "#FFF",
+    color: colors.white,
     fontWeight: "700",
     fontSize: moderateScale(20),
     marginBottom: verticalScale(4),
   },
   note: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "400",
   },
@@ -456,7 +469,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   stringingLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
   },

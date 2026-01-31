@@ -1,24 +1,39 @@
 // src/screens/Project/SystemDetails/sections/InverterSection.tsx
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   View,
   StyleSheet,
   Text,
 } from "react-native";
 import { useSelector } from "react-redux";
+import { colors } from "../../../../theme/tokens/tokens";
 import Toast from "react-native-toast-message";
+import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import NewExistingToggle from "../../../../components/NewExistingToggle";
+import { colors } from "../../../../theme/tokens/tokens";
 import Dropdown from "../../../../components/Dropdown";
+import { colors } from "../../../../theme/tokens/tokens";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
+import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
+import { colors } from "../../../../theme/tokens/tokens";
 import SystemButton from "../../../../components/Button/SystemButton";
+import { colors } from "../../../../theme/tokens/tokens";
 import RadialButton from "../../../../components/Button/RadialButton";
+import { colors } from "../../../../theme/tokens/tokens";
 import InlineCustomStringing from "../../../../components/sections/InlineCustomStringing";
+import { colors } from "../../../../theme/tokens/tokens";
 import OptimizerSection from "./OptimizerSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import { equipmentManufacturers } from "../../../../api/project.service";
+import { colors } from "../../../../theme/tokens/tokens";
 import { GetModelNumber } from "../../../../api/inventry.service";
+import { colors } from "../../../../theme/tokens/tokens";
 import { PreferredEquipment } from "../../../../api/preferredEquipment.service";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   fetchPreferredEquipment,
   filterEquipmentByPreferred,
@@ -27,17 +42,24 @@ import {
   logPreferredFiltering,
 } from "../../../../utils/preferredEquipmentHelper";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
+import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
+import { colors } from "../../../../theme/tokens/tokens";
 import { DEFAULT_INVERTER_PHOTO_TAGS, INVERTER_MANUFACTURERS_WITH_OPTIMIZERS, POWERWALL_3_KILOWATT_OPTIONS } from "../../../../utils/constants";
+import { colors } from "../../../../theme/tokens/tokens";
 import { StringingConfiguration } from "../hooks/useEquipmentDetails";
+import { colors } from "../../../../theme/tokens/tokens";
 import axiosInstance from "../../../../api/axiosInstance";
+import { colors } from "../../../../theme/tokens/tokens";
 import apiEndpoints from "../../../../config/apiEndPoint";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   moderateScale,
   verticalScale,
   widthPercentageToDP as wp,
 } from "../../../../utils/responsive";
 import { equipmentCacheManager } from "../../../../utils/equipmentCacheManager";
+import { colors } from "../../../../theme/tokens/tokens";
 
 type Option = { label: string; value: string };
 
@@ -919,7 +941,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   stringingLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     flex: 1,
@@ -958,7 +980,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   optimizerLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
   },
@@ -982,7 +1004,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20), // Increased bottom spacing
   },
   kilowattLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     marginBottom: verticalScale(12),

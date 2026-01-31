@@ -1,15 +1,26 @@
 // src/screens/Project/SystemDetails/sections/PowerWallConfigurationSection.tsx
 import React, { useState, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { colors } from "../../../../theme/tokens/tokens";
 import LinearGradient from "react-native-linear-gradient";
+import { colors } from "../../../../theme/tokens/tokens";
 import { moderateScale, verticalScale } from "../../../../utils/responsive";
+import { colors } from "../../../../theme/tokens/tokens";
 import { ORANGE_TB, BLUE_2C_BT } from "../../../../styles/gradient";
+import { colors } from "../../../../theme/tokens/tokens";
 import { TESLA_POWERWALL_GATEWAYS } from "../../../../utils/constants";
+import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
+import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
+import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
+import { colors } from "../../../../theme/tokens/tokens";
 import { DEFAULT_INVERTER_PHOTO_TAGS } from "../../../../utils/constants";
+import { colors } from "../../../../theme/tokens/tokens";
 
 interface PowerWallConfigurationSectionProps {
   make: string;
@@ -338,7 +349,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10), // Match spacing from InverterSection noteText
   },
   label: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     marginBottom: verticalScale(10),
@@ -420,7 +431,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(20),
   },
   gatewayLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     marginBottom: verticalScale(10),
@@ -437,7 +448,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(15),
   },
   backupSwitchLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     marginBottom: verticalScale(10),
@@ -470,7 +481,7 @@ const styles = StyleSheet.create({
     marginTop: 0, // No top margin since it's first
   },
   backupOptionLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     marginBottom: verticalScale(10),
@@ -488,7 +499,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   noBackupText: {
-    color: "#FD7332", // Orange text to match theme
+    color: colors.primary, // Orange text to match theme
     fontSize: moderateScale(16),
     fontWeight: "600",
     textAlign: "center",

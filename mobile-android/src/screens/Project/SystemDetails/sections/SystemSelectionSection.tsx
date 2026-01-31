@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, Text } from "react-native";
+import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
+import { colors } from "../../../../theme/tokens/tokens";
 import SystemSwitchConfirmModal from "../../../../components/Modals/SystemSwitchConfirmModal";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   moderateScale,
   verticalScale,
@@ -143,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   labelText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     flex: 1,
