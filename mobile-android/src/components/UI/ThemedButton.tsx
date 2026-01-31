@@ -9,6 +9,7 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import Text from "../Text"; // 🔥 Use your custom Text component
 import { moderateScale, verticalScale } from "../../utils/responsive";
+import { colors } from "../../theme/tokens/tokens";
 
 interface ThemedButtonProps {
   onPress?: () => void;
@@ -27,8 +28,8 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
   onPress,
   style,
   textStyle,
-  color1 = "#FD7332",
-  color2 = "#EF3826",
+  color1 = colors.primary,
+  color2 = colors.primaryDark,
   color3,
   disabled = false,
   gradient = true,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(12),
   },
   text: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(16),
     fontWeight: "700",
   },
@@ -103,10 +104,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   disabledText: {
-    color: "#AAAAAA",
+    color: colors.textMuted,
   },
   disabledBackground: {
-    backgroundColor: "#445066",
+    backgroundColor: colors.bgInputDisabled,
   },
 });
 
