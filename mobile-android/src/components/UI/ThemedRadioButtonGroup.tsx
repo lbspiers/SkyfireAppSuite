@@ -1,5 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { colors, radius, spacing } from "../../theme/tokens/tokens";
 
 interface Props {
   options: number[];
@@ -34,17 +35,17 @@ const ThemedRadioButtonGroup: React.FC<Props> = ({
 const styles = StyleSheet.create({
   container: { flexDirection: "row" },
   option: {
-    borderRadius: 8,
+    borderRadius: radius.md,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#2E4161",
-    marginRight: 8,
+    backgroundColor: colors.bgInputHover,
+    marginRight: spacing.tight,
   },
   selectedOption: {
-    backgroundColor: "#FD7332",
+    backgroundColor: colors.primary,
   },
-  text: { color: "#ccc" },
-  selectedText: { color: "#fff", fontWeight: "700" },
+  text: { color: colors.textSecondary },
+  selectedText: { color: colors.white, fontWeight: "700" },
 });
 
 export default ThemedRadioButtonGroup;
