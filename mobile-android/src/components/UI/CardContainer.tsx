@@ -2,6 +2,7 @@ import React from "react";
 import { ViewStyle, StyleSheet } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../../utils/responsive";
+import { colors, radius, spacing } from "../../theme/tokens/tokens";
 
 interface CardContainerProps {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ interface CardContainerProps {
 const CardContainer: React.FC<CardContainerProps> = ({ children, style }) => {
   return (
     <LinearGradient
-      colors={["#334A66", "#223347"]}
+      colors={[colors.bgElevated, colors.bgSurface]}
       style={[styles.card, style]}
     >
       {children}
@@ -22,10 +23,10 @@ const CardContainer: React.FC<CardContainerProps> = ({ children, style }) => {
 const styles = StyleSheet.create({
   card: {
     borderRadius: moderateScale(10),
-    padding: moderateScale(16),
-    marginBottom: verticalScale(16),
+    padding: moderateScale(spacing.base),
+    marginBottom: verticalScale(spacing.base),
     borderWidth: moderateScale(1),
-    borderColor: "#445066",
+    borderColor: colors.borderDefault,
   },
 });
 
