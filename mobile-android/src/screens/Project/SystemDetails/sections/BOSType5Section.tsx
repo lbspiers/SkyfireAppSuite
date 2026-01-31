@@ -1,16 +1,27 @@
 // src/screens/Project/SystemDetails/sections/BOSType5Section.tsx
 
 import React, { useState, useEffect, useRef } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
+import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import { colors } from "../../../../theme/tokens/tokens";
 import Dropdown from "../../../../components/Dropdown";
+import { colors } from "../../../../theme/tokens/tokens";
 import NewExistingToggle from "../../../../components/NewExistingToggle";
+import { colors } from "../../../../theme/tokens/tokens";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
+import { colors } from "../../../../theme/tokens/tokens";
 import SystemButton from "../../../../components/Button/SystemButton";
+import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
+import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
+import { colors } from "../../../../theme/tokens/tokens";
 import { DEFAULT_BOS_PHOTO_TAGS } from "../../../../utils/constants";
+import { colors } from "../../../../theme/tokens/tokens";
 import { PreferredEquipment } from "../../../../api/preferredEquipment.service";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   fetchPreferredEquipment,
   filterEquipmentByPreferred,
@@ -25,6 +36,7 @@ import {
   getUtilityEquipmentTypeOptions,
 } from "../../../../utils/constants";
 import { moderateScale, verticalScale } from "../../../../utils/responsive";
+import { colors } from "../../../../theme/tokens/tokens";
 
 interface BOSType5SectionProps {
   values: {
@@ -400,7 +412,7 @@ const BOSType5Section: React.FC<BOSType5SectionProps> = ({
       <View style={styles.maxOutputContainer}>
         <Text style={styles.maxOutputLabel}>{sizingLabel || 'Max Continuous Output'}:</Text>
         {loadingMaxOutput ? (
-          <ActivityIndicator size="small" color="#FD7332" style={styles.maxOutputLoader} />
+          <ActivityIndicator size="small" color={colors.primary} style={styles.maxOutputLoader} />
         ) : sizingCalculation ? (
           <Text style={styles.maxOutputValue}>{sizingCalculation}</Text>
         ) : maxContinuousOutputAmps !== null ? (
@@ -487,12 +499,12 @@ const styles = StyleSheet.create({
     gap: moderateScale(8),
   },
   maxOutputLabel: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: moderateScale(18),
     fontWeight: "600",
   },
   maxOutputValue: {
-    color: "#FD7332",
+    color: colors.primary,
     fontSize: moderateScale(18),
     fontWeight: "700",
   },
@@ -500,13 +512,13 @@ const styles = StyleSheet.create({
     marginLeft: moderateScale(8),
   },
   noteContainer: {
-    backgroundColor: "#1E3A5F",
+    backgroundColor: colors.bgSurface,
     borderRadius: moderateScale(8),
     padding: moderateScale(12),
     marginBottom: verticalScale(16),
   },
   noteText: {
-    color: "#A8C5E6",
+    color: colors.textSecondary,
     fontSize: moderateScale(13),
     lineHeight: moderateScale(18),
     fontStyle: "italic",
