@@ -2,25 +2,15 @@
 import React, { useState, useEffect } from "react";
 import { colors } from "../../../../theme/tokens/tokens";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { colors } from "../../../../theme/tokens/tokens";
 import LinearGradient from "react-native-linear-gradient";
-import { colors } from "../../../../theme/tokens/tokens";
 import { moderateScale, verticalScale } from "../../../../utils/responsive";
-import { colors } from "../../../../theme/tokens/tokens";
 import { ORANGE_TB, BLUE_2C_BT } from "../../../../styles/gradient";
-import { colors } from "../../../../theme/tokens/tokens";
 import { TESLA_POWERWALL_GATEWAYS } from "../../../../utils/constants";
-import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
-import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
-import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
-import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
-import { colors } from "../../../../theme/tokens/tokens";
 import { DEFAULT_INVERTER_PHOTO_TAGS } from "../../../../utils/constants";
-import { colors } from "../../../../theme/tokens/tokens";
 
 interface PowerWallConfigurationSectionProps {
   make: string;

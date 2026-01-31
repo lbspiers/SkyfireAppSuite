@@ -3,25 +3,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
-import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
-import { colors } from "../../../../theme/tokens/tokens";
 import Dropdown from "../../../../components/Dropdown";
-import { colors } from "../../../../theme/tokens/tokens";
 import NewExistingToggle from "../../../../components/NewExistingToggle";
-import { colors } from "../../../../theme/tokens/tokens";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
-import { colors } from "../../../../theme/tokens/tokens";
 import SystemButton from "../../../../components/Button/SystemButton";
-import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
-import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
-import { colors } from "../../../../theme/tokens/tokens";
 import { DEFAULT_BOS_PHOTO_TAGS } from "../../../../utils/constants";
-import { colors } from "../../../../theme/tokens/tokens";
 import { PreferredEquipment } from "../../../../api/preferredEquipment.service";
-import { colors } from "../../../../theme/tokens/tokens";
 import {
   fetchPreferredEquipment,
   filterEquipmentByPreferred,
@@ -30,7 +20,6 @@ import {
   logPreferredFiltering,
 } from "../../../../utils/preferredEquipmentHelper";
 import { moderateScale, verticalScale } from "../../../../utils/responsive";
-import { colors } from "../../../../theme/tokens/tokens";
 import {
   EQUIPMENT_CATALOG,
   BOS_EQUIPMENT_TRANSLATION,

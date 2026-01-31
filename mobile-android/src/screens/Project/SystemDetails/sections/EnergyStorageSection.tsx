@@ -3,21 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
-import { colors } from "../../../../theme/tokens/tokens";
 import LinearGradient from "react-native-linear-gradient";
-import { colors } from "../../../../theme/tokens/tokens";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
-import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
-import { colors } from "../../../../theme/tokens/tokens";
 import Dropdown from "../../../../components/Dropdown";
-import { colors } from "../../../../theme/tokens/tokens";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
-import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
-import { colors } from "../../../../theme/tokens/tokens";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
-import { colors } from "../../../../theme/tokens/tokens";
 import {
   DEFAULT_INVERTER_PHOTO_TAGS,
   BACKUP_SYSTEM_SIZE_WHOLE_HOME_OPTIONS,
