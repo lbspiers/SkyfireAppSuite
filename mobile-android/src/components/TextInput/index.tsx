@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../../utils/responsive";
-import { BLUE_2C_BT } from "../../styles/gradient";
+import { colors } from "../../theme/tokens/tokens";
 // TODO: Custom keyboard disabled - will be re-enabled later
 // import { useGlobalKeyboard } from "../CustomKeyboard/GlobalKeyboardProvider";
 
@@ -82,21 +82,21 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
       <View style={{ height: verticalScale(6) }} />
 
       <LinearGradient
-        colors={BLUE_2C_BT.colors}
-        start={BLUE_2C_BT.start}
-        end={BLUE_2C_BT.end}
+        colors={[colors.bgInput, colors.bgInputHover]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
         style={[
           styles.inputWrapper,
           {
             borderWidth: moderateScale(1),
-            borderColor: hasText ? "#FD7332" : "#888888",
+            borderColor: hasText ? colors.primary : colors.borderInactive,
           },
         ]}
       >
         <RNTextInput
           ref={inputRef}
           placeholder={placeholder}
-          placeholderTextColor="#bbb"
+          placeholderTextColor={colors.textMuted}
           value={value}
           onChangeText={onChangeText}
           onFocus={handleFocus}
@@ -108,7 +108,7 @@ const TextInputField: React.FC<TextInputFieldProps> = ({
           style={[
             styles.input,
             {
-              color: "#FFFFFF",
+              color: colors.textPrimary,
               flex: 1,
             },
             inputStyle,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(20),
     lineHeight: moderateScale(20),
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: colors.textPrimary,
   },
   inputWrapper: {
     flexDirection: "row",
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(20),
     paddingVertical: 0,
     paddingHorizontal: 0,
-    color: "#FFFFFF",
+    color: colors.textPrimary,
     backgroundColor: "transparent",
     minHeight: moderateScale(20),
   },
@@ -178,13 +178,13 @@ const styles = StyleSheet.create({
   eyeIcon: {
     width: moderateScale(20),
     height: moderateScale(20),
-    tintColor: "#FFFFFF",
+    tintColor: colors.textPrimary,
     resizeMode: "contain",
   },
   errorText: {
     marginTop: verticalScale(5),
     fontSize: moderateScale(12),
-    color: "#EF4444",
+    color: colors.error,
     marginBottom: verticalScale(-5),
   },
 });

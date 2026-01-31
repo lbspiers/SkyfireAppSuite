@@ -12,7 +12,20 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useResponsive } from "../../utils/responsive";
-import { ORANGE_TB, BLUE_2C_BT } from "../../styles/gradient";
+import { colors } from "../../theme/tokens/tokens";
+
+// Define gradients using Design Constitution tokens
+const ORANGE_GRADIENT = {
+  colors: [colors.primary, colors.primaryDark],
+  start: { x: 0, y: 0 },
+  end: { x: 0, y: 1 },
+};
+
+const BLUE_GRADIENT = {
+  colors: [colors.bgInput, colors.bgInputHover],
+  start: { x: 0, y: 0 },
+  end: { x: 0, y: 1 },
+};
 
 export type ButtonProps = {
   title?: string;
@@ -62,7 +75,7 @@ function Button({
   const { moderateScale, verticalScale, font } = useResponsive();
   const styles = getStyles({ moderateScale, verticalScale, font });
 
-  const baseGradient = selected ? ORANGE_TB : BLUE_2C_BT;
+  const baseGradient = selected ? ORANGE_GRADIENT : BLUE_GRADIENT;
   const gradientProps =
     color1 && color2
       ? { ...baseGradient, colors: [color1, color2] }
@@ -93,7 +106,7 @@ function Button({
   };
 
   // Update text color and weight based on selected/deactivated state (matches NewExistingToggle)
-  const textColor = deactivated ? "#999999" : (selected ? "#ffffff" : "#bbbbbb");
+  const textColor = deactivated ? colors.textMuted : (selected ? colors.textPrimary : colors.textSecondary);
   const fontWeight = selected ? "700" : "400"; // Bold for selected, normal for unselected (matches NewExistingToggle)
   const mergedTextStyle = [
     styles.text,
@@ -124,7 +137,7 @@ function Button({
 
   // If border is needed, use nested view approach (matches SystemButton)
   if (hasBorder) {
-    const borderColor = deactivated ? "#808080" : "#888888";
+    const borderColor = deactivated ? colors.borderInactive : colors.borderInactive;
     return (
       <View style={wrapperStyle}>
         <View style={{ borderRadius, overflow: "hidden", flex: 1, backgroundColor: borderColor }}>
@@ -212,7 +225,7 @@ const getStyles = ({
       alignItems: "center",
     },
     text: {
-      color: "#ffffff", // Matches NewExistingToggle
+      color: colors.textPrimary, // Matches NewExistingToggle
       fontSize: moderateScale(18), // Matches NewExistingToggle (was font(20))
       fontWeight: "700", // Will be overridden by mergedTextStyle
       textAlign: "center",
