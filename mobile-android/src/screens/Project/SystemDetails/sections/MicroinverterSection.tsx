@@ -9,10 +9,11 @@ import {
   Text as RNText,
 } from "react-native";
 import { useSelector } from "react-redux";
-import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
-import NewExistingToggle from "../../../../components/NewExistingToggle";
-import Dropdown from "../../../../components/Dropdown";
+import EquipmentSection from "../../../../components/UI/EquipmentSection";
+import InlineField from "../../../../components/UI/InlineField";
+import InlineDropdown from "../../../../components/UI/InlineDropdown";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
+import { colors } from "../../../../theme/tokens/tokens";
 import Button from "../../../../components/Button";
 import InlineCustomStringing from "../../../../components/sections/InlineCustomStringing";
 import InlineHoymilesStringing from "../../../../components/sections/InlineHoymilesStringing";
@@ -904,56 +905,42 @@ export default function MicroinverterSection({
 
   return (
     <>
-      <CollapsibleSection
-        title={titleWithoutNumber}
-        systemNumber={systemNumber}
-        initiallyExpanded={false}
-        isDirty={isDirty}
-        isRequiredComplete={isComplete}
-        photoCount={photoCount}
+      <EquipmentSection
+        title={label}
+        isNew={values.isNew}
+        onNewExistingToggle={(v) => onChange("isNew", v)}
+        showNewExistingToggle={true}
         onCameraPress={handleCameraPress}
+        photoCount={photoCount}
+        onDeletePress={() => setShowClearModal(true)}
         isLoading={isLoading}
       >
-        <View style={styles.sectionContent}>
-          <NewExistingToggle
-            isNew={values.isNew}
-            onToggle={(v) => onChange("isNew", v)}
-            onTrashPress={() => setShowClearModal(true)}
-          />
-
-          <ConfirmClearModal
-            visible={showClearModal}
-            sectionTitle={label}
-            onConfirm={() => {
-              clearFields();
-              setShowClearModal(false);
-            }}
-            onCancel={() => setShowClearModal(false)}
-          />
 
           {/* Make */}
-          <Dropdown
-            label="Make*"
-            data={makes}
-            value={values.selectedMake}
-            onOpen={handleMakeOpen}
-            loading={loadingMakes}
-            disabled={loadingMakes}
-            onChange={handleMakeChange}
-            errorText={errors.selectedMake}
-          />
+          <InlineField label="Make" required error={errors.selectedMake}>
+            <InlineDropdown
+              value={values.selectedMake || ""}
+              options={makes}
+              onChange={handleMakeChange}
+              onOpen={handleMakeOpen}
+              loading={loadingMakes}
+              placeholder="Select make"
+            />
+          </InlineField>
 
           {/* Model */}
-          <Dropdown
-            label="Model*"
-            data={models}
-            value={values.selectedModel}
-            onOpen={handleModelOpen}
-            loading={loadingModels}
-            disabled={!values.selectedMake || loadingModels}
-            onChange={handleModelChange}
-            errorText={errors.selectedModel}
-          />
+          <InlineField label="Model" required error={errors.selectedModel}>
+            <InlineDropdown
+              value={values.selectedModel || ""}
+              displayValue={models.find(m => m.value === values.selectedModel)?.label}
+              options={models}
+              onChange={handleModelChange}
+              onOpen={handleModelOpen}
+              loading={loadingModels}
+              disabled={!values.selectedMake}
+              placeholder={values.selectedMake ? "Select model" : "Select make first"}
+            />
+          </InlineField>
 
           {/* Stringing Section */}
           <View style={styles.stringingSection}>
@@ -1093,8 +1080,18 @@ export default function MicroinverterSection({
               )}
             </View>
           )}
-        </View>
-      </CollapsibleSection>
+      </EquipmentSection>
+
+      {/* Clear Confirmation Modal */}
+      <ConfirmClearModal
+        visible={showClearModal}
+        sectionTitle={label}
+        onConfirm={() => {
+          clearFields();
+          setShowClearModal(false);
+        }}
+        onCancel={() => setShowClearModal(false)}
+      />
     </>
   );
 }
@@ -1107,9 +1104,9 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   stringingLabel: {
-    color: "#fff",
-    fontSize: moderateScale(20),
-    fontWeight: "700",
+    color: colors.primary,
+    fontSize: moderateScale(18),
+    fontWeight: "600",
     marginBottom: verticalScale(10),
   },
   stringingButtonRow: {
@@ -1119,14 +1116,14 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   noteText: {
-    color: "#fff",
+    color: colors.textPrimary,
     fontSize: moderateScale(16),
     lineHeight: moderateScale(20),
     marginTop: 0,
     marginBottom: verticalScale(8),
   },
   warningText: {
-    color: "#FFA500",
+    color: colors.warning,
     fontSize: moderateScale(16),
     lineHeight: moderateScale(20),
     marginTop: 0,
