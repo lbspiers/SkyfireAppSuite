@@ -132,6 +132,9 @@ export function useEquipmentDetails(
     state?: string;
   }
 ) {
+  // Extract system number from systemPrefix (e.g., "sys1_" -> "1", "sys2_" -> "2")
+  const sysNum = systemPrefix.replace('sys', '').replace('_', '');
+
   console.log(`🔧 [useEquipmentDetails] Hook called for systemPrefix: ${systemPrefix}`);
 
   // Get project from Redux for utility information
