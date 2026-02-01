@@ -892,17 +892,21 @@ export default function InverterSection({
           ) : null}
         </View>
 
-        {/* BOS Section - REMOVED: Button moved to different location */}
+        {/* BOS Section - Add Pre-Combine BOS Equipment (matches web dashed button) */}
         {showBOSButton && onShowBOS && (
           <View style={styles.bosSection}>
-            <SystemButton
-              label="Add Pre-Combine BOS Equipment"
+            <TouchableOpacity
+              style={styles.addBOSButton}
               onPress={() => {
                 onShowBOS();
               }}
-              style={styles.addBOSButton}
-              scaleOverride={0.85}
-            />
+              activeOpacity={0.7}
+            >
+              <View style={styles.addBOSButtonContent}>
+                <Text style={styles.addBOSButtonIcon}>+</Text>
+                <Text style={styles.addBOSButtonText}>Add Pre-Combine BOS Equipment</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -1022,12 +1026,34 @@ const styles = StyleSheet.create({
   },
   bosSection: {
     width: "100%",
-    marginTop: 0,
+    marginTop: verticalScale(8),
   },
   addBOSButton: {
     width: "100%",
-    height: verticalScale(40),
+    paddingVertical: verticalScale(8),
+    paddingHorizontal: moderateScale(16),
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: colors.borderSubtle, // Dashed gray border (matches web gray-300)
+    borderRadius: moderateScale(6),
     marginBottom: verticalScale(10),
+  },
+  addBOSButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: moderateScale(4),
+  },
+  addBOSButtonIcon: {
+    fontSize: moderateScale(16),
+    fontWeight: "600",
+    color: colors.textMuted, // Gray text (matches web gray-500)
+  },
+  addBOSButtonText: {
+    fontSize: moderateScale(14),
+    fontWeight: "500",
+    color: colors.textMuted, // Gray text (matches web gray-500)
   },
   kilowattSection: {
     width: "100%",
