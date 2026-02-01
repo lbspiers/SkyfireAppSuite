@@ -89,7 +89,7 @@ const SystemSelectionSection: React.FC<SystemSelectionSectionProps> = ({
           </View>
 
           {/* Add Solar Panels Button - centered under system buttons */}
-          {showAddSolarPanels && (
+          {showAddSolarPanels && onAddSolarPanels && (
             <View style={styles.addSolarPanelsRow}>
               <Button
                 title="Add Solar Panels"

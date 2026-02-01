@@ -219,6 +219,12 @@ export default function MicroinverterSection({
     (store: any) => store.profile.profile?.company?.uuid
   );
 
+  // Choose which data source to display (must be before useEffects that use these)
+  const makes = useExternal ? makesProp ?? [] : makesLocal;
+  const models = useExternal ? modelsProp ?? [] : modelsLocal;
+  const loadingMakes = useExternal ? !!loadingMakesProp : loadingMakesLocal;
+  const loadingModels = useExternal ? !!loadingModelsProp : loadingModelsLocal;
+
   // Load photo count for this section
   useEffect(() => {
     if (projectId && label) {
@@ -818,12 +824,6 @@ export default function MicroinverterSection({
       }
     }
   }, [values.selectedMake, onChange, useExternal]);
-
-  // Choose which data source to display
-  const makes = useExternal ? makesProp ?? [] : makesLocal;
-  const models = useExternal ? modelsProp ?? [] : modelsLocal;
-  const loadingMakes = useExternal ? !!loadingMakesProp : loadingMakesLocal;
-  const loadingModels = useExternal ? !!loadingModelsProp : loadingModelsLocal;
 
   // Dirty / complete flags
   const isDirty = Boolean(values.quantity) || Boolean(values.selectedMake) || Boolean(values.selectedModel);
