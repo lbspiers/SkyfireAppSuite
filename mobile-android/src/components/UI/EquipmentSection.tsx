@@ -237,9 +237,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: verticalScale(14),
+    paddingVertical: verticalScale(12),
     paddingHorizontal: moderateScale(16),
-    backgroundColor: colors.bgSurface,
+    backgroundColor: colors.bgPanel,
   },
   headerExpanded: {
     backgroundColor: colors.bgElevated,
@@ -276,12 +276,16 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   iconButton: {
-    padding: moderateScale(8),
+    padding: moderateScale(6),
     position: "relative",
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    borderRadius: moderateScale(6),
+    marginHorizontal: moderateScale(2),
   },
   actionIcon: {
-    width: moderateScale(20),
-    height: moderateScale(20),
+    width: moderateScale(18),
+    height: moderateScale(18),
     tintColor: colors.textMuted,
   },
   activeIcon: {
