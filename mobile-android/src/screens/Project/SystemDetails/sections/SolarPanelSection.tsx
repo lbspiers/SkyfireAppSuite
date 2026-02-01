@@ -683,17 +683,14 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(16),
     paddingVertical: verticalScale(12),
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.primary,
     borderRadius: moderateScale(8),
     alignItems: "center",
   },
   addButtonText: {
-    color: colors.textMuted,
+    color: colors.primary,
     fontSize: moderateScale(14),
     fontWeight: "600",
-  },
-  addButtonTextActive: {
-    color: colors.primary,
   },
   // Battery only mode styles
   addSolarButton: {

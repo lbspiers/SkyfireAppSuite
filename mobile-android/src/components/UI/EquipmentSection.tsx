@@ -317,16 +317,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: moderateScale(8),
     marginBottom: verticalScale(16),
+    alignSelf: "flex-start", // Keep buttons compact, don't stretch
   },
   toggleButton: {
-    flex: 1,
     borderRadius: moderateScale(20),
     overflow: "hidden",
+    minWidth: moderateScale(80), // Minimum width for readability
   },
   toggleButtonActive: {},
   toggleGradient: {
     paddingVertical: verticalScale(8),
-    paddingHorizontal: moderateScale(20),
+    paddingHorizontal: moderateScale(16), // Reduced from 20
     alignItems: "center",
     justifyContent: "center",
   },
