@@ -5,9 +5,11 @@ import {
   View,
   StyleSheet,
   Text,
+  TouchableOpacity,
 } from "react-native";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
+import LinearGradient from "react-native-linear-gradient";
 import EquipmentSection from "../../../../components/UI/EquipmentSection";
 import InlineField from "../../../../components/UI/InlineField";
 import InlineDropdown from "../../../../components/UI/InlineDropdown";
@@ -793,21 +795,57 @@ export default function InverterSection({
             <Text style={styles.stringingLabel}>Choose System Stringing</Text>
           </View>
 
-          {/* Auto/Custom Buttons */}
+          {/* Auto/Custom Toggle Buttons (matches web TableRowButton design) */}
           <View style={styles.stringingButtonRow}>
-            <Button
-              title="Auto"
+            {/* Auto Button */}
+            <TouchableOpacity
+              style={[
+                styles.stringingToggleButton,
+                stringingType !== "auto" && styles.stringingToggleButtonInactive,
+              ]}
               onPress={handleAutoSelection}
-              selected={stringingType === "auto"}
-              width={wp("44%")}
-              style={{ marginRight: moderateScale(10) }}
-            />
-            <Button
-              title="Custom"
+              activeOpacity={0.7}
+            >
+              {stringingType === "auto" ? (
+                <LinearGradient
+                  colors={[colors.primary, colors.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.stringingToggleGradient}
+                >
+                  <Text style={styles.stringingToggleTextActive}>Auto</Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.stringingToggleGradient}>
+                  <Text style={styles.stringingToggleTextInactive}>Auto</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            {/* Custom Button */}
+            <TouchableOpacity
+              style={[
+                styles.stringingToggleButton,
+                stringingType !== "custom" && styles.stringingToggleButtonInactive,
+              ]}
               onPress={handleCustomSelection}
-              selected={stringingType === "custom"}
-              width={wp("44%")}
-            />
+              activeOpacity={0.7}
+            >
+              {stringingType === "custom" ? (
+                <LinearGradient
+                  colors={[colors.primary, colors.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.stringingToggleGradient}
+                >
+                  <Text style={styles.stringingToggleTextActive}>Custom</Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.stringingToggleGradient}>
+                  <Text style={styles.stringingToggleTextInactive}>Custom</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
 
           {/* Conditional Content */}
@@ -916,10 +954,35 @@ const styles = StyleSheet.create({
   },
   stringingButtonRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
+    gap: moderateScale(8),
+    alignSelf: "flex-start", // Keep buttons compact
     marginTop: verticalScale(10),
     marginBottom: verticalScale(10),
+  },
+  stringingToggleButton: {
+    borderRadius: moderateScale(9999), // Fully rounded pill shape (matches web)
+    overflow: "hidden",
+  },
+  stringingToggleButtonInactive: {
+    borderWidth: 1,
+    borderColor: `${colors.primary}80`, // 50% opacity orange border
+    backgroundColor: "transparent",
+  },
+  stringingToggleGradient: {
+    paddingVertical: verticalScale(8),
+    paddingHorizontal: moderateScale(8), // 8px all around (matches web)
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stringingToggleTextActive: {
+    fontSize: moderateScale(12), // 12px (matches web)
+    fontWeight: "600", // Semibold (matches web)
+    color: colors.textPrimary, // White text for active state
+  },
+  stringingToggleTextInactive: {
+    fontSize: moderateScale(12), // 12px (matches web)
+    fontWeight: "600", // Semibold (matches web)
+    color: colors.primary, // Orange text for inactive state
   },
   noteText: {
     color: colors.textPrimary,
