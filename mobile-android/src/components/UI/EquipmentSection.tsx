@@ -172,32 +172,54 @@ export default function EquipmentSection({
           {/* New/Existing Toggle Row */}
           {showNewExistingToggle && onNewExistingToggle && (
             <View style={styles.toggleRow}>
+              {/* New Button */}
               <TouchableOpacity
-                style={[styles.toggleButton, isNew && styles.toggleButtonActive]}
+                style={[
+                  styles.toggleButton,
+                  !isNew && styles.toggleButtonInactive,
+                ]}
                 onPress={() => onNewExistingToggle(true)}
+                activeOpacity={0.7}
               >
-                <LinearGradient
-                  colors={isNew ? [colors.primary, colors.primaryDark] : [colors.bgInput, colors.bgInputHover]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0, y: 1 }}
-                  style={styles.toggleGradient}
-                >
-                  <Text style={[styles.toggleText, isNew && styles.toggleTextActive]}>New</Text>
-                </LinearGradient>
+                {isNew ? (
+                  <LinearGradient
+                    colors={[colors.primary, colors.primaryDark]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={styles.toggleGradient}
+                  >
+                    <Text style={styles.toggleTextActive}>New</Text>
+                  </LinearGradient>
+                ) : (
+                  <View style={styles.toggleGradient}>
+                    <Text style={styles.toggleTextInactive}>New</Text>
+                  </View>
+                )}
               </TouchableOpacity>
 
+              {/* Existing Button */}
               <TouchableOpacity
-                style={[styles.toggleButton, !isNew && styles.toggleButtonActive]}
+                style={[
+                  styles.toggleButton,
+                  isNew && styles.toggleButtonInactive,
+                ]}
                 onPress={() => onNewExistingToggle(false)}
+                activeOpacity={0.7}
               >
-                <LinearGradient
-                  colors={!isNew ? [colors.primary, colors.primaryDark] : [colors.bgInput, colors.bgInputHover]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0, y: 1 }}
-                  style={styles.toggleGradient}
-                >
-                  <Text style={[styles.toggleText, !isNew && styles.toggleTextActive]}>Existing</Text>
-                </LinearGradient>
+                {!isNew ? (
+                  <LinearGradient
+                    colors={[colors.primary, colors.primaryDark]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={styles.toggleGradient}
+                  >
+                    <Text style={styles.toggleTextActive}>Existing</Text>
+                  </LinearGradient>
+                ) : (
+                  <View style={styles.toggleGradient}>
+                    <Text style={styles.toggleTextInactive}>Existing</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             </View>
           )}
@@ -321,25 +343,29 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start", // Keep buttons compact, don't stretch
   },
   toggleButton: {
-    borderRadius: moderateScale(20),
+    borderRadius: moderateScale(9999), // Fully rounded pill shape (matches web)
     overflow: "hidden",
-    minWidth: moderateScale(80), // Minimum width for readability
   },
-  toggleButtonActive: {},
+  toggleButtonInactive: {
+    borderWidth: 1,
+    borderColor: `${colors.primary}80`, // 50% opacity orange border (matches web rgba(253, 115, 50, 0.5))
+    backgroundColor: "transparent",
+  },
   toggleGradient: {
     paddingVertical: verticalScale(8),
-    paddingHorizontal: moderateScale(16), // Reduced from 20
+    paddingHorizontal: moderateScale(8), // 8px all around (matches web)
     alignItems: "center",
     justifyContent: "center",
   },
-  toggleText: {
-    fontSize: moderateScale(14),
-    fontWeight: "500",
-    color: colors.textSecondary,
-  },
   toggleTextActive: {
-    color: colors.white,
-    fontWeight: "600",
+    fontSize: moderateScale(12), // 12px (matches web)
+    fontWeight: "600", // Semibold (matches web)
+    color: colors.textPrimary, // White text for active state
+  },
+  toggleTextInactive: {
+    fontSize: moderateScale(12), // 12px (matches web)
+    fontWeight: "600", // Semibold (matches web)
+    color: colors.primary, // Orange text for inactive state
   },
   content: {},
   loadingContainer: {
