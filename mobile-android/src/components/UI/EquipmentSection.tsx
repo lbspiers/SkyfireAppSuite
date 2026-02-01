@@ -76,7 +76,7 @@ export default function EquipmentSection({
     <View style={styles.container}>
       {/* Header Row */}
       <TouchableOpacity
-        style={[styles.header, expanded && styles.headerExpanded]}
+        style={styles.header}
         onPress={toggle}
         activeOpacity={0.8}
       >
@@ -239,10 +239,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: verticalScale(12),
     paddingHorizontal: moderateScale(16),
-    backgroundColor: colors.bgPanel,
-  },
-  headerExpanded: {
-    backgroundColor: colors.bgElevated,
+    backgroundColor: colors.bgSurface,
   },
   headerLeft: {
     flex: 1,
