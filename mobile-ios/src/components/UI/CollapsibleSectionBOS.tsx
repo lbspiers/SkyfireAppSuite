@@ -11,6 +11,7 @@ import {
   Text as RNText,
 } from "react-native";
 import { spacing, typography } from "../../theme/theme";
+import { colors } from "../../theme/tokens/tokens";
 import NewExistingToggle from "../NewExistingToggle"; // <-- import toggle
 
 interface Props {
@@ -44,7 +45,7 @@ export default function CollapsibleSectionBOS({
 
   // camera visibility logic
   const showCamera = expanded || (!expanded && photoCount > 0);
-  const cameraTint = photoCount > 0 ? "#FD7332" : "#FFFFFF";
+  const cameraTint = photoCount > 0 ? colors.primary : colors.white;
 
   return (
     <View style={[
@@ -129,7 +130,7 @@ export default function CollapsibleSectionBOS({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     overflow: "hidden",
     marginBottom: 0,
   },
@@ -140,21 +141,21 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 20, // same LR spacing as other sections
     minHeight: 45,
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     marginTop: -14,
   },
   headerTouchable: {
     flex: 1,
   },
   title: {
-    color: "#FFFFFF",
+    color: colors.textPrimary,
     fontSize: 20,
     lineHeight: 24,
     marginTop: 4,
     marginLeft: -20,
   },
   completeTitle: {
-    color: "#36B509",
+    color: colors.success,
   },
   toggle: {
     marginRight: 12, // ensure spacing before camera/icon
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   countBadge: {
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     borderRadius: 5,
     minWidth: 30,
     height: 30,
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   badgeText: {
-    color: "#FFF",
+    color: colors.white,
     fontWeight: "700",
     fontSize: 24,
     letterSpacing: 0.15,
@@ -197,17 +198,17 @@ const styles = StyleSheet.create({
   body: {
     paddingHorizontal: 20, // same LR padding
     paddingBottom: 8,
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
   },
   collapsedContainer: {
     borderWidth: 2,
-    borderColor: "#6B7280",
+    borderColor: colors.gray500,
     borderRadius: 8,
     marginBottom: 6,
     marginTop: 14,
     paddingVertical: 3,
   },
   collapsedContainerDirty: {
-    borderColor: "#FD7332",
+    borderColor: colors.primary,
   },
 });

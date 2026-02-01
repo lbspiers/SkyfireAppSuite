@@ -45,6 +45,9 @@ const BatteryTypeSection = ({
   const [showMountValidationModal, setShowMountValidationModal] = useState(false);
   const [mountValidationData, setMountValidationData] = useState(null);
 
+  // Track if user manually cleared data (prevents auto-select from re-triggering)
+  const [manuallyCleared, setManuallyCleared] = useState(false);
+
   // Derive 6C mode from props or combiner data
   const is6CMode = isEnphase6CMode || isEnphase6CCombiner(combinerPanelMake, combinerPanelModel);
 
@@ -153,6 +156,8 @@ const BatteryTypeSection = ({
 
     onChange(`${prefix}_make`, value);
     onChange(`${prefix}_model`, '');
+    // Reset manually cleared flag when user selects new equipment
+    setManuallyCleared(false);
   };
 
   const handleModelChange = (value) => {
@@ -319,21 +324,51 @@ const BatteryTypeSection = ({
 
   const getSubtitle = () => {
     const parts = [];
+
+    // Quantity with New/Existing indicator
     if (formData[quantityField]) {
-      parts.push(`Qty: ${formData[quantityField]}`);
+      const statusLetter = formData[`${prefix}_isnew`] !== false ? 'N' : 'E';
+      parts.push(`${formData[quantityField]} (${statusLetter})`);
     }
+
     if (formData[makeField] && formData[modelField]) {
       const displayModel = getBatteryDisplayName(formData[modelField]);
       parts.push(`${formData[makeField]} ${displayModel}`);
     }
-    return parts.join(' - ');
+    return parts.join(' ');
   };
 
   const handleDelete = () => {
-    onChange(makeField, '');
-    onChange(modelField, '');
-    onChange(quantityField, '');
-    onChange(configurationField, '');
+    // Check if there's any data to clear
+    const hasData = !!(
+      formData[makeField] ||
+      formData[modelField] ||
+      formData[quantityField] ||
+      formData[tieInLocationField] ||
+      formData[configurationField] ||
+      formData[mountTypeField]
+    );
+
+    if (hasData) {
+      // First click: Clear all data
+      onChange(makeField, '');
+      onChange(modelField, '');
+      onChange(quantityField, '');
+      onChange(tieInLocationField, '');
+      onChange(configurationField, '');
+      onChange(combinationMethodField, '');
+      onChange(mountTypeField, '');
+      onChange(`${prefix}_isnew`, true); // Reset to default
+      // Also hide BOS if it was showing
+      onChange(`show_battery${batteryNumber}_bos`, false);
+      // Mark as manually cleared to prevent auto-select from re-triggering
+      setManuallyCleared(true);
+    } else {
+      // Second click: Hide the entire section (only for Battery Type 2)
+      if (batteryNumber === 2) {
+        onChange('show_battery_type_2', false);
+      }
+    }
   };
 
   const handlePreferredSelect = (selected) => {
@@ -437,13 +472,13 @@ const BatteryTypeSection = ({
     formData.battery_combiner_panel_model,
   ]);
 
-  // Auto-select if only one option (always save to ensure DB has value)
+  // Auto-select if only one option (unless user manually cleared)
   useEffect(() => {
-    if (tieInLocationOptions.length === 1 && !formData[tieInLocationField]) {
+    if (tieInLocationOptions.length === 1 && !formData[tieInLocationField] && !manuallyCleared) {
       console.log('🔌 Auto-selecting tie-in location:', tieInLocationOptions[0].value);
       onChange(tieInLocationField, tieInLocationOptions[0].value);
     }
-  }, [tieInLocationOptions, formData[tieInLocationField], tieInLocationField, onChange]);
+  }, [tieInLocationOptions, formData[tieInLocationField], tieInLocationField, onChange, manuallyCleared]);
 
   // Determine section title based on 6C mode
   const sectionTitle = is6CMode
@@ -451,7 +486,7 @@ const BatteryTypeSection = ({
     : `Battery (Type ${batteryNumber})`;
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title={sectionTitle}
         subtitle={getSubtitle()}
@@ -555,10 +590,21 @@ const BatteryTypeSection = ({
             showSearch={false}
           />
         )}
+        {/* Add Battery BOS Button - Show inside when battery is configured but BOS not yet added */}
+        {isComplete && !formData[`show_battery${batteryNumber}_bos`] && (
+          <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
+            <TableRowButton
+              label={`+ Battery Type ${batteryNumber} BOS`}
+              variant="outline"
+              onClick={() => onChange(`show_battery${batteryNumber}_bos`, true)}
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
       </EquipmentRow>
 
-      {/* BOS Equipment */}
-      {isComplete && (
+      {/* BOS Equipment - Only show if flag is set */}
+      {isComplete && formData[`show_battery${batteryNumber}_bos`] && (
         <BOSEquipmentSection
           formData={formData}
           onChange={onChange}
@@ -626,6 +672,8 @@ const arePropsEqual = (prevProps, nextProps) => {
     `${prefix}_tie_in_location`,
     `${prefix}_mount_type`,
     'show_battery_type_2',
+    'show_battery1_bos',
+    'show_battery2_bos',
   ];
 
   // Compare relevant formData fields

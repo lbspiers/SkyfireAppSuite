@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
+import { colors, radius, spacing, fontSize, fontWeight } from "../../theme/tokens/tokens";
 
 interface SectionHeaderProps {
   title: string;
@@ -15,7 +16,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 }) => {
   return (
     <LinearGradient
-      colors={["#334A66", "#223347"]}
+      colors={[colors.bgElevated, colors.bgSurface]}
       style={styles.headerContainer}
     >
       <TouchableOpacity style={styles.row} onPress={onPress}>
@@ -35,9 +36,9 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 
 const styles = StyleSheet.create({
   headerContainer: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    paddingHorizontal: 16,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    paddingHorizontal: spacing.base,
     paddingVertical: 14,
   },
   row: {
@@ -46,14 +47,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
+    color: colors.textPrimary,
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
   },
   icon: {
     width: 18,
     height: 18,
-    tintColor: "#FD7332",
+    tintColor: colors.primary,
   },
 });
 

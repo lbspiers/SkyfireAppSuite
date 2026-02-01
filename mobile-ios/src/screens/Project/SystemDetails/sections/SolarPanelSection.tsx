@@ -1,14 +1,14 @@
-// src/screens/Project/SystemDetails/sections/SolarPanelSection.tsx - CLEAN VERSION
+// src/screens/Project/SystemDetails/sections/SolarPanelSection.tsx - WEB LAYOUT VERSION
 import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
-import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
-import NewExistingToggle from "../../../../components/NewExistingToggle";
-import TextInput from "../../../../components/TextInput";
-import Dropdown from "../../../../components/Dropdown";
-import NumericKeypad from "../../../../components/NumericKeypad";
+import EquipmentSection from "../../../../components/UI/EquipmentSection";
+import InlineField from "../../../../components/UI/InlineField";
+import InlineTextInput from "../../../../components/UI/InlineTextInput";
+import InlineDropdown from "../../../../components/UI/InlineDropdown";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
 import SolarPanelSpecsModal from "../../../../components/SolarPanelSpecsModal";
 import Button from "../../../../components/Button";
+import { colors } from "../../../../theme/tokens/tokens";
 import { useProjectContext } from "../../../../hooks/useProjectContext";
 import { usePhotoCapture } from "../../../../hooks/usePhotoCapture";
 import { DEFAULT_PANEL_PHOTO_TAGS } from "../../../../utils/constants";
@@ -533,199 +533,114 @@ export default function SolarPanelsSection({
 
   return (
     <>
-      <CollapsibleSection
-        title={values.isBatteryOnly ? "Battery Only" : titleWithoutNumber}
-        systemNumber={values.isBatteryOnly ? undefined : systemNumber}
-        initiallyExpanded={false}
-        isDirty={isDirty}
-        isRequiredComplete={isComplete}
-        photoCount={photoCount}
+      <EquipmentSection
+        title={values.isBatteryOnly ? "Battery Only" : label}
+        isNew={values.isNew}
+        onNewExistingToggle={(v) => onChange("isNew", v)}
+        showNewExistingToggle={!values.isBatteryOnly}
         onCameraPress={handleCameraPress}
+        photoCount={photoCount}
+        onDeletePress={() => setShowClearModal(true)}
         isLoading={isLoading}
+        headerRightContent={
+          !values.isBatteryOnly && (
+            <TouchableOpacity
+              style={styles.batteryOnlyHeaderButton}
+              onPress={() => {
+                onChange("isBatteryOnly", true);
+                // Clear solar panel data
+                onChange("quantity", "");
+                onChange("selectedMake", "");
+                onChange("selectedMakeLabel", "");
+                onChange("selectedModel", "");
+                onChange("selectedModelLabel", "");
+              }}
+            >
+              <Text style={[
+                styles.batteryOnlyHeaderText,
+                values.isBatteryOnly && styles.batteryOnlyHeaderTextActive
+              ]}>
+                Battery Only
+              </Text>
+            </TouchableOpacity>
+          )
+        }
       >
-        <View style={styles.content}>
-          {/* New/Existing Toggle - only show if not battery only */}
-          {!values.isBatteryOnly && (
-            <NewExistingToggle
-              isNew={values.isNew}
-              onToggle={(v) => onChange("isNew", v)}
-              onTrashPress={() => setShowClearModal(true)}
-            />
-          )}
+        {!values.isBatteryOnly ? (
+          <>
+            {/* Quantity */}
+            <InlineField label="Quantity" required error={errors.quantity}>
+              <InlineTextInput
+                value={tempQty}
+                onChangeText={(text) => {
+                  const numericText = text.replace(/[^0-9]/g, '');
+                  setTempQty(numericText);
+                }}
+                onBlur={() => {
+                  const cleanedQty = tempQty.replace(/^0+/, "") || "";
+                  onChange("quantity", cleanedQty);
+                }}
+                placeholder="Enter quantity"
+                numeric
+              />
+            </InlineField>
 
-          {/* Form Fields - only show if not battery only */}
-          {!values.isBatteryOnly && (
-            <View style={styles.formFields}>
-              {/* Quantity and Watts Row */}
-              <View style={styles.quantityRow}>
-                <View style={styles.qtyWrap}>
-                  <TextInput
-                    label="Quantity*"
-                    value={tempQty}
-                    editable
-                    showNumericKeypad={true}
-                    onChangeText={(text) => {
-                      // Only allow numbers
-                      const numericText = text.replace(/[^0-9]/g, '');
-                      setTempQty(numericText);
-                    }}
-                    onBlur={() => {
-                      // Save to parent when user finishes editing
-                      const cleanedQty = tempQty.replace(/^0+/, "") || "";
-                      console.log('[SolarPanelSection] onBlur - saving quantity:', { tempQty, cleanedQty });
-                      onChange("quantity", cleanedQty);
-                    }}
-                    errorText={errors.quantity}
-                  />
-                </View>
-
-                <View style={styles.wattsWrap}>
-                  <TextInput
-                    label="Watt Filter"
-                    value={tempWatts}
-                    editable
-                    showNumericKeypad={true}
-                    onChangeText={(text) => {
-                      // Only allow numbers, max 3 digits
-                      const numericText = text.replace(/[^0-9]/g, '').slice(0, 3);
-                      console.log('[SolarPanelSection] Watt filter onChangeText:', { text, numericText });
-                      setTempWatts(numericText);
-                    }}
-                    onBlur={() => {
-                      // Apply filter when user finishes editing
-                      console.log('[SolarPanelSection] Watt filter onBlur:', { tempWatts });
-                      setWatts(tempWatts);
-                    }}
-                  />
-                </View>
-              </View>
-
-              {/* Make */}
-              <Dropdown
-                label="Make*"
-                data={makeData}
-                value={values.selectedMake}
+            {/* Make */}
+            <InlineField label="Make" required error={errors.selectedMake}>
+              <InlineDropdown
+                value={values.selectedMake || ""}
+                displayValue={values.selectedMakeLabel}
+                options={makeData}
+                onChange={handleMakeChange}
                 onOpen={handleMakeOpen}
                 loading={loadingSolarMakes}
-                onChange={handleMakeChange}
-                errorText={errors.selectedMake}
-                // enableSearch={true} // COMMENTED OUT - Search needs better solution
+                placeholder="Select make"
               />
+            </InlineField>
 
-              {/* Model */}
-              <Dropdown
-                label="Model*"
-                data={modelData}
-                value={values.selectedModel}
+            {/* Model */}
+            <InlineField label="Model" required noBorder error={errors.selectedModel}>
+              <InlineDropdown
+                value={values.selectedModel || ""}
+                displayValue={values.selectedModelLabel}
+                options={modelData}
+                onChange={handleModelChange}
                 onOpen={handleModelOpen}
                 loading={loadingSolarModels}
-                disabled={!values.selectedMake || loadingSolarModels}
-                onChange={handleModelChange}
-                errorText={errors.selectedModel}
-                // enableSearch={true} // COMMENTED OUT - Search needs better solution
+                disabled={!values.selectedMake}
+                placeholder={values.selectedMake ? "Select model" : "Select make first"}
               />
-            </View>
-          )}
+            </InlineField>
 
-          {/* Action Buttons Row - Different buttons based on Battery Only state and AC Integrated */}
-          <View style={[styles.batteryButtonRow, (values.isBatteryOnly || values.isAcIntegrated) && styles.centeredButtonRow]}>
-            {values.isBatteryOnly ? (
-              // Battery Only Mode: Show Add Solar Panels button
-              <Button
-                title="Add Solar Panels"
-                onPress={() => {
-                  onChange("isBatteryOnly", false);
-                }}
-                selected={false}
-                width={wp("60%")} // Centered button, wider like in System Selection
-                style={styles.batteryOnlyButton}
-              />
-            ) : values.isAcIntegrated ? (
-              // AC Integrated Mode: Show only Battery Only button (centered)
-              <Button
-                title="Battery Only"
-                onPress={() => {
-                  onChange("isBatteryOnly", true);
-                  // Clear solar panel data when switching to battery only
-                  onChange("quantity", "");
-                  onChange("selectedMake", "");
-                  onChange("selectedMakeLabel", "");
-                  onChange("selectedModel", "");
-                  onChange("selectedModelLabel", "");
-                }}
-                selected={values.isBatteryOnly}
-                width={wp("60%")} // Centered button, wider like Battery Only mode
-                style={styles.batteryOnlyButton}
-              />
-            ) : (
-              // Normal Mode: Show both buttons
-              <>
-                <Button
-                  title="+ 2nd Panel Type"
-                  onPress={() => {
-                    if (values.showSecondPanelType) {
-                      // User is unchecking - clear data and hide section
-                      onChange("showSecondPanelType", false);
-                      // Clear Solar Panel Type 2 data from database
-                      onClearType2?.();
-                    } else {
-                      // User is checking - show section
-                      onChange("showSecondPanelType", true);
-                    }
-                  }}
-                  selected={values.showSecondPanelType}
-                  width={wp("44%")} // 44% width to match System Selection buttons
-                  style={styles.batteryOnlyButton}
-                />
-
-                <Button
-                  title="Battery Only"
-                  onPress={() => {
-                    onChange("isBatteryOnly", true);
-                    // Clear solar panel data when switching to battery only
-                    onChange("quantity", "");
-                    onChange("selectedMake", "");
-                    onChange("selectedMakeLabel", "");
-                    onChange("selectedModel", "");
-                    onChange("selectedModelLabel", "");
-                  }}
-                  selected={values.isBatteryOnly}
-                  width={wp("44%")} // 44% width to match System Selection buttons
-                  style={styles.batteryOnlyButton}
-                />
-              </>
-            )}
-          </View>
-        </View>
-      </CollapsibleSection>
-
-      {/* Quantity Keypad */}
-      <NumericKeypad
-        isVisible={keypadVisible}
-        currentValue={tempQty}
-        onNumberPress={(n) =>
-          setTempQty((prev) => (prev === "" || prev === "0" ? n : prev + n))
-        }
-        onBackspace={() => setTempQty((prev) => prev.slice(0, -1))}
-        onClose={handleQuantityClose}
-      />
-
-      {/* Watts Keypad */}
-      <NumericKeypad
-        isVisible={wattsKeypadVisible}
-        currentValue={tempWatts}
-        title="Wattage Filter"
-        onNumberPress={(n) => {
-          if (tempWatts.length < 3) {
-            setTempWatts((prev) => (prev === "" || prev === "0" ? n : prev + n));
-          }
-        }}
-        onBackspace={() => setTempWatts((prev) => prev.slice(0, -1))}
-        onClose={() => {
-          setWatts(tempWatts);
-          setWattsKeypadVisible(false);
-        }}
-      />
+            {/* + Solar Panel Type 2 Button */}
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => {
+                if (values.showSecondPanelType) {
+                  onChange("showSecondPanelType", false);
+                  onClearType2?.();
+                } else {
+                  onChange("showSecondPanelType", true);
+                }
+              }}
+            >
+              <Text style={[
+                styles.addButtonText,
+                values.showSecondPanelType && styles.addButtonTextActive
+              ]}>
+                + Solar Panel (Type 2)
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity
+            style={styles.addSolarButton}
+            onPress={() => onChange("isBatteryOnly", false)}
+          >
+            <Text style={styles.addSolarButtonText}>+ Add Solar Panels</Text>
+          </TouchableOpacity>
+        )}
+      </EquipmentSection>
 
       {/* Clear Confirmation Modal */}
       <ConfirmClearModal
@@ -748,52 +663,43 @@ export default function SolarPanelsSection({
 }
 
 const styles = StyleSheet.create({
-  content: {
-    paddingHorizontal: 0,
-    width: "100%",
+  // Header button styles
+  batteryOnlyHeaderButton: {
+    paddingVertical: verticalScale(6),
+    paddingHorizontal: moderateScale(12),
+    borderRadius: moderateScale(16),
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
   },
-  formFields: {
-    width: "100%",
+  batteryOnlyHeaderText: {
+    fontSize: moderateScale(12),
+    color: colors.textMuted,
   },
-  quantityRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "relative",
+  batteryOnlyHeaderTextActive: {
+    color: colors.primary,
   },
-  qtyWrap: {
-    width: moderateScale(180),
-    marginBottom: verticalScale(-10),
+  // Add button styles
+  addButton: {
+    marginTop: verticalScale(16),
+    paddingVertical: verticalScale(12),
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: moderateScale(8),
+    alignItems: "center",
   },
-  wattsWrap: {
-    width: moderateScale(180),
-    marginBottom: verticalScale(-10),
-  },
-  specsLink: {
-    marginLeft: moderateScale(12),
-    marginBottom: verticalScale(12),
-    paddingVertical: verticalScale(4),
-    paddingHorizontal: moderateScale(8),
-  },
-  specsText: {
-    color: "#FFB02E",
+  addButtonText: {
+    color: colors.primary,
     fontSize: moderateScale(14),
-    textDecorationLine: "underline",
-    fontWeight: "500",
+    fontWeight: "600",
   },
-  batteryButtonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-    marginTop: verticalScale(10),
-    marginBottom: verticalScale(30),
+  // Battery only mode styles
+  addSolarButton: {
+    paddingVertical: verticalScale(16),
+    alignItems: "center",
   },
-  centeredButtonRow: {
-    justifyContent: "center",
-  },
-  batteryOnlyButton: {
-    // No additional styles needed - Button component handles it
-    // This matches the System Selection buttons exactly
+  addSolarButtonText: {
+    color: colors.primary,
+    fontSize: moderateScale(16),
+    fontWeight: "600",
   },
 });

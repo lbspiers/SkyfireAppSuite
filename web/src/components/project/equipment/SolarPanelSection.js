@@ -450,9 +450,10 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
 
     const parts = [];
 
-    // Quantity
+    // Quantity with New/Existing indicator
     if (formData[solarPanelQuantityField]) {
-      parts.push(`Qty: ${formData[solarPanelQuantityField]}`);
+      const statusLetter = formData[solarPanelIsNewField] !== false ? 'N' : 'E';
+      parts.push(`${formData[solarPanelQuantityField]} (${statusLetter})`);
     }
 
     // Make and Model
@@ -460,21 +461,12 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       parts.push(`${formData[solarPanelMakeField]} ${formData[solarPanelModelField]}`);
     }
 
-    // Wattage
-    if (formData[solarPanelWattageField]) {
-      parts.push(`${formData[solarPanelWattageField]}W`);
-    }
-
-    // New/Existing status
-    const status = formData[solarPanelIsNewField] !== false ? 'New' : 'Existing';
-    parts.push(status);
-
-    return parts.join(' | ');
+    return parts.join(' ');
   };
 
   return (
     <div>
-      <div style={{ marginBottom: 'var(--spacing)' }}>
+      <div style={{ marginBottom: 'var(--spacing-xs)' }}>
         <EquipmentRow
           title={sectionTitle}
           subtitle={getSubtitle()}

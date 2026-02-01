@@ -608,37 +608,16 @@ const InverterMicroSection = ({
       quantity = solarPanelQty + solarPanelQty2;
     }
 
-    // Show quantity for microinverters or always for string inverters
+    // Quantity with New/Existing indicator
     if (quantity > 0) {
-      parts.push(`Qty: ${quantity}`);
+      const statusLetter = formData.inverter_isnew !== false ? 'N' : 'E';
+      parts.push(`${quantity} (${statusLetter})`);
     }
 
     // Make and Model
     parts.push(`${formData.inverter_make} ${formData.inverter_model}`);
 
-    // Max Continuous Output - multiply by quantity for total system output
-    if (formData.inverter_max_cont_output_amps) {
-      const perUnitAmps = parseFloat(formData.inverter_max_cont_output_amps);
-      const totalAmps = perUnitAmps * quantity;
-
-      // For microinverters, show both per-unit and total
-      if (isMicroinverter && quantity > 1) {
-        parts.push(`${perUnitAmps}A each (${totalAmps.toFixed(1)}A total)`);
-      } else {
-        parts.push(`${perUnitAmps}A`);
-      }
-    }
-
-    // Type (only show if it's a microinverter to differentiate)
-    if (isMicroinverter) {
-      parts.push('Micro');
-    }
-
-    // New/Existing status
-    const status = formData.inverter_isnew !== false ? 'New' : 'Existing';
-    parts.push(status);
-
-    return parts.join(' | ');
+    return parts.join(' ');
   };
 
   // Deduplicate PowerWall 3 models - show only "Powerwall 3" once
@@ -863,7 +842,8 @@ const InverterMicroSection = ({
         )}
       </EquipmentRow>
 
-      {/* Add Inverter BOS Button - Show after Inverter when NO optimizer AND inverter configured */}
+      {/* Add Inverter BOS Button - Show after Inverter when NO optimizer AND inverter configured
+          Note: For microinverters, this button is inside the String Combiner Panel section */}
       {!showOptimizers && formData.inverter_type === 'inverter' && formData.inverter_make && formData.inverter_model && !formData.show_inverter_bos && (
         <AddSectionButton
           label="Inverter BOS (Type 1)"

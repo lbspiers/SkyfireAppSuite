@@ -52,11 +52,13 @@ const BOSEquipmentSection = ({
       }
     }
 
-    // Only update if different from current state
-    if (JSON.stringify(slotsWithData) !== JSON.stringify(visibleSlots)) {
-      setVisibleSlots(slotsWithData);
-    }
-  }, [formData, pattern.maxSlots, systemNumber]); // React to formData changes
+    // Only update if different from current state (but don't compare against visibleSlots to avoid interference with manual additions)
+    setVisibleSlots(prev => {
+      const currentSlots = JSON.stringify(prev.sort());
+      const newSlots = JSON.stringify(slotsWithData.sort());
+      return currentSlots !== newSlots ? slotsWithData : prev;
+    });
+  }, [formData, pattern.maxSlots, systemNumber]); // React to formData changes only
 
   // Get utility from multiple sources (fallback chain)
   const utility = useMemo(() => {
@@ -81,6 +83,28 @@ const BOSEquipmentSection = ({
   // Check if inverter is Hoymiles or APSystems (requires breaker rating)
   const inverterMake = formData.inverter_make || formData[`sys${systemNumber}_inverter_make`] || '';
   const isHoymilesOrApsystems = inverterMake === 'Hoymiles' || inverterMake === 'APSystems';
+
+  // Check if this is a microinverter system (for title labeling)
+  const inverterType = formData.inverter_type || formData[`sys${systemNumber}_inverter_type`] || '';
+  const isMicroinverter = inverterType === 'microinverter';
+
+  // Get section-specific title
+  const getSectionTitle = (slotNumber) => {
+    switch (section) {
+      case 'utility':
+        return isMicroinverter ? `String Combiner BOS (Type ${slotNumber})` : `Inverter BOS (Type ${slotNumber})`;
+      case 'battery1':
+        return `Battery 1 BOS (Type ${slotNumber})`;
+      case 'battery2':
+        return `Battery 2 BOS (Type ${slotNumber})`;
+      case 'backup':
+        return `Backup BOS (Type ${slotNumber})`;
+      case 'postSMS':
+        return `Post-SMS BOS (Type ${slotNumber})`;
+      default:
+        return `BOS Equipment (Type ${slotNumber})`;
+    }
+  };
 
   // Breaker size options for Hoymiles/APSystems
   const breakerSizeOptions = [
@@ -183,7 +207,18 @@ const BOSEquipmentSection = ({
 
     // If this is the last visible slot (slot 1) being deleted, hide the entire BOS section
     if (visibleSlots.length === 1 && slotNumber === 1) {
-      onChange('show_inverter_bos', false);
+      // Hide the appropriate BOS section based on section type
+      const bosFlags = {
+        utility: 'show_inverter_bos',
+        battery1: 'show_battery1_bos',
+        battery2: 'show_battery2_bos',
+        backup: 'show_backup_bos',
+        postSMS: 'show_postsms_bos',
+      };
+      const flagToHide = bosFlags[section];
+      if (flagToHide) {
+        onChange(flagToHide, false);
+      }
     }
     // Otherwise, remove it from visibleSlots array
     else if (visibleSlots.length > 1) {
@@ -311,7 +346,7 @@ const BOSEquipmentSection = ({
   };
 
   return (
-    <div style={{ marginTop: 'var(--spacing)', marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginTop: 'var(--spacing)', marginBottom: 'var(--spacing-xs)' }}>
       {slotsToRender.map((slot, index) => {
         const availableMakes = getAvailableMakes(slot.equipmentType, slot.ampRating);
         const availableModels = getAvailableModels(slot.equipmentType, slot.make, slot.ampRating);
@@ -320,13 +355,18 @@ const BOSEquipmentSection = ({
         // Subtitle shows make/model if available
         const getSubtitle = () => {
           const parts = [];
+
+          // New/Existing indicator
+          const statusLetter = slot.isNew ? 'N' : 'E';
+          parts.push(`(${statusLetter})`);
+
           if (slot.make && slot.model) {
             parts.push(`${slot.make} ${slot.model}`);
           }
           if (slot.ampRating) {
             parts.push(`${slot.ampRating}`);
           }
-          return parts.join(' - ');
+          return parts.join(' ');
         };
 
         const availableAmpRatings = getAvailableAmpRatings(slot.equipmentType);
@@ -334,7 +374,7 @@ const BOSEquipmentSection = ({
         return (
           <EquipmentRow
             key={slot.slotNumber}
-            title={slot.equipmentType || `Inverter BOS (Type ${slot.slotNumber})`}
+            title={slot.equipmentType || getSectionTitle(slot.slotNumber)}
             subtitle={getSubtitle()}
             showNewExistingToggle={true}
             isNew={slot.isNew}
@@ -426,7 +466,7 @@ const BOSEquipmentSection = ({
                   onClick={handleAddSlot}
                   style={{ borderRadius: '9999px' }}
                 >
-                  + Inverter BOS (Type {nextSlot})
+                  + {getSectionTitle(nextSlot)}
                 </Button>
               </div>
             )}

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { TextInput, TextInputProps } from "react-native-paper";
 import LinearGradient from "react-native-linear-gradient";
-import { ORANGE_LR, BLUE_2C_BT } from "../../styles/gradient";
+import { colors } from "../../theme/tokens/tokens";
 import { moderateScale, verticalScale } from "../../utils/responsive";
 
 interface ThemedTextInputProps extends TextInputProps {
@@ -27,8 +27,6 @@ interface ThemedTextInputProps extends TextInputProps {
   placeholderColor?: string;
 }
 
-const ORANGE = "#FD7332";
-
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
   label,
   placeholder,
@@ -38,7 +36,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
   containerStyle,
   labelStyle,
   inputStyle,
-  placeholderColor = "#AAAAAA",
+  placeholderColor = colors.textMuted,
   ...rest
 }) => {
   const hasError = !!errorText;
@@ -49,16 +47,16 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 
       {/* Orange gradient border */}
       <LinearGradient
-        colors={ORANGE_LR.colors}
-        start={ORANGE_LR.start}
-        end={ORANGE_LR.end}
+        colors={[colors.primary, colors.primaryDark]}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
         style={styles.borderGradient}
       >
         {/* Blue gradient background */}
         <LinearGradient
-          colors={BLUE_2C_BT.colors}
-          start={BLUE_2C_BT.start}
-          end={BLUE_2C_BT.end}
+          colors={[colors.bgInput, colors.bgInputHover]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
           style={styles.gradientWrapper}
         >
           <TextInput
@@ -66,10 +64,10 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
             style={[styles.input, inputStyle]}
             placeholder={placeholder}
             placeholderTextColor={placeholderColor}
-            underlineColor="transparent"
-            activeUnderlineColor="transparent"
-            textColor="#FFFFFF"
-            selectionColor="#FFFFFF"
+            underlineColor={colors.transparent}
+            activeUnderlineColor={colors.transparent}
+            textColor={colors.textPrimary}
+            selectionColor={colors.textPrimary}
             {...rest}
           />
           {icon && (
@@ -91,7 +89,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: moderateScale(16),
-    color: "#FFFFFF",
+    color: colors.textPrimary,
     fontWeight: "600",
     marginBottom: verticalScale(4),
   },
@@ -106,9 +104,9 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(2), // Reduced from 4 to 2
   },
   input: {
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     fontSize: moderateScale(15),
-    color: "#FFFFFF",
+    color: colors.textPrimary,
     height: verticalScale(32),
     padding: 0,
     margin: 0,
@@ -121,11 +119,11 @@ const styles = StyleSheet.create({
   icon: {
     width: moderateScale(18),
     height: moderateScale(18),
-    tintColor: ORANGE,
+    tintColor: colors.primary,
     resizeMode: "contain",
   },
   errorText: {
-    color: "red",
+    color: colors.error,
     fontSize: moderateScale(12),
     marginTop: verticalScale(6),
   },

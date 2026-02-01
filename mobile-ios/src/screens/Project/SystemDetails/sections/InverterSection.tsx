@@ -1,5 +1,6 @@
 // src/screens/Project/SystemDetails/sections/InverterSection.tsx
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   View,
   StyleSheet,
@@ -7,9 +8,9 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
-import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
-import NewExistingToggle from "../../../../components/NewExistingToggle";
-import Dropdown from "../../../../components/Dropdown";
+import EquipmentSection from "../../../../components/UI/EquipmentSection";
+import InlineField from "../../../../components/UI/InlineField";
+import InlineDropdown from "../../../../components/UI/InlineDropdown";
 import ConfirmClearModal from "../../../../components/Modals/ConfirmClearModal";
 import Button from "../../../../components/Button";
 import SystemButton from "../../../../components/Button/SystemButton";
@@ -663,89 +664,61 @@ export default function InverterSection({
   const titleWithoutNumber = label.replace(/\s+\d+$/, "");
 
   return (
-    <CollapsibleSection
-      title={titleWithoutNumber}
-      systemNumber={systemNumber}
-      initiallyExpanded={false}
-      isDirty={!!isDirty}
-      isRequiredComplete={isComplete}
-      photoCount={photoCount}
+    <EquipmentSection
+      title={label}
+      isNew={values.isNew}
+      onNewExistingToggle={(v) => onChange("isNew", v)}
+      showNewExistingToggle={true}
       onCameraPress={handleCameraPress}
+      photoCount={photoCount}
+      onDeletePress={() => setShowClearModal(true)}
       isLoading={isLoading}
     >
       <View style={styles.sectionContent}>
-        <View style={styles.toggleRow}>
-          <NewExistingToggle
-            isNew={values.isNew}
-            onToggle={(v) => onChange("isNew", v)}
-            onTrashPress={() => setShowClearModal(true)}
-          />
-        </View>
 
-        <ConfirmClearModal
-          visible={showClearModal}
-          sectionTitle={label}
-          onConfirm={() => {
-            clearAll();
-            setShowClearModal(false);
-          }}
-          onCancel={() => setShowClearModal(false)}
-        />
-
-        <ConfirmClearModal
-          visible={showStringingChangeModal}
-          sectionTitle="Custom Stringing to Auto Stringing"
-          onConfirm={() => {
-            switchToAutoStringing();
-            setShowStringingChangeModal(false);
-          }}
-          onCancel={() => setShowStringingChangeModal(false)}
-        />
-
-        {/* Make* */}
-        <Dropdown
-          label="Make*"
-          data={makes}
-          value={values.selectedMake}
-          onOpen={handleMakeOpen}
-          loading={loadingMakes}
-          disabled={loadingMakes}
-          onChange={(val) => {
-            onChange("selectedMake", val);
-            onChange("selectedModel", "");
-            // optional: kick model load right after make selection in external mode
-            if (useExternal) {
-              loadModelsProp?.();
-            } else {
-              equipmentCacheManager.setCacheFlag('inverterModels', false);
-              setModelsLocal([]);
-            }
-          }}
-          errorText={errors.selectedMake}
-        />
-
-        {/* Model* (IMPORTANT: uses `models`) */}
-        <Dropdown
-          label="Model*"
-          data={models}
-          value={values.selectedModel}
-          onOpen={handleModelOpen}
-          loading={loadingModels}
-          disabled={!values.selectedMake || loadingModels}
-          onChange={async (val) => {
-            onChange("selectedModel", val);
-
-            // Fetch inverter specifications to get hybrid field
-            if (values.selectedMake && val) {
-              try {
-                await fetchInverterSpecifications(values.selectedMake, val);
-              } catch (error) {
-                // Error handled silently
+        {/* Make */}
+        <InlineField label="Make" required error={errors.selectedMake}>
+          <InlineDropdown
+            value={values.selectedMake || ""}
+            options={makes}
+            onChange={(val) => {
+              onChange("selectedMake", val);
+              onChange("selectedModel", "");
+              if (useExternal) {
+                loadModelsProp?.();
+              } else {
+                equipmentCacheManager.setCacheFlag('inverterModels', false);
+                setModelsLocal([]);
               }
-            }
-          }}
-          errorText={errors.selectedModel}
-        />
+            }}
+            onOpen={handleMakeOpen}
+            loading={loadingMakes}
+            placeholder="Select make"
+          />
+        </InlineField>
+
+        {/* Model */}
+        <InlineField label="Model" required error={errors.selectedModel}>
+          <InlineDropdown
+            value={values.selectedModel || ""}
+            displayValue={models.find(m => m.value === values.selectedModel)?.label}
+            options={models}
+            onChange={async (val) => {
+              onChange("selectedModel", val);
+              if (values.selectedMake && val) {
+                try {
+                  await fetchInverterSpecifications(values.selectedMake, val);
+                } catch (error) {
+                  // Error handled silently
+                }
+              }
+            }}
+            onOpen={handleModelOpen}
+            loading={loadingModels}
+            disabled={!values.selectedMake}
+            placeholder={values.selectedMake ? "Select model" : "Select make first"}
+          />
+        </InlineField>
 
         {/* Powerwall 3 Kilowatt Rating Selection */}
         {isPowerwall3 && (
@@ -895,7 +868,27 @@ export default function InverterSection({
         )}
 
       </View>
-    </CollapsibleSection>
+    </EquipmentSection>
+
+    <ConfirmClearModal
+      visible={showClearModal}
+      sectionTitle={label}
+      onConfirm={() => {
+        clearAll();
+        setShowClearModal(false);
+      }}
+      onCancel={() => setShowClearModal(false)}
+    />
+
+    <ConfirmClearModal
+      visible={showStringingChangeModal}
+      sectionTitle="Custom Stringing to Auto Stringing"
+      onConfirm={() => {
+        switchToAutoStringing();
+        setShowStringingChangeModal(false);
+      }}
+      onCancel={() => setShowStringingChangeModal(false)}
+    />
   );
 }
 
@@ -904,11 +897,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     width: "100%",
     alignItems: "stretch",
-  },
-  toggleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   stringingSection: {
     // Removed marginTop since model dropdown already has bottom spacing
@@ -919,9 +907,9 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   stringingLabel: {
-    color: "#FFFFFF",
-    fontSize: moderateScale(20),
-    fontWeight: "700",
+    color: colors.primary,
+    fontSize: moderateScale(18),
+    fontWeight: "600",
     flex: 1,
   },
   stringingButtonRow: {
@@ -932,7 +920,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   noteText: {
-    color: "#fff",
+    color: colors.textPrimary,
     fontSize: moderateScale(18),
     lineHeight: moderateScale(22),
     marginTop: verticalScale(10),
@@ -943,7 +931,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(10),
   },
   warningText: {
-    color: "#FFA500",
+    color: colors.warning,
     fontSize: moderateScale(16),
     marginTop: verticalScale(10),
     fontStyle: "italic",
@@ -958,9 +946,9 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   optimizerLabel: {
-    color: "#FFFFFF",
-    fontSize: moderateScale(20),
-    fontWeight: "700",
+    color: colors.primary,
+    fontSize: moderateScale(18),
+    fontWeight: "600",
   },
   addOptimizerButton: {
     width: "100%",
@@ -982,9 +970,9 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20), // Increased bottom spacing
   },
   kilowattLabel: {
-    color: "#FFFFFF",
-    fontSize: moderateScale(20),
-    fontWeight: "700",
+    color: colors.primary,
+    fontSize: moderateScale(18),
+    fontWeight: "600",
     marginBottom: verticalScale(12),
   },
   kilowattButtonRow: {

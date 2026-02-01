@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, Text } from "react-native";
-import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
+import EquipmentSection from "../../../../components/UI/EquipmentSection";
 import Button from "../../../../components/Button";
 import SystemSwitchConfirmModal from "../../../../components/Modals/SystemSwitchConfirmModal";
 import {
@@ -49,13 +50,10 @@ const SystemSelectionSection: React.FC<SystemSelectionSectionProps> = ({
 
   return (
     <>
-      <CollapsibleSection
-        title={titleWithoutNumber}
-        systemNumber={systemNum || undefined}
+      <EquipmentSection
+        title={systemLabel || "System Selection"}
+        showNewExistingToggle={false}
         initiallyExpanded={false}
-        isDirty={isDirty}
-        isRequiredComplete={isRequiredComplete}
-        renderCamera={false}
       >
         <View style={styles.sectionContent}>
           {/* Label */}
@@ -105,7 +103,7 @@ const SystemSelectionSection: React.FC<SystemSelectionSectionProps> = ({
 
           {errors.value ? <Text style={styles.error}>{errors.value}</Text> : null}
         </View>
-      </CollapsibleSection>
+      </EquipmentSection>
 
       <SystemSwitchConfirmModal
         visible={showConfirmModal}
@@ -143,9 +141,9 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   labelText: {
-    color: "#FFFFFF",
-    fontSize: moderateScale(20),
-    fontWeight: "700",
+    color: colors.primary,
+    fontSize: moderateScale(18),
+    fontWeight: "600",
     flex: 1,
   },
   buttonRow: {
@@ -164,7 +162,7 @@ const styles = StyleSheet.create({
     height: verticalScale(40),
   },
   error: {
-    color: "#FF3B30",
+    color: colors.error,
     marginTop: verticalScale(8),
     fontSize: moderateScale(14),
     fontWeight: "700",

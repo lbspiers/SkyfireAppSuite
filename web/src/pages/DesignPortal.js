@@ -15,7 +15,6 @@ import EquipmentForm from '../components/project/EquipmentForm';
 import ElectricalForm from '../components/project/ElectricalForm';
 import StructuralForm from '../components/project/StructuralForm';
 import SubmitForm from '../components/project/SubmitForm';
-import MapPanel from '../components/maps/MapPanel';
 import ChatterPanel from '../components/chatter/ChatterPanel';
 import TabbedPanel from '../components/common/TabbedPanel';
 import QCChecklistPanel from '../components/pdf/QCChecklistPanel';
@@ -437,7 +436,7 @@ const DesignPortal = () => {
             selectedTab={selectedOverviewTab}
             onTabChange={setSelectedOverviewTab}
             loading={loading}
-            tabs={['survey', 'map', 'overview', 'planset', 'revisions', 'files']}
+            tabs={['survey', 'overview', 'planset', 'revisions', 'files']}
           >
             {selectedOverviewTab === 'overview' && projectUuid && (
               <SitePlanVersions
@@ -448,18 +447,8 @@ const DesignPortal = () => {
             {selectedOverviewTab === 'survey' && projectUuid && (
               <SurveyPanel
                 projectUuid={projectUuid}
+                projectData={projectData}
                 onSwitchToFilesTab={() => setSelectedOverviewTab('files')}
-              />
-            )}
-            {selectedOverviewTab === 'map' && projectData && (
-              <MapPanel
-                address={projectData?.site?.address}
-                city={projectData?.site?.city}
-                state={projectData?.site?.state}
-                zip={projectData?.site?.zip}
-                lat={projectData?.site?.lat}
-                lng={projectData?.site?.lng}
-                projectUuid={projectData?.uuid}
               />
             )}
             {selectedOverviewTab === 'planset' && (

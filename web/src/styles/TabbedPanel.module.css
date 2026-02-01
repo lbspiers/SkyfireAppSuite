@@ -51,7 +51,7 @@
 
 .tab:hover:not(.tabActive) {
   background: var(--gradient-tab-hover);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-tab-hover, 0 6px 16px rgba(0, 0, 0, 0.3));
 }
 
 .tabActive {

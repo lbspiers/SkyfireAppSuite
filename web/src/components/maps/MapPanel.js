@@ -135,13 +135,10 @@ const MapPanel = ({
       {/* Subtab Navigation */}
       <div className={styles.subtabContainer}>
         {viewTabs.map((view, index) => (
-          <a
+          <button
             key={view.key}
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setActiveView(view.key);
-            }}
+            type="button"
+            onClick={() => setActiveView(view.key)}
             className={`${styles.subtabLink} ${activeView === view.key ? styles.subtabLinkActive : ''} ${index === 0 ? styles.subtabLinkFirst : ''}`}
           >
             {view.icon && <view.icon className={styles.subtabIcon} />}
@@ -149,7 +146,7 @@ const MapPanel = ({
             {activeView === view.key && (
               <span className={`${styles.subtabIndicator} ${index === 0 ? styles.subtabIndicatorFirst : styles.subtabIndicatorCenter}`} />
             )}
-          </a>
+          </button>
         ))}
       </div>
 

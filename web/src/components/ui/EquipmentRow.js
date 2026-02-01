@@ -66,7 +66,7 @@ const EquipmentRow = ({
               <span className={styles.title}>{title}</span>
               {!isExpanded && (
                 <span className={`${styles.subtitle} ${!subtitle ? styles.empty : ''}`}>
-                  {subtitle || 'Empty'}
+                  {subtitle || '-'}
                 </span>
               )}
             </div>

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { spacing, typography } from "../../theme/theme";
+import { colors } from "../../theme/tokens/tokens";
 
 interface Props {
   /** Section header text */
@@ -97,7 +98,7 @@ export default function CollapsibleSectionSimple({
 
       {/* ACCENT BAR */}
       <LinearGradient
-        colors={["#FD7332", "#B92011"]}
+        colors={[colors.primary, colors.primaryDark]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.accentBorder}
@@ -109,12 +110,12 @@ export default function CollapsibleSectionSimple({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     overflow: "hidden",
     marginBottom: 0,
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
+        shadowColor: colors.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -136,13 +137,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: 24,
     lineHeight: 24,
     marginTop: 6,
   },
   completeTitle: {
-    color: "#36B509",
+    color: colors.success,
   },
   icon: {
     width: 30,

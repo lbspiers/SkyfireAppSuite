@@ -13,8 +13,7 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import LinearGradient from "react-native-linear-gradient";
-import COLORS from "../../utils/styleConstant/Color";
-import { BLUE_2C_BT } from "../../styles/gradient";
+import { colors, radius } from "../../theme/tokens/tokens";
 import { moderateScale, verticalScale } from "../../utils/responsive";
 // TODO: Custom keyboard disabled - using hardware keyboard
 // import { useGlobalKeyboard } from "../CustomKeyboard/GlobalKeyboardProvider";
@@ -41,8 +40,8 @@ export type DropdownComponentProps<T> = {
 
 const ICON_WHITE =
   require("../../assets/Images/icons/chevron_down_white_thin.png") as ImageSourcePropType;
-const ORANGE_GRADIENT = ["#FD7332", "#B92011"];
-const DARK_BLUE = "#0C1F3F";
+const ORANGE_GRADIENT = [colors.primary, colors.primaryDark];
+const DARK_BLUE = colors.bgInput;
 
 // Small helper to guarantee arrays
 function toArray<U>(x?: U[]): U[] {
@@ -197,14 +196,14 @@ export default function DropdownComponent<T extends Record<string, any>>({
 
       {/* Blue gradient background with conditional border */}
       <LinearGradient
-        colors={BLUE_2C_BT.colors}
-        start={BLUE_2C_BT.start}
-        end={BLUE_2C_BT.end}
+        colors={[colors.bgInput, colors.bgInputHover]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
         style={[
           styles.dropdownWrapper,
           {
             borderWidth: moderateScale(1),
-            borderColor: hasValue || isOpen ? "#FD7332" : "#888888",
+            borderColor: hasValue || isOpen ? colors.primary : colors.borderInactive,
           },
         ]}
       >
@@ -220,13 +219,13 @@ export default function DropdownComponent<T extends Record<string, any>>({
           selectedTextStyle={styles.selectedText}
           renderRightIcon={() =>
             loading ? (
-              <ActivityIndicator color={COLORS.orange} />
+              <ActivityIndicator color={colors.primary} />
             ) : (
               <Image
                 source={ICON_WHITE}
                 style={[
                   styles.icon,
-                  hasValue && { tintColor: COLORS.orange }
+                  hasValue && { tintColor: colors.primary }
                 ]}
               />
             )
@@ -332,7 +331,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(20),
     lineHeight: moderateScale(20),
     fontWeight: "700",
-    color: COLORS.white,
+    color: colors.white,
   },
   dropdownWrapper: {
     borderRadius: moderateScale(4),
@@ -343,8 +342,8 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     fontSize: moderateScale(20),
-    color: COLORS.white,
-    backgroundColor: "transparent",
+    color: colors.white,
+    backgroundColor: colors.transparent,
     paddingTop: 0,
     paddingBottom: 0,
     paddingLeft: 0,
@@ -353,12 +352,12 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     backgroundColor: DARK_BLUE,
     borderWidth: moderateScale(1),
-    borderColor: "#FD7332",
+    borderColor: colors.primary,
     borderRadius: moderateScale(4),
     marginTop: moderateScale(4), // Increased from 2 to 4 for small gap
     maxHeight: 400, // Increased height for better scrolling
     elevation: 5,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -367,13 +366,13 @@ const styles = StyleSheet.create({
   placeholder: {
     fontSize: moderateScale(20),
     fontWeight: "400",
-    color: "#bbb",
+    color: colors.textMuted,
     paddingBottom: 0,
   },
   selectedText: {
     fontSize: moderateScale(20),
     fontWeight: "400",
-    color: COLORS.white,
+    color: colors.white,
     paddingBottom: 0,
   },
   icon: {
@@ -383,12 +382,12 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
   menuItem: {
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     paddingVertical: 8,
     paddingHorizontal: moderateScale(8), // Match dropdown padding
     alignItems: "flex-start", // Left align
     borderWidth: 0,
-    borderColor: "transparent",
+    borderColor: colors.transparent,
   },
   menuItemGradient: {
     paddingVertical: 8,
@@ -396,19 +395,19 @@ const styles = StyleSheet.create({
     alignItems: "flex-start", // Left align
   },
   menuItemText: {
-    color: COLORS.white,
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "400",
   },
   menuItemTextSelected: {},
   error: {
     fontSize: 12,
-    color: COLORS.red,
+    color: colors.error,
   },
   errorText: {
     marginTop: verticalScale(5),
     fontSize: moderateScale(12),
-    color: "#EF4444",
+    color: colors.error,
     marginBottom: verticalScale(-5),
   },
   externalSearchContainer: {
@@ -416,9 +415,9 @@ const styles = StyleSheet.create({
   },
   externalSearchInput: {
     backgroundColor: DARK_BLUE,
-    color: COLORS.white,
+    color: colors.white,
     borderWidth: moderateScale(1),
-    borderColor: "#FD7332",
+    borderColor: colors.primary,
     borderRadius: moderateScale(4),
     paddingHorizontal: moderateScale(12),
     paddingVertical: verticalScale(10),

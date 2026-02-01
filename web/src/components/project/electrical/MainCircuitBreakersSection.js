@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SERVICE_TYPE_OPTIONS } from '../../../utils/constants';
-import { EquipmentRow, TableDropdown, SectionClearModal } from '../../ui';
+import { EquipmentRow, TableDropdown, SectionClearModal, TableRowButton } from '../../ui';
 import styles from './MainCircuitBreakersSection.module.css';
 import axios from '../../../config/axios';
 import logger from '../../../services/devLogger';
@@ -184,6 +184,15 @@ const MainCircuitBreakersSection = ({ formData, onChange, projectData }) => {
           disabled={loadingUtilities || utilities.length === 0}
         />
 
+        {/* Service Size - Required for SolarAPP+ */}
+        <TableDropdown
+          label="Service Size"
+          value={formData.utility_service_amps || ''}
+          onChange={(value) => handleFieldChange('utility_service_amps', value)}
+          options={UTILITY_SERVICE_RATING_OPTIONS}
+          placeholder="Select service amperage..."
+        />
+
         {/* Service Type */}
         <TableDropdown
           label="Service Type"
@@ -200,26 +209,16 @@ const MainCircuitBreakersSection = ({ formData, onChange, projectData }) => {
           </div>
           <div className={styles.serviceDisconnectsButtons}>
             {mcbQuantityOptions.map((qty) => (
-              <button
+              <TableRowButton
                 key={qty}
-                type="button"
-                className={`${styles.serviceDisconnectButton} ${currentQuantity === qty ? styles.active : ''}`}
+                label={qty.toString()}
+                variant="outline"
+                active={currentQuantity === qty}
                 onClick={() => onChange('ele_main_circuit_breakers_qty', qty)}
-              >
-                {qty}
-              </button>
+              />
             ))}
           </div>
         </div>
-
-        {/* Utility Service - Required for SolarAPP+ */}
-        <TableDropdown
-          label="Utility Service"
-          value={formData.utility_service_amps || ''}
-          onChange={(value) => handleFieldChange('utility_service_amps', value)}
-          options={UTILITY_SERVICE_RATING_OPTIONS}
-          placeholder="Select service amperage..."
-        />
       </EquipmentRow>
 
       <SectionClearModal

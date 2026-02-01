@@ -6,6 +6,7 @@ import MediaGallery from './MediaGallery';
 import EquipmentSectionGroup from './EquipmentSectionGroup';
 import ComingSoon from '../common/ComingSoon';
 import PhotoPanelViewer from './PhotoPanelViewer';
+import MapPanel from '../maps/MapPanel';
 import styles from '../../styles/SurveyPanel.module.css';
 
 // Simple SVG icons for grid toggle
@@ -65,12 +66,13 @@ const UploadIcon = () => (
  * SurveyPanel - Parent container for survey-related content with sub-tabs
  * Replaces the old Gallery tab with organized survey data
  *
- * Sub-tabs: Notes, Photos, Videos, SS Report
+ * Sub-tabs: Notes, Photos, Videos, SS Report, Map
  *
  * @param {string} projectUuid - Project UUID for fetching survey data
+ * @param {object} projectData - Full project data object containing site info for Map
  * @param {function} onSwitchToFilesTab - Callback to switch to main Files tab
  */
-const SurveyPanel = ({ projectUuid, onSwitchToFilesTab }) => {
+const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('surveyPanelTab') || 'photos';
   });
@@ -297,6 +299,17 @@ const SurveyPanel = ({ projectUuid, onSwitchToFilesTab }) => {
     notes: (
       <SurveyNotesPanel projectUuid={projectUuid} compact={false} />
     ),
+    map: projectData ? (
+      <MapPanel
+        address={projectData?.site?.address}
+        city={projectData?.site?.city}
+        state={projectData?.site?.state}
+        zip={projectData?.site?.zip}
+        lat={projectData?.site?.lat}
+        lng={projectData?.site?.lng}
+        projectUuid={projectData?.uuid}
+      />
+    ) : null,
     report: (
       <ComingSoon
         feature="Site Survey Report"
@@ -312,6 +325,7 @@ const SurveyPanel = ({ projectUuid, onSwitchToFilesTab }) => {
           { id: 'all', label: 'All' },
           { id: 'photos', label: 'Photos' },
           { id: 'notes', label: 'Notes' },
+          { id: 'map', label: 'Map' },
           { id: 'report', label: 'SS Report' },
         ]}
         defaultTab="photos"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
-import { Alert, EquipmentRow, FormFieldRow, TableDropdown, TableRowButton, AddSectionButton, PreferredButton, Tooltip } from '../../ui';
+import { Alert, EquipmentRow, FormFieldRow, TableDropdown, TableRowButton, AddSectionButton, PreferredButton, Tooltip, Divider } from '../../ui';
 import { PreferredEquipmentModal } from '../../equipment';
 import BOSEquipmentSection from './BOSEquipmentSection';
 import {
@@ -201,7 +201,8 @@ const StorageManagementSystemSection = ({
   const getSubtitle = () => {
     if (isNoSMS) return 'No SMS';
     if (formData.sms_make && formData.sms_model) {
-      return `${formData.sms_make} ${formData.sms_model}`;
+      const statusLetter = formData.sms_isnew !== false ? 'N' : 'E';
+      return `(${statusLetter}) ${formData.sms_make} ${formData.sms_model}`;
     }
     return '';
   };
@@ -248,30 +249,48 @@ const StorageManagementSystemSection = ({
   };
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title="Storage Management System"
         subtitle={getSubtitle()}
-        showNewExistingToggle={true}
-        isNew={formData.sms_isnew !== false}
-        onNewExistingChange={handleToggle}
         onDelete={handleDelete}
         headerRightContent={
           <PreferredButton onClick={() => setShowPreferredModal(true)} />
         }
       >
-        {/* No SMS Button - Show when no make is selected */}
+        {/* Row 1: No SMS Button - Show when no make is selected */}
         {!formData.sms_make && (
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'var(--spacing-tight) var(--spacing)',
+            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
           }}>
             <TableRowButton
               label="No SMS"
               variant="outline"
               onClick={() => handleMakeChange({ target: { value: 'No SMS' } })}
               style={{ width: '100%' }}
+            />
+          </div>
+        )}
+
+        {/* Row 2: New/Existing Toggle - Always visible (except when "No SMS") */}
+        {!isNoSMS && (
+          <div style={{
+            display: 'flex',
+            gap: 'var(--spacing-tight)',
+            padding: 'var(--spacing-tight) var(--spacing)',
+            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
+          }}>
+            <TableRowButton
+              label="New"
+              variant="outline"
+              active={formData.sms_isnew !== false}
+              onClick={() => handleToggle(true)}
+            />
+            <TableRowButton
+              label="Existing"
+              variant="outline"
+              active={formData.sms_isnew === false}
+              onClick={() => handleToggle(false)}
             />
           </div>
         )}
@@ -298,6 +317,7 @@ const StorageManagementSystemSection = ({
               options={manufacturers}
               placeholder={loadingManufacturers ? 'Loading...' : 'Select make...'}
               disabled={loadingManufacturers}
+              showSearch={true}
             />
 
             <TableDropdown

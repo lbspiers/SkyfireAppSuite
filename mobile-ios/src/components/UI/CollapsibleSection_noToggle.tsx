@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { spacing, typography } from "../../theme/theme";
+import { colors } from "../../theme/tokens/tokens";
 
 interface Props {
   title: string;
@@ -64,7 +65,7 @@ export default function CollapsibleSection({
     renderCamera && (expanded || (!expanded && photoCount > 0));
 
   // Camera icon tint: grey if no photos, orange if > 0
-  const cameraTint = photoCount > 0 ? "#FD7332" : "#FFFFFF";
+  const cameraTint = photoCount > 0 ? colors.primary : colors.white;
 
   return (
     <View style={styles.container}>
@@ -142,7 +143,7 @@ export default function CollapsibleSection({
 
       {/* Bottom accent border */}
       <LinearGradient
-        colors={["#FD7332", "#B92011"]}
+        colors={[colors.primary, colors.primaryDark]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.accentBorder}
@@ -154,12 +155,12 @@ export default function CollapsibleSection({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     overflow: "hidden",
     marginBottom: 0,
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
+        shadowColor: colors.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -176,20 +177,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     minHeight: 64,
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
   },
   headerTouchable: {
     flex: 1,
   },
   title: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 24,
     lineHeight: 24,
     marginTop: 15,
     marginBottom: 10,
   },
   completeTitle: {
-    color: "#36B509",
+    color: colors.success,
   },
   cameraWrapper: {
     flexDirection: "row",
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     marginTop: -5,
   },
   countBadge: {
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
     borderRadius: 5,
     minWidth: 30,
     height: 30,
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     marginTop: -8,
   },
   badgeText: {
-    color: "#FFF",
+    color: colors.white,
     fontWeight: "700",
     fontSize: 24,
     letterSpacing: 0.15,
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   clearText: {
-    color: "#FD7332",
+    color: colors.primary,
     fontSize: 20,
     fontWeight: "600",
     fontFamily: "Lato-Bold",
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
   body: {
     paddingHorizontal: 20,
     paddingBottom: spacing.sm,
-    backgroundColor: "transparent",
+    backgroundColor: colors.transparent,
   },
   accentBorder: {
     height: 1,

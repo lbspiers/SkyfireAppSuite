@@ -100,9 +100,9 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       for (let i = 1; i <= maxPlanes; i++) {
         const hasData = !!(
           systemDetails[`st_mp${i}_mode`] ||
-          systemDetails[`mp${i}_stories`] !== null && systemDetails[`mp${i}_stories`] !== undefined && systemDetails[`mp${i}_stories`] !== '' ||
-          systemDetails[`mp${i}_pitch`] !== null && systemDetails[`mp${i}_pitch`] !== undefined && systemDetails[`mp${i}_pitch`] !== '' ||
-          systemDetails[`mp${i}_azimuth`] !== null && systemDetails[`mp${i}_azimuth`] !== undefined && systemDetails[`mp${i}_azimuth`] !== ''
+          (systemDetails[`mp${i}_stories`] !== null && systemDetails[`mp${i}_stories`] !== undefined && systemDetails[`mp${i}_stories`] !== '') ||
+          (systemDetails[`mp${i}_pitch`] !== null && systemDetails[`mp${i}_pitch`] !== undefined && systemDetails[`mp${i}_pitch`] !== '') ||
+          (systemDetails[`mp${i}_azimuth`] !== null && systemDetails[`mp${i}_azimuth`] !== undefined && systemDetails[`mp${i}_azimuth`] !== '')
         );
         if (hasData) {
           maxVisiblePlane = i;

@@ -1,6 +1,7 @@
 // src/screens/Project/SystemDetails/sections/EnergyStorageSection.tsx
 
 import React, { useState, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   clearText: {
-    color: "#FD7332",
+    color: colors.primary,
     fontSize: moderateScale(16),
     fontWeight: "600",
   },
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(30),
   },
   helperText: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: moderateScale(14),
     lineHeight: moderateScale(18),
     marginBottom: verticalScale(12),

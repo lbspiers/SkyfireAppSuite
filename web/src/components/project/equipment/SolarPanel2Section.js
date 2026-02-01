@@ -159,7 +159,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
   const hasSolarPanel2 = formData.solar_panel_type2_manufacturer && formData.solar_panel_type2_model;
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title={`Solar Panel ${systemNumber} ((Type 2))`}
         subtitle={hasSolarPanel2 ? `${formData.solar_panel_type2_manufacturer} ${formData.solar_panel_type2_model}` : ''}

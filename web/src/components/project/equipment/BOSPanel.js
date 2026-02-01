@@ -330,8 +330,8 @@ const BOSPanel = ({
           // Section labels
           const sectionLabels = {
             utility: 'Utility BOS',
-            battery1: 'Battery BOS (Type 1)',
-            battery2: 'Battery BOS (Type 2)',
+            battery1: 'Battery Type 1 BOS',
+            battery2: 'Battery Type 2 BOS',
             backup: 'Backup BOS',
             postSMS: 'Post-SMS BOS',
           };

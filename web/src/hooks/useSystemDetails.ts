@@ -8,6 +8,7 @@ import {
   SystemNumber,
   buildFieldName,
 } from '../services/systemDetailsAPI';
+import { logFieldChanges, FieldChange } from '../services/activityLogAPI';
 import { useIsAuthenticated } from '../store';
 
 interface UseSystemDetailsOptions {
@@ -47,6 +48,12 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
   const lastSavedRef = useRef<Record<string, any>>({});
   // Track if fetch is in progress to prevent duplicate calls
   const fetchInProgressRef = useRef(false);
+  // Track values for activity logging (before changes)
+  const lastSavedValuesRef = useRef<Record<string, any>>({});
+  // Debounce timer for activity logging
+  const activityLogTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Pending activity log changes buffer
+  const pendingActivityChangesRef = useRef<FieldChange[]>([]);
 
   // Fetch system details
   const fetch = useCallback(async () => {
@@ -72,6 +79,8 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
       // Initialize last saved snapshot
       if (result) {
         lastSavedRef.current = { ...result };
+        // Initialize activity log baseline
+        lastSavedValuesRef.current = { ...result };
       }
     } catch (err: any) {
       console.error('[useSystemDetails] Fetch error:', err);
@@ -89,10 +98,132 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
     }
   }, [fetch, autoFetch]);
 
+  // Cleanup: flush pending activity logs on unmount
+  useEffect(() => {
+    return () => {
+      if (activityLogTimerRef.current) {
+        clearTimeout(activityLogTimerRef.current);
+
+        // Flush any pending changes immediately
+        if (pendingActivityChangesRef.current.length > 0) {
+          const changesToLog = [...pendingActivityChangesRef.current];
+          pendingActivityChangesRef.current = [];
+
+          // Fire-and-forget
+          (async () => {
+            try {
+              const projectData = sessionStorage.getItem('currentProject');
+              let projectNumber: string | undefined;
+              let homeownerName: string | undefined;
+
+              if (projectData) {
+                try {
+                  const parsed = JSON.parse(projectData);
+                  projectNumber = parsed.project_number || parsed.projectNumber;
+                  homeownerName = parsed.site?.homeowner_name || parsed.homeownerName;
+                } catch (e) {
+                  // Ignore parse errors
+                }
+              }
+
+              await logFieldChanges(
+                projectUuid,
+                changesToLog,
+                'web',
+                projectNumber,
+                homeownerName
+              );
+            } catch (err) {
+              console.error('[useSystemDetails] Failed to flush activity logs on unmount:', err);
+            }
+          })();
+        }
+      }
+    };
+  }, [projectUuid]);
+
   // Refresh handler
   const refresh = useCallback(async () => {
     await fetch();
   }, [fetch]);
+
+  // Helper: Normalize value for comparison (null, undefined, empty string all treated as empty)
+  const normalizeValue = (value: any): string => {
+    if (value === null || value === undefined || value === '') return '';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    return String(value);
+  };
+
+  // Helper: Check if a value change is meaningful for activity logging
+  const isMeaningfulChange = (oldValue: any, newValue: any): boolean => {
+    const oldNormalized = normalizeValue(oldValue);
+    const newNormalized = normalizeValue(newValue);
+
+    // Don't log if both are empty
+    if (oldNormalized === '' && newNormalized === '') return false;
+
+    // Log if values differ
+    return oldNormalized !== newNormalized;
+  };
+
+  // Helper: Log activity changes with debouncing
+  const logActivity = useCallback((changes: FieldChange[]) => {
+    // Filter out excluded fields (derived/calculated fields that shouldn't be in audit trail)
+    const filteredChanges = changes.filter(change => {
+      // Exclude solar panel wattage fields (calculated from panel model)
+      if (change.fieldName.endsWith('_solar_panel_wattage')) {
+        return false;
+      }
+      return true;
+    });
+
+    // Add to pending buffer
+    pendingActivityChangesRef.current.push(...filteredChanges);
+
+    // Clear existing timer
+    if (activityLogTimerRef.current) {
+      clearTimeout(activityLogTimerRef.current);
+    }
+
+    // Set new timer (2 second debounce)
+    activityLogTimerRef.current = setTimeout(async () => {
+      const changesToLog = [...pendingActivityChangesRef.current];
+      pendingActivityChangesRef.current = [];
+
+      if (changesToLog.length === 0) return;
+
+      try {
+        // Get project context for logging
+        const projectData = sessionStorage.getItem('currentProject');
+        let projectNumber: string | undefined;
+        let homeownerName: string | undefined;
+
+        if (projectData) {
+          try {
+            const parsed = JSON.parse(projectData);
+            projectNumber = parsed.project_number || parsed.projectNumber;
+            homeownerName = parsed.site?.homeowner_name || parsed.homeownerName;
+          } catch (e) {
+            console.debug('[useSystemDetails] Failed to parse project data from session:', e);
+          }
+        }
+
+        // Fire-and-forget: log to activity API
+        await logFieldChanges(
+          projectUuid,
+          changesToLog,
+          'web',
+          projectNumber,
+          homeownerName
+        );
+
+        console.debug('[useSystemDetails] Logged', changesToLog.length, 'field changes to activity log');
+      } catch (err) {
+        // Don't block on logging errors
+        console.error('[useSystemDetails] Failed to log activity changes:', err);
+      }
+    }, 2000); // 2 second debounce
+  }, [projectUuid]);
 
   // Check if value has changed (for deduplication)
   const hasChanged = useCallback((fieldName: string, value: any): boolean => {
@@ -118,6 +249,9 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
       return;
     }
 
+    // Capture old value for activity logging
+    const oldValue = lastSavedValuesRef.current[fieldName];
+
     setSaving(true);
 
     // Optimistic update
@@ -127,6 +261,18 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
       await patchSystemDetails(projectUuid, { [fieldName]: value });
       // Update last saved snapshot
       lastSavedRef.current[fieldName] = value;
+
+      // Log to activity log if change is meaningful
+      if (isMeaningfulChange(oldValue, value)) {
+        logActivity([{
+          fieldName,
+          oldValue: normalizeValue(oldValue) || null,
+          newValue: normalizeValue(value) || null,
+        }]);
+      }
+
+      // Update activity log baseline
+      lastSavedValuesRef.current[fieldName] = value;
     } catch (err: any) {
       // If PATCH fails with 404 (record doesn't exist), retry with PUT (upsert)
       if (err?.response?.status === 404) {
@@ -135,6 +281,18 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
           const { saveSystemDetails } = await import('../services/systemDetailsAPI');
           await saveSystemDetails(projectUuid, { [fieldName]: value });
           lastSavedRef.current[fieldName] = value;
+
+          // Log to activity log if change is meaningful
+          if (isMeaningfulChange(oldValue, value)) {
+            logActivity([{
+              fieldName,
+              oldValue: normalizeValue(oldValue) || null,
+              newValue: normalizeValue(value) || null,
+            }]);
+          }
+
+          // Update activity log baseline
+          lastSavedValuesRef.current[fieldName] = value;
           setSaving(false);
           return;
         } catch (putErr: any) {
@@ -160,11 +318,23 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
   const updateFields = useCallback(async (fields: Record<string, any>) => {
     if (!projectUuid || Object.keys(fields).length === 0) return;
 
-    // Filter out unchanged fields
+    // Filter out unchanged fields and capture old values
     const changedFields: Record<string, any> = {};
+    const activityChanges: FieldChange[] = [];
+
     Object.entries(fields).forEach(([key, value]) => {
       if (hasChanged(key, value)) {
         changedFields[key] = value;
+
+        // Capture for activity logging
+        const oldValue = lastSavedValuesRef.current[key];
+        if (isMeaningfulChange(oldValue, value)) {
+          activityChanges.push({
+            fieldName: key,
+            oldValue: normalizeValue(oldValue) || null,
+            newValue: normalizeValue(value) || null,
+          });
+        }
       }
     });
 
@@ -182,6 +352,14 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
       await patchSystemDetails(projectUuid, changedFields);
       // Update last saved snapshot
       Object.assign(lastSavedRef.current, changedFields);
+
+      // Log activity changes
+      if (activityChanges.length > 0) {
+        logActivity(activityChanges);
+      }
+
+      // Update activity log baseline
+      Object.assign(lastSavedValuesRef.current, changedFields);
     } catch (err: any) {
       // If PATCH fails with 404 (record doesn't exist), retry with PUT (upsert)
       if (err?.response?.status === 404) {
@@ -190,6 +368,14 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
           const { saveSystemDetails } = await import('../services/systemDetailsAPI');
           await saveSystemDetails(projectUuid, changedFields);
           Object.assign(lastSavedRef.current, changedFields);
+
+          // Log activity changes
+          if (activityChanges.length > 0) {
+            logActivity(activityChanges);
+          }
+
+          // Update activity log baseline
+          Object.assign(lastSavedValuesRef.current, changedFields);
           setSaving(false);
           return;
         } catch (putErr: any) {

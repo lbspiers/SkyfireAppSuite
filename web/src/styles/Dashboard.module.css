@@ -232,7 +232,7 @@
 
 .statusTab:hover:not(.statusTabSelected) {
   background: var(--gradient-tab-hover);
-  transform: translateY(-2px);
+  box-shadow: var(--spacing-xs) 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 .statusTabSelected {

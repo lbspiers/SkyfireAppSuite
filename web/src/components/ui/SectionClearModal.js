@@ -16,12 +16,16 @@ const SectionClearModal = ({
   sectionName = 'this section',
   fieldCount = 0,
   scopedToPanel = true, // Default to true for left panel modals
+  cascadeSections = [], // Array of section names that will also be cleared
+  willRemove = false, // Whether the section will also be removed after clearing
 }) => {
+  const hasCascade = cascadeSections && cascadeSections.length > 0;
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Clear Section Data?"
+      title={willRemove ? "Clear and Remove Section?" : "Clear Section Data?"}
       size="sm"
       scopedToPanel={scopedToPanel}
       footer={
@@ -34,19 +38,28 @@ const SectionClearModal = ({
             onClick={onConfirm}
             className={styles.dangerButton}
           >
-            Clear Data
+            {willRemove ? "Clear and Remove" : "Clear Data"}
           </Button>
         </>
       }
     >
       <div className={styles.content}>
         <p className={styles.message}>
-          This will clear all data from <strong>{sectionName}</strong>.
+          This will clear all data from <strong>{sectionName}</strong>{willRemove && ' and remove the section'}.
           {fieldCount > 0 && ` (${fieldCount} field${fieldCount === 1 ? '' : 's'} will be reset)`}
         </p>
-        <p className={styles.secondaryMessage}>
-          You can enter new data after clearing.
-        </p>
+
+        {!willRemove && (
+          <p className={styles.secondaryMessage} style={{ marginTop: 'var(--spacing)' }}>
+            You can enter new data after clearing.
+          </p>
+        )}
+
+        {willRemove && (
+          <p className={styles.secondaryMessage} style={{ marginTop: 'var(--spacing)', fontWeight: 'bold', color: 'var(--color-danger)' }}>
+            ⚠️ This action cannot be undone.
+          </p>
+        )}
       </div>
     </Modal>
   );

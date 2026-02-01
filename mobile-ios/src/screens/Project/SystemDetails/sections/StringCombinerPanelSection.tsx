@@ -1,5 +1,6 @@
 // src/screens/Project/SystemDetails/sections/StringCombinerPanelSection.tsx
 import React, { useState, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import {
   View,
   StyleSheet,
@@ -411,19 +412,19 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(8),
   },
   specsLabel: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: moderateScale(16),
     fontWeight: "400",
     marginBottom: verticalScale(4),
   },
   noteLabel: {
-    color: "#FFF",
+    color: colors.white,
     fontWeight: "700",
     fontSize: moderateScale(20),
     marginBottom: verticalScale(4),
   },
   note: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "400",
   },
@@ -456,7 +457,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   stringingLabel: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
   },

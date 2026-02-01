@@ -36,6 +36,20 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
 
   // Prepare cascade clear fields for use with the delete hook (all downstream ESS fields)
   const essCascadeFields = [
+    // Clear main ESS fields first (this controls section visibility)
+      ['backup_option', ''],
+      ['backup_system_size', ''],
+      ['meter_collar_location', ''],
+
+    // Hide all ESS-related sections
+      ['show_sms', false],
+      ['show_battery1', false],
+      ['show_battery2', false],
+      ['show_battery_type_2', false],
+      ['show_battery1_bos', false],
+      ['show_battery2_bos', false],
+      ['show_backup_panel', false],
+
     // SMS fields
       ['sms_isnew', true],
       ['sms_make', ''],
@@ -57,14 +71,50 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
       ['battery1_quantity', ''],
       ['battery1_configuration', ''],
       ['battery1_tie_in_location', ''],
+      ['battery1_mount_type', ''],
 
-      // Clear Battery Type 2 fields and hide section
+      // Clear Battery Type 2 fields
       ['battery2_isnew', true],
       ['battery2_make', ''],
       ['battery2_model', ''],
       ['battery2_quantity', ''],
       ['battery2_tie_in_location', ''],
-      ['show_battery_type_2', false],
+      ['battery2_mount_type', ''],
+      ['battery2_configuration', ''],
+
+      // Clear Battery 1 BOS equipment slots (3 slots)
+      ['battery1_bos_type1_equipment_type', ''],
+      ['battery1_bos_type1_make', ''],
+      ['battery1_bos_type1_model', ''],
+      ['battery1_bos_type1_amp_rating', ''],
+      ['battery1_bos_type1_is_new', true],
+      ['battery1_bos_type2_equipment_type', ''],
+      ['battery1_bos_type2_make', ''],
+      ['battery1_bos_type2_model', ''],
+      ['battery1_bos_type2_amp_rating', ''],
+      ['battery1_bos_type2_is_new', true],
+      ['battery1_bos_type3_equipment_type', ''],
+      ['battery1_bos_type3_make', ''],
+      ['battery1_bos_type3_model', ''],
+      ['battery1_bos_type3_amp_rating', ''],
+      ['battery1_bos_type3_is_new', true],
+
+      // Clear Battery 2 BOS equipment slots (3 slots)
+      ['battery2_bos_type1_equipment_type', ''],
+      ['battery2_bos_type1_make', ''],
+      ['battery2_bos_type1_model', ''],
+      ['battery2_bos_type1_amp_rating', ''],
+      ['battery2_bos_type1_is_new', true],
+      ['battery2_bos_type2_equipment_type', ''],
+      ['battery2_bos_type2_make', ''],
+      ['battery2_bos_type2_model', ''],
+      ['battery2_bos_type2_amp_rating', ''],
+      ['battery2_bos_type2_is_new', true],
+      ['battery2_bos_type3_equipment_type', ''],
+      ['battery2_bos_type3_make', ''],
+      ['battery2_bos_type3_model', ''],
+      ['battery2_bos_type3_amp_rating', ''],
+      ['battery2_bos_type3_is_new', true],
 
       // Clear Backup Load Sub Panel fields
       ['backup_panel_isnew', true],
@@ -98,13 +148,16 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
   const cascadeSections = [
     'Storage Management System',
     'Battery (Type 1)',
+    'Battery Type 1 BOS',
     'Battery (Type 2)',
+    'Battery Type 2 BOS',
     'Backup Load Sub Panel',
     'Battery Combiner Panel',
     'Gateway Configuration',
   ];
 
-  // Use the section delete hook with CLEAR_AND_REMOVE behavior
+  // Use the section delete hook with CLEAR_ONLY behavior
+  // For ESS, clearing backup_option effectively removes the section (collapses to AddSectionButton)
   const {
     showClearModal,
     showRemoveModal,
@@ -118,8 +171,8 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
     formData,
     onChange,
     onBatchChange,
-    behavior: DELETE_BEHAVIOR.CLEAR_AND_REMOVE,
-    visibilityFlag: null, // ESS doesn't use visibility flag - uses presence of backup_option
+    behavior: DELETE_BEHAVIOR.CLEAR_ONLY,
+    visibilityFlag: null, // ESS doesn't use visibility flag - clearing backup_option collapses section
     additionalClearFields: essCascadeFields,
     cascadeSections,
   });
@@ -128,13 +181,39 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
     // Update backup option
     onChange('backup_option', option);
 
+    // Skip all other logic if just expanding the section
+    if (option === 'expand') {
+      return;
+    }
+
     // Clear backup system size when changing options
     // (No Backup doesn't use size, Whole/Partial have different options)
     onChange('backup_system_size', '');
 
-    // Clear IQ Combiner 6C meter collar location when switching to No Backup
-    if (option === 'No Backup') {
+    // Toggle visibility flags based on backup option
+    if (option === 'Whole Home' || option === 'Partial Home') {
+      // Show ESS-related sections
+      onChange('show_sms', true);
+      onChange('show_battery1', true);
+      onChange('show_backup_panel', true);
+      // Note: Battery Type 2 and BOS sections remain manually controlled
+    } else if (option === 'No Backup') {
+      // Hide all ESS-related sections for No Backup
+      onChange('show_sms', false);
+      onChange('show_battery1', false);
+      onChange('show_battery2', false);
+      onChange('show_battery1_bos', false);
+      onChange('show_battery2_bos', false);
+      onChange('show_backup_panel', false);
       onChange('meter_collar_location', '');
+    } else {
+      // No option selected or empty - hide all
+      onChange('show_sms', false);
+      onChange('show_battery1', false);
+      onChange('show_battery2', false);
+      onChange('show_battery1_bos', false);
+      onChange('show_battery2_bos', false);
+      onChange('show_backup_panel', false);
     }
   };
 
@@ -155,20 +234,29 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
   const sizeOptions = backupOption === 'Whole Home' ? wholeHomeOptions : partialHomeOptions;
 
   // Show AddSectionButton when no backup option is selected (empty state)
-  if (!backupOption) {
+  // Allow 'expand' as a temporary state to show options without defaulting
+  const isExpanded = backupOption && backupOption !== '';
+
+  if (!isExpanded) {
     return (
       <AddSectionButton
         label="Energy Storage System"
-        onClick={() => handleBackupOptionChange('Whole Home')}
+        onClick={() => onChange('backup_option', 'expand')}
       />
     );
   }
 
+  // Build subtitle - show nothing if 'expand' state, otherwise show the selected option
+  const hasValidSelection = backupOption && backupOption !== 'expand';
+  const subtitle = hasValidSelection
+    ? `${backupOption}${backupSystemSize ? ` - ${backupSystemSize} Amps` : ''}`
+    : '';
+
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title="Energy Storage System"
-        subtitle={backupOption ? `${backupOption}${backupSystemSize ? ` - ${backupSystemSize} Amps` : ''}` : ''}
+        subtitle={subtitle}
         onDelete={handleTrashClick}
       >
         {/* Row 1: Grid Forming Options */}
@@ -216,12 +304,13 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
         </Alert>
       )}
 
-      {/* Section Clear Modal with cascade info */}
+      {/* Section Clear Modal */}
       <SectionClearModal
         isOpen={showClearModal}
         onClose={closeClearModal}
         onConfirm={handleClearConfirm}
         sectionName="Energy Storage System"
+        willRemove={true}
       />
 
       {/* Section Remove Modal - Not typically used since ESS is added/removed via AddSectionButton */}

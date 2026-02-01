@@ -511,6 +511,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         el_mpa_derated: false,
         backup_option: '',
         backup_loads_landing: '',
+        backup_panel_selection: '',
         backup_system_size: '',
         backup_panel_make: '',
         backup_panel_model: '',
@@ -591,8 +592,8 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       utility_company: getField('utility_company', ''),
 
       // Main Panel A
-      mpa_bus_bar_existing: getField('mpa_bus_bar_existing', false),
-      mpa_main_circuit_breaker_existing: getField('mpa_main_circuit_breaker_existing', false),
+      mpa_bus_bar_existing: getField('mpa_bus_bar_existing', true),
+      mpa_main_circuit_breaker_existing: getField('mpa_main_circuit_breaker_existing', true),
       ele_bus_bar_rating: getField('ele_bus_bar_rating', ''),
       ele_main_circuit_breaker_rating: getField('ele_main_circuit_breaker_rating', 'MLO'),
       ele_feeder_location_on_bus_bar: getField('ele_feeder_location_on_bus_bar', ''),
@@ -601,6 +602,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       // Backup Configuration
       backup_option: getField('sys1_backup_option', ''),
       backup_loads_landing: getField('backup_loads_landing', ''),
+      backup_panel_selection: getField('backup_panel_selection', ''),
       backup_system_size: getField('utility_service_amps', ''),
       backup_panel_make: getField('backup_panel_make', ''),
       backup_panel_model: getField('backup_panel_model', ''),

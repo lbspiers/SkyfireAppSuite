@@ -117,18 +117,23 @@ const SubPanelBSection = ({ formData, onChange, onShowSubPanelC, subPanelCVisibl
   };
 
   const handleDelete = () => {
-    // Clear all Sub Panel B fields
-    onChange('spb_bus_bar_rating', null);
-    onChange('spb_main_breaker_rating', null);
-    onChange('spb_subpanel_b_feeder_location', null);
-    onChange('spb_upstream_breaker_rating', null);
-    onChange('spb_conductor_sizing', null);
-    onChange('spb_tie_in_location', null);
-    onChange('spb_subpanel_existing', null);
-    onChange('el_spb_derated', null);
-    onChange('spb_subpanelb_mcbexisting', null);
-
-    // Note: Sub Panel B doesn't have a show flag since it's always visible when electrical form is shown
+    // If there's data, clear it (first click)
+    if (hasData) {
+      // Clear all Sub Panel B fields
+      onChange('spb_bus_bar_rating', null);
+      onChange('spb_main_breaker_rating', null);
+      onChange('spb_subpanel_b_feeder_location', null);
+      onChange('spb_upstream_breaker_rating', null);
+      onChange('spb_conductor_sizing', null);
+      onChange('spb_tie_in_location', null);
+      onChange('spb_subpanel_existing', null);
+      onChange('el_spb_derated', null);
+      onChange('spb_subpanelb_mcbexisting', null);
+    } else {
+      // If no data, hide the section (second click)
+      onChange('show_sub_panel_b', false);
+      onChange('spb_activated', false);
+    }
   };
 
   return (

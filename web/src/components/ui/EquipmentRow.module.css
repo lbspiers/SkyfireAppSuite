@@ -58,11 +58,11 @@
 
 .titleGroup {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+  flex-direction: row;
+  gap: var(--spacing);
   flex: 1;
   min-width: 0;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .title {
@@ -73,7 +73,8 @@
 }
 
 .subtitle {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;

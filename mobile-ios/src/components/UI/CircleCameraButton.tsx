@@ -7,6 +7,7 @@ import {
   Platform,
   Pressable,
 } from "react-native";
+import { colors } from "../../theme/tokens/tokens";
 
 interface Props {
   onPress: () => void;
@@ -41,10 +42,10 @@ const CircleCameraButton: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#FD7332",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
-    tintColor: "#FFFFFF",
+    tintColor: colors.white,
   },
 });
 

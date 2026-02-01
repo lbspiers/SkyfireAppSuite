@@ -12,6 +12,7 @@ import { Button, FormFieldRow, TableDropdown, EquipmentRow, Alert } from '../ui'
 import ConfirmActionModal from '../ui/ConfirmActionModal';
 import SystemContainer from './equipment/SystemContainer';
 import OrderContainer from './submit/OrderContainer';
+import ActivityLogPanel from './ActivityLogPanel';
 import { getStampPermitOrders, createStampPermitOrders, formatOrderInfo } from '../../services/stampPermitService';
 import equipStyles from './EquipmentForm.module.css';
 import styles from './SubmitForm.module.css';
@@ -144,9 +145,9 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   // View configuration
   const viewSteps = [
     { key: 'overview', label: 'Overview' },
-    { key: 'spec-sheets', label: 'Spec Sheets' },
     { key: 'qc', label: 'QC' },
-    { key: 'print', label: 'Order & Print' },
+    { key: 'print', label: 'Submit' },
+    { key: 'activity', label: 'Activity', alignRight: true },
   ];
 
   // Handle publish to permitting
@@ -258,23 +259,38 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     <form onSubmit={(e) => e.preventDefault()} className={styles.formContainer}>
       {/* Sticky Header Section - Sub-tab Navigation */}
       <div className={equipStyles.stickyHeader}>
-        {/* View Navigation - Overview, Draft, QC, Spec Sheets */}
+        {/* View Navigation - Overview, QC, Submit + Activity on right */}
         <div className={`${styles.viewNavigation} ${selectedView === 'qc' ? styles.viewNavigationWithQC : ''}`}>
-          {viewSteps.map((view, index) => (
-            <a
+          {viewSteps.filter(v => !v.alignRight).map((view, index) => (
+            <button
               key={view.key}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setSelectedView(view.key);
-              }}
+              type="button"
+              onClick={() => setSelectedView(view.key)}
               className={`${styles.viewLink} ${index === 0 ? styles.viewLinkFirst : ''} ${selectedView === view.key ? styles.viewLinkActive : ''}`}
             >
               {view.label}
               {selectedView === view.key && (
                 <span className={`${styles.viewLinkIndicator} ${index === 0 ? styles.viewLinkIndicatorFirst : styles.viewLinkIndicatorCenter}`} />
               )}
-            </a>
+            </button>
+          ))}
+
+          {/* Spacer to push right-aligned tabs */}
+          <div style={{ flex: 1 }} />
+
+          {/* Right-aligned tabs (Activity) */}
+          {viewSteps.filter(v => v.alignRight).map((view) => (
+            <button
+              key={view.key}
+              type="button"
+              onClick={() => setSelectedView(view.key)}
+              className={`${styles.viewLink} ${styles.viewLinkRight} ${selectedView === view.key ? styles.viewLinkActive : ''}`}
+            >
+              {view.label}
+              {selectedView === view.key && (
+                <span className={`${styles.viewLinkIndicator} ${styles.viewLinkIndicatorCenter}`} />
+              )}
+            </button>
           ))}
         </div>
 
@@ -322,15 +338,6 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
           </div>
         )}
 
-        {/* Spec Sheets View */}
-        {selectedView === 'spec-sheets' && (
-          <SpecSheetsSubTab
-            projectUuid={projectUuid}
-            projectData={projectData}
-            systemDetails={systemDetails}
-          />
-        )}
-
         {/* QC View */}
         {selectedView === 'qc' && (
           <QCSubTab
@@ -350,6 +357,15 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         {/* Print View */}
         {selectedView === 'print' && (
           <PrintSubTab projectUuid={projectUuid} projectData={projectData} />
+        )}
+
+        {/* Activity View */}
+        {selectedView === 'activity' && (
+          <ActivityLogPanel
+            projectUuid={projectUuid}
+            projectNumber={projectData?.details?.installer_project_id}
+            homeownerName={projectData?.details ? `${projectData.details.customer_first_name || ''} ${projectData.details.customer_last_name || ''}`.trim() : ''}
+          />
         )}
       </div>
 

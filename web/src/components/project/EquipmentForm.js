@@ -381,8 +381,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     sys2_inverter_make: '',
     sys2_inverter_model: '',
 
-    // Combine Systems configuration
-    ele_combine_positions: null, // JSON string storing combine configuration
+    // Note: ele_combine_positions is defined earlier (line 309) - removed duplicate
+    // Combine Systems Sub Panel B configuration
     has_subpanel_b: false, // Whether Sub Panel B exists
     ele_subpanel_b_bus_rating: '',
     ele_subpanel_b_main_breaker: '',
@@ -1475,6 +1475,14 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // BOS Visibility Flags
       show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
+      show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
+
+      // ESS Section Visibility Flags
+      show_sms: `${sysPrefix}_show_sms`,
+      show_battery1: `${sysPrefix}_show_battery1`,
+      show_battery2: `${sysPrefix}_show_battery2`,
+      show_backup_panel: `${sysPrefix}_show_backup_panel`,
 
       // Hoymiles/APSystems breaker size
       sys1_ap_hoy_breaker_size: 'sys1_ap_hoy_breaker_size',
@@ -1701,6 +1709,14 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // BOS Visibility Flags
       show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
+      show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
+
+      // ESS Section Visibility Flags
+      show_sms: `${sysPrefix}_show_sms`,
+      show_battery1: `${sysPrefix}_show_battery1`,
+      show_battery2: `${sysPrefix}_show_battery2`,
+      show_backup_panel: `${sysPrefix}_show_backup_panel`,
 
       // Stringing
       stringing_type: `${sysPrefix}_stringing_type`,
@@ -2141,6 +2157,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           { component: 'backup_loads_label', state: `${sysPrefix}_backup_loads_label` },
           // BOS Visibility Flags
           { component: 'show_inverter_bos', state: `${sysPrefix}_show_inverter_bos` },
+          { component: 'show_battery1_bos', state: `${sysPrefix}_show_battery1_bos` },
+          { component: 'show_battery2_bos', state: `${sysPrefix}_show_battery2_bos` },
+          // ESS Section Visibility Flags
+          { component: 'show_sms', state: `${sysPrefix}_show_sms` },
+          { component: 'show_battery1', state: `${sysPrefix}_show_battery1` },
+          { component: 'show_battery2', state: `${sysPrefix}_show_battery2` },
+          { component: 'show_backup_panel', state: `${sysPrefix}_show_backup_panel` },
         ];
 
         inverterFieldMappings.forEach(({ component, state: stateFieldName }) => {
@@ -2302,6 +2325,14 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // BOS Visibility Flags
       show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
+      show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
+
+      // ESS Section Visibility Flags
+      show_sms: `${sysPrefix}_show_sms`,
+      show_battery1: `${sysPrefix}_show_battery1`,
+      show_battery2: `${sysPrefix}_show_battery2`,
+      show_backup_panel: `${sysPrefix}_show_backup_panel`,
     });
 
     const fieldMapping = getFieldMapping(systemNumber, prefix);
@@ -3077,6 +3108,11 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
               combiner_panel_model: `${systemPrefix}_combiner_panel_model`,
               combiner_panel_bus_amps: `${systemPrefix}_combinerpanel_bus_rating`,
               combiner_panel_main_breaker: `${systemPrefix}_combinerpanel_main_breaker_rating`,
+              combiner_panel_tie_in_breaker: `${systemPrefix}_combiner_panel_tie_in_breaker`,
+              // BOS visibility flags
+              show_inverter_bos: `${systemPrefix}_show_inverter_bos`,
+              show_battery1_bos: `${systemPrefix}_show_battery1_bos`,
+              show_battery2_bos: `${systemPrefix}_show_battery2_bos`,
             };
 
             // Process each field update
@@ -3262,13 +3298,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 />
               )} */}
 
-              {/* Storage Management System - Show ONLY for Whole/Partial Home backup (NOT PowerWall, NOT Enphase 6C, NOT Sol-Ark, NOT Duracell) */}
+              {/* Storage Management System - Show when visibility flag is true (NOT PowerWall, NOT Enphase 6C, NOT Sol-Ark, NOT Duracell) */}
               {mergedFormData.inverter_model &&
                !systemIsEnphaseCombiner6C &&
                !systemIsPowerWall &&
                !systemIsSolArkInverter &&
                !systemIsDuracellInverter &&
-               (mergedFormData.backup_option === 'Whole Home' || mergedFormData.backup_option === 'Partial Home') && (
+               mergedFormData.show_sms && (
                 <StorageManagementSystemSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
@@ -3289,8 +3325,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 </div>
               )}
 
-              {/* Battery Type/Input 1 - Show ONLY when backup option selected (NOT PowerWall) */}
-              {mergedFormData.backup_option && !systemIsPowerWall && (
+              {/* Battery Type/Input 1 - Show when visibility flag is true (NOT PowerWall) */}
+              {mergedFormData.show_battery1 && !systemIsPowerWall && (
                 <BatteryTypeSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
@@ -3305,8 +3341,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 />
               )}
 
-              {/* Battery Type/Input 2 - Show when user adds it OR when Enphase 6C mode OR when Duracell inverter */}
-              {(mergedFormData.show_battery_type_2 || (systemIsEnphaseCombiner6C && mergedFormData.backup_option) || systemIsDuracellInverter) && (
+              {/* Battery Type/Input 2 - Show when visibility flag is true OR when manually added OR when Enphase 6C mode OR when Duracell inverter */}
+              {(mergedFormData.show_battery2 || mergedFormData.show_battery_type_2 || (systemIsEnphaseCombiner6C && mergedFormData.show_battery1) || systemIsDuracellInverter) && (
                 <BatteryTypeSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
@@ -3365,13 +3401,18 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         {visibleSystems.length === 1 && (
           <div className={equipStyles.sectionMarginTop}>
             <div className={`${formStyles.infoBox} ${equipStyles.infoBoxMarginBase}`}>
-              <span className={formStyles.infoBoxIcon}>⚠️</span>
+              <img
+                src={flameIcon}
+                alt=""
+                className={formStyles.infoBoxIcon}
+                style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }}
+              />
               <span className={formStyles.infoBoxContent}>
                 Please select all equipment and combination method before detecting utility required BOS.
               </span>
             </div>
             <AddSectionButton
-              label="Add Utility Required Equipment"
+              label="Utility Required Equipment"
               onClick={handleDetectUtilityBOS}
             />
           </div>
@@ -3433,13 +3474,18 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         {visibleSystems.length >= 2 && (
           <div className={equipStyles.sectionMarginTop}>
             <div className={`${formStyles.infoBox} ${equipStyles.infoBoxMarginBase}`}>
-              <span className={formStyles.infoBoxIcon}>⚠️</span>
+              <img
+                src={flameIcon}
+                alt=""
+                className={formStyles.infoBoxIcon}
+                style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }}
+              />
               <span className={formStyles.infoBoxContent}>
                 Please select all equipment and combination method before detecting utility required BOS.
               </span>
             </div>
             <AddSectionButton
-              label="Add Utility Required Equipment"
+              label="Utility Required Equipment"
               onClick={handleDetectUtilityBOS}
             />
           </div>
@@ -3546,7 +3592,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         isOpen={showBOSDetectionModal}
         onClose={() => setShowBOSDetectionModal(false)}
         onConfirm={handleBOSDetectionConfirm}
-        title="Add Utility Required Equipment"
+        title="Utility Required Equipment"
         confirmText={bosDetectionLoading || !bosDetectionResult || bosItemCount === 0 ? null : `Add Equipment (${bosItemCount} items)`}
         cancelText="Cancel"
         variant="info"

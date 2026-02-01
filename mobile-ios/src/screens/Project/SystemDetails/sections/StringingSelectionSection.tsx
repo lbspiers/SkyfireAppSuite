@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { colors } from "../../../../theme/tokens/tokens";
 import { View, StyleSheet, Text } from "react-native";
 import { useSelector } from "react-redux";
 import CollapsibleSection from "../../../../components/UI/CollapsibleSection";
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(10),
   },
   labelText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: moderateScale(20),
     fontWeight: "700",
     flex: 1,

@@ -73,7 +73,7 @@ const StatusTabCard = ({
       }}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={!isSelected ? { y: -2 } : undefined}
+      whileHover={!isSelected ? {} : undefined}
       transition={{ duration: 0.2 }}
     >
       {/* Status Label */}

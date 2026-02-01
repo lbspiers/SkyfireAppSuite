@@ -143,6 +143,7 @@ const StringCombinerPanelSection = ({
 
   // Check if Enphase is selected
   const isEnphase = formData.combiner_panel_make === 'Enphase';
+  const isNoCombiner = formData.combiner_panel_make === 'No String Combiner Panel';
 
   // Load manufacturers on mount
   // Load manufacturers on mount (once only)
@@ -395,21 +396,12 @@ const StringCombinerPanelSection = ({
 
   // Build comprehensive subtitle with all selections
   const getSubtitle = () => {
+    if (isNoCombiner) return 'No String Combiner Panel';
     if (!hasCombinerPanel) return '';
 
-    const parts = [];
-
-    // Make and Model
-    parts.push(`${formData.combiner_panel_make} ${formData.combiner_panel_model}`);
-
-    // Bus Amps (if not Enphase)
-    if (!isEnphase && formData.combiner_panel_bus_amps) {
-      parts.push(`Bus: ${formData.combiner_panel_bus_amps}A`);
-    }
-
-    // New/Existing status
-    const status = formData.combiner_panel_isnew !== false ? 'New' : 'Existing';
-    parts.push(status);
+    // Quantity (always 1) with New/Existing indicator
+    const statusLetter = formData.combiner_panel_isnew !== false ? 'N' : 'E';
+    const parts = [`1 (${statusLetter}) ${formData.combiner_panel_make} ${formData.combiner_panel_model}`];
 
     // Custom Stringing Configuration
     if (stringingType === 'custom' && totalPanelQty > 0) {
@@ -447,32 +439,84 @@ const StringCombinerPanelSection = ({
   });
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title="String Combiner Panel"
         subtitle={getSubtitle()}
-        showNewExistingToggle={true}
-        isNew={formData.combiner_panel_isnew !== false}
-        onNewExistingChange={(isNew) => onChange('combiner_panel_isnew', isNew)}
         onDelete={handleDelete}
         headerRightContent={
           <PreferredButton onClick={() => setShowPreferredModal(true)} />
         }
       >
-        {/* Make dropdown */}
-        <TableDropdown
-          label="Make"
-          value={formData.combiner_panel_make || ''}
-          onChange={handleManufacturerChange}
-          options={manufacturers.map(m => ({ value: m, label: m }))}
-          placeholder={loadingMakes ? 'Loading...' : 'Select make'}
-          disabled={loadingMakes}
-        />
+        {/* Row 1: No String Combiner Panel Button - Show when no make is selected */}
+        {!formData.combiner_panel_make && (
+          <div style={{
+            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
+          }}>
+            <TableRowButton
+              label="No String Combiner Panel"
+              variant="outline"
+              onClick={() => {
+                onChange('combiner_panel_make', 'No String Combiner Panel');
+                onChange('combiner_panel_model', '');
+                onChange('combiner_panel_main_breaker', 'MLO');
+              }}
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
 
-        {/* Model dropdown */}
-        <TableDropdown
-          label="Model"
-          value={formData.combiner_panel_model || ''}
+        {/* Row 2: New/Existing Toggle - Always visible (except when "No String Combiner Panel") */}
+        {!isNoCombiner && (
+          <div style={{
+            display: 'flex',
+            gap: 'var(--spacing-tight)',
+            padding: 'var(--spacing-tight) var(--spacing)',
+            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
+          }}>
+            <TableRowButton
+              label="New"
+              variant="outline"
+              active={formData.combiner_panel_isnew !== false}
+              onClick={() => onChange('combiner_panel_isnew', true)}
+            />
+            <TableRowButton
+              label="Existing"
+              variant="outline"
+              active={formData.combiner_panel_isnew === false}
+              onClick={() => onChange('combiner_panel_isnew', false)}
+            />
+          </div>
+        )}
+
+        {/* Show "No String Combiner Panel Selected" indicator when selected */}
+        {isNoCombiner && (
+          <div style={{
+            padding: 'var(--spacing-tight) var(--spacing)',
+            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
+          }}>
+            <Alert variant="info">
+              This system does not require a String Combiner Panel. Microinverters connect directly to the main panel.
+            </Alert>
+          </div>
+        )}
+
+        {/* Make & Model - Hide when "No String Combiner Panel" is selected */}
+        {!isNoCombiner && (
+          <>
+            <TableDropdown
+              label="Make"
+              value={formData.combiner_panel_make || ''}
+              onChange={handleManufacturerChange}
+              options={manufacturers.map(m => ({ value: m, label: m }))}
+              placeholder={loadingMakes ? 'Loading...' : 'Select make'}
+              disabled={loadingMakes}
+              showSearch={true}
+            />
+
+            <TableDropdown
+              label="Model"
+              value={formData.combiner_panel_model || ''}
           onChange={handleModelChange}
           options={models.map(m => ({ value: m.value, label: m.label }))}
           placeholder={
@@ -678,6 +722,20 @@ const StringCombinerPanelSection = ({
             /> */}
           </>
         )}
+
+        {/* Add String Combiner BOS Button - Show inside when combiner panel is configured but BOS not yet added */}
+        {hasCombinerPanel && !formData.show_inverter_bos && (
+          <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
+            <TableRowButton
+              label="+ String Combiner BOS (Type 1)"
+              variant="outline"
+              onClick={() => onChange('show_inverter_bos', true)}
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
+          </>
+        )}
       </EquipmentRow>
 
       {/* BOS Equipment - Only show if flag is set */}
@@ -689,14 +747,6 @@ const StringCombinerPanelSection = ({
           systemNumber={systemNumber}
           maxContinuousOutputAmps={maxContinuousOutputAmps}
           loadingMaxOutput={loadingMaxOutput}
-        />
-      )}
-
-      {/* Add Inverter BOS Button - Show when combiner panel is configured but BOS not yet added */}
-      {hasCombinerPanel && !formData.show_inverter_bos && (
-        <AddSectionButton
-          label="Inverter BOS (Type 1)"
-          onClick={() => onChange('show_inverter_bos', true)}
         />
       )}
 

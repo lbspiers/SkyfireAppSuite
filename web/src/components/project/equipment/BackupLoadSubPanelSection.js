@@ -221,7 +221,8 @@ const BackupLoadSubPanelSection = ({
 
   const getSubtitle = () => {
     if (formData.backup_panel_make && formData.backup_panel_model) {
-      return `${formData.backup_panel_make} ${formData.backup_panel_model}`;
+      const statusLetter = formData.backup_panel_isnew !== false ? 'N' : 'E';
+      return `(${statusLetter}) ${formData.backup_panel_make} ${formData.backup_panel_model}`;
     }
     return '';
   };
