@@ -664,7 +664,8 @@ export default function InverterSection({
   const titleWithoutNumber = label.replace(/\s+\d+$/, "");
 
   return (
-    <EquipmentSection
+    <>
+      <EquipmentSection
       title={label}
       isNew={values.isNew}
       onNewExistingToggle={(v) => onChange("isNew", v)}
@@ -889,6 +890,7 @@ export default function InverterSection({
       }}
       onCancel={() => setShowStringingChangeModal(false)}
     />
+    </>
   );
 }
 
