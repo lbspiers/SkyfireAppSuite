@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
+import { safeGetJSON } from '../utils/safeStorage';
 
 const SOCKET_URL = 'https://api.skyfireapp.io';
 
@@ -18,7 +19,7 @@ const getSocket = () => {
 
   if (!socketInstance) {
     // Get user from session storage
-    const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    const userData = safeGetJSON('userData', sessionStorage, {});
 
     socketInstance = io(SOCKET_URL, {
       withCredentials: true,
@@ -110,7 +111,7 @@ export const useSocket = () => {
   useEffect(() => {
     const handleStorageChange = () => {
       const socket = socketRef.current;
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      const userData = safeGetJSON('userData', sessionStorage, {});
       if (socket && socket.connected && userData?.uuid) {
         socket.emit('join:user', userData.uuid);
 

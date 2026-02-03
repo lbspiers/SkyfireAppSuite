@@ -39,7 +39,7 @@ const ChatterInput = ({
     const fetchUsers = async () => {
       try {
         console.log('[ChatterInput] Fetching mentionable users for project:', projectUuid);
-        const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+        const userData = safeGetJSON('userData', sessionStorage, {});
         const currentUserUuid = userData.uuid;
 
         // Fetch project-based mentionable users (includes team + Skyfire admins)

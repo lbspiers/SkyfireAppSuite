@@ -87,7 +87,7 @@ const ChatterPanel = ({
   const [showSearch, setShowSearch] = useState(false);
   const [showUtilityModal, setShowUtilityModal] = useState(false);
   const threadListRef = useRef(null);
-  const currentUser = JSON.parse(sessionStorage.getItem('userData') || '{}');
+  const currentUser = safeGetJSON('userData', sessionStorage, {});
 
   // Override tab state when projectInfo.defaultTab is provided
   useEffect(() => {
@@ -101,7 +101,7 @@ const ChatterPanel = ({
   const fetchProjectData = async () => {
     setLoadingProject(true);
     try {
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      const userData = safeGetJSON('userData', sessionStorage, {});
       const companyId = userData?.company?.uuid;
 
       // Use same endpoint format as Design Portal
@@ -193,7 +193,7 @@ const ChatterPanel = ({
   const handleUtilitySave = async (selectedUtility) => {
     console.log('[ChatterPanel] Utility save requested:', selectedUtility);
     try {
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      const userData = safeGetJSON('userData', sessionStorage, {});
       const companyId = userData?.company?.uuid;
 
       if (!companyId) {

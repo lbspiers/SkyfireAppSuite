@@ -9,9 +9,11 @@ import styles from '../../styles/Dashboard.module.css';
 import { CSS_GRADIENTS } from '../../styles/gradient';
 import { updateProjectStatus } from '../../services/projectService';
 import { LaunchButton } from '../ui';
+import TabStatusIndicators from './TabStatusIndicators';
 import speechBubbleIcon from '../../assets/images/speech-bubble-plus-128.png';
 import eyeIcon from '../../assets/images/eye-icon-128.png';
 import logger from '../../services/devLogger';
+import { safeGetJSON } from '../../utils/safeStorage';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -65,7 +67,7 @@ const STATUS_COLORS = {
  * ProjectsOverview - Comprehensive projects table with AG Grid
  * Displays all project data from /project endpoint
  */
-const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'all', onProjectsUpdate, onViewChatter, onNewProject, isNewProjectOpen = false }) => {
+const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'all', onProjectsUpdate, onViewChatter, onNewProject, isNewProjectOpen = false, tabStatuses = {} }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showRecentOnly, setShowRecentOnly] = useState(false);
   const [showSkyfireProjects, setShowSkyfireProjects] = useState(() => {
@@ -76,7 +78,7 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
   const [projectsData, setProjectsData] = useState(projects);
   const [hasRecentProjects, setHasRecentProjects] = useState(() => {
     try {
-      const recent = JSON.parse(localStorage.getItem('recentProjects') || '{}');
+      const recent = safeGetJSON('recentProjects', localStorage, {});
       return Object.keys(recent).length > 0;
     } catch {
       return false;
@@ -125,7 +127,7 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
 
   // Get user data to check if superuser
   const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
-  const companyData = JSON.parse(sessionStorage.getItem('companyData') || '{}');
+  const companyData = safeGetJSON('companyData', sessionStorage, {});
   const isSuperAdmin = userData?.isSuperAdmin === true;
 
   // Handle status change
@@ -170,7 +172,7 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
   const ActionButtonsRenderer = (params) => {
     const handleLaunchClick = () => {
       // Track this project as recently accessed
-      const recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '{}');
+      const recentProjects = safeGetJSON('recentProjects', localStorage, {});
       recentProjects[params.data.uuid] = Date.now();
       localStorage.setItem('recentProjects', JSON.stringify(recentProjects));
 
@@ -434,6 +436,8 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
       headerTooltip: 'Project Status'
     });
 
+    // Removed Tabs column - statuses now shown in individual columns
+
     // Address
     baseCols.push({
       headerName: 'Address',
@@ -503,37 +507,103 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
     // Site Survey
     baseCols.push({
       headerName: 'Site Survey',
-      field: 'site_survey_url',
+      field: 'uuid',
       width: 110,
       cellRenderer: (params) => {
-        if (!params.value) return '-';
-        return `<a href="${params.value}" target="_blank" rel="noopener noreferrer" style="color: var(--color-link); text-decoration: underline;">View</a>`;
+        const projectTabStatuses = params.context?.tabStatuses?.[params.value] || {};
+        const surveyStatus = projectTabStatuses?.survey?.status;
+
+        if (!surveyStatus || surveyStatus === 'none') return '-';
+
+        const statusColors = {
+          pending: 'var(--gray-500)',
+          draft: 'var(--color-info)',
+          complete: 'var(--color-success)',
+          needs_attention: 'var(--color-warning)'
+        };
+
+        const statusLabels = {
+          needs_attention: 'Attention',
+          pending: 'Pending',
+          draft: 'In Progress',
+          complete: 'Complete'
+        };
+
+        return (
+          <span style={{ color: statusColors[surveyStatus] || 'var(--text-secondary)', fontWeight: 500, textTransform: 'capitalize' }}>
+            {statusLabels[surveyStatus] || surveyStatus}
+          </span>
+        );
       },
-      headerTooltip: 'Site Survey Document'
+      headerTooltip: 'Site Survey Status'
     });
 
     // Site Plan
     baseCols.push({
       headerName: 'Site Plan',
-      field: 'site_plan_url',
+      field: 'uuid',
       width: 100,
       cellRenderer: (params) => {
-        if (!params.value) return '-';
-        return `<a href="${params.value}" target="_blank" rel="noopener noreferrer" style="color: var(--color-link); text-decoration: underline;">View</a>`;
+        const projectTabStatuses = params.context?.tabStatuses?.[params.value] || {};
+        const sitePlanStatus = projectTabStatuses?.site_plan?.status;
+
+        if (!sitePlanStatus || sitePlanStatus === 'none') return '-';
+
+        const statusColors = {
+          pending: 'var(--gray-500)',
+          draft: 'var(--color-info)',
+          complete: 'var(--color-success)',
+          needs_attention: 'var(--color-warning)'
+        };
+
+        const statusLabels = {
+          needs_attention: 'Attention',
+          pending: 'Pending',
+          draft: 'In Progress',
+          complete: 'Complete'
+        };
+
+        return (
+          <span style={{ color: statusColors[sitePlanStatus] || 'var(--text-secondary)', fontWeight: 500, textTransform: 'capitalize' }}>
+            {statusLabels[sitePlanStatus] || sitePlanStatus}
+          </span>
+        );
       },
-      headerTooltip: 'Site Plan Document'
+      headerTooltip: 'Site Plan Status'
     });
 
     // Plan Set
     baseCols.push({
       headerName: 'Plan Set',
-      field: 'plan_set_url',
+      field: 'uuid',
       width: 100,
       cellRenderer: (params) => {
-        if (!params.value) return '-';
-        return `<a href="${params.value}" target="_blank" rel="noopener noreferrer" style="color: var(--color-link); text-decoration: underline;">View</a>`;
+        const projectTabStatuses = params.context?.tabStatuses?.[params.value] || {};
+        const planSetStatus = projectTabStatuses?.plan_set?.status;
+
+        if (!planSetStatus || planSetStatus === 'none') return '-';
+
+        const statusColors = {
+          pending: 'var(--gray-500)',
+          draft: 'var(--color-info)',
+          complete: 'var(--color-success)',
+          needs_attention: 'var(--color-warning)'
+        };
+
+        const statusLabels = {
+          needs_attention: 'Attention',
+          pending: 'Pending',
+          draft: 'In Progress',
+          complete: 'Complete'
+        };
+
+        return (
+          <span style={{ color: statusColors[planSetStatus] || 'var(--text-secondary)', fontWeight: 500, textTransform: 'capitalize' }}>
+            {statusLabels[planSetStatus] || planSetStatus}
+          </span>
+        );
       },
-      headerTooltip: 'Plan Set Document'
+      headerTooltip: 'Plan Set Status'
     });
 
     // Permits
@@ -660,7 +730,7 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
 
     // Filter by recent projects
     if (showRecentOnly) {
-      const recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '{}');
+      const recentProjects = safeGetJSON('recentProjects', localStorage, {});
       const recentUuids = Object.keys(recentProjects);
 
       // Filter to only include projects that have been launched
@@ -810,7 +880,7 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
             rowData={filteredProjects}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
-            context={{ onViewChatter }}
+            context={{ onViewChatter, tabStatuses }}
             pagination={false}
             rowHeight={38}
             headerHeight={38}

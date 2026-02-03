@@ -26,6 +26,7 @@ import pageStyles from '../pages/Project.module.css';
 import { CSS_GRADIENTS } from '../styles/gradient';
 import { getTimeBasedGreeting } from '../utils/constants';
 import { canAccessDevPortal } from '../constants/devPortalConstants';
+import { safeGetJSON } from '../utils/safeStorage';
 
 /**
  * Skyfire Admin Dashboard - Main Page
@@ -64,7 +65,7 @@ const Dashboard = () => {
   const projectFormRef = useRef(null);
 
   // Get user data from session
-  const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+  const userData = safeGetJSON('userData', sessionStorage, {});
 
   // Check if user can access Dev Portal
   const showDevPortalTab = canAccessDevPortal(userData?.email);

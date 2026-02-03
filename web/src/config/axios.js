@@ -1,6 +1,7 @@
 import axiosLib from 'axios';
 import { toast } from 'react-toastify';
 import requestCache from '../services/requestCache';
+import { safeGetJSON } from '../utils/safeStorage';
 
 // Configure axios to use the API base URL
 // Hardcoded temporarily to bypass env variable caching issues
@@ -15,7 +16,7 @@ const axios = axiosLib.create({
 axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    const userData = safeGetJSON('userData', sessionStorage, {});
     const companyId = userData?.company?.uuid;
 
     if (token) {

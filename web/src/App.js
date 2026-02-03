@@ -255,7 +255,7 @@ function App() {
           <Route path="/redeem-invite" element={<RedeemInvite />} />
 
           {/* Dashboard Routes - Protected */}
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><ErrorBoundary><Dashboard /></ErrorBoundary></PrivateRoute>} />
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
           <Route path="/companies" element={<PrivateRoute><Companies /></PrivateRoute>} />
@@ -264,22 +264,22 @@ function App() {
           <Route path="/inventory" element={<PrivateRoute><Inventory /></PrivateRoute>} />
           <Route path="/photo-gallery" element={<PrivateRoute><PhotoGallery /></PrivateRoute>} />
           <Route path="/preferred-equipment" element={<PrivateRoute><PreferredEquipment /></PrivateRoute>} />
-          <Route path="/project/:projectUuid" element={<PrivateRoute><DesignPortal /></PrivateRoute>} />
+          <Route path="/project/:projectUuid" element={<PrivateRoute><ErrorBoundary><DesignPortal /></ErrorBoundary></PrivateRoute>} />
           <Route path="/service-territory" element={<PrivateRoute><ServiceTerritory /></PrivateRoute>} />
           <Route path="/support" element={<PrivateRoute><Support /></PrivateRoute>} />
           <Route path="/scheduling" element={<PrivateRoute><SchedulingPortal /></PrivateRoute>} />
 
           {/* Portal Routes - Protected */}
           {/* Global portal routes (all projects) */}
-          <Route path="/sales" element={<PrivateRoute><SalesPortal /></PrivateRoute>} />
-          <Route path="/design" element={<PrivateRoute><DesignPortal /></PrivateRoute>} />
-          <Route path="/permitting" element={<PrivateRoute><PermittingPortal /></PrivateRoute>} />
-          <Route path="/install" element={<PrivateRoute><InstallPortal /></PrivateRoute>} />
+          <Route path="/sales" element={<PrivateRoute><ErrorBoundary><SalesPortal /></ErrorBoundary></PrivateRoute>} />
+          <Route path="/design" element={<PrivateRoute><ErrorBoundary><DesignPortal /></ErrorBoundary></PrivateRoute>} />
+          <Route path="/permitting" element={<PrivateRoute><ErrorBoundary><PermittingPortal /></ErrorBoundary></PrivateRoute>} />
+          <Route path="/install" element={<PrivateRoute><ErrorBoundary><InstallPortal /></ErrorBoundary></PrivateRoute>} />
           {/* Project-specific portal routes */}
-          <Route path="/project/:projectUuid/sales" element={<PrivateRoute><SalesPortal /></PrivateRoute>} />
-          <Route path="/project/:projectUuid/design" element={<PrivateRoute><DesignPortal /></PrivateRoute>} />
-          <Route path="/project/:projectUuid/permitting" element={<PrivateRoute><PermittingPortal /></PrivateRoute>} />
-          <Route path="/project/:projectUuid/install" element={<PrivateRoute><InstallPortal /></PrivateRoute>} />
+          <Route path="/project/:projectUuid/sales" element={<PrivateRoute><ErrorBoundary><SalesPortal /></ErrorBoundary></PrivateRoute>} />
+          <Route path="/project/:projectUuid/design" element={<PrivateRoute><ErrorBoundary><DesignPortal /></ErrorBoundary></PrivateRoute>} />
+          <Route path="/project/:projectUuid/permitting" element={<PrivateRoute><ErrorBoundary><PermittingPortal /></ErrorBoundary></PrivateRoute>} />
+          <Route path="/project/:projectUuid/install" element={<PrivateRoute><ErrorBoundary><InstallPortal /></ErrorBoundary></PrivateRoute>} />
 
           {/* Drafter Portal - Protected with Nested Routes */}
           <Route path="/drafter-portal" element={<PrivateRoute><DrafterPortalLayout /></PrivateRoute>}>

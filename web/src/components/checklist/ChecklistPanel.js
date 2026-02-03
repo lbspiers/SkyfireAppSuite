@@ -66,7 +66,7 @@ const ChecklistPanel = ({ projectUuid, compact = false }) => {
 
   // Update item status
   const updateItemStatus = async (sectionId, itemId, status, subStatus = null) => {
-    const currentUser = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    const currentUser = safeGetJSON('userData', sessionStorage, {});
     const timestamp = new Date().toISOString();
 
     const updateData = {
@@ -112,7 +112,7 @@ const ChecklistPanel = ({ projectUuid, compact = false }) => {
 
   // Submit revision notes
   const submitRevisionNotes = async (sectionId, itemId, notes) => {
-    const currentUser = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    const currentUser = safeGetJSON('userData', sessionStorage, {});
     const timestamp = new Date().toISOString();
 
     const revisionRecord = {
@@ -194,7 +194,7 @@ const ChecklistPanel = ({ projectUuid, compact = false }) => {
     if (!taskContext) return;
 
     const { sectionId, itemId } = taskContext;
-    const currentUser = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    const currentUser = safeGetJSON('userData', sessionStorage, {});
 
     try {
       await axiosInstance.post(`/checklist/project/${projectUuid}/${sectionId}/${itemId}/tasks`, {

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from '../config/axios';
 import logger from '../services/devLogger';
+import { safeGetJSON } from '../utils/safeStorage';
 import ProjectDetailsTabs from '../components/dashboard/ProjectDetailsTabs';
 import ProjectOverviewTabs from '../components/dashboard/ProjectOverviewTabs';
 import PlanSetVersions from '../components/dashboard/PlanSetVersions';
@@ -53,7 +54,7 @@ const DesignPortal = () => {
   const navigate = useNavigate();
 
   // Get user data from session
-  const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+  const userData = safeGetJSON('userData', sessionStorage, {});
 
   // Check if user can access Dev Portal
   const showDevPortalTab = canAccessDevPortal(userData?.email);
@@ -433,6 +434,7 @@ const DesignPortal = () => {
           </ProjectDetailsTabs>
 
           <ProjectOverviewTabs
+            projectUuid={projectUuid}
             selectedTab={selectedOverviewTab}
             onTabChange={setSelectedOverviewTab}
             loading={loading}
