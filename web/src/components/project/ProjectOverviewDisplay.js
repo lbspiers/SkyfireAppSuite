@@ -358,16 +358,12 @@ const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) 
   }
 
   // Debug: Log when component renders
-  console.log('[ProjectOverviewDisplay] Component rendering...');
-  console.log('[ProjectOverviewDisplay] onUtilityClick prop:', onUtilityClick);
-  console.log('[ProjectOverviewDisplay] sections:', sections);
 
   return (
     <div className={styles.overviewDisplay}>
       {sections.map((section, sectionIndex) => {
         // Debug log for Customer & Site section
         if (section.title === 'Customer & Site') {
-          console.log('[ProjectOverviewDisplay] Customer & Site fields:', section.fields);
         }
 
         return (
@@ -380,22 +376,13 @@ const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) 
               const isUtilityMissing = field.specialClass === 'utilityMissing';
               const isMountingPlaneDivider = field.specialClass === 'mountingPlaneDivider';
 
-              // Debug log for utility field specifically
+              // Utility field specific handling
               if (field.label === 'Utility') {
-                console.log('[ProjectOverviewDisplay] Rendering Utility field:', {
-                  value: field.value,
-                  specialClass: field.specialClass,
-                  isUtilityMissing,
-                  hasOnUtilityClick: !!onUtilityClick
-                });
+                // Field-specific logic for utility (if needed in future)
               }
 
               const handleClick = () => {
-                console.log('[ProjectOverviewDisplay] Utility field clicked!');
-                console.log('[ProjectOverviewDisplay] isUtilityMissing:', isUtilityMissing);
-                console.log('[ProjectOverviewDisplay] onUtilityClick exists:', !!onUtilityClick);
                 if (isUtilityMissing && onUtilityClick) {
-                  console.log('[ProjectOverviewDisplay] Calling onUtilityClick...');
                   onUtilityClick();
                 }
               };

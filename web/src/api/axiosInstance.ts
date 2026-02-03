@@ -18,8 +18,6 @@ const triggerUpdateNotification = () => {
   window.dispatchEvent(new CustomEvent('app-update-available', {
     detail: { reason: 'version-mismatch' }
   }));
-
-  console.log('[App] New version detected via API header - update notification triggered');
 };
 
 // Helper function to summarize large objects for logging
@@ -90,16 +88,6 @@ axiosInstance.interceptors.request.use(
     // Add app version header for version mismatch detection
     config.headers['X-App-Version'] = DEPLOYMENT_ID;
 
-    // Debug log in development
-    if (isDevelopment()) {
-      console.log('[API Request]', {
-        method: config.method?.toUpperCase(),
-        url: config.url,
-        params: config.params,
-        data: summarize(config.data),
-      });
-    }
-
     return config;
   },
   (error) => {
@@ -116,17 +104,7 @@ axiosInstance.interceptors.response.use(
     // Check for version mismatch
     const serverVersion = response.headers['x-app-version'];
     if (serverVersion && serverVersion !== DEPLOYMENT_ID && serverVersion !== 'dev') {
-      console.log(`[App] Version mismatch detected - Client: ${DEPLOYMENT_ID}, Server expects: ${serverVersion}`);
       triggerUpdateNotification();
-    }
-
-    // Debug log in development
-    if (isDevelopment()) {
-      console.log('[API Response]', {
-        status: response.status,
-        url: response.config.url,
-        data: summarize(response.data),
-      });
     }
 
     return response;

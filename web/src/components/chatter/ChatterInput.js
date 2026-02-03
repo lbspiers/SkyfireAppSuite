@@ -39,13 +39,11 @@ const ChatterInput = ({
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        console.log('[ChatterInput] Fetching mentionable users for project:', projectUuid);
         const userData = safeGetJSON('userData', sessionStorage, {});
         const currentUserUuid = userData.uuid;
 
         // Fetch project-based mentionable users (includes team + Skyfire admins)
         const mentionableUsers = await chatterService.getMentionableUsers(projectUuid);
-        console.log('[ChatterInput] Fetched mentionable users:', mentionableUsers);
 
         // Create current user object with isSelf flag
         const currentUser = mentionableUsers.find(u => u.uuid === currentUserUuid);
@@ -73,7 +71,6 @@ const ChatterInput = ({
           ? [currentUser, ...sortedUsers]
           : sortedUsers;
 
-        console.log('[ChatterInput] Final users list:', finalUsers);
         setUsers(finalUsers);
       } catch (error) {
         console.error('[ChatterInput] Failed to fetch users:', error);
@@ -184,7 +181,6 @@ const ChatterInput = ({
     name: `${user.firstName} ${user.lastName}`,
     role: user.isSkyfireAdmin ? 'Skyfire Admin' : user.role || 'Team Member'
   }));
-  console.log('[ChatterInput] Prepared mention suggestions:', mentionSuggestions);
 
   return (
     <div className={styles.chatterInputContainer}>

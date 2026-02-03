@@ -186,13 +186,11 @@ const ChatterPanel = ({
 
   // Handle utility click from overview
   const handleUtilityClick = () => {
-    console.log('[ChatterPanel] Utility field clicked, opening modal');
     setShowUtilityModal(true);
   };
 
   // Handle utility save from modal
   const handleUtilitySave = async (selectedUtility) => {
-    console.log('[ChatterPanel] Utility save requested:', selectedUtility);
     try {
       const userData = safeGetJSON('userData', sessionStorage, {});
       const companyId = userData?.company?.uuid;

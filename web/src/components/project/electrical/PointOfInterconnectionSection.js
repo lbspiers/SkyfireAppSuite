@@ -197,14 +197,6 @@ const PointOfInterconnectionSection = ({
     combinedSystemMaxOutput,
   });
 
-  console.log('[POI] PCS Field Debug:', {
-    pcsFieldName,
-    formDataValue: formData[pcsFieldName],
-    recommendedPcsAmps: pcsCalculations.recommendedPcsAmps,
-    optionsCount: pcsCalculations.filteredPcsAmpsOptions?.length || 0,
-    options: pcsCalculations.filteredPcsAmpsOptions,
-  });
-
   console.debug('[POI] PCS Calculations:', {
     systemNumber,
     hasBattery: pcsCalculations.hasBattery,
@@ -225,12 +217,6 @@ const PointOfInterconnectionSection = ({
   useEffect(() => {
     if (pcsCalculations.shouldAutoTriggerPCS && pcsCalculations.recommendedPcsAmps && !formData[pcsFieldName]) {
       const pcsSettingsField = systemNumber === 1 ? 'sys1_pcs_settings' : 'sys2_pcs_settings';
-      console.log('[POI] Auto-selecting recommended PCS amps - Saving to BOTH fields:', {
-        field1: pcsFieldName,
-        field2: pcsSettingsField,
-        ampValue: pcsCalculations.recommendedPcsAmps,
-        booleanValue: true
-      });
       // Save amp value to pcs_amps (integer field)
       onChange(pcsFieldName, pcsCalculations.recommendedPcsAmps);
       // Save true to pcs_settings (boolean field) to indicate PCS is active
@@ -861,12 +847,6 @@ const PointOfInterconnectionSection = ({
             value={formData[pcsFieldName]?.toString() || pcsCalculations.recommendedPcsAmps || ''}
             onChange={(value) => {
               const pcsSettingsField = systemNumber === 1 ? 'sys1_pcs_settings' : 'sys2_pcs_settings';
-              console.log('[POI] PCS Setting onChange - Saving to BOTH fields:', {
-                field1: pcsFieldName,
-                field2: pcsSettingsField,
-                ampValue: value,
-                booleanValue: true,
-              });
               // Save amp value to pcs_amps (integer field)
               onChange(pcsFieldName, value);
               // Save true to pcs_settings (boolean field) to indicate PCS is active

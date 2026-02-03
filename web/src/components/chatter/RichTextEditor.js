@@ -44,7 +44,6 @@ const RichTextEditor = forwardRef(({
   // Keep ref updated when prop changes
   useEffect(() => {
     mentionSuggestionsRef.current = mentionSuggestions;
-    console.log('[RichTextEditor] Updated mentionSuggestionsRef:', mentionSuggestions);
   }, [mentionSuggestions]);
   const editor = useEditor({
     extensions: [
@@ -70,12 +69,9 @@ const RichTextEditor = forwardRef(({
           items: ({ query }) => {
             // Read from ref to get the latest suggestions
             const suggestions = mentionSuggestionsRef.current || [];
-            console.log('[RichTextEditor] Mention triggered with query:', query);
-            console.log('[RichTextEditor] Available suggestions from ref:', suggestions);
             const filtered = suggestions
               .filter(user => user.name.toLowerCase().includes(query.toLowerCase()))
               .slice(0, 5);
-            console.log('[RichTextEditor] Filtered results:', filtered);
             return filtered;
           },
           render: () => {

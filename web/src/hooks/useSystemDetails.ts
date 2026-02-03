@@ -54,6 +54,10 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
   const activityLogTimerRef = useRef<NodeJS.Timeout | null>(null);
   // Pending activity log changes buffer
   const pendingActivityChangesRef = useRef<FieldChange[]>([]);
+  // AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+  // Track last projectUuid to detect actual changes (not re-renders)
+  const lastProjectUuidRef = useRef<string | null>(null);
 
   // Fetch system details
   const fetch = useCallback(async (signal?: AbortSignal) => {
@@ -104,13 +108,24 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
   useEffect(() => {
     if (!autoFetch) return;
 
+    // Only abort if projectUuid actually changed (not on re-renders)
+    if (lastProjectUuidRef.current && lastProjectUuidRef.current !== projectUuid) {
+      console.debug('[useSystemDetails] Project changed, aborting previous request');
+      abortControllerRef.current?.abort();
+    }
+
+    lastProjectUuidRef.current = projectUuid;
     const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     fetch(controller.signal);
 
+    // DON'T abort on cleanup - only abort when projectUuid changes (handled above)
+    // Aborting on every cleanup would cancel requests on any re-render
     return () => {
-      controller.abort();
+      // Empty cleanup - we only abort when projectUuid actually changes
     };
-  }, [fetch, autoFetch]);
+  }, [projectUuid, autoFetch, fetch]);
 
   // Cleanup: flush pending activity logs on unmount
   useEffect(() => {

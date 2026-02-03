@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from '../config/axios';
@@ -52,6 +52,10 @@ const DesignPortal = () => {
   });
   const [isSuperUser, setIsSuperUser] = useState(false);
   const navigate = useNavigate();
+
+  // AbortController refs for managing in-flight requests
+  const abortControllerRef = useRef(null);
+  const lastProjectUuidRef = useRef(null);
 
   // Get user data from session
   const userData = safeGetJSON('userData', sessionStorage, {});
@@ -115,7 +119,15 @@ const DesignPortal = () => {
   };
 
   useEffect(() => {
+    // Only abort if projectUuid actually changed (not on re-renders)
+    if (lastProjectUuidRef.current && lastProjectUuidRef.current !== projectUuid) {
+      logger.debug("Portal", "Project changed, aborting previous request");
+      abortControllerRef.current?.abort();
+    }
+
+    lastProjectUuidRef.current = projectUuid;
     const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     const fetchProjectData = async () => {
       try {
@@ -164,8 +176,9 @@ const DesignPortal = () => {
 
     fetchProjectData();
 
+    // DON'T abort on cleanup - only abort when projectUuid changes (handled above)
     return () => {
-      controller.abort();
+      // Empty cleanup - we only abort when projectUuid actually changes
     };
   }, [projectUuid]);
 

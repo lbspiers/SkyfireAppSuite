@@ -52,7 +52,6 @@ const TeamManagement = () => {
 
   // Debug: Log modal state changes
   useEffect(() => {
-    console.log('[TeamManagement] showAddModal state changed to:', showAddModal);
   }, [showAddModal]);
   const [preselectedRole, setPreselectedRole] = useState(null); // For suggestion clicks
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -120,7 +119,6 @@ const TeamManagement = () => {
     showToasts: true,
 
     onMemberJoined: useCallback((data) => {
-      console.log('[TeamManagement] Socket: Member joined', data);
       // Add new member to list or update status to active
       setMembers(prev => {
         // Check if already exists (was pending invite)
@@ -156,13 +154,11 @@ const TeamManagement = () => {
     }, []),
 
     onMemberRemoved: useCallback((data) => {
-      console.log('[TeamManagement] Socket: Member removed', data);
       // Remove from list
       setMembers(prev => prev.filter(m => m.uuid !== data.uuid));
     }, []),
 
     onRoleChanged: useCallback((data) => {
-      console.log('[TeamManagement] Socket: Role changed', data);
       // Update role in list
       setMembers(prev => prev.map(m =>
         m.uuid === data.uuid
@@ -172,7 +168,6 @@ const TeamManagement = () => {
     }, []),
 
     onInviteSent: useCallback((data) => {
-      console.log('[TeamManagement] Socket: Invite sent', data);
       // Add pending invite to list
       setMembers(prev => {
         // Check if already exists
@@ -305,10 +300,8 @@ const TeamManagement = () => {
         <Button
           variant="primary"
           onClick={() => {
-            console.log('[TeamManagement] Add Member clicked');
             setPreselectedRole(null);
             setShowAddModal(true);
-            console.log('[TeamManagement] showAddModal set to true');
           }}
         >
           <i className="ri-user-add-line" /> Add Member
