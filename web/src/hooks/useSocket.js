@@ -109,13 +109,14 @@ export const useSocket = () => {
   // Re-join user room when user changes (login/logout)
   useEffect(() => {
     const handleStorageChange = () => {
+      const socket = socketRef.current;
       const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
-      if (socketRef.current?.connected && userData?.uuid) {
-        socketRef.current.emit('join:user', userData.uuid);
+      if (socket && socket.connected && userData?.uuid) {
+        socket.emit('join:user', userData.uuid);
 
         // Re-join superadmin room if super admin
         if (userData?.isSuperAdmin) {
-          socketRef.current.emit('join:superadmin');
+          socket.emit('join:superadmin');
         }
       }
     };
@@ -128,8 +129,9 @@ export const useSocket = () => {
    * Join a project room for real-time collaboration
    */
   const joinProject = useCallback((projectUuid) => {
-    if (socketRef.current?.connected && projectUuid) {
-      socketRef.current.emit('join-project', projectUuid);
+    const socket = socketRef.current;
+    if (socket && socket.connected && projectUuid) {
+      socket.emit('join-project', projectUuid);
     }
   }, []);
 
@@ -137,8 +139,9 @@ export const useSocket = () => {
    * Leave a project room
    */
   const leaveProject = useCallback((projectUuid) => {
-    if (socketRef.current?.connected && projectUuid) {
-      socketRef.current.emit('leave-project', projectUuid);
+    const socket = socketRef.current;
+    if (socket && socket.connected && projectUuid) {
+      socket.emit('leave-project', projectUuid);
     }
   }, []);
 
