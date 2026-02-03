@@ -1,7 +1,7 @@
 // Skyfire Service Worker
 // Version format: YYYY.MM.DD.increment (e.g., 2024.12.25.1)
 // IMPORTANT: Increment version when changing caching behavior to force browser updates
-const CACHE_VERSION = '2026.01.29.1745';
+const CACHE_VERSION = '2026.02.03.0046';
 const CACHE_NAME = `skyfire-cache-v${CACHE_VERSION}`;
 
 // Assets to cache immediately on install

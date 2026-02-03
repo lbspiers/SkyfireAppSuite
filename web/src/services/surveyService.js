@@ -196,13 +196,14 @@ export const photosApi = {
   },
 
   /**
-   * Upload a photo
+   * Upload a photo with automatic compression and optimization
    * @param {string} projectId - Project UUID
-   * @param {File} file - Photo file
-   * @param {Object} metadata - Optional metadata (section, tag, note)
-   * @returns {Promise<Object>} Uploaded photo object
+   * @param {File} file - Photo file (supports HEIC, JPEG, PNG, etc.)
+   * @param {Object} metadata - Optional metadata (section, tag, note, capturedAt)
+   * @param {Function} onProgress - Optional progress callback (percent: number) => void
+   * @returns {Promise<Object>} Uploaded photo object with compressed URLs
    */
-  async upload(projectId, file, metadata = {}) {
+  async upload(projectId, file, metadata = {}, onProgress = null) {
     const companyId = getCompanyId();
     if (!companyId) throw new Error('Company ID not found');
 
@@ -216,25 +217,28 @@ export const photosApi = {
         metadata
       });
 
-      // Step 1: Upload file to S3 using presigned URL
-      logger.log('SurveyService', `[Photos] Uploading ${file.name} to S3...`);
-      const s3Url = await uploadFileToS3(file, projectId);
+      // Use new compression endpoint - single upload with server-side processing
+      logger.log('SurveyService', `[Photos] Uploading ${file.name} to compression endpoint...`);
 
-      // Step 2: Create photo record in database with S3 URL
-      logger.log('SurveyService', `[Photos] Creating photo record at ${ENDPOINTS.photos.upload(projectId, companyId)}`);
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('section', metadata.section || 'general'); // Required field
+      formData.append('companyId', companyId);
 
-      const response = await fetch(ENDPOINTS.photos.upload(projectId, companyId), {
+      // Optional metadata
+      if (metadata.tag) formData.append('tag', metadata.tag);
+      if (metadata.note) formData.append('note', metadata.note);
+      if (metadata.capturedAt) formData.append('capturedAt', metadata.capturedAt);
+
+      // Upload with compression (new endpoint)
+      const uploadEndpoint = `${API_BASE}/project/${projectId}/photos/upload`;
+      logger.log('SurveyService', `[Photos] Uploading to: ${uploadEndpoint}`);
+
+      const response = await fetch(uploadEndpoint, {
         method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({
-          url: s3Url,
-          section: metadata.section || 'general', // Required field - default to 'general'
-          fileName: file.name,
-          mimeType: file.type,
-          fileSize: file.size,
-          tag: metadata.tag || null,
-          note: metadata.note || null,
-        }),
+        headers: getMultipartHeaders(), // Don't set Content-Type - browser handles boundary
+        body: formData,
       });
 
       logger.log('SurveyService', `[Photos] Upload response: ${response.status} ${response.statusText}`);
@@ -246,7 +250,14 @@ export const photosApi = {
       }
 
       const data = await response.json();
-      logger.log('SurveyService', `[Photos] Upload successful:`, data);
+      logger.log('SurveyService', `[Photos] Upload successful with compression:`, data);
+
+      // Log compression savings if HEIC was converted
+      if (data.compression) {
+        const { originalSize, compressedSize, savings, wasHeic } = data.compression;
+        logger.log('SurveyService', `[Photos] Compression: ${wasHeic ? 'HEIC→JPEG' : 'Optimized'}, Saved: ${savings}%, ${originalSize}→${compressedSize}`);
+      }
+
       return data.data || data;
     } catch (error) {
       logger.error('SurveyService', 'Failed to upload photo:', error);
@@ -611,8 +622,8 @@ export const videosApi = {
 };
 
 /**
- * Notes API - Currently using mock data
- * TODO: Replace with real API when backend is ready
+ * Notes API - CRUD operations for project notes
+ * Uses the new /project/:projectUuid/notes endpoint
  */
 export const notesApi = {
   /**
@@ -622,19 +633,27 @@ export const notesApi = {
    * @returns {Promise<Array>} Array of note objects
    */
   async list(projectId, filters = {}) {
-    // TODO: Replace with real API when backend is ready
-    logger.debug('SurveyService', '[notesApi] Using mock data - backend not implemented');
-
     try {
-      const { mockSurveyNotes, getNotesBySection } = await import('../mockData/surveyMockData');
+      logger.log('SurveyService', `[Notes] Fetching notes for project ${projectId}`, filters);
 
-      if (filters.section) {
-        return getNotesBySection(filters.section);
+      const url = filters.section
+        ? `${API_BASE}/project/${projectId}/notes?section=${encodeURIComponent(filters.section)}`
+        : `${API_BASE}/project/${projectId}/notes`;
+
+      const response = await fetch(url, { headers: getHeaders() });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      return mockSurveyNotes;
+
+      const data = await response.json();
+      const notes = data.data || data || [];
+
+      logger.log('SurveyService', `[Notes] Loaded ${notes.length} notes`);
+      return notes;
     } catch (error) {
-      logger.error('SurveyService', 'Failed to load mock notes:', error);
-      return [];
+      logger.error('SurveyService', 'Failed to fetch notes:', error);
+      throw error;
     }
   },
 
@@ -642,34 +661,66 @@ export const notesApi = {
    * Create a new note
    * @param {string} projectId - Project UUID
    * @param {Object} noteData - Note content and metadata
+   * @param {string} noteData.content - Note content (required)
+   * @param {string} [noteData.section] - Section identifier
+   * @param {string} [noteData.priority] - Priority: 'high' | 'medium' | 'info'
    * @returns {Promise<Object>} Created note object
    */
   async create(projectId, noteData) {
-    // TODO: Replace with real API
-    logger.debug('SurveyService', '[notesApi] Mock create:', noteData);
-    return {
-      id: `note-${Date.now()}`,
-      ...noteData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      logger.log('SurveyService', `[Notes] Creating note`, noteData);
+
+      const response = await fetch(ENDPOINTS.notes.create(projectId), {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(noteData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const note = data.data || data;
+
+      logger.log('SurveyService', `[Notes] Created note ${note.id}`);
+      return note;
+    } catch (error) {
+      logger.error('SurveyService', 'Failed to create note:', error);
+      throw error;
+    }
   },
 
   /**
    * Update an existing note
    * @param {string} projectId - Project UUID
    * @param {string} noteId - Note ID
-   * @param {Object} updates - Fields to update
+   * @param {Object} updates - Fields to update (content, section, priority, isPinned)
    * @returns {Promise<Object>} Updated note object
    */
   async update(projectId, noteId, updates) {
-    // TODO: Replace with real API
-    logger.debug('SurveyService', '[notesApi] Mock update:', noteId, updates);
-    return {
-      id: noteId,
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      logger.log('SurveyService', `[Notes] Updating note ${noteId}`, updates);
+
+      const response = await fetch(ENDPOINTS.notes.update(projectId, noteId), {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const note = data.data || data;
+
+      logger.log('SurveyService', `[Notes] Updated note ${noteId}`);
+      return note;
+    } catch (error) {
+      logger.error('SurveyService', 'Failed to update note:', error);
+      throw error;
+    }
   },
 
   /**
@@ -679,9 +730,26 @@ export const notesApi = {
    * @returns {Promise<Object>} Delete result
    */
   async delete(projectId, noteId) {
-    // TODO: Replace with real API
-    logger.debug('SurveyService', '[notesApi] Mock delete:', noteId);
-    return { success: true };
+    try {
+      logger.log('SurveyService', `[Notes] Deleting note ${noteId}`);
+
+      const response = await fetch(ENDPOINTS.notes.delete(projectId, noteId), {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      logger.log('SurveyService', `[Notes] Deleted note ${noteId}`);
+      return data;
+    } catch (error) {
+      logger.error('SurveyService', 'Failed to delete note:', error);
+      throw error;
+    }
   },
 };
 

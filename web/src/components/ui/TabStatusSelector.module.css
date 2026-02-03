@@ -1,0 +1,112 @@
+/* ===== CONTAINER ===== */
+.container {
+  display: inline-block;
+}
+
+/* ===== TRIGGER BUTTON ===== */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-family: inherit;
+  font-weight: var(--font-medium);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.trigger:hover:not(.disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-elevated);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid rgba(253, 115, 50, 0.5);
+  outline-offset: 2px;
+}
+
+.trigger.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== TRIGGER SIZES ===== */
+.trigger.sm {
+  padding: var(--spacing-xs) var(--spacing-tight);
+  font-size: var(--text-xs);
+}
+
+.trigger.md {
+  padding: var(--spacing-tight) var(--spacing);
+  font-size: var(--text-base);
+}
+
+.trigger.lg {
+  padding: var(--spacing) var(--spacing-loose);
+  font-size: var(--text-lg);
+}
+
+/* ===== TRIGGER CONTENT ===== */
+.triggerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.triggerLabel {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.chevronIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* ===== ACTIVE ITEM INDICATOR ===== */
+.active {
+  background: rgba(253, 115, 50, 0.1);
+  color: var(--color-primary);
+}
+
+/* ===== MODAL CONTENT ===== */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.modalDescription {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.reasonInput {
+  width: 100%;
+  padding: var(--spacing);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  transition: var(--transition-base);
+}
+
+.reasonInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--bg-input-hover);
+}
+
+.reasonInput::placeholder {
+  color: var(--text-disabled);
+}

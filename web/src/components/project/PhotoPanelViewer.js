@@ -250,7 +250,8 @@ const PhotoPanelViewer = ({
     return <div className={styles.emptyState}>No photo selected</div>;
   }
 
-  const photoUrl = currentItem.url || currentItem.preview_url || currentItem.thumbnail_url;
+  // Use preview_url for viewing (optimized for display), fall back to full resolution
+  const photoUrl = currentItem.preview_url || currentItem.previewUrl || currentItem.url;
 
   return (
     <div className={styles.viewerContainer}>
@@ -355,7 +356,8 @@ const PhotoPanelViewer = ({
             onMouseLeave={handleCarouselMouseUp}
           >
             {media.map((item, index) => {
-              const thumbnailUrl = item.thumbnail_url || item.preview_url || item.url;
+              // Use thumb_url for carousel thumbnails (smallest, fastest)
+              const thumbnailUrl = item.thumb_url || item.thumbUrl || item.thumbnail_url || item.url;
               const isActive = index === currentIndex;
 
               // Calculate size tier based on hover (if hovering) or selection (if not)

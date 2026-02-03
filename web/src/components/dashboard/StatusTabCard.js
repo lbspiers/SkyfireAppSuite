@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import styles from '../../styles/Dashboard.module.css';
 import { CSS_GRADIENTS } from '../../styles/gradient';
+import { StatusDropdown } from '../ui';
 
 /**
  * Animated number counter component
@@ -38,6 +39,9 @@ const AnimatedCounter = ({ value }) => {
  * @param {boolean} showMetrics - Whether to show count and change metrics
  * @param {string} customColor - Custom background color for selected tab
  * @param {ReactNode} icon - Optional icon component to display before label
+ * @param {string} status - Optional status (pending, in_progress, draft, complete, needs_attention, none)
+ * @param {function} onStatusChange - Optional callback when status is manually changed (newStatus, reason)
+ * @param {string} tabName - Optional tab name for filtering status options ('survey' | 'site_plan' | 'plan_set' | 'revisions')
  */
 const StatusTabCard = ({
   label,
@@ -49,7 +53,10 @@ const StatusTabCard = ({
   loading = false,
   showMetrics = true,
   customColor,
-  icon
+  icon,
+  status,
+  onStatusChange,
+  tabName = null
 }) => {
   if (loading) {
     return (
@@ -69,13 +76,26 @@ const StatusTabCard = ({
       onClick={onClick}
       className={`${styles.statusTab} ${isSelected ? styles.statusTabSelected : ''}`}
       style={{
-        background: isSelected ? (customColor || 'var(--bg-panel)') : undefined
+        background: isSelected ? (customColor || 'var(--bg-panel)') : undefined,
+        position: 'relative'
       }}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={!isSelected ? {} : undefined}
       transition={{ duration: 0.2 }}
     >
+      {/* Status indicator */}
+      {status && (
+        <div style={{ position: 'absolute', top: '6px', left: '6px', bottom: '-2px', zIndex: 100, display: 'flex', alignItems: 'stretch' }}>
+          <StatusDropdown
+            currentStatus={status}
+            onStatusChange={onStatusChange}
+            disabled={!onStatusChange}
+            tabName={tabName}
+          />
+        </div>
+      )}
+
       {/* Status Label */}
       <span className={styles.statusTabLabelWrapper}>
         <span className={styles.statusTabLabelContent}>

@@ -1,6 +1,6 @@
 /* ===== SECTION WRAPPER ===== */
 .sectionWrapper {
-  margin-bottom: var(--spacing);
+  margin-bottom: var(--spacing-xs);
 }
 
 /* ===== PANEL TYPE TOGGLE ===== */

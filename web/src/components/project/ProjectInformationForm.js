@@ -8,6 +8,7 @@ import logger from '../../services/devLogger';
 import documentService from '../../services/documentService';
 import { isCurrentUserAdminAsync } from '../../utils/adminUtils';
 import UtilityValidationModal from '../modals/UtilityValidationModal';
+import { isEnergyAidCompany, getDocumentTypeForCompany, getUploadLabelForCompany } from '../../utils/companyUtils';
 
 const STATUS_OPTIONS = [
   { label: 'Sales', value: '0' },
@@ -111,6 +112,9 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
   const [showUtilityModal, setShowUtilityModal] = useState(false);
   const [pendingZipCode, setPendingZipCode] = useState(null);
 
+  // EnergyAid company detection
+  const [isEnergyAid, setIsEnergyAid] = useState(false);
+
   // Check if form is valid
   const isFormValid = () => {
     const baseValid = (
@@ -155,6 +159,14 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
         const companyData = JSON.parse(sessionStorage.getItem('companyData') || '{}');
         if (companyData.name) {
           setFormData(prev => ({ ...prev, installer: companyData.name }));
+        }
+
+        // Check if EnergyAid company (for assessment upload mode)
+        const energyAidDetected = isEnergyAidCompany(companyData.id, companyData.uuid, companyData.name);
+        setIsEnergyAid(energyAidDetected);
+
+        if (energyAidDetected) {
+          logger.log('Project', '🔋 EnergyAid company detected - using assessment upload mode');
         }
       }
     };
@@ -420,8 +432,20 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
 
       logger.log('Project', 'Using company ID:', companyId);
 
+      // Determine document type - EnergyAid uses 'assessment', others use 'sales_proposal'
+      const selectedCompany = isAdmin
+        ? installersList.find(c => c.value === formData.installer)
+        : null;
+      const effectiveCompanyId = selectedCompany?.id || companyId;
+      const effectiveCompanyName = selectedCompany?.label || companyData.name;
+      const documentType = isEnergyAid || isEnergyAidCompany(effectiveCompanyId, null, effectiveCompanyName)
+        ? 'assessment'
+        : 'sales_proposal';
+
+      logger.log('Project', `Using document_type: ${documentType} for company: ${effectiveCompanyName}`);
+
       // Step 2: Upload PDF to S3
-      toast.info('Uploading proposal to S3...', {
+      toast.info(isEnergyAid ? 'Uploading assessment to S3...' : 'Uploading proposal to S3...', {
         position: 'top-right',
         autoClose: 2000,
       });
@@ -429,16 +453,17 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
       logger.log('Project', 'Proposal uploaded to S3:', s3Url);
 
       // Step 3: Call automation API
-      toast.info('Processing proposal with AI...', {
+      toast.info(isEnergyAid ? 'Processing assessment with AI...' : 'Processing proposal with AI...', {
         position: 'top-right',
         autoClose: 3000,
       });
 
       const automationResponse = await axios.post('/automation/upload', {
-        company_id: companyId,
+        company_id: effectiveCompanyId,
         user_id: userData.id,
         file_url: s3Url,
-        document_type: 'sales_proposal'
+        document_type: documentType,
+        company_name: effectiveCompanyName || 'Unknown'
       });
 
       const result = automationResponse.data;
@@ -446,7 +471,7 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
 
       if (result.status === 'accepted' && result.job_id) {
         // Step 4: Poll for completion
-        toast.info('Scraping proposal data... This may take up to 2 minutes.', {
+        toast.info(isEnergyAid ? 'Scraping assessment data... This may take up to 2 minutes.' : 'Scraping proposal data... This may take up to 2 minutes.', {
           position: 'top-right',
           autoClose: 5000,
         });
@@ -474,12 +499,56 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
             zip: data.address_zip || prev.zip,
           }));
 
+          // NEW: Store equipment data for later use (after project creation)
+          // Equipment comes back in project_data for assessments
+          if (data.panel_make || data.inverter_make || data.battery_make) {
+            const equipmentData = {
+              panel_make: data.panel_make || null,
+              panel_model: data.panel_model || null,
+              panel_quantity: data.panel_quantity || null,
+              inverter_make: data.inverter_make || null,
+              inverter_model: data.inverter_model || null,
+              battery_make: data.battery_make || null,
+              battery_model: data.battery_model || null,
+              battery_quantity: data.battery_quantity || null,
+            };
+
+            // Store in sessionStorage for use after project creation
+            sessionStorage.setItem('pendingEquipmentData', JSON.stringify(equipmentData));
+            logger.log('Project', '⚡ Equipment data stored for auto-population:', equipmentData);
+
+            toast.info('Equipment data extracted! Will be auto-filled after project creation.', {
+              position: 'top-right',
+              autoClose: 4000,
+            });
+          }
+
+          // NEW: Store photo URLs for post-creation import (assessments only)
+          if (jobResult.photo_urls && jobResult.photo_urls.length > 0) {
+            const photoData = {
+              photo_urls: jobResult.photo_urls,
+              photos_uploaded: jobResult.photos_uploaded || jobResult.photo_urls.length,
+            };
+
+            sessionStorage.setItem('pendingPhotoData', JSON.stringify(photoData));
+            logger.log('Project', '📸 Photo URLs stored for import:', photoData);
+
+            toast.info(`${photoData.photos_uploaded} photos extracted! Will be imported after project creation.`, {
+              position: 'top-right',
+              autoClose: 4000,
+            });
+          }
+
           // Expand relevant sections
           setProjectInfoExpanded(true);
           setCustomerExpanded(true);
           setLocationExpanded(true);
 
-          toast.success('Form autofilled from proposal! Review and create project.', {
+          const successMessage = documentType === 'assessment'
+            ? 'Form autofilled from assessment! Review and create project.'
+            : 'Form autofilled from proposal! Review and create project.';
+
+          toast.success(successMessage, {
             position: 'top-right',
             autoClose: 5000,
           });
@@ -643,6 +712,37 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
           });
         }
 
+        // Import photos from assessment if available
+        const pendingPhotoData = sessionStorage.getItem('pendingPhotoData');
+        if (pendingPhotoData) {
+          try {
+            const photoData = JSON.parse(pendingPhotoData);
+            logger.log('Project', '📸 Importing photos for project:', projectUuid);
+
+            // Call bulk import endpoint
+            await axios.post(`/project/${projectUuid}/photos/bulk-import`, {
+              photo_urls: photoData.photo_urls,
+            });
+
+            logger.log('Project', `✅ Successfully imported ${photoData.photos_uploaded} photos`);
+            toast.success(`${photoData.photos_uploaded} photos imported to project gallery!`, {
+              position: 'top-right',
+              autoClose: 4000,
+            });
+
+            // Clear the pending photo data
+            sessionStorage.removeItem('pendingPhotoData');
+          } catch (photoError) {
+            logger.error('Project', 'Failed to import photos:', photoError);
+            toast.warning('Project created but failed to import photos. You can upload them manually.', {
+              position: 'top-right',
+              autoClose: 5000,
+            });
+            // Don't block project creation if photo import fails
+            sessionStorage.removeItem('pendingPhotoData');
+          }
+        }
+
         // Reset form
         const resetInstaller = isAdmin ? '' : (companyData.name || '');
 
@@ -730,7 +830,7 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
     <form onSubmit={handleSubmit} className={styles.form}>
       {/* Upload Sales Proposal Section */}
       <EquipmentRow
-        title="Upload Sales Proposal"
+        title={isEnergyAid ? "Upload Assessment" : "Upload Sales Proposal"}
         subtitle={getProposalSubtitle()}
         initiallyExpanded={proposalExpanded}
         expanded={proposalExpanded}
@@ -774,13 +874,15 @@ const ProjectInformationForm = forwardRef(({ onNext, hideSubmitButton = false, o
             disabled={!salesProposal || uploadingProposal}
             loading={uploadingProposal}
           >
-            Autofill from Proposal
+            {isEnergyAid ? 'Autofill from Assessment' : 'Autofill from Proposal'}
           </Button>
 
           {uploadingProposal && (
             <div className={styles.loadingRow}>
               <LoadingSpinner size="md" />
-              <span className={styles.loadingText}>Scraping proposal data...</span>
+              <span className={styles.loadingText}>
+                {isEnergyAid ? 'Scraping assessment data...' : 'Scraping proposal data...'}
+              </span>
             </div>
           )}
         </div>

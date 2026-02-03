@@ -1,0 +1,41 @@
+/* StatusActionButton - Rectangle status indicator based on ActionButton */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 100%;
+  min-height: 50px;
+  background: var(--status-bg-color);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition-colors);
+  padding: 0;
+  position: relative;
+}
+
+.button:hover:not(.disabled) {
+  filter: brightness(1.15);
+}
+
+.button.disabled {
+  cursor: default;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--status-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button:hover:not(.disabled) .label {
+  filter: brightness(1.2);
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { safeGetJSON } from '../utils/safeStorage';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ProfileSection from '../components/account/ProfileSection';
@@ -7,7 +8,7 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import ChangePasswordModal from '../components/account/ChangePasswordModal';
 import TeamManagement from './Team/TeamManagement';
-import CustomerInvitation from '../components/Admin/CustomerInvitation';
+import { CustomerInvitation, PendingUserApproval } from '../components/Admin';
 import { toast } from 'react-toastify';
 import accountStyles from '../components/account/Account.module.css';
 import { useServiceWorker } from '../hooks/useServiceWorker';
@@ -44,7 +45,7 @@ const Account = () => {
       const isAdmin = await isCurrentUserAdminAsync();
 
       // TEMPORARY: Also check userData directly for debugging
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      const userData = safeGetJSON('userData', sessionStorage, {});
 
       // Fallback: Also check userData directly if backend verification fails
       const isAdminFromUserData = userData.isSuperAdmin === true ||
@@ -163,6 +164,13 @@ const Account = () => {
               {isSuperAdmin && (
                 <FormSection title="Customer Invitation">
                   <CustomerInvitation />
+                </FormSection>
+              )}
+
+              {/* Pending User Approval Section - Super Admin Only */}
+              {isSuperAdmin && (
+                <FormSection title="Pending User Approvals">
+                  <PendingUserApproval />
                 </FormSection>
               )}
             </div>

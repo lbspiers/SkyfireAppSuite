@@ -7,7 +7,7 @@ import ComingSoon from '../common/ComingSoon';
 import styles from './RevisionsPanel.module.css';
 
 // Feature flag - set to true to enable Revisions panel, false to show Coming Soon
-const REVISIONS_ENABLED = false;
+const REVISIONS_ENABLED = true;
 
 /**
  * RevisionsPanel - Main revisions container with AHJ/Utility/Support sub-tabs

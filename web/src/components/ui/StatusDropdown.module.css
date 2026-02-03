@@ -1,0 +1,165 @@
+/* StatusDropdown - Manual status override dropdown */
+
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  min-width: 200px;
+  padding: var(--spacing-xs);
+}
+
+.option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding: var(--spacing-tight);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-base);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-sm);
+}
+
+.option:hover {
+  background: var(--bg-hover);
+}
+
+.optionActive {
+  background: rgba(253, 115, 50, 0.1);
+}
+
+.optionLabel {
+  flex: 1;
+  text-align: left;
+}
+
+/* Reason Modal */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-loose);
+  max-width: 500px;
+  width: 90%;
+  box-shadow: var(--shadow-xl);
+}
+
+.modalTitle {
+  margin: 0 0 var(--spacing) 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.modalDescription {
+  margin: 0 0 var(--spacing) 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.reasonInput {
+  width: 100%;
+  padding: var(--spacing);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: var(--border-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  transition: var(--transition-base);
+}
+
+.reasonInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--bg-input-hover);
+}
+
+.reasonInput::placeholder {
+  color: var(--text-disabled);
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--spacing);
+  margin-top: var(--spacing);
+  justify-content: flex-end;
+}
+
+.cancelButton,
+.submitButton {
+  padding: var(--spacing-tight) var(--spacing);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+  border: none;
+}
+
+.cancelButton {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+.cancelButton:hover {
+  background: var(--bg-hover);
+}
+
+.submitButton {
+  background: var(--color-primary);
+  color: white;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

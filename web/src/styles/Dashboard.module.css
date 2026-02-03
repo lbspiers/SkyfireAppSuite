@@ -235,6 +235,37 @@
   box-shadow: var(--spacing-xs) 6px 12px rgba(0, 0, 0, 0.4);
 }
 
+/* Tab Status Badge Wrapper */
+.statusBadgeWrapper {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Tab Status Text Overlay */
+.tabStatusText {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: capitalize;
+  pointer-events: none;
+  z-index: 10;
+  letter-spacing: 0.3px;
+}
+
+.statusTabSelected .tabStatusText {
+  color: var(--text-secondary);
+}
+
+.statusTab:hover .tabStatusText {
+  color: var(--text-primary);
+}
+
 .statusTabSelected {
   background: var(--bg-surface);
   position: relative;

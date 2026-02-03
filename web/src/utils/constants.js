@@ -161,6 +161,7 @@ export const CONDUCTOR_SIZING_OPTIONS = [
 export const POI_TYPE_OPTIONS = [
   { label: "PV Breaker (OCPD)", value: "PV Breaker (OCPD)" },
   { label: "Line (Supply) Side Tap", value: "Line (Supply) Side Tap" },
+  { label: "Line Side Connection", value: "Line Side Connection" },
   { label: "Load Side Tap", value: "Load Side Tap" },
   { label: "Lug Kit", value: "Lug Kit" },
   { label: "Meter Collar Adapter", value: "Meter Collar Adapter" },

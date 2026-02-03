@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { safeGetJSON } from '../utils/safeStorage';
 import * as chatterService from '../services/chatterService';
 import logger from '../services/devLogger';
 
@@ -74,7 +75,7 @@ export const useChatter = (projectUuid) => {
       // Optimistically update local state
       setNotes(prev => prev.map(note => {
         if (note.id === noteId) {
-          const currentUser = JSON.parse(sessionStorage.getItem('userData') || '{}');
+          const currentUser = safeGetJSON('userData', sessionStorage, {});
           const existingReaction = note.reactions.find(r => r.emoji === emoji);
 
           if (existingReaction) {

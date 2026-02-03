@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { safeGetJSON } from '../../utils/safeStorage';
 import { Link, useNavigate } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
@@ -78,7 +79,7 @@ const DrafterPortal = ({ projects = [], loading = false, selectedStatus = 'all',
 
   // Get user data to check if superuser
   const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
-  const companyData = JSON.parse(sessionStorage.getItem('companyData') || '{}');
+  const companyData = safeGetJSON('companyData', sessionStorage, {});
   const isSuperAdmin = userData?.isSuperAdmin === true;
 
   // Handle status change

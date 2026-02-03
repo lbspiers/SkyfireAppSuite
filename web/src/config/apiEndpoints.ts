@@ -30,6 +30,7 @@ const apiEndpoints = {
     List_Manufacturer_by_Type: (type: string) => `/equipment/manufacturers?type=${type}`,
     GET_MODEL_NUMBER: (type: string, manufacturer: string) => `/equipment/models?type=${type}&manufacturer=${manufacturer}`,
     GET_BATTERY_MODELS: (manufacturer: string) => `/api/batteries/models?manufacturer=${manufacturer}`,
+    VALIDATE_EQUIPMENT: "/equipment/validate",
     ADD_INVENTORY: (companyId: string) => `/company/${companyId}/inventory`,
     UNLIST_ADD_INVENTORY: (companyId: string) => `/company/${companyId}/inventory/unlisted`,
     LIST_INVENTORY_EQUIPMENT: (companyId: string, equipmentType: string) => `/company/${companyId}/inventory?equipmentType=${equipmentType}`,
@@ -92,10 +93,19 @@ const apiEndpoints = {
     PHOTOS: {
       LIST: (projectId: string) => `/project/${projectId}/photos`,
       CREATE: (projectId: string) => `/project/${projectId}/photos`,
+      BULK_IMPORT: (projectId: string) => `/project/${projectId}/photos/bulk-import`,
       BULK_DELETE: (projectId: string) => `/project/${projectId}/photos/bulk-delete`,
       DELETE_ONE: (projectId: string, photoId: string) => `/project/${projectId}/photos/${photoId}`,
       SECTION_NOTES_UPSERT: (projectId: string) => `/project/${projectId}/section-notes`,
       SECTION_NOTES_CLEAR: (projectId: string) => `/project/${projectId}/section-notes`,
+    },
+    TAB_STATUSES: {
+      GET_ALL: (projectId: string) => `/project/${projectId}/tab-statuses`,
+      GET_ONE: (projectId: string, tabName: string) => `/project/${projectId}/tab-statuses/${tabName}`,
+      UPDATE: (projectId: string, tabName: string) => `/project/${projectId}/tab-statuses/${tabName}`,
+      INIT: (projectId: string) => `/project/${projectId}/tab-statuses/init`,
+      CHECK_STALE: (projectId: string) => `/project/${projectId}/tab-statuses/check-stale`,
+      BATCH: '/projects/tab-statuses/batch',
     },
   },
 

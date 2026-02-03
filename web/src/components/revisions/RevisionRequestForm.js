@@ -74,25 +74,48 @@ const RevisionRequestForm = ({ revisionType = 'ahj', onSubmit, submitting = fals
     e.stopPropagation();
     setIsDragActive(false);
 
-    const files = Array.from(e.dataTransfer.files);
-    const pdfFile = files.find(f => f.type === 'application/pdf');
+    const ALLOWED_TYPES = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+    ];
 
-    if (pdfFile) {
-      setSelectedFile(pdfFile);
+    const files = Array.from(e.dataTransfer.files);
+    const validFile = files.find(f => ALLOWED_TYPES.includes(f.type) || f.type.startsWith('image/'));
+
+    if (validFile) {
+      setSelectedFile(validFile);
       setErrors(prev => ({ ...prev, file: null }));
     } else {
-      setErrors(prev => ({ ...prev, file: 'Please upload a PDF file' }));
+      setErrors(prev => ({ ...prev, file: 'Please upload a PDF, Word document, or image file' }));
     }
   };
 
   const handleFileSelect = (e) => {
+    const ALLOWED_TYPES = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+    ];
+
     const file = e.target.files?.[0];
     if (file) {
-      if (file.type === 'application/pdf') {
+      const isAllowed = ALLOWED_TYPES.includes(file.type) || file.type.startsWith('image/');
+      if (isAllowed) {
         setSelectedFile(file);
         setErrors(prev => ({ ...prev, file: null }));
       } else {
-        setErrors(prev => ({ ...prev, file: 'Please upload a PDF file' }));
+        setErrors(prev => ({ ...prev, file: 'Please upload a PDF, Word document, or image file' }));
       }
     }
   };
@@ -166,7 +189,7 @@ const RevisionRequestForm = ({ revisionType = 'ahj', onSubmit, submitting = fals
               Drop {typeLabel} revision document here
             </div>
             <div className={styles.uploadHint}>
-              or click to browse (PDF only)
+              or click to browse (PDF, Word, images)
             </div>
           </div>
         ) : (
@@ -196,7 +219,7 @@ const RevisionRequestForm = ({ revisionType = 'ahj', onSubmit, submitting = fals
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,application/pdf"
+          accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*"
           onChange={handleFileSelect}
           style={{ display: 'none' }}
         />

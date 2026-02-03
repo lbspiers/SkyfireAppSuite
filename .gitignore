@@ -85,3 +85,7 @@ web/build/
 
 nul
 *.backup
+
+# Database Schema Documentation
+# NOTE: docs/schemas/*.sql files are COMMITTED (not ignored)
+# These are auto-generated documentation files that should be version controlled

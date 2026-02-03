@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Grid, List } from 'lucide-react';
 import CompactTabs from '../common/CompactTabs';
-import SurveyNotesPanel from './SurveyNotesPanel';
-import MediaGallery from './MediaGallery';
+import DocumentationPanel from './DocumentationPanel';
 import EquipmentSectionGroup from './EquipmentSectionGroup';
 import ComingSoon from '../common/ComingSoon';
 import PhotoPanelViewer from './PhotoPanelViewer';
@@ -54,19 +53,11 @@ const GridIcon4x4 = () => (
   </svg>
 );
 
-const UploadIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
-
 /**
  * SurveyPanel - Parent container for survey-related content with sub-tabs
  * Replaces the old Gallery tab with organized survey data
  *
- * Sub-tabs: Notes, Photos, Videos, SS Report, Map
+ * Sub-tabs: Documentation (Photos & Notes), All, SS Report, Map
  *
  * @param {string} projectUuid - Project UUID for fetching survey data
  * @param {object} projectData - Full project data object containing site info for Map
@@ -74,7 +65,7 @@ const UploadIcon = () => (
  */
 const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem('surveyPanelTab') || 'photos';
+    return localStorage.getItem('surveyPanelTab') || 'documentation';
   });
   const [gridSize, setGridSize] = useState(() => {
     return localStorage.getItem('surveyGalleryGridSize') || 'medium';
@@ -83,8 +74,6 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
     return localStorage.getItem('surveyViewMode') || 'grid';
   });
   const [photoCount, setPhotoCount] = useState(0);
-  const [videoCount, setVideoCount] = useState(0);
-  const [uploadTrigger, setUploadTrigger] = useState({ type: null, timestamp: 0 });
 
   // Photo viewer state
   const [viewerState, setViewerState] = useState({
@@ -105,10 +94,6 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   const handleViewModeChange = (mode) => {
     setViewMode(mode);
     localStorage.setItem('surveyViewMode', mode);
-  };
-
-  const handleUploadClick = (mediaType) => {
-    setUploadTrigger({ type: mediaType, timestamp: Date.now() });
   };
 
   const handleOpenPhoto = (media, index) => {
@@ -155,8 +140,8 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   };
 
   const renderControls = (activeTab) => {
-    if (activeTab === 'photos' || activeTab === 'all') {
-      const count = activeTab === 'photos' ? photoCount : null;
+    if (activeTab === 'documentation' || activeTab === 'all') {
+      const count = activeTab === 'documentation' ? photoCount : null;
 
       return (
         <React.Fragment>
@@ -269,7 +254,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
 
   const tabContent = {
     all: <EquipmentSectionGroup projectUuid={projectUuid} gridSize={gridSize} />,
-    photos: viewerState.isOpen ? (
+    documentation: viewerState.isOpen ? (
       <PhotoPanelViewer
         media={viewerState.media}
         currentIndex={viewerState.currentIndex}
@@ -284,20 +269,12 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
         setPan={setPan}
       />
     ) : (
-      <MediaGallery
+      <DocumentationPanel
         projectUuid={projectUuid}
-        mediaType="both"
         gridSize={gridSize}
-        viewMode={viewMode}
         onCountChange={setPhotoCount}
-        uploadTrigger={uploadTrigger.type === 'photos' ? uploadTrigger.timestamp : 0}
-        enableUploads={false}
-        onTabSwitch={onSwitchToFilesTab}
         onPhotoClick={handleOpenPhoto}
       />
-    ),
-    notes: (
-      <SurveyNotesPanel projectUuid={projectUuid} compact={false} />
     ),
     map: projectData ? (
       <MapPanel
@@ -323,12 +300,11 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
       <CompactTabs
         tabs={[
           { id: 'all', label: 'All' },
-          { id: 'photos', label: 'Photos' },
-          { id: 'notes', label: 'Notes' },
+          { id: 'documentation', label: 'Documentation' },
           { id: 'map', label: 'Map' },
           { id: 'report', label: 'SS Report' },
         ]}
-        defaultTab="photos"
+        defaultTab="documentation"
         storageKey="surveyPanelTab"
         renderControls={renderControls}
         tabContent={tabContent}

@@ -332,7 +332,10 @@ if (-Not (Test-Path $sshKeyPath)) {
 }
 
 # Upload build directory contents
-scp -i $sshKeyPath -r .\build\* bitnami@${serverIP}:${remotePath}
+# Convert Windows path to Unix-style path for Git's scp
+$buildPath = (Resolve-Path ".\build").Path
+$unixBuildPath = $buildPath -replace '\\', '/' -replace '^([A-Z]):', '/$1'
+& scp -i $sshKeyPath -r "$unixBuildPath/*" "bitnami@${serverIP}:${remotePath}"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""

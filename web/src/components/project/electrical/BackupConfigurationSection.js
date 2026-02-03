@@ -69,7 +69,7 @@ const BackupConfigurationSection = ({
   const getTitle = () => {
     const backupOption = formData.backup_option || '';
     if (backupOption === 'Whole Home' || backupOption === 'Partial Home') {
-      return `${backupOption} Backup Loads`;
+      return `Backup Loads - ${backupOption}`;
     }
     return 'Backup Loads';
   };
@@ -91,7 +91,7 @@ const BackupConfigurationSection = ({
 
   return (
     <>
-      <div style={{ marginBottom: 'var(--spacing)' }}>
+      <div style={{ marginBottom: showBackupLoadSubPanel ? '0' : 'var(--spacing-xs)' }}>
         <EquipmentRow
           title={getTitle()}
           subtitle={getSubtitle()}
@@ -134,13 +134,15 @@ const BackupConfigurationSection = ({
 
       {/* Conditionally render Backup Load Sub Panel Section - External to configuration */}
       {showBackupLoadSubPanel && (
-        <BackupLoadSubPanelSection
-          formData={formData}
-          onChange={onChange}
-          backupSystemSize={backupSystemSize}
-          maxContinuousOutputAmps={maxContinuousOutputAmps}
-          loadingMaxOutput={loadingMaxOutput}
-        />
+        <div style={{ marginTop: 'var(--spacing-xs)', marginBottom: 'var(--spacing-xs)' }}>
+          <BackupLoadSubPanelSection
+            formData={formData}
+            onChange={onChange}
+            backupSystemSize={backupSystemSize}
+            maxContinuousOutputAmps={maxContinuousOutputAmps}
+            loadingMaxOutput={loadingMaxOutput}
+          />
+        </div>
       )}
     </>
   );

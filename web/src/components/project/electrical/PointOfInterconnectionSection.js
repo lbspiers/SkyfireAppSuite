@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { POI_TYPE_OPTIONS, BREAKER_RATING_OPTIONS } from '../../../utils/constants';
 import { usePCSCalculations } from '../../../hooks/usePCSCalculations';
-import { Alert, EquipmentRow, TableDropdown, FormFieldRow, TableRowButton, SectionClearModal } from '../../ui';
+import { Alert, EquipmentRow, TableDropdown, FormFieldRow, FormInput, TableRowButton, SectionClearModal, Modal, Button } from '../../ui';
 import equipStyles from '../EquipmentForm.module.css';
 
 // Wire Gauge Amp Ratings (for conductor sizing)
@@ -46,12 +46,16 @@ const PointOfInterconnectionSection = ({
   combinedSystemMaxOutput = null,
   sectionTitle = null,
   totalActiveSystems = 1,
+  utilityRequirements = null,
 }) => {
   // ============================================
   // LOCAL STATE
   // ============================================
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showTapDisconnectPrompt, setShowTapDisconnectPrompt] = useState(false);
+  const [showAddTapDisconnectPrompt, setShowAddTapDisconnectPrompt] = useState(false);
+  const [existingDisconnect, setExistingDisconnect] = useState(null);
 
   // ============================================
   // DYNAMIC FIELD NAMES (System-aware)
@@ -62,6 +66,26 @@ const PointOfInterconnectionSection = ({
    * Combined systems use sys1_ prefix for POI fields (shared between systems)
    */
   const getFieldName = (baseField) => {
+    // Tap disconnect field mappings (always system-specific)
+    const tapFields = [
+      'tap_disconnect_detected',
+      'tap_disconnect_use_existing',
+      'tap_disconnect_source',
+      'tap_disconnect_linked_bos_slot',
+      'tap_disconnect_make',
+      'tap_disconnect_model',
+      'tap_disconnect_amp_rating',
+      'tap_disconnect_wattage',
+      'tap_disconnect_is_new',
+      'tap_disconnect_sizing_mode',
+      'tap_disconnect_equipment_id'
+    ];
+
+    if (tapFields.includes(baseField)) {
+      const sysNum = isCombinedSystem ? 1 : systemNumber;
+      return `sys${sysNum}_${baseField}`;
+    }
+
     // Combined systems always use System 1 fields
     if (isCombinedSystem) {
       if (baseField === 'ele_breaker_location') return 'ele_breaker_location';
@@ -114,7 +138,7 @@ const PointOfInterconnectionSection = ({
    * Rules:
    * - If sectionTitle prop provided → use it
    * - If combined systems → "POI - Combined Systems 1 & 2"
-   * - If only 1 system total → "Point of Interconnection" (no system number)
+   * - If only 1 system total → "POI" (no system number)
    * - If 2+ systems, separate → "POI - System N"
    */
   const getSectionTitle = () => {
@@ -123,7 +147,7 @@ const PointOfInterconnectionSection = ({
 
     // Single system - no number needed
     if (totalActiveSystems <= 1) {
-      return "Point of Interconnection";
+      return "POI";
     }
 
     // Multiple separate systems - show system number
@@ -273,6 +297,10 @@ const PointOfInterconnectionSection = ({
       return [{ label: 'Between Main Panel (A) MCB & Utility Meter', value: 'Between Main Panel (A) MCB & Utility Meter' }];
     }
 
+    if (poiType === 'Line Side Connection') {
+      return [{ label: 'Utility Meter', value: 'Utility Meter' }];
+    }
+
     if (poiType === 'Load Side Tap') {
       return [
         { label: 'Between Main Panel (A) Bus & MCB', value: 'Between Main Panel (A) Bus & MCB' },
@@ -299,6 +327,89 @@ const PointOfInterconnectionSection = ({
   };
 
   const locationOptions = getLocationOptions();
+
+  // ============================================
+  // TAP DISCONNECT HELPER FUNCTIONS
+  // ============================================
+
+  /**
+   * Check if utility requires a fused AC disconnect based on bos_1 through bos_5
+   */
+  const utilityRequiresFusedDisconnect = (utilityReqs) => {
+    if (!utilityReqs) return false;
+
+    const bosFields = ['bos_1', 'bos_2', 'bos_3', 'bos_4', 'bos_5'];
+    return bosFields.some(field => {
+      const value = utilityReqs[field];
+      if (!value) return false;
+      const normalized = value.toLowerCase();
+      return normalized.includes('fused') && normalized.includes('disconnect');
+    });
+  };
+
+  /**
+   * Check if tap disconnect scenario is triggered
+   */
+  const isTapDisconnectScenario = () => {
+    const sesType = formData.ele_ses_type || '';
+    const poiType = formData[poiTypeFieldName] || '';
+
+    const isDetachedService = sesType.toLowerCase().includes('detached');
+    const isLineSideTap = poiType === 'Line (Supply) Side Tap' || poiType === 'Line Side Connection';
+    const utilityRequiresFused = utilityRequiresFusedDisconnect(utilityRequirements);
+
+    return isDetachedService && isLineSideTap && utilityRequiresFused;
+  };
+
+  /**
+   * Search BOS slots for existing fused AC disconnect
+   */
+  const findExistingFusedDisconnect = () => {
+    const sysNum = isCombinedSystem ? 1 : systemNumber;
+    const slots = ['type1', 'type2', 'type3', 'type4', 'type5', 'type6'];
+
+    for (const slot of slots) {
+      const prefix = `bos_sys${sysNum}_${slot}`;
+      const equipType = formData[`${prefix}_equipment_type`] || '';
+      const isActive = formData[`${prefix}_active`] === 'true' || formData[`${prefix}_active`] === true;
+
+      const normalizedType = equipType.toLowerCase();
+      const isFusedDisconnect = normalizedType.includes('fused') && normalizedType.includes('disconnect');
+
+      if (isActive && isFusedDisconnect) {
+        return {
+          found: true,
+          slot: prefix,
+          make: formData[`${prefix}_make`] || '',
+          model: formData[`${prefix}_model`] || '',
+          ampRating: formData[`${prefix}_amp_rating`] || '',
+          wattage: formData[`${prefix}_wattage`] || '',
+          isNew: formData[`${prefix}_is_new`] === 'New' || formData[`${prefix}_is_new`] === true
+        };
+      }
+    }
+
+    return { found: false };
+  };
+
+  /**
+   * Find next available BOS slot for new tap disconnect
+   */
+  const findNextAvailableBosSlot = () => {
+    const sysNum = isCombinedSystem ? 1 : systemNumber;
+    const slots = ['type1', 'type2', 'type3', 'type4', 'type5', 'type6'];
+
+    for (const slot of slots) {
+      const prefix = `bos_sys${sysNum}_${slot}`;
+      const isActive = formData[`${prefix}_active`];
+      const equipType = formData[`${prefix}_equipment_type`];
+
+      if (!isActive && !equipType) {
+        return prefix;
+      }
+    }
+    return null;
+  };
 
   // ============================================
   // FILTERED POI OPTIONS (120% RULE)
@@ -339,6 +450,19 @@ const PointOfInterconnectionSection = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBreakerSize, showCustomBreakerFields]);
+
+  // ============================================
+  // AUTO-SELECT POI LOCATION WHEN ONLY ONE OPTION
+  // ============================================
+
+  useEffect(() => {
+    // Only auto-select if POI type is selected and location is not already set
+    if (poiType && !formData[locationFieldName] && locationOptions.length === 1) {
+      console.debug('[POI] Auto-selecting location (only option):', locationOptions[0].value);
+      onChange(locationFieldName, locationOptions[0].value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poiType, locationOptions.length]);
 
   // ============================================
   // AUTO-CLEAR PCS WHEN CONDITIONS NO LONGER MET
@@ -389,6 +513,44 @@ const PointOfInterconnectionSection = ({
   }, [showPowerControl, pcsCalculations.recommendedPcsAmps, pcsCalculations.allowableBackfeed, formData[pcsFieldName], pcsFieldName]);
 
   // ============================================
+  // TAP DISCONNECT DETECTION
+  // ============================================
+
+  useEffect(() => {
+    const scenarioActive = isTapDisconnectScenario();
+
+    if (!scenarioActive) {
+      // Clear detection if scenario no longer applies
+      if (formData[getFieldName('tap_disconnect_detected')]) {
+        onChange(getFieldName('tap_disconnect_detected'), false);
+      }
+      return;
+    }
+
+    // Mark as detected
+    if (!formData[getFieldName('tap_disconnect_detected')]) {
+      onChange(getFieldName('tap_disconnect_detected'), true);
+    }
+
+    // Check if user already made a choice
+    const useExisting = formData[getFieldName('tap_disconnect_use_existing')];
+    if (useExisting !== null && useExisting !== undefined) {
+      return;
+    }
+
+    // Search for existing fused disconnect in System BOS
+    const existing = findExistingFusedDisconnect();
+
+    if (existing.found) {
+      setExistingDisconnect(existing);
+      setShowTapDisconnectPrompt(true);
+    } else {
+      setShowAddTapDisconnectPrompt(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData[poiTypeFieldName], formData.ele_ses_type, utilityRequirements]);
+
+  // ============================================
   // HANDLERS
   // ============================================
 
@@ -401,6 +563,89 @@ const PointOfInterconnectionSection = ({
     console.debug('[POI] Deactivating PCS');
     onChange(pcsSettingsFieldName, false);
     onChange(pcsFieldName, '');
+  };
+
+  /**
+   * User chooses to use existing BOS disconnect as tap disconnect
+   */
+  const handleUseExistingDisconnect = () => {
+    if (!existingDisconnect) return;
+
+    onChange(getFieldName('tap_disconnect_use_existing'), true);
+    onChange(getFieldName('tap_disconnect_source'), 'system_bos');
+    onChange(getFieldName('tap_disconnect_linked_bos_slot'), existingDisconnect.slot);
+    onChange(getFieldName('tap_disconnect_make'), existingDisconnect.make);
+    onChange(getFieldName('tap_disconnect_model'), existingDisconnect.model);
+    onChange(getFieldName('tap_disconnect_amp_rating'), existingDisconnect.ampRating);
+    onChange(getFieldName('tap_disconnect_wattage'), existingDisconnect.wattage);
+    onChange(getFieldName('tap_disconnect_is_new'), existingDisconnect.isNew);
+
+    // Mark BOS slot as tap disconnect
+    onChange(`${existingDisconnect.slot}_trigger`, 'tap_disconnect');
+
+    setShowTapDisconnectPrompt(false);
+    setExistingDisconnect(null);
+  };
+
+  /**
+   * User chooses to add a new tap disconnect via POI
+   */
+  const handleAddNewDisconnect = () => {
+    onChange(getFieldName('tap_disconnect_use_existing'), false);
+    onChange(getFieldName('tap_disconnect_source'), 'poi');
+
+    // Create BOS slot for the new tap disconnect
+    const newSlot = findNextAvailableBosSlot();
+    if (newSlot) {
+      onChange(`${newSlot}_equipment_type`, 'Fused AC Disconnect');
+      onChange(`${newSlot}_active`, 'true');
+      onChange(`${newSlot}_trigger`, 'tap_disconnect');
+      onChange(`${newSlot}_show`, 'true');
+      onChange(getFieldName('tap_disconnect_linked_bos_slot'), newSlot);
+    }
+
+    setShowTapDisconnectPrompt(false);
+    setShowAddTapDisconnectPrompt(false);
+    setExistingDisconnect(null);
+  };
+
+  /**
+   * Handle tap disconnect field changes - mirror to BOS
+   */
+  const handleTapDisconnectChange = (field, value) => {
+    const fullFieldName = getFieldName(field);
+    onChange(fullFieldName, value);
+
+    // Mirror to linked BOS slot
+    const linkedSlot = formData[getFieldName('tap_disconnect_linked_bos_slot')];
+    if (linkedSlot) {
+      const bosFieldMap = {
+        'tap_disconnect_make': 'make',
+        'tap_disconnect_model': 'model',
+        'tap_disconnect_amp_rating': 'amp_rating',
+        'tap_disconnect_wattage': 'wattage',
+        'tap_disconnect_is_new': 'is_new'
+      };
+
+      if (bosFieldMap[field]) {
+        const bosValue = field === 'tap_disconnect_is_new' ? (value ? 'New' : 'Existing') : value;
+        onChange(`${linkedSlot}_${bosFieldMap[field]}`, bosValue);
+      }
+    }
+  };
+
+  /**
+   * Allow user to change their tap disconnect choice
+   */
+  const handleChangeTapDisconnect = () => {
+    onChange(getFieldName('tap_disconnect_use_existing'), null);
+    const existing = findExistingFusedDisconnect();
+    if (existing.found) {
+      setExistingDisconnect(existing);
+      setShowTapDisconnectPrompt(true);
+    } else {
+      setShowAddTapDisconnectPrompt(true);
+    }
   };
 
   // ============================================
@@ -427,6 +672,20 @@ const PointOfInterconnectionSection = ({
     onChange(breakerConductorModeFieldName, 'auto');
     onChange(breakerSizeFieldName, '');
     onChange(conductorSizeFieldName, '');
+
+    // Clear tap disconnect fields
+    onChange(getFieldName('tap_disconnect_detected'), false);
+    onChange(getFieldName('tap_disconnect_use_existing'), null);
+    onChange(getFieldName('tap_disconnect_source'), null);
+    onChange(getFieldName('tap_disconnect_linked_bos_slot'), null);
+    onChange(getFieldName('tap_disconnect_make'), '');
+    onChange(getFieldName('tap_disconnect_model'), '');
+    onChange(getFieldName('tap_disconnect_amp_rating'), '');
+    onChange(getFieldName('tap_disconnect_wattage'), '');
+    onChange(getFieldName('tap_disconnect_is_new'), true);
+    onChange(getFieldName('tap_disconnect_sizing_mode'), 'auto');
+    onChange(getFieldName('tap_disconnect_equipment_id'), null);
+
     setShowClearConfirm(false);
   };
 
@@ -656,7 +915,173 @@ const PointOfInterconnectionSection = ({
           )}
         </>
       )}
+
+      {/* Tap Disconnect Section - shown when scenario is triggered */}
+      {isTapDisconnectScenario() && (
+        <>
+          {formData[getFieldName('tap_disconnect_use_existing')] === true ? (
+            // Using existing BOS disconnect - show info banner
+            <div style={{ padding: '0 var(--spacing) var(--spacing)' }}>
+              <Alert variant="success" collapsible={false}>
+                <strong>Tap Disconnect:</strong> Using {formData[getFieldName('tap_disconnect_make')]} {formData[getFieldName('tap_disconnect_model')]} ({formData[getFieldName('tap_disconnect_amp_rating')]}A) from System BOS
+              </Alert>
+              <div style={{ marginTop: 'var(--spacing-tight)' }}>
+                <TableRowButton
+                  label="Change Tap Disconnect"
+                  variant="ghost"
+                  onClick={handleChangeTapDisconnect}
+                />
+              </div>
+            </div>
+          ) : formData[getFieldName('tap_disconnect_source')] === 'poi' ? (
+            // Input fields for new tap disconnect entered via POI
+            <>
+              <div style={{ padding: 'var(--spacing-tight) var(--spacing)', borderBottom: '1px solid var(--border-subtle)' }}>
+                <span style={{ fontSize: 'var(--font-size-small)', color: 'var(--text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
+                  Tap Disconnect (Fused AC) - Required per utility
+                </span>
+              </div>
+
+              <TableDropdown
+                label="Sizing Mode"
+                value={formData[getFieldName('tap_disconnect_sizing_mode')] || 'auto'}
+                onChange={(value) => handleTapDisconnectChange('tap_disconnect_sizing_mode', value)}
+                options={[
+                  { value: 'auto', label: 'Auto-size' },
+                  { value: 'custom', label: 'Custom' }
+                ]}
+              />
+
+              {formData[getFieldName('tap_disconnect_sizing_mode')] === 'custom' && (
+                <>
+                  <TableDropdown
+                    label="Manufacturer"
+                    value={formData[getFieldName('tap_disconnect_make')] || ''}
+                    onChange={(value) => handleTapDisconnectChange('tap_disconnect_make', value)}
+                    options={[
+                      { value: 'Eaton', label: 'Eaton' },
+                      { value: 'Square D', label: 'Square D' },
+                      { value: 'Siemens', label: 'Siemens' },
+                      { value: 'Leviton', label: 'Leviton' },
+                      { value: 'MidNite Solar', label: 'MidNite Solar' },
+                      { value: 'OutBack Power', label: 'OutBack Power' },
+                      { value: 'Other', label: 'Other' }
+                    ]}
+                    placeholder="Select manufacturer..."
+                  />
+
+                  <TableDropdown
+                    label="Model"
+                    value={formData[getFieldName('tap_disconnect_model')] || ''}
+                    onChange={(value) => handleTapDisconnectChange('tap_disconnect_model', value)}
+                    options={[
+                      { value: 'DPF222R', label: 'DPF222R' },
+                      { value: 'DPF223R', label: 'DPF223R' },
+                      { value: 'HF361R', label: 'HF361R' },
+                      { value: 'HF362R', label: 'HF362R' },
+                      { value: 'Other', label: 'Other' }
+                    ]}
+                    placeholder="Select model..."
+                  />
+                </>
+              )}
+
+              <TableDropdown
+                label="Amp Rating"
+                value={formData[getFieldName('tap_disconnect_amp_rating')]?.toString() || ''}
+                onChange={(value) => handleTapDisconnectChange('tap_disconnect_amp_rating', value)}
+                options={[30, 60, 100, 200, 400].map(v => ({ value: v.toString(), label: `${v}A` }))}
+                placeholder="Select rating..."
+              />
+
+              <FormFieldRow label="Wattage">
+                <FormInput
+                  type="number"
+                  value={formData[getFieldName('tap_disconnect_wattage')] || ''}
+                  onChange={(e) => handleTapDisconnectChange('tap_disconnect_wattage', e.target.value)}
+                  placeholder="Enter wattage..."
+                />
+              </FormFieldRow>
+
+              <TableDropdown
+                label="New/Existing"
+                value={formData[getFieldName('tap_disconnect_is_new')] === true ? 'New' : formData[getFieldName('tap_disconnect_is_new')] === false ? 'Existing' : ''}
+                onChange={(value) => handleTapDisconnectChange('tap_disconnect_is_new', value === 'New')}
+                options={[
+                  { value: 'New', label: 'New' },
+                  { value: 'Existing', label: 'Existing' }
+                ]}
+              />
+
+              <div style={{ marginTop: 'var(--spacing-tight)', padding: '0 var(--spacing)' }}>
+                <TableRowButton
+                  label="Change Tap Disconnect"
+                  variant="ghost"
+                  onClick={handleChangeTapDisconnect}
+                />
+              </div>
+            </>
+          ) : null}
+        </>
+      )}
     </EquipmentRow>
+
+    {/* Modal: Use existing fused disconnect from System BOS? */}
+    <Modal
+      isOpen={showTapDisconnectPrompt && existingDisconnect !== null}
+      onClose={() => setShowTapDisconnectPrompt(false)}
+      title="Tap Disconnect Found"
+    >
+      <div style={{ padding: 'var(--spacing)' }}>
+        <p style={{ marginBottom: 'var(--spacing)' }}>
+          A fused AC disconnect was found in your System BOS equipment:
+        </p>
+        <p style={{
+          fontWeight: 'var(--font-weight-semibold)',
+          margin: 'var(--spacing) 0',
+          padding: 'var(--spacing)',
+          backgroundColor: 'var(--surface-secondary)',
+          borderRadius: 'var(--radius-md)'
+        }}>
+          {existingDisconnect?.make} {existingDisconnect?.model} ({existingDisconnect?.ampRating}A)
+        </p>
+        <p style={{ marginBottom: 'var(--spacing-loose)' }}>
+          Would you like to use this as your tap disconnect for the Line Side Tap?
+        </p>
+        <div style={{ display: 'flex', gap: 'var(--spacing)', justifyContent: 'flex-end' }}>
+          <Button variant="secondary" onClick={handleAddNewDisconnect}>
+            No, add new
+          </Button>
+          <Button variant="primary" onClick={handleUseExistingDisconnect}>
+            Yes, use this
+          </Button>
+        </div>
+      </div>
+    </Modal>
+
+    {/* Modal: No existing disconnect - prompt to add */}
+    <Modal
+      isOpen={showAddTapDisconnectPrompt}
+      onClose={() => setShowAddTapDisconnectPrompt(false)}
+      title="Fused AC Disconnect Required"
+    >
+      <div style={{ padding: 'var(--spacing)' }}>
+        <p style={{ marginBottom: 'var(--spacing)' }}>
+          This utility requires a <strong>Fused AC Disconnect</strong> for Line Side Tap interconnection.
+        </p>
+        <p style={{ marginBottom: 'var(--spacing-loose)' }}>
+          No fused AC disconnect was found in your System BOS. Would you like to add one now?
+        </p>
+        <div style={{ display: 'flex', gap: 'var(--spacing)', justifyContent: 'flex-end' }}>
+          <Button variant="secondary" onClick={() => setShowAddTapDisconnectPrompt(false)}>
+            Later
+          </Button>
+          <Button variant="primary" onClick={handleAddNewDisconnect}>
+            Add Tap Disconnect
+          </Button>
+        </div>
+      </div>
+    </Modal>
 
     <SectionClearModal
       isOpen={showClearConfirm}

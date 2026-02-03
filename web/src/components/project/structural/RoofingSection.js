@@ -186,7 +186,7 @@ const RoofingSection = ({ formData, onChange, onBatchChange, roofType = 'A', onC
 
   return (
     <div style={{
-      marginBottom: 'var(--spacing)'
+      marginBottom: 'var(--spacing-xs)'
     }}>
       <EquipmentRow
         title={title}

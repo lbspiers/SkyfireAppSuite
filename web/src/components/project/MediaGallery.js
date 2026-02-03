@@ -946,6 +946,15 @@ const MediaLightbox = ({
                 </button>
               </>
             )}
+            {/* Download full resolution */}
+            <a
+              href={currentItem.url}
+              download={currentItem.fileName || currentItem.filename || `photo_${currentItem.id}`}
+              className={styles.iconButton}
+              title="Download full resolution"
+            >
+              <Icons.Download size={18} />
+            </a>
             <button className={styles.iconButton} onClick={onClose} title="Close">
               <Icons.X size={20} />
             </button>

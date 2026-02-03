@@ -90,7 +90,7 @@ const MountingHardwareSection = ({ formData, onChange, hardwareType = 'A', onCle
   const subtitle = attachMake && attachModel ? `${attachMake} ${attachModel}` : undefined;
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title={`Attachment (${hardwareType})`}
         subtitle={subtitle}

@@ -91,7 +91,7 @@ const RailsSection = ({ formData, onChange, railType = 'A', onClear }) => {
   const subtitle = railMake && railModel ? `${railMake} ${railModel}` : isRailless ? 'Rail-less' : undefined;
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title={`Rail (${railType})`}
         subtitle={subtitle}

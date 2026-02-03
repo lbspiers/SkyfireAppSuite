@@ -265,6 +265,7 @@ const PermittingPortal = () => {
         />
 
         <ProjectOverviewTabs
+          projectUuid={projectUuid}
           selectedTab={selectedOverviewTab}
           onTabChange={setSelectedOverviewTab}
           loading={loading}

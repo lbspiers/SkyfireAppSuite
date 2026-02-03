@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { safeGetJSON } from '../../utils/safeStorage';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import logger from '../../services/devLogger';

@@ -127,7 +127,7 @@ const MainPanelASection = ({ formData, onChange, onShowSubPanelB, subPanelBVisib
   };
 
   return (
-    <div style={{ marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title="Main Panel (A)"
         subtitle={getSubtitle()}

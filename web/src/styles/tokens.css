@@ -87,6 +87,14 @@
   --status-on-hold: #979797;
   --status-canceled: #000000;
 
+  /* Tab Status Colors - Solar Flare Palette */
+  --tab-status-pending: #2F3E4E;         /* Charcoal Blue */
+  --tab-status-in-progress: #E85D04;     /* Solar Orange */
+  --tab-status-draft: #1E4D8C;           /* Cobalt */
+  --tab-status-complete: #1B4332;        /* Hunter Green */
+  --tab-status-needs-attention: #7B1E1E; /* Oxblood */
+  --tab-status-none: #6C757D;            /* Smoke */
+
   /* Semantic Colors */
   --color-link: #0EA5E9;        /* Sky blue - for hyperlinks */
   --color-danger: #DC2626;      /* Red-600 - delete/destructive actions */

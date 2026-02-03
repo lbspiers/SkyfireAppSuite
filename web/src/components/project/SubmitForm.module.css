@@ -68,25 +68,26 @@
   text-decoration: none;
   font-size: var(--text-sm);
   font-weight: 500;
-  padding: 0 var(--spacing) var(--spacing-xs) var(--spacing);
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
-  position: relative;
+  padding: 0;
+  border: none;
   background: transparent;
+  transition: color 0.2s ease;
+  position: relative;
+  cursor: pointer;
 }
 
 .viewLinkFirst {
-  padding: 0 var(--spacing) var(--spacing-xs) 0;
+  padding: 0;
 }
 
 .viewLinkRight {
-  margin-left: var(--spacing-sm);
+  margin-left: var(--spacing);
   padding-left: var(--spacing);
   border-left: 1px solid var(--border-subtle);
 }
 
 .viewLink:hover {
-  background: transparent;
+  color: var(--text-primary);
 }
 
 .viewLinkActive {
@@ -105,13 +106,12 @@
 
 .viewLinkIndicatorFirst {
   left: 0;
-  width: calc(100% - 1rem);
+  width: 100%;
 }
 
 .viewLinkIndicatorCenter {
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
+  left: 0;
+  width: 100%;
 }
 
 /* ===== QC PILL BUTTONS ===== */

@@ -4,6 +4,7 @@
  */
 
 import axios from '../config/axios';
+import { safeGetJSON } from './safeStorage';
 
 // Session storage key for admin status
 const ADMIN_STATUS_KEY = 'isVerifiedAdmin';
@@ -111,7 +112,7 @@ export const getCompanyIdForFetch = (userData?: any): string | null => {
   }
 
   // Get company ID from provided userData or sessionStorage
-  const user = userData || JSON.parse(sessionStorage.getItem('userData') || '{}');
+  const user = userData || safeGetJSON('userData', sessionStorage, {});
   return user?.company?.uuid || user?.companyUuid || null;
 };
 

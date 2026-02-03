@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import surveyService from '../../services/surveyService';
+import { getSurveyNotes } from '../../services/surveyNotesService';
 import logger from '../../services/devLogger';
 import { Button, SectionHeader, Note } from '../ui';
 import styles from '../../styles/SurveyNotesPanel.module.css';
@@ -38,11 +38,15 @@ const SurveyNotesPanel = ({ projectUuid, compact = false }) => {
     const fetchNotes = async () => {
       setLoading(true);
       try {
-        const data = await surveyService.notes.list(projectUuid);
+        const data = await getSurveyNotes(projectUuid);
         setNotes(data);
         logger.log('SurveyNotes', `Loaded ${data.length} notes`);
       } catch (err) {
         logger.error('SurveyNotes', 'Failed to fetch notes:', err);
+        // Show error toast if available
+        if (window.toast) {
+          window.toast.error('Failed to load notes. Please try refreshing the page.');
+        }
       } finally {
         setLoading(false);
       }

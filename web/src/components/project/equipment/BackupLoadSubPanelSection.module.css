@@ -1,6 +1,6 @@
 /* ===== SECTION WRAPPER ===== */
 .sectionWrapper {
-  margin-bottom: var(--spacing);
+  /* Margin controlled by parent component */
 }
 
 /* ===== ALERT CONTAINER ===== */

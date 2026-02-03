@@ -6,11 +6,13 @@ import SubPanelCSection from './electrical/SubPanelCSection';
 import SubPanelDSection from './electrical/SubPanelDSection';
 import BackupConfigurationSection from './electrical/BackupConfigurationSection';
 import PointOfInterconnectionSection from './electrical/PointOfInterconnectionSection';
+import SystemContainer from './equipment/SystemContainer';
 import FormNavigationFooter from './FormNavigationFooter';
 import { SectionHeader } from '../ui';
 import equipStyles from './EquipmentForm.module.css';
 import { useSystemDetails } from '../../hooks/useSystemDetails';
 import { calculateMaxContinuousOutput } from '../../utils/pcsUtils';
+import { fetchUtilityRequirements } from '../../services/utilityRequirementsService';
 
 /**
  * ElectricalForm - Electrical configuration component
@@ -32,6 +34,27 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     clearFields,
     getField,
   } = useSystemDetails({ projectUuid });
+
+  // ============================================
+  // UTILITY REQUIREMENTS
+  // ============================================
+
+  const [utilityRequirements, setUtilityRequirements] = useState(null);
+
+  useEffect(() => {
+    const loadUtilityRequirements = async () => {
+      const utilityName = projectData?.site?.utility || getField('utility_company');
+      if (!utilityName) {
+        setUtilityRequirements(null);
+        return;
+      }
+
+      const requirements = await fetchUtilityRequirements(utilityName);
+      setUtilityRequirements(requirements);
+    };
+
+    loadUtilityRequirements();
+  }, [projectData?.site?.utility, getField]);
 
   // ============================================
   // NAVIGATION HANDLERS
@@ -56,8 +79,16 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   const handleFieldChange = async (field, value) => {
     console.debug(`[ElectricalForm] Field change: ${field} =`, value);
 
+    // Map component field names to database field names
+    const fieldMap = {
+      'backup_loads_landing': 'sys1_backupconfig',
+      'backup_panel_selection': 'sys1_backupconfig_selectpanel',
+    };
+
+    const dbFieldName = fieldMap[field] || field;
+
     try {
-      await updateField(field, value);
+      await updateField(dbFieldName, value);
     } catch (err) {
       console.error(`[ElectricalForm] Failed to update field ${field}:`, err);
     }
@@ -581,6 +612,51 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         sys4_ele_breaker_location: '',
         sys4_pcs_amps: '',
         sys4_pcs_settings: false,
+        // Tap Disconnect fields (all systems)
+        sys1_tap_disconnect_detected: false,
+        sys1_tap_disconnect_use_existing: null,
+        sys1_tap_disconnect_source: null,
+        sys1_tap_disconnect_linked_bos_slot: null,
+        sys1_tap_disconnect_make: '',
+        sys1_tap_disconnect_model: '',
+        sys1_tap_disconnect_amp_rating: '',
+        sys1_tap_disconnect_wattage: '',
+        sys1_tap_disconnect_is_new: true,
+        sys1_tap_disconnect_sizing_mode: 'auto',
+        sys1_tap_disconnect_equipment_id: null,
+        sys2_tap_disconnect_detected: false,
+        sys2_tap_disconnect_use_existing: null,
+        sys2_tap_disconnect_source: null,
+        sys2_tap_disconnect_linked_bos_slot: null,
+        sys2_tap_disconnect_make: '',
+        sys2_tap_disconnect_model: '',
+        sys2_tap_disconnect_amp_rating: '',
+        sys2_tap_disconnect_wattage: '',
+        sys2_tap_disconnect_is_new: true,
+        sys2_tap_disconnect_sizing_mode: 'auto',
+        sys2_tap_disconnect_equipment_id: null,
+        sys3_tap_disconnect_detected: false,
+        sys3_tap_disconnect_use_existing: null,
+        sys3_tap_disconnect_source: null,
+        sys3_tap_disconnect_linked_bos_slot: null,
+        sys3_tap_disconnect_make: '',
+        sys3_tap_disconnect_model: '',
+        sys3_tap_disconnect_amp_rating: '',
+        sys3_tap_disconnect_wattage: '',
+        sys3_tap_disconnect_is_new: true,
+        sys3_tap_disconnect_sizing_mode: 'auto',
+        sys3_tap_disconnect_equipment_id: null,
+        sys4_tap_disconnect_detected: false,
+        sys4_tap_disconnect_use_existing: null,
+        sys4_tap_disconnect_source: null,
+        sys4_tap_disconnect_linked_bos_slot: null,
+        sys4_tap_disconnect_make: '',
+        sys4_tap_disconnect_model: '',
+        sys4_tap_disconnect_amp_rating: '',
+        sys4_tap_disconnect_wattage: '',
+        sys4_tap_disconnect_is_new: true,
+        sys4_tap_disconnect_sizing_mode: 'auto',
+        sys4_tap_disconnect_equipment_id: null,
       };
     }
 
@@ -601,8 +677,8 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
 
       // Backup Configuration
       backup_option: getField('sys1_backup_option', ''),
-      backup_loads_landing: getField('backup_loads_landing', ''),
-      backup_panel_selection: getField('backup_panel_selection', ''),
+      backup_loads_landing: getField('sys1_backupconfig', ''),
+      backup_panel_selection: getField('sys1_backupconfig_selectpanel', ''),
       backup_system_size: getField('utility_service_amps', ''),
       backup_panel_make: getField('backup_panel_make', ''),
       backup_panel_model: getField('backup_panel_model', ''),
@@ -688,6 +764,58 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       sys4_ele_breaker_location: getField('sys4_ele_breaker_location', ''),
       sys4_pcs_amps: getField('sys4_pcs_amps', ''),
       sys4_pcs_settings: getField('sys4_pcs_settings', false),
+
+      // Tap Disconnect fields - System 1
+      sys1_tap_disconnect_detected: getField('sys1_tap_disconnect_detected', false),
+      sys1_tap_disconnect_use_existing: getField('sys1_tap_disconnect_use_existing', null),
+      sys1_tap_disconnect_source: getField('sys1_tap_disconnect_source', null),
+      sys1_tap_disconnect_linked_bos_slot: getField('sys1_tap_disconnect_linked_bos_slot', null),
+      sys1_tap_disconnect_make: getField('sys1_tap_disconnect_make', ''),
+      sys1_tap_disconnect_model: getField('sys1_tap_disconnect_model', ''),
+      sys1_tap_disconnect_amp_rating: getField('sys1_tap_disconnect_amp_rating', ''),
+      sys1_tap_disconnect_wattage: getField('sys1_tap_disconnect_wattage', ''),
+      sys1_tap_disconnect_is_new: getField('sys1_tap_disconnect_is_new', true),
+      sys1_tap_disconnect_sizing_mode: getField('sys1_tap_disconnect_sizing_mode', 'auto'),
+      sys1_tap_disconnect_equipment_id: getField('sys1_tap_disconnect_equipment_id', null),
+
+      // Tap Disconnect fields - System 2
+      sys2_tap_disconnect_detected: getField('sys2_tap_disconnect_detected', false),
+      sys2_tap_disconnect_use_existing: getField('sys2_tap_disconnect_use_existing', null),
+      sys2_tap_disconnect_source: getField('sys2_tap_disconnect_source', null),
+      sys2_tap_disconnect_linked_bos_slot: getField('sys2_tap_disconnect_linked_bos_slot', null),
+      sys2_tap_disconnect_make: getField('sys2_tap_disconnect_make', ''),
+      sys2_tap_disconnect_model: getField('sys2_tap_disconnect_model', ''),
+      sys2_tap_disconnect_amp_rating: getField('sys2_tap_disconnect_amp_rating', ''),
+      sys2_tap_disconnect_wattage: getField('sys2_tap_disconnect_wattage', ''),
+      sys2_tap_disconnect_is_new: getField('sys2_tap_disconnect_is_new', true),
+      sys2_tap_disconnect_sizing_mode: getField('sys2_tap_disconnect_sizing_mode', 'auto'),
+      sys2_tap_disconnect_equipment_id: getField('sys2_tap_disconnect_equipment_id', null),
+
+      // Tap Disconnect fields - System 3
+      sys3_tap_disconnect_detected: getField('sys3_tap_disconnect_detected', false),
+      sys3_tap_disconnect_use_existing: getField('sys3_tap_disconnect_use_existing', null),
+      sys3_tap_disconnect_source: getField('sys3_tap_disconnect_source', null),
+      sys3_tap_disconnect_linked_bos_slot: getField('sys3_tap_disconnect_linked_bos_slot', null),
+      sys3_tap_disconnect_make: getField('sys3_tap_disconnect_make', ''),
+      sys3_tap_disconnect_model: getField('sys3_tap_disconnect_model', ''),
+      sys3_tap_disconnect_amp_rating: getField('sys3_tap_disconnect_amp_rating', ''),
+      sys3_tap_disconnect_wattage: getField('sys3_tap_disconnect_wattage', ''),
+      sys3_tap_disconnect_is_new: getField('sys3_tap_disconnect_is_new', true),
+      sys3_tap_disconnect_sizing_mode: getField('sys3_tap_disconnect_sizing_mode', 'auto'),
+      sys3_tap_disconnect_equipment_id: getField('sys3_tap_disconnect_equipment_id', null),
+
+      // Tap Disconnect fields - System 4
+      sys4_tap_disconnect_detected: getField('sys4_tap_disconnect_detected', false),
+      sys4_tap_disconnect_use_existing: getField('sys4_tap_disconnect_use_existing', null),
+      sys4_tap_disconnect_source: getField('sys4_tap_disconnect_source', null),
+      sys4_tap_disconnect_linked_bos_slot: getField('sys4_tap_disconnect_linked_bos_slot', null),
+      sys4_tap_disconnect_make: getField('sys4_tap_disconnect_make', ''),
+      sys4_tap_disconnect_model: getField('sys4_tap_disconnect_model', ''),
+      sys4_tap_disconnect_amp_rating: getField('sys4_tap_disconnect_amp_rating', ''),
+      sys4_tap_disconnect_wattage: getField('sys4_tap_disconnect_wattage', ''),
+      sys4_tap_disconnect_is_new: getField('sys4_tap_disconnect_is_new', true),
+      sys4_tap_disconnect_sizing_mode: getField('sys4_tap_disconnect_sizing_mode', 'auto'),
+      sys4_tap_disconnect_equipment_id: getField('sys4_tap_disconnect_equipment_id', null),
     };
   }, [systemDetails, getField]);
 
@@ -719,63 +847,73 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     <form onSubmit={(e) => e.preventDefault()} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Scrollable Content */}
       <div className={equipStyles.scrollableContent}>
-        {/* Main Circuit Breakers (Electrical Service) */}
-        <MainCircuitBreakersSection
-          formData={formData}
-          onChange={handleFieldChange}
-          projectData={projectData}
-        />
-
-        {/* Backup Configuration - Only show when backup option is Whole Home or Partial Home */}
-        {(formData.backup_option === 'Whole Home' || formData.backup_option === 'Partial Home') && (
-          <BackupConfigurationSection
+        {/* ========================================
+            ELECTRICAL SERVICE
+            ======================================== */}
+        <SystemContainer systemNumber="Electrical Service">
+          {/* Service Entrance (Main Circuit Breakers) */}
+          <MainCircuitBreakersSection
             formData={formData}
             onChange={handleFieldChange}
-            onActivateSubPanelB={() => {
-              handleFieldChange('show_sub_panel_b', true);
-              handleFieldChange('spb_activated', true);
-            }}
-            backupSystemSize={getField('utility_service_amps')}
-            maxContinuousOutputAmps={combinedSystemMaxOutput || sys1InvMaxOutput}
-            loadingMaxOutput={loading}
+            projectData={projectData}
           />
-        )}
 
-        {/* Main Panel A */}
-        <MainPanelASection
-          formData={formData}
-          onChange={handleFieldChange}
-          onShowSubPanelB={() => handleFieldChange('show_sub_panel_b', true)}
-          subPanelBVisible={subPanelBVisible}
-        />
+          {/* Backup Configuration - Only show when backup option is Whole Home or Partial Home */}
+          {(formData.backup_option === 'Whole Home' || formData.backup_option === 'Partial Home') && (
+            <BackupConfigurationSection
+              formData={formData}
+              onChange={handleFieldChange}
+              onActivateSubPanelB={() => {
+                handleFieldChange('show_sub_panel_b', true);
+                handleFieldChange('spb_activated', true);
+              }}
+              backupSystemSize={getField('utility_service_amps')}
+              maxContinuousOutputAmps={combinedSystemMaxOutput || sys1InvMaxOutput}
+              loadingMaxOutput={loading}
+            />
+          )}
 
-        {/* Sub Panel B - Conditionally visible based on data or user action */}
-        {subPanelBVisible && (
-          <SubPanelBSection
+          {/* Main Panel A */}
+          <MainPanelASection
             formData={formData}
             onChange={handleFieldChange}
-            onShowSubPanelC={() => handleFieldChange('show_sub_panel_c', true)}
-            subPanelCVisible={subPanelCVisible}
+            onShowSubPanelB={() => handleFieldChange('show_sub_panel_b', true)}
+            subPanelBVisible={subPanelBVisible}
           />
-        )}
 
-        {/* Sub Panel C - Conditionally visible based on data or user action */}
-        {subPanelCVisible && (
-          <SubPanelCSection
-            formData={formData}
-            onChange={handleFieldChange}
-            onShowSubPanelD={() => handleFieldChange('show_sub_panel_d', true)}
-            subPanelDVisible={subPanelDVisible}
-          />
-        )}
+          {/* Sub Panel B - Conditionally visible based on data or user action */}
+          {subPanelBVisible && (
+            <SubPanelBSection
+              formData={formData}
+              onChange={handleFieldChange}
+              onShowSubPanelC={() => handleFieldChange('show_sub_panel_c', true)}
+              subPanelCVisible={subPanelCVisible}
+            />
+          )}
 
-        {/* Sub Panel D - Conditionally visible based on data or user action */}
-        {subPanelDVisible && (
-          <SubPanelDSection
-            formData={formData}
-            onChange={handleFieldChange}
-          />
-        )}
+          {/* Sub Panel C - Conditionally visible based on data or user action */}
+          {subPanelCVisible && (
+            <SubPanelCSection
+              formData={formData}
+              onChange={handleFieldChange}
+              onShowSubPanelD={() => handleFieldChange('show_sub_panel_d', true)}
+              subPanelDVisible={subPanelDVisible}
+            />
+          )}
+
+          {/* Sub Panel D - Conditionally visible based on data or user action */}
+          {subPanelDVisible && (
+            <SubPanelDSection
+              formData={formData}
+              onChange={handleFieldChange}
+            />
+          )}
+        </SystemContainer>
+
+        {/* ========================================
+            POINT OF INTERCONNECTION
+            ======================================== */}
+        <SystemContainer systemNumber="Point of Interconnection" style={{ marginTop: 'var(--spacing-wide)' }}>
 
         {/* Point of Interconnection - Conditional based on combined state */}
         {(() => {
@@ -797,6 +935,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
                 panelData={panelData}
                 isCombinedSystem={false}
                 totalActiveSystems={1}
+                utilityRequirements={utilityRequirements}
               />
             );
           }
@@ -837,6 +976,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
                 combinedSystemMaxOutput={combinedSystemMaxOutput}
                 sectionTitle={combinedTitle}
                 totalActiveSystems={activeSystems.length}
+                utilityRequirements={utilityRequirements}
               />
             );
           }
@@ -886,11 +1026,13 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
                   isCombinedSystem={false}
                   sectionTitle={sectionTitle}
                   totalActiveSystems={activeSystems.length}
+                  utilityRequirements={utilityRequirements}
                 />
               </div>
             );
           });
         })()}
+        </SystemContainer>
       </div>
 
       {/* Footer Navigation */}

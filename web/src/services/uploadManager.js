@@ -29,6 +29,7 @@ import { v4 as uuidv4 } from 'uuid';
 import surveyService from './surveyService';
 import documentService from './documentService';
 import { processFileForUpload, isHeicFile } from '../utils/imageProcessor';
+import { autoUpdateSurveyStatusOnPhotoUpload } from './surveyStatusAutomation';
 import logger from './devLogger';
 
 // File extension categories (from FilesTab.js)
@@ -616,6 +617,15 @@ class UploadManager {
         Object.entries(categorized).map(([k, v]) => [k, v.length])
       ),
     });
+
+    // Auto-update survey status when photos start uploading
+    // Only update if there are photo/heic files (not just documents/videos)
+    const hasPhotoFiles = categorized.readyImages.length > 0 || categorized.heicImages.length > 0;
+    if (hasPhotoFiles && projectUuid) {
+      autoUpdateSurveyStatusOnPhotoUpload(projectUuid).catch(err => {
+        logger.error('UploadManager', 'Failed to auto-update survey status:', err);
+      });
+    }
 
     // Start processing if not already
     if (!this.isProcessing) {

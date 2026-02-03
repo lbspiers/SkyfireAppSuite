@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { safeGetJSON } from '../../utils/safeStorage';
 import logger from '../../services/devLogger';
 import RichTextEditor from './RichTextEditor';
 import { SendButton } from '../ui';

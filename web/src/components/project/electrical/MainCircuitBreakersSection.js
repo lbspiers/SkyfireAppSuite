@@ -168,9 +168,9 @@ const MainCircuitBreakersSection = ({ formData, onChange, projectData }) => {
   };
 
   return (
-    <div style={{ marginTop: 'var(--spacing)', marginBottom: 'var(--spacing)' }}>
+    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
-        title="Electrical Service"
+        title="Service Entrance"
         subtitle={getSubtitle()}
         onDelete={handleDelete}
       >
