@@ -364,7 +364,32 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
       headerTooltip: 'Actions'
     });
 
-    // Company (second column for superadmin) - Pinned left
+    // Date Created column (second column for superadmin) - Pinned left
+    if (isSuperAdmin) {
+      baseCols.push({
+        headerName: 'Date Created',
+        valueGetter: (params) => params.data._created_at || params.data.created_at,
+        width: 160,
+        sortable: true,
+        editable: false,
+        pinned: 'left',
+        lockPosition: true,
+        suppressSizeToFit: true,
+        cellRenderer: (params) => {
+          const date = params.data._created_at || params.data.created_at;
+          if (!date) return '-';
+          return moment(date).format('MM/DD/YYYY');
+        },
+        headerTooltip: 'Date Created',
+        tooltipValueGetter: (params) => {
+          const date = params.data._created_at || params.data.created_at;
+          if (!date) return 'No date available';
+          return moment(date).format('MMMM DD, YYYY [at] h:mm A');
+        }
+      });
+    }
+
+    // Company (third column for superadmin) - Pinned left
     if (isSuperAdmin) {
       baseCols.push({
         headerName: 'Company',
@@ -378,7 +403,7 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
       });
     }
 
-    // Customer (2nd/3rd column depending on superadmin) - Pinned left
+    // Customer (2nd/4th column depending on superadmin) - Pinned left
     baseCols.push({
       headerName: 'Customer',
       valueGetter: (params) => {
@@ -398,22 +423,6 @@ const ProjectsOverview = ({ projects = [], loading = false, selectedStatus = 'al
         return `${last}, ${first}`;
       }
     });
-
-    // Installer column (for superadmin only) - shows company name
-    if (isSuperAdmin) {
-      baseCols.push({
-        headerName: 'Installer',
-        field: 'company.name',
-        width: 160,
-        sortable: true,
-        editable: false,
-        pinned: 'left',
-        lockPosition: true,
-        suppressSizeToFit: true,
-        headerTooltip: 'Installer Company',
-        tooltipField: 'company.name'
-      });
-    }
 
     // Project ID
     baseCols.push({
