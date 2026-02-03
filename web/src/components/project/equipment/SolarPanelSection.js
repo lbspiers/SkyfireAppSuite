@@ -16,7 +16,6 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const renderCount = useRef(0);
   useEffect(() => {
     renderCount.current += 1;
-    console.log(`[SolarPanelSection System ${systemNumber}] Render #${renderCount.current}`);
   });
 
   // Use shared equipment catalog
@@ -54,13 +53,6 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const [showPreferredModal, setShowPreferredModal] = useState(false);
   const [useFullCatalog, setUseFullCatalog] = useState(false);
 
-  console.log(`[SolarPanelSection System ${systemNumber}] Initial render:`, {
-    batteryOnlyMode,
-    'formData.batteryonly': formData.batteryonly,
-    'solarPanelIsNewField': solarPanelIsNewField,
-    'isNew value': formData[solarPanelIsNewField]
-  });
-
   // Check if we have a solar panel configured
   const hasSolarPanel = formData[solarPanelMakeField] && formData[solarPanelModelField];
 
@@ -73,12 +65,6 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
 
   // Sync batteryOnlyMode state with formData battery only field when it changes (for persistence)
   useEffect(() => {
-    console.log(`[SolarPanelSection System ${systemNumber}] useEffect triggered:`, {
-      'formData batteryonly': formData[batteryOnlyField],
-      'batteryOnlyField': batteryOnlyField,
-      'previous batteryOnlyMode': batteryOnlyMode,
-      'new batteryOnlyMode': formData[batteryOnlyField] === true
-    });
     setBatteryOnlyMode(formData[batteryOnlyField] === true);
   }, [formData[batteryOnlyField], batteryOnlyField]);
 
@@ -323,7 +309,6 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   };
 
   const activateBatteryOnly = () => {
-    console.log(`[SolarPanelSection System ${systemNumber}] activateBatteryOnly called`);
     setBatteryOnlyMode(true);
 
     if (onBatchChange) {
@@ -361,7 +346,6 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       onBatchChange(updates, systemNumber);
     } else {
       // Fallback: Sequential onChange (backwards compatibility)
-      console.log(`[SolarPanelSection System ${systemNumber}] Calling onChange('${batteryOnlyField}', true)`);
       onChange(batteryOnlyField, true, systemNumber);
       onChange(solarPanelMakeField, null, systemNumber);
       onChange(solarPanelModelField, null, systemNumber);
@@ -392,9 +376,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   };
 
   const deactivateBatteryOnly = () => {
-    console.log(`[SolarPanelSection System ${systemNumber}] deactivateBatteryOnly called`);
     setBatteryOnlyMode(false);
-    console.log(`[SolarPanelSection System ${systemNumber}] Calling onChange('${batteryOnlyField}', false)`);
     onChange(batteryOnlyField, false, systemNumber);
     // Form is now empty and ready for input
   };
@@ -473,12 +455,6 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
           showNewExistingToggle={!batteryOnlyMode}
           isNew={formData[solarPanelIsNewField] !== false}
           onNewExistingChange={(isNew) => {
-            console.log(`[SolarPanelSection System ${systemNumber}] New/Existing toggle clicked:`, {
-              field: solarPanelIsNewField,
-              newValue: isNew,
-              oldValue: formData[solarPanelIsNewField],
-              systemNumber
-            });
             onChange(solarPanelIsNewField, isNew, systemNumber);
           }}
           onEdit={!batteryOnlyMode ? () => {} : undefined}
@@ -517,7 +493,9 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
                 label="Switch to Solar"
                 variant="outline"
                 active={false}
-                onClick={deactivateBatteryOnly}
+                onClick={() => {
+                  deactivateBatteryOnly();
+                }}
               />
             </div>
           ) : (

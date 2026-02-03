@@ -53,7 +53,6 @@ const loadManufacturers = async (type) => {
   try {
     const response = await cachedGet(ENDPOINTS[stateKey], {}, axios);
     const data = response.data?.data || response.data || [];
-    console.log(`[useEquipmentCatalog] Loaded ${data.length} ${type} manufacturers:`, data);
 
     catalogState[stateKey] = { data, loading: false, loaded: true, error: null };
   } catch (error) {
@@ -85,10 +84,8 @@ const loadModels = async (type, make, force = false) => {
     const cacheBust = Date.now();
     const baseEndpoint = ENDPOINTS[modelsKey](make);
     const endpoint = `${baseEndpoint}${baseEndpoint.includes('?') ? '&' : '?'}_=${cacheBust}`;
-    console.log(`[useEquipmentCatalog] Loading ${type} models for ${make} from:`, endpoint, force ? '(FORCED)' : '');
     const response = await cachedGet(endpoint, {}, axios);
     const data = response.data?.data || response.data || [];
-    console.log(`[useEquipmentCatalog] Loaded ${data.length} ${type} models for ${make}`, data.length > 0 ? data[0] : 'empty');
 
     catalogState[modelsKey] = {
       ...catalogState[modelsKey],
@@ -175,7 +172,6 @@ export const clearModelCache = (type, manufacturer) => {
   const modelsKey = `${type}Models`;
   if (catalogState[modelsKey] && catalogState[modelsKey][manufacturer]) {
     delete catalogState[modelsKey][manufacturer];
-    console.log(`[useEquipmentCatalog] Cleared cache for ${type} models - ${manufacturer}`);
     notifySubscribers();
   }
 };
@@ -184,7 +180,6 @@ export const clearModelCache = (type, manufacturer) => {
 export const clearAllModelsCache = (type) => {
   const modelsKey = `${type}Models`;
   catalogState[modelsKey] = {};
-  console.log(`[useEquipmentCatalog] Cleared all ${type} models cache`);
   notifySubscribers();
 };
 

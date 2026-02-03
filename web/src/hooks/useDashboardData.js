@@ -3,6 +3,7 @@ import axios from '../config/axios';
 import moment from 'moment';
 import logger from '../services/devLogger';
 import { isCurrentUserAdminAsync } from '../utils/adminUtils';
+import { batchGetTabStatuses } from '../services/projectTabStatusAPI';
 
 /**
  * Custom hook to fetch and calculate dashboard statistics
@@ -17,6 +18,7 @@ export const useDashboardData = () => {
       activeTickets: 0,
     },
     projects: [],
+    tabStatuses: {}, // { [projectId]: [{ tab_name, status, status_reason }] }
     loading: true,
     error: null,
   });
@@ -72,22 +74,31 @@ export const useDashboardData = () => {
       const totalProjectCount = pagination?.total || projects.length;
 
       logger.log('Dashboard', `Loaded ${projects.length} projects (Total in DB: ${totalProjectCount})`);
-      console.log('[useDashboardData] Pagination info:', {
-        currentPage: pagination?.page,
-        totalPages: pagination?.totalPages,
-        total: pagination?.total,
-        showing: projects.length
-      });
 
       // Calculate statistics
       const stats = calculateStats(projects);
       const { statusCounts, statusChanges } = calculateStatusCounts(projects, totalProjectCount);
+
+      // Fetch tab statuses for all projects
+      let tabStatuses = {};
+      try {
+        const projectIds = projects.map(p => p.uuid).filter(Boolean);
+        if (projectIds.length > 0) {
+          logger.log('Dashboard', `Fetching tab statuses for ${projectIds.length} projects`);
+          tabStatuses = await batchGetTabStatuses(projectIds);
+          logger.log('Dashboard', 'Tab statuses loaded:', Object.keys(tabStatuses).length);
+        }
+      } catch (error) {
+        // Don't fail dashboard load if tab statuses fail
+        logger.error('Dashboard', 'Failed to fetch tab statuses:', error);
+      }
 
       setData({
         stats,
         statusCounts,
         statusChanges,
         projects,
+        tabStatuses,
         loading: false,
         error: null,
       });

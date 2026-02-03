@@ -37,11 +37,9 @@ const Dashboard = () => {
   const mountCountRef = useRef(0);
   useEffect(() => {
     mountCountRef.current++;
-    console.log(`🏠 Dashboard MOUNTED (count: ${mountCountRef.current})`);
-    return () => console.log(`🏠 Dashboard UNMOUNTED (count: ${mountCountRef.current})`);
   }, []);
 
-  const { stats, statusCounts, statusChanges, projects, loading, error, refetch, addProject} = useDashboardData();
+  const { stats, statusCounts, statusChanges, projects, tabStatuses, loading, error, refetch, addProject} = useDashboardData();
   const { openPanel } = useDevNotes();
   const { onAutomationComplete } = useSocket();
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -148,14 +146,9 @@ const Dashboard = () => {
 
   // Listen for automation:complete events (new project created via webhook)
   useEffect(() => {
-    console.log('🔧 Dashboard: Setting up automation:complete listener');
-    console.log('🔧 handleAutomationComplete reference:', handleAutomationComplete);
-    console.log('🔧 onAutomationComplete reference:', onAutomationComplete);
     const cleanup = onAutomationComplete(handleAutomationComplete);
-    console.log('✅ Dashboard: automation:complete listener registered successfully');
 
     return () => {
-      console.log('🔧 Dashboard: Cleaning up automation:complete listener');
       cleanup();
     };
   }, [onAutomationComplete, handleAutomationComplete]);
@@ -445,6 +438,7 @@ const Dashboard = () => {
                   onNewProject={handleNewProjectToggle}
                   isNewProjectOpen={leftPanelMode === 'newProject'}
                   showCompanyBadge={isSuperUser}
+                  tabStatuses={tabStatuses}
                 />
               </StatusTabs>
             </div>

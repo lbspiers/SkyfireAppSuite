@@ -64,25 +64,21 @@ class RequestCache {
     // Check if rate limited
     if (this.isRateLimited()) {
       const waitTime = this.rateLimitedUntil - Date.now();
-      console.log(`[RequestCache] Waiting ${Math.ceil(waitTime/1000)}s for rate limit to clear`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
 
     // Check cache
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() < cached.expiresAt) {
-      console.log(`[RequestCache] Cache HIT: ${url}`);
       return cached.data;
     }
 
     // Check if request is already in flight (DEDUPLICATION)
     if (this.inFlight.has(cacheKey)) {
-      console.log(`[RequestCache] Joining in-flight request: ${url}`);
       return this.inFlight.get(cacheKey);
     }
 
     // Make the request
-    console.log(`[RequestCache] Cache MISS, fetching: ${url}`);
     const promise = axiosInstance.request({ url, ...options })
       .then(response => {
         // Cache the response

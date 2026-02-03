@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { SitePlanHouseIcon, PlanSetIcon } from '../../assets/icons/CustomIcons';
 import StatusTabCard from './StatusTabCard';
+import { TabStatusBadge } from '../ui';
+import { useProjectTabStatuses } from '../../hooks/useProjectTabStatuses';
 import styles from '../../styles/Dashboard.module.css';
 
 // Tab configuration for project overview
@@ -23,9 +25,18 @@ const OVERVIEW_CONFIG = [
   { key: 'files', label: 'Files', color: 'var(--color-info)', step: null, icon: <FolderOpen size={16} /> },
 ];
 
+// Map tab keys to API tab names
+const TAB_KEY_TO_API_NAME = {
+  survey: 'survey',
+  overview: 'site_plan',
+  planset: 'plan_set',
+  revisions: 'revisions',
+};
+
 /**
  * ProjectOverviewTabs - File folder style tabs for project overview sections
  *
+ * @param {string} projectUuid - Project UUID for fetching tab statuses
  * @param {string} selectedTab - Currently selected tab key
  * @param {function} onTabChange - Callback when tab changes
  * @param {boolean} loading - Loading state
@@ -33,12 +44,28 @@ const OVERVIEW_CONFIG = [
  * @param {Array<string>} tabs - Optional array of tab keys to display. If not provided, shows all tabs.
  */
 const ProjectOverviewTabs = ({
+  projectUuid,
   selectedTab = 'overview',
   onTabChange,
   loading = false,
   children,
   tabs = null, // If null, show all tabs
 }) => {
+  // Fetch tab statuses for this project
+  const { getStatus, updateStatus } = useProjectTabStatuses(projectUuid);
+
+  // Handle status change callback
+  const handleStatusChange = async (tabKey, newStatus, reason) => {
+    const apiTabName = TAB_KEY_TO_API_NAME[tabKey];
+    if (!apiTabName) return;
+
+    try {
+      await updateStatus(apiTabName, newStatus, reason);
+    } catch (error) {
+      console.error(`[ProjectOverviewTabs] Failed to update ${tabKey} status:`, error);
+    }
+  };
+
   const containerVariants = {
     initial: { opacity: 0 },
     animate: {
@@ -68,6 +95,11 @@ const ProjectOverviewTabs = ({
         {visibleTabs.map((tab) => {
           const isSelected = selectedTab === tab.key;
 
+          // Get tab status for tabs that map to API tabs
+          const apiTabName = TAB_KEY_TO_API_NAME[tab.key];
+          const tabStatus = apiTabName ? getStatus(apiTabName) : null;
+          const status = tabStatus?.status || null;
+
           return (
             <StatusTabCard
               key={tab.key}
@@ -81,6 +113,9 @@ const ProjectOverviewTabs = ({
               loading={loading}
               showMetrics={false}
               customColor={customColor}
+              status={status}
+              onStatusChange={apiTabName ? (newStatus, reason) => handleStatusChange(tab.key, newStatus, reason) : null}
+              tabName={apiTabName}
             />
           );
         })}

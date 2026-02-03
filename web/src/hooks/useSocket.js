@@ -14,7 +14,6 @@ const getSocket = () => {
   if (disconnectTimer) {
     clearTimeout(disconnectTimer);
     disconnectTimer = null;
-    console.log('[Socket] Cancelled pending disconnect - new consumer');
   }
 
   if (!socketInstance) {
@@ -32,13 +31,11 @@ const getSocket = () => {
       // Join user's notification room if logged in
       if (userData?.uuid) {
         socketInstance.emit('join:user', userData.uuid);
-        console.log('[Socket] Joined user room:', userData.uuid);
       }
 
       // Join superadmin room if super admin
       if (userData?.isSuperAdmin) {
         socketInstance.emit('join:superadmin');
-        console.log('[Socket] Joined superadmin room');
       }
     });
 
@@ -52,27 +49,21 @@ const getSocket = () => {
   }
 
   connectionCount++;
-  console.log(`[Socket] Connection count: ${connectionCount}`);
   return socketInstance;
 };
 
 const releaseSocket = () => {
   connectionCount--;
-  console.log(`[Socket] Connection count: ${connectionCount}`);
 
   if (connectionCount <= 0) {
     // Don't disconnect immediately - use grace period
-    console.log(`[Socket] No consumers - starting ${DISCONNECT_GRACE_PERIOD/1000}s grace period`);
-
     disconnectTimer = setTimeout(() => {
       if (connectionCount <= 0 && socketInstance) {
-        console.log('[Socket] Grace period expired, disconnecting...');
         socketInstance.disconnect();
         socketInstance = null;
         connectionCount = 0;
         disconnectTimer = null;
       } else {
-        console.log('[Socket] Grace period expired but new consumers exist, keeping connection');
         disconnectTimer = null;
       }
     }, DISCONNECT_GRACE_PERIOD);
@@ -121,12 +112,10 @@ export const useSocket = () => {
       const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
       if (socketRef.current?.connected && userData?.uuid) {
         socketRef.current.emit('join:user', userData.uuid);
-        console.log('[Socket] Re-joined user room:', userData.uuid);
 
         // Re-join superadmin room if super admin
         if (userData?.isSuperAdmin) {
           socketRef.current.emit('join:superadmin');
-          console.log('[Socket] Re-joined superadmin room');
         }
       }
     };
@@ -141,7 +130,6 @@ export const useSocket = () => {
   const joinProject = useCallback((projectUuid) => {
     if (socketRef.current?.connected && projectUuid) {
       socketRef.current.emit('join-project', projectUuid);
-      console.log('[Socket] Joined project:', projectUuid);
     }
   }, []);
 
@@ -151,7 +139,6 @@ export const useSocket = () => {
   const leaveProject = useCallback((projectUuid) => {
     if (socketRef.current?.connected && projectUuid) {
       socketRef.current.emit('leave-project', projectUuid);
-      console.log('[Socket] Left project:', projectUuid);
     }
   }, []);
 
@@ -164,11 +151,9 @@ export const useSocket = () => {
     const socket = socketRef.current;
     if (!socket) return () => {};
 
-    console.log('[Socket] Registering notification listener');
     socket.on('notification:new', callback);
 
     return () => {
-      console.log('[Socket] Removing notification listener');
       socket.off('notification:new', callback);
     };
   }, []);
@@ -185,11 +170,9 @@ export const useSocket = () => {
       return () => {};
     }
 
-    console.log('[Socket] Registering automation:complete listener');
     socket.on('automation:complete', callback);
 
     return () => {
-      console.log('[Socket] Removing automation:complete listener');
       socket.off('automation:complete', callback);
     };
   }, []);

@@ -30,6 +30,7 @@ import BOSPanel from './equipment/BOSPanel';
 import SystemContainer from './equipment/SystemContainer';
 import FormNavigationFooter from './FormNavigationFooter';
 import ConfirmDialog from '../ui/ConfirmDialog';
+import EquipmentValidationModal from '../modals/EquipmentValidationModal';
 import { SectionHeader, Tooltip, AddSectionButton, AddButton, Alert } from '../ui';
 import { detectProjectConfiguration } from '../../utils/bosConfigurationSwitchboard';
 import { prepareBOSPopulation, saveBOSPopulation } from '../../services/bosAutoPopulationService';
@@ -100,7 +101,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   const renderCount = useRef(0);
   useEffect(() => {
     renderCount.current += 1;
-    console.log(`[EquipmentForm] Render #${renderCount.current}`);
   });
 
   // Stabilize projectData dependencies - extract only what we need
@@ -144,6 +144,11 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   // Combine systems toggle confirmation state
   const [showCombineConfirmModal, setShowCombineConfirmModal] = useState(false);
   const [pendingCombineChoice, setPendingCombineChoice] = useState(null);
+
+  // Equipment validation modal state (for assessment scraper)
+  const [showEquipmentValidationModal, setShowEquipmentValidationModal] = useState(false);
+  const [equipmentValidationResults, setEquipmentValidationResults] = useState([]);
+  const [pendingEquipmentToPopulate, setPendingEquipmentToPopulate] = useState(null);
 
   // Ref to track previous gateway value for Gateway 3 SMS sync
   const prevGatewayRef = useRef('');
@@ -309,6 +314,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     ele_combine_positions: '', // JSON string of combine configuration
 
     // Backup Load Sub Panel fields (for Whole Home / Partial Home)
+    backup_loads_landing: '', // 'Backup Existing Panel' or 'Relocate Loads to New Backup Sub Panel'
+    backup_panel_selection: '', // 'Main Panel (A)', 'Sub Panel (B)', or 'Sub Panel (C)'
     backup_panel_isnew: true,
     backup_panel_make: '',
     backup_panel_model: '',
@@ -547,6 +554,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         show_battery_type_2: false,
 
         // Backup Load Sub Panel defaults
+        backup_loads_landing: '',
+        backup_panel_selection: '',
         backup_panel_isnew: true,
         backup_panel_make: '',
         backup_panel_model: '',
@@ -770,6 +779,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       [`sys${systemNum}_combination_method`]: systemDetails[`${prefix}_combination_method`] || '',
 
       // Backup Load Sub Panel
+      backup_loads_landing: systemDetails[`${prefix}_backupconfig`] || '',
+      backup_panel_selection: systemDetails[`${prefix}_backupconfig_selectpanel`] || '',
       backup_panel_isnew: !systemDetails[`bls${systemNum}_backuploader_existing`],
       backup_panel_make: systemDetails[`bls${systemNum}_backup_load_sub_panel_make`] || '',
       backup_panel_model: systemDetails[`bls${systemNum}_backup_load_sub_panel_model`] || '',
@@ -835,8 +846,241 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
     return hydratedData;
   }, [systemDetails, projectSiteData]);
+  // Batch update multiple fields at once (for auto-population)
+  // Memoized to prevent child component re-renders
+  const handleBatchFieldChange = useCallback(async (fieldUpdates) => {
+    if (!fieldUpdates || fieldUpdates.length === 0) return;
 
-  // Keep refs in sync with latest values
+    // Build field mapping for current system (same as in handleFieldChange)
+    const systemPrefix = SYSTEM_PREFIXES[selectedSystem];
+    const getFieldMapping = (sysNum, sysPrefix) => ({
+      // Solar Panel
+      solar_panel_isnew: getSchemaField(sysNum, 'solar_panel_existing'),
+      solar_panel_make: `${sysPrefix}_solar_panel_make`,
+      solar_panel_model: `${sysPrefix}_solar_panel_model`,
+      solar_panel_quantity: `${sysPrefix}_solar_panel_quantity`,
+      solar_panel_watts: `${sysPrefix}_solar_panel_watts`,
+      solar_panel_vmp: `${sysPrefix}_solar_panel_vmp`,
+      solar_panel_imp: `${sysPrefix}_solar_panel_imp`,
+      solar_panel_voc: `${sysPrefix}_solar_panel_voc`,
+      solar_panel_isc: `${sysPrefix}_solar_panel_isc`,
+
+      // Solar Panel 2 (for mixed systems)
+      solar_panel_type2_is_new: getSchemaField(sysNum, 'solar_panel_type2_existing'),
+      solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
+      solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
+      solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
+      solar_panel_type2_wattage: `${sysPrefix}_solar_panel_type2_watts`,
+      solar_panel_type2_vmp: `${sysPrefix}_solar_panel_type2_vmp`,
+      solar_panel_type2_imp: `${sysPrefix}_solar_panel_type2_imp`,
+      solar_panel_type2_voc: `${sysPrefix}_solar_panel_type2_voc`,
+      solar_panel_type2_isc: `${sysPrefix}_solar_panel_type2_isc`,
+      solar_panel_type2_model_id: `${sysPrefix}_solar_panel_type2_model_id`,
+      solar_panel_type2_temp_coeff_voc: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
+      show_solar_panel_2: `${sysPrefix}_mixed_panel_system`,
+      batteryonly: `${sysPrefix}_batteryonly`,
+
+      // Inverter/Microinverter
+      inverter_isnew: getSchemaField(sysNum, 'micro_inverter_existing'),
+      inverter_make: `${sysPrefix}_inverter_make`,
+      inverter_model: `${sysPrefix}_inverter_model`,
+      inverter_type: `${sysPrefix}_inverter_type`,
+      inverter_max_cont_output_amps: `${sysPrefix}_inv_max_continuous_output`,
+      inverter_max_strings_branches: `${sysPrefix}_inv_max_strings_branches`,
+      inverter_max_vdc: `${sysPrefix}_inv_max_vdc`,
+      inverter_min_vdc: `${sysPrefix}_inv_min_vdc`,
+      inverter_max_input_isc: `${sysPrefix}_inv_max_input_isc`,
+      inverter_model_id: `${sysPrefix}_inverter_model_id`,
+
+      // Hoymiles/APSystems Granular Microinverter Panel Tracking
+      micro1Panels: `${sysPrefix}_micro1Panels`,
+      micro2Panels: `${sysPrefix}_micro2Panels`,
+      micro3Panels: `${sysPrefix}_micro3Panels`,
+      micro4Panels: `${sysPrefix}_micro4Panels`,
+      micro5Panels: `${sysPrefix}_micro5Panels`,
+      micro6Panels: `${sysPrefix}_micro6Panels`,
+      micro7Panels: `${sysPrefix}_micro7Panels`,
+      micro8Panels: `${sysPrefix}_micro8Panels`,
+      micro9Panels: `${sysPrefix}_micro9Panels`,
+      micro10Panels: `${sysPrefix}_micro10Panels`,
+      micro11Panels: `${sysPrefix}_micro11Panels`,
+      micro12Panels: `${sysPrefix}_micro12Panels`,
+      micro13Panels: `${sysPrefix}_micro13Panels`,
+      micro14Panels: `${sysPrefix}_micro14Panels`,
+      micro15Panels: `${sysPrefix}_micro15Panels`,
+      micro16Panels: `${sysPrefix}_micro16Panels`,
+      micro17Panels: `${sysPrefix}_micro17Panels`,
+      micro18Panels: `${sysPrefix}_micro18Panels`,
+      micro19Panels: `${sysPrefix}_micro19Panels`,
+      micro20Panels: `${sysPrefix}_micro20Panels`,
+      micro21Panels: `${sysPrefix}_micro21Panels`,
+      micro22Panels: `${sysPrefix}_micro22Panels`,
+      micro23Panels: `${sysPrefix}_micro23Panels`,
+      micro24Panels: `${sysPrefix}_micro24Panels`,
+      micro25Panels: `${sysPrefix}_micro25Panels`,
+
+      // Optimizer
+      optimizer_isnew: getSchemaField(sysNum, 'optimizer_existing'),
+      optimizer_make: `${sysPrefix}_optimizer_make`,
+      optimizer_model: `${sysPrefix}_optimizer_model`,
+
+      // String Combiner Panel
+      combiner_panel_isnew: getSchemaField(sysNum, 'combiner_existing'),
+      combiner_panel_make: `${sysPrefix}_combiner_panel_make`,
+      combiner_panel_model: `${sysPrefix}_combiner_panel_model`,
+      combiner_panel_bus_amps: `${sysPrefix}_combiner_panel_bus_amps`,
+      combiner_panel_main_breaker: `${sysPrefix}_combiner_panel_main_breaker`,
+      combiner_panel_tie_in_breaker: `${sysPrefix}_combiner_panel_tie_in_breaker`,
+      aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
+
+      // BOS Visibility Flags
+      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
+      show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
+
+      // ESS Section Visibility Flags
+      show_sms: `${sysPrefix}_show_sms`,
+      show_battery1: `${sysPrefix}_show_battery1`,
+      show_battery2: `${sysPrefix}_show_battery2`,
+      show_backup_panel: `${sysPrefix}_show_backup_panel`,
+
+      // Hoymiles/APSystems breaker size
+      sys1_ap_hoy_breaker_size: 'sys1_ap_hoy_breaker_size',
+
+      // Energy Storage System (ESS)
+      backup_option: 'backup_option',
+      backup_system_size: 'backup_system_size',
+
+      // IQ Combiner 6C
+      iq_combiner_config_id: `${sysPrefix}_iq_combiner_config_id`,
+      meter_collar_location: `${sysPrefix}_meter_collar_setting`,
+      iq_combiner_backup_type: `${sysPrefix}_iq_combiner_backup_type`,
+
+      // IQ Meter Collar
+      iq_meter_collar_type: `${sysPrefix}_meter_collar_setting`,
+
+      // Storage Management System (SMS)
+      sms_equipment_type: 'sms_equipment_type',
+      sms_isnew: 'sms_existing',
+      sms_make: 'sms_make',
+      sms_model: 'sms_model',
+      sms_main_breaker: 'sms_main_breaker',
+      sms_pv_breaker: 'sms_pv_breaker',
+      sms_ess_breaker: 'sms_ess_breaker',
+      sms_tie_in_breaker: 'sms_tie_in_breaker',
+      sms_has_rsd: 'sms_has_rsd',
+      sms_pv_breaker_rating_override: 'sms_pv_breaker_rating_override',
+      sms_ess_breaker_rating_override: 'sms_ess_breaker_rating_override',
+      sms_tie_in_breaker_rating_override: 'sms_tie_in_breaker_rating_override',
+      sms_backup_load_sub_panel_breaker_rating: 'sms_backup_load_sub_panel_breaker_rating',
+
+      // Battery Type 1
+      battery1_isnew: 'battery1_existing',
+      battery1_make: 'battery1_make',
+      battery1_model: 'battery1_model',
+      battery1_quantity: 'battery1_quantity',
+      battery1_configuration: 'battery1_configuration',
+      battery1_tie_in_location: 'battery1_tie_in_location',
+      battery1_mount_type: 'sys1_battery1_mount_type',
+
+      // Battery Type 2
+      battery2_isnew: 'battery2_existing',
+      battery2_make: 'battery2_make',
+      battery2_model: 'battery2_model',
+      battery2_quantity: 'battery2_quantity',
+      battery2_tie_in_location: 'battery2_tie_in_location',
+      battery2_mount_type: 'sys1_battery2_mount_type',
+      show_battery_type_2: 'show_battery_type_2',
+
+      // Backup Load Sub Panel
+      backup_loads_landing: 'sys1_backupconfig',
+      backup_panel_selection: 'sys1_backupconfig_selectpanel',
+      backup_panel_isnew: 'backup_panel_existing',
+      backup_panel_make: 'backup_panel_make',
+      backup_panel_model: 'backup_panel_model',
+      backup_panel_bus_amps: 'backup_panel_bus_amps',
+      backup_panel_main_breaker: 'backup_panel_main_breaker',
+      backup_panel_tie_in_breaker: 'backup_panel_tie_in_breaker',
+
+      // Battery Combiner Panel
+      battery_combiner_panel_isnew: 'battery_combiner_panel_existing',
+      battery_combiner_panel_make: 'battery_combiner_panel_make',
+      battery_combiner_panel_model: 'battery_combiner_panel_model',
+      battery_combiner_panel_bus_amps: 'battery_combiner_panel_bus_amps',
+      battery_combiner_panel_main_breaker: 'battery_combiner_panel_main_breaker',
+      battery_combiner_panel_tie_in_breaker: 'battery_combiner_panel_tie_in_breaker',
+
+      // Tesla PowerWall fields
+      expansionPacks: 'sys1_tesla_extensions',
+      gateway: 'sys1_gateway',
+      teslagatewaytype: 'sys1_teslagatewaytype',
+      backupSwitchLocation: 'sys1_backupswitch_location',
+      batteryExisting: 'battery1_existing',
+
+      // Tesla Gateway Config fields
+      gatewayConfigIsNew: 'sys1_sms_existing',
+      gatewayConfigMainBreaker: 'sys1_sms_breaker_rating',
+      gatewayConfigBackupPanel: 'sys1_sms_backup_load_sub_panel_breaker_rating',
+      gatewayConfigActivatePCS: 'sys1_pcs_settings',
+      gatewayConfigPVBreaker: 'sys1_sms_pv_breaker_rating_override',
+      gatewayConfigESSBreaker: 'sys1_sms_ess_breaker_rating_override',
+      gatewayConfigTieInBreaker: 'sys1_sms_tie_in_breaker_rating_override',
+      pcs_settings: 'pcs_settings',
+    });
+
+    const fieldMapping = getFieldMapping(selectedSystem, systemPrefix);
+
+    // Build database updates object
+    const dbUpdates = {};
+    const stateUpdates = {};
+
+    fieldUpdates.forEach(([field, value]) => {
+      // Update local state object
+      stateUpdates[field] = value;
+
+      // BOS fields already match database schema - use directly
+      const isBOSField = field.startsWith('bos_sys') || field.startsWith('post_sms_bos_sys') || field.startsWith('postcombine_');
+      const dbFieldName = isBOSField ? field : fieldMapping[field];
+
+      if (!dbFieldName) {
+        logger.warn('EquipmentForm', `No field mapping found for: ${field}`);
+        return;
+      }
+
+      // Handle special value transformations
+      let dbValue = value;
+
+      // Invert "isNew" fields to "existing" fields
+      if (field.endsWith('_isnew')) {
+        dbValue = !value; // isNew=true means existing=false
+      }
+
+      // Convert empty strings to null for database
+      if (dbValue === '') {
+        dbValue = null;
+      }
+
+      dbUpdates[dbFieldName] = dbValue;
+
+      // No special handling needed for gateway - it now maps directly to sys1_teslagatewaytype
+    });
+
+    // Update local state immediately (optimistic update)
+    setFormData(prev => ({
+      ...prev,
+      ...stateUpdates
+    }));
+
+    // Batch save to database
+    try {
+      if (Object.keys(dbUpdates).length > 0) {
+        await updateFields(dbUpdates);
+        logger.log('EquipmentForm', `Batch saved ${Object.keys(dbUpdates).length} fields:`, dbUpdates);
+      }
+    } catch (error) {
+      logger.error('EquipmentForm', 'Failed to batch save fields:', error);
+    }
+  }, [selectedSystem, updateFields]); // Dependencies: selectedSystem for prefix, updateFields for API call
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
@@ -928,6 +1172,213 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.inverter_make, formData.inverter_model, formData.expansionPacks]);
+
+  // Auto-populate equipment from assessment scraper (EnergyAid) with validation
+  // This runs once when the component mounts with a valid projectUuid
+  useEffect(() => {
+    const pendingEquipment = sessionStorage.getItem('pendingEquipmentData');
+
+    if (!pendingEquipment || !projectUuid) return;
+
+    const validateAndPopulateEquipment = async () => {
+      try {
+        const equipment = JSON.parse(pendingEquipment);
+        logger.log('EquipmentForm', '⚡ Auto-populating from assessment:', equipment);
+
+        // Validate equipment against database
+        const validationResults = [];
+
+        // Validate solar panel
+        if (equipment.panel_make && equipment.panel_model) {
+          try {
+            const panelValidation = await axios.post('/equipment/validate', {
+              equipment_type: 'solar_panel',
+              manufacturer: equipment.panel_make,
+              model: equipment.panel_model,
+            });
+
+            if (panelValidation.data.status === 'unmatched') {
+              validationResults.push({
+                type: 'Solar Panel',
+                original: {
+                  manufacturer: equipment.panel_make,
+                  model: equipment.panel_model,
+                },
+                suggestions: panelValidation.data.suggestions || [],
+              });
+            }
+          } catch (error) {
+            logger.warn('EquipmentForm', 'Panel validation failed:', error);
+          }
+        }
+
+        // Validate inverter
+        if (equipment.inverter_make && equipment.inverter_model) {
+          try {
+            const inverterValidation = await axios.post('/equipment/validate', {
+              equipment_type: 'inverter',
+              manufacturer: equipment.inverter_make,
+              model: equipment.inverter_model,
+            });
+
+            if (inverterValidation.data.status === 'unmatched') {
+              validationResults.push({
+                type: 'Inverter',
+                original: {
+                  manufacturer: equipment.inverter_make,
+                  model: equipment.inverter_model,
+                },
+                suggestions: inverterValidation.data.suggestions || [],
+              });
+            }
+          } catch (error) {
+            logger.warn('EquipmentForm', 'Inverter validation failed:', error);
+          }
+        }
+
+        // Validate battery
+        if (equipment.battery_make && equipment.battery_model) {
+          try {
+            const batteryValidation = await axios.post('/equipment/validate', {
+              equipment_type: 'battery',
+              manufacturer: equipment.battery_make,
+              model: equipment.battery_model,
+            });
+
+            if (batteryValidation.data.status === 'unmatched') {
+              validationResults.push({
+                type: 'Battery',
+                original: {
+                  manufacturer: equipment.battery_make,
+                  model: equipment.battery_model,
+                },
+                suggestions: batteryValidation.data.suggestions || [],
+              });
+            }
+          } catch (error) {
+            logger.warn('EquipmentForm', 'Battery validation failed:', error);
+          }
+        }
+
+        // If we have unmatched equipment, show validation modal
+        if (validationResults.length > 0) {
+          logger.log('EquipmentForm', '⚠️ Equipment validation warnings:', validationResults);
+          setPendingEquipmentToPopulate(equipment);
+          setEquipmentValidationResults(validationResults);
+          setShowEquipmentValidationModal(true);
+        } else {
+          // All equipment validated successfully - auto-populate immediately
+          applyEquipmentData(equipment);
+        }
+
+        // Clear the pending data from sessionStorage
+        sessionStorage.removeItem('pendingEquipmentData');
+
+      } catch (error) {
+        logger.error('EquipmentForm', 'Failed to validate/populate equipment:', error);
+        sessionStorage.removeItem('pendingEquipmentData');
+      }
+    };
+
+    validateAndPopulateEquipment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectUuid]); // Only run when projectUuid is available
+
+  // Helper function to apply equipment data to form
+  const applyEquipmentData = useCallback((equipment) => {
+    const updates = [];
+
+    // Map assessment equipment to sys1 fields
+    if (equipment.panel_make) {
+      updates.push(['solar_panel_make', equipment.panel_make]);
+    }
+    if (equipment.panel_model) {
+      updates.push(['solar_panel_model', equipment.panel_model]);
+    }
+    if (equipment.panel_quantity) {
+      updates.push(['solar_panel_qty', equipment.panel_quantity]);
+    }
+    if (equipment.inverter_make) {
+      updates.push(['inverter_make', equipment.inverter_make]);
+    }
+    if (equipment.inverter_model) {
+      updates.push(['inverter_model', equipment.inverter_model]);
+    }
+    if (equipment.battery_make) {
+      updates.push(['battery1_make', equipment.battery_make]);
+    }
+    if (equipment.battery_model) {
+      updates.push(['battery1_model', equipment.battery_model]);
+    }
+    if (equipment.battery_quantity) {
+      updates.push(['battery1_quantity', equipment.battery_quantity]);
+    }
+
+    // Apply updates if we have any
+    if (updates.length > 0) {
+      // Use batch update for better performance
+      handleBatchFieldChange(updates);
+
+      // Also persist to database
+      const updatesObj = Object.fromEntries(updates);
+      updateFields(updatesObj);
+
+      toast.success('Equipment auto-populated from assessment!', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    }
+  }, [handleBatchFieldChange, updateFields]);
+
+  // Handler for when user selects a suggestion from validation modal
+  const handleEquipmentSuggestionSelect = useCallback((equipmentType, suggestion) => {
+    if (!pendingEquipmentToPopulate) return;
+
+    // Update the pending equipment with the selected suggestion
+    const updatedEquipment = { ...pendingEquipmentToPopulate };
+
+    if (equipmentType === 'Solar Panel') {
+      updatedEquipment.panel_make = suggestion.manufacturer;
+      updatedEquipment.panel_model = suggestion.model;
+    } else if (equipmentType === 'Inverter') {
+      updatedEquipment.inverter_make = suggestion.manufacturer;
+      updatedEquipment.inverter_model = suggestion.model;
+    } else if (equipmentType === 'Battery') {
+      updatedEquipment.battery_make = suggestion.manufacturer;
+      updatedEquipment.battery_model = suggestion.model;
+    }
+
+    // Apply the updated equipment
+    applyEquipmentData(updatedEquipment);
+
+    // Close modal
+    setShowEquipmentValidationModal(false);
+    setPendingEquipmentToPopulate(null);
+    setEquipmentValidationResults([]);
+
+    toast.success(`${equipmentType} updated to: ${suggestion.manufacturer} ${suggestion.model}`, {
+      position: 'top-right',
+      autoClose: 3000,
+    });
+  }, [pendingEquipmentToPopulate, applyEquipmentData]);
+
+  // Handler for proceeding with original values despite validation warnings
+  const handleProceedWithOriginalValues = useCallback(() => {
+    if (!pendingEquipmentToPopulate) return;
+
+    // Apply original equipment data
+    applyEquipmentData(pendingEquipmentToPopulate);
+
+    // Close modal
+    setShowEquipmentValidationModal(false);
+    setPendingEquipmentToPopulate(null);
+    setEquipmentValidationResults([]);
+
+    toast.info('Equipment populated with original assessment values', {
+      position: 'top-right',
+      autoClose: 3000,
+    });
+  }, [pendingEquipmentToPopulate, applyEquipmentData]);
 
   // Sync Gateway selection with SMS fields
   // Gateway 2 and Gateway 3 auto-populate SMS for PowerWall systems
@@ -1137,8 +1588,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       const inverterModel = formData.inverter_model;
       const microQty = isMicro ? parseInt(formData.inverter_qty) || 0 : 1;
 
-      console.log('[BOS Sizing] Checking inverter:', { isMicro, inverterMake, inverterModel, microQty });
-
       // Guard: Check required fields
       if (!inverterMake || !inverterModel) {
         setMaxContinuousOutputAmpsPerSystem(prev => ({
@@ -1208,7 +1657,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           ...prev,
           [selectedSystem]: Math.round(totalAmps)
         }));
-        console.log(`[BOS Sizing System ${selectedSystem}] Inverter output: ${totalAmps}A (${isMicro ? `${microQty} × ${maxAmps}A` : `${maxAmps}A`})`);
 
       } catch (error) {
         console.error('Error calculating inverter output:', error);
@@ -1256,8 +1704,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       const batteryModel = formData.battery1_model;
       const batteryQty = parseInt(formData.battery1_quantity) || 1;
 
-      console.log('[BOS Sizing] Checking battery:', { batteryMake, batteryModel, batteryQty });
-
       // Guard: Check required fields
       if (!batteryMake || !batteryModel) {
         setBatteryMaxContinuousOutputAmpsPerSystem(prev => ({
@@ -1273,7 +1719,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           ...prev,
           [selectedSystem]: 48
         }));
-        console.log(`[BOS Sizing System ${selectedSystem}] Tesla battery: 48A (fixed)`);
         return;
       }
 
@@ -1319,7 +1764,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           for (const [key, fallbackISC] of Object.entries(FRANKLIN_ISC_FALLBACKS)) {
             if (batteryModel.includes(key)) {
               iscValue = fallbackISC;
-              console.log(`[BOS Sizing System ${selectedSystem}] Using Franklin fallback ISC: ${fallbackISC}A for ${key}`);
               break;
             }
           }
@@ -1340,7 +1784,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           ...prev,
           [selectedSystem]: Math.round(totalAmps)
         }));
-        console.log(`[BOS Sizing System ${selectedSystem}] Battery output: ${totalAmps}A (${batteryQty} × ${iscValue}A × 1.25)`);
 
       } catch (error) {
         console.error('Error calculating battery output:', error);
@@ -1373,8 +1816,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     // CRITICAL: Divide by 1.25 because BOS section will multiply by 1.25
     const filterValue = desiredMinAmps / 1.25;
 
-    console.log(`[BOS Sizing System ${selectedSystem}] Post-SMS filter: ${filterValue}A (from MAX(${backupBusRating}, ${utilityServiceAmps}, ${inverterAmps}, 100) ÷ 1.25)`);
-
     return filterValue;
   }, [
     formData.backup_panel_bus_amps,
@@ -1386,239 +1827,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   // NOTE: Field mapping is now handled dynamically in handleFieldChange()
   // to avoid async state update issues with multi-system support
 
-  // Batch update multiple fields at once (for auto-population)
-  // Memoized to prevent child component re-renders
-  const handleBatchFieldChange = useCallback(async (fieldUpdates) => {
-    if (!fieldUpdates || fieldUpdates.length === 0) return;
-
-    // Build field mapping for current system (same as in handleFieldChange)
-    const systemPrefix = SYSTEM_PREFIXES[selectedSystem];
-    const getFieldMapping = (sysNum, sysPrefix) => ({
-      // Solar Panel
-      solar_panel_isnew: getSchemaField(sysNum, 'solar_panel_existing'),
-      solar_panel_make: `${sysPrefix}_solar_panel_make`,
-      solar_panel_model: `${sysPrefix}_solar_panel_model`,
-      solar_panel_quantity: `${sysPrefix}_solar_panel_quantity`,
-      solar_panel_watts: `${sysPrefix}_solar_panel_watts`,
-      solar_panel_vmp: `${sysPrefix}_solar_panel_vmp`,
-      solar_panel_imp: `${sysPrefix}_solar_panel_imp`,
-      solar_panel_voc: `${sysPrefix}_solar_panel_voc`,
-      solar_panel_isc: `${sysPrefix}_solar_panel_isc`,
-
-      // Solar Panel 2 (for mixed systems)
-      solar_panel_type2_is_new: getSchemaField(sysNum, 'solar_panel_type2_existing'),
-      solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
-      solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
-      solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
-      solar_panel_type2_wattage: `${sysPrefix}_solar_panel_type2_watts`,
-      solar_panel_type2_vmp: `${sysPrefix}_solar_panel_type2_vmp`,
-      solar_panel_type2_imp: `${sysPrefix}_solar_panel_type2_imp`,
-      solar_panel_type2_voc: `${sysPrefix}_solar_panel_type2_voc`,
-      solar_panel_type2_isc: `${sysPrefix}_solar_panel_type2_isc`,
-      solar_panel_type2_model_id: `${sysPrefix}_solar_panel_type2_model_id`,
-      solar_panel_type2_temp_coeff_voc: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
-      show_solar_panel_2: `${sysPrefix}_mixed_panel_system`,
-      batteryonly: `${sysPrefix}_batteryonly`,
-
-      // Inverter/Microinverter
-      inverter_isnew: getSchemaField(sysNum, 'micro_inverter_existing'),
-      inverter_make: `${sysPrefix}_inverter_make`,
-      inverter_model: `${sysPrefix}_inverter_model`,
-      inverter_type: `${sysPrefix}_inverter_type`,
-      inverter_max_cont_output_amps: `${sysPrefix}_inv_max_continuous_output`,
-      inverter_max_strings_branches: `${sysPrefix}_inv_max_strings_branches`,
-      inverter_max_vdc: `${sysPrefix}_inv_max_vdc`,
-      inverter_min_vdc: `${sysPrefix}_inv_min_vdc`,
-      inverter_max_input_isc: `${sysPrefix}_inv_max_input_isc`,
-      inverter_model_id: `${sysPrefix}_inverter_model_id`,
-
-      // Hoymiles/APSystems Granular Microinverter Panel Tracking
-      micro1Panels: `${sysPrefix}_micro1Panels`,
-      micro2Panels: `${sysPrefix}_micro2Panels`,
-      micro3Panels: `${sysPrefix}_micro3Panels`,
-      micro4Panels: `${sysPrefix}_micro4Panels`,
-      micro5Panels: `${sysPrefix}_micro5Panels`,
-      micro6Panels: `${sysPrefix}_micro6Panels`,
-      micro7Panels: `${sysPrefix}_micro7Panels`,
-      micro8Panels: `${sysPrefix}_micro8Panels`,
-      micro9Panels: `${sysPrefix}_micro9Panels`,
-      micro10Panels: `${sysPrefix}_micro10Panels`,
-      micro11Panels: `${sysPrefix}_micro11Panels`,
-      micro12Panels: `${sysPrefix}_micro12Panels`,
-      micro13Panels: `${sysPrefix}_micro13Panels`,
-      micro14Panels: `${sysPrefix}_micro14Panels`,
-      micro15Panels: `${sysPrefix}_micro15Panels`,
-      micro16Panels: `${sysPrefix}_micro16Panels`,
-      micro17Panels: `${sysPrefix}_micro17Panels`,
-      micro18Panels: `${sysPrefix}_micro18Panels`,
-      micro19Panels: `${sysPrefix}_micro19Panels`,
-      micro20Panels: `${sysPrefix}_micro20Panels`,
-      micro21Panels: `${sysPrefix}_micro21Panels`,
-      micro22Panels: `${sysPrefix}_micro22Panels`,
-      micro23Panels: `${sysPrefix}_micro23Panels`,
-      micro24Panels: `${sysPrefix}_micro24Panels`,
-      micro25Panels: `${sysPrefix}_micro25Panels`,
-
-      // Optimizer
-      optimizer_isnew: getSchemaField(sysNum, 'optimizer_existing'),
-      optimizer_make: `${sysPrefix}_optimizer_make`,
-      optimizer_model: `${sysPrefix}_optimizer_model`,
-
-      // String Combiner Panel
-      combiner_panel_isnew: getSchemaField(sysNum, 'combiner_existing'),
-      combiner_panel_make: `${sysPrefix}_combiner_panel_make`,
-      combiner_panel_model: `${sysPrefix}_combiner_panel_model`,
-      combiner_panel_bus_amps: `${sysPrefix}_combiner_panel_bus_amps`,
-      combiner_panel_main_breaker: `${sysPrefix}_combiner_panel_main_breaker`,
-      combiner_panel_tie_in_breaker: `${sysPrefix}_combiner_panel_tie_in_breaker`,
-      aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
-
-      // BOS Visibility Flags
-      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
-      show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
-      show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
-
-      // ESS Section Visibility Flags
-      show_sms: `${sysPrefix}_show_sms`,
-      show_battery1: `${sysPrefix}_show_battery1`,
-      show_battery2: `${sysPrefix}_show_battery2`,
-      show_backup_panel: `${sysPrefix}_show_backup_panel`,
-
-      // Hoymiles/APSystems breaker size
-      sys1_ap_hoy_breaker_size: 'sys1_ap_hoy_breaker_size',
-
-      // Energy Storage System (ESS)
-      backup_option: 'backup_option',
-      backup_system_size: 'backup_system_size',
-
-      // IQ Combiner 6C
-      iq_combiner_config_id: `${sysPrefix}_iq_combiner_config_id`,
-      meter_collar_location: `${sysPrefix}_meter_collar_setting`,
-      iq_combiner_backup_type: `${sysPrefix}_iq_combiner_backup_type`,
-
-      // IQ Meter Collar
-      iq_meter_collar_type: `${sysPrefix}_meter_collar_setting`,
-
-      // Storage Management System (SMS)
-      sms_equipment_type: 'sms_equipment_type',
-      sms_isnew: 'sms_existing',
-      sms_make: 'sms_make',
-      sms_model: 'sms_model',
-      sms_main_breaker: 'sms_main_breaker',
-      sms_pv_breaker: 'sms_pv_breaker',
-      sms_ess_breaker: 'sms_ess_breaker',
-      sms_tie_in_breaker: 'sms_tie_in_breaker',
-      sms_has_rsd: 'sms_has_rsd',
-      sms_pv_breaker_rating_override: 'sms_pv_breaker_rating_override',
-      sms_ess_breaker_rating_override: 'sms_ess_breaker_rating_override',
-      sms_tie_in_breaker_rating_override: 'sms_tie_in_breaker_rating_override',
-      sms_backup_load_sub_panel_breaker_rating: 'sms_backup_load_sub_panel_breaker_rating',
-
-      // Battery Type 1
-      battery1_isnew: 'battery1_existing',
-      battery1_make: 'battery1_make',
-      battery1_model: 'battery1_model',
-      battery1_quantity: 'battery1_quantity',
-      battery1_configuration: 'battery1_configuration',
-      battery1_tie_in_location: 'battery1_tie_in_location',
-      battery1_mount_type: 'sys1_battery1_mount_type',
-
-      // Battery Type 2
-      battery2_isnew: 'battery2_existing',
-      battery2_make: 'battery2_make',
-      battery2_model: 'battery2_model',
-      battery2_quantity: 'battery2_quantity',
-      battery2_tie_in_location: 'battery2_tie_in_location',
-      battery2_mount_type: 'sys1_battery2_mount_type',
-      show_battery_type_2: 'show_battery_type_2',
-
-      // Backup Load Sub Panel
-      backup_panel_isnew: 'backup_panel_existing',
-      backup_panel_make: 'backup_panel_make',
-      backup_panel_model: 'backup_panel_model',
-      backup_panel_bus_amps: 'backup_panel_bus_amps',
-      backup_panel_main_breaker: 'backup_panel_main_breaker',
-      backup_panel_tie_in_breaker: 'backup_panel_tie_in_breaker',
-
-      // Battery Combiner Panel
-      battery_combiner_panel_isnew: 'battery_combiner_panel_existing',
-      battery_combiner_panel_make: 'battery_combiner_panel_make',
-      battery_combiner_panel_model: 'battery_combiner_panel_model',
-      battery_combiner_panel_bus_amps: 'battery_combiner_panel_bus_amps',
-      battery_combiner_panel_main_breaker: 'battery_combiner_panel_main_breaker',
-      battery_combiner_panel_tie_in_breaker: 'battery_combiner_panel_tie_in_breaker',
-
-      // Tesla PowerWall fields
-      expansionPacks: 'sys1_tesla_extensions',
-      gateway: 'sys1_gateway',
-      teslagatewaytype: 'sys1_teslagatewaytype',
-      backupSwitchLocation: 'sys1_backupswitch_location',
-      batteryExisting: 'battery1_existing',
-
-      // Tesla Gateway Config fields
-      gatewayConfigIsNew: 'sys1_sms_existing',
-      gatewayConfigMainBreaker: 'sys1_sms_breaker_rating',
-      gatewayConfigBackupPanel: 'sys1_sms_backup_load_sub_panel_breaker_rating',
-      gatewayConfigActivatePCS: 'sys1_pcs_settings',
-      gatewayConfigPVBreaker: 'sys1_sms_pv_breaker_rating_override',
-      gatewayConfigESSBreaker: 'sys1_sms_ess_breaker_rating_override',
-      gatewayConfigTieInBreaker: 'sys1_sms_tie_in_breaker_rating_override',
-      pcs_settings: 'pcs_settings',
-    });
-
-    const fieldMapping = getFieldMapping(selectedSystem, systemPrefix);
-
-    // Build database updates object
-    const dbUpdates = {};
-    const stateUpdates = {};
-
-    fieldUpdates.forEach(([field, value]) => {
-      // Update local state object
-      stateUpdates[field] = value;
-
-      // BOS fields already match database schema - use directly
-      const isBOSField = field.startsWith('bos_sys') || field.startsWith('post_sms_bos_sys') || field.startsWith('postcombine_');
-      const dbFieldName = isBOSField ? field : fieldMapping[field];
-
-      if (!dbFieldName) {
-        logger.warn('EquipmentForm', `No field mapping found for: ${field}`);
-        return;
-      }
-
-      // Handle special value transformations
-      let dbValue = value;
-
-      // Invert "isNew" fields to "existing" fields
-      if (field.endsWith('_isnew')) {
-        dbValue = !value; // isNew=true means existing=false
-      }
-
-      // Convert empty strings to null for database
-      if (dbValue === '') {
-        dbValue = null;
-      }
-
-      dbUpdates[dbFieldName] = dbValue;
-
-      // No special handling needed for gateway - it now maps directly to sys1_teslagatewaytype
-    });
-
-    // Update local state immediately (optimistic update)
-    setFormData(prev => ({
-      ...prev,
-      ...stateUpdates
-    }));
-
-    // Batch save to database
-    try {
-      if (Object.keys(dbUpdates).length > 0) {
-        await updateFields(dbUpdates);
-        logger.log('EquipmentForm', `Batch saved ${Object.keys(dbUpdates).length} fields:`, dbUpdates);
-      }
-    } catch (error) {
-      logger.error('EquipmentForm', 'Failed to batch save fields:', error);
-    }
-  }, [selectedSystem, updateFields]); // Dependencies: selectedSystem for prefix, updateFields for API call
 
   // Handle field changes and auto-save to system-details endpoint
   // Memoized to prevent child component re-renders
@@ -1626,19 +1834,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     // Use refs to access latest values without making them dependencies
     const currentFormData = formDataRef.current;
     const currentSystemDetails = systemDetailsRef.current;
-
-    console.log('[EquipmentForm handleFieldChange] Called:', { field, value, overrideSystemNumber });
-
-    // Extra logging for inverter_isnew to debug System 2 issue
-    if (field === 'inverter_isnew') {
-      console.log('[EquipmentForm] inverter_isnew change detected:', {
-        field,
-        value,
-        overrideSystemNumber,
-        selectedSystem,
-        willUseSystem: overrideSystemNumber !== null ? overrideSystemNumber : selectedSystem
-      });
-    }
 
     // BOS fields already match database schema - save directly without mapping
     const isBOSField = field.startsWith('bos_sys') || field.startsWith('post_sms_bos_sys') || field.startsWith('postcombine_');
@@ -1682,6 +1877,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_type2_model_id: `${sysPrefix}_solar_panel_type2_model_id`,
       solar_panel_type2_temp_coeff_voc: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
       show_solar_panel_2: `${sysPrefix}_mixed_panel_system`,
+      batteryonly: `${sysPrefix}_batteryonly`,
 
       // Inverter/Microinverter
       inverter_isnew: getSchemaField(sysNum, 'micro_inverter_existing'),
@@ -1823,6 +2019,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       [`sys${sysNum}_combination_method`]: `${sysPrefix}_combination_method`,
 
       // Backup Load Sub Panel
+      backup_loads_landing: `${sysPrefix}_backupconfig`,
+      backup_panel_selection: `${sysPrefix}_backupconfig_selectpanel`,
       backup_panel_isnew: `bls${sysNum}_backuploader_existing`,
       backup_panel_make: `bls${sysNum}_backup_load_sub_panel_make`,
       backup_panel_model: `bls${sysNum}_backup_load_sub_panel_model`,
@@ -1908,7 +2106,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         ...prev,
         [dbFieldName]: value  // Store using DB field name to keep systems separate
       };
-      console.log('[EquipmentForm handleFieldChange] Updated formData:', { field, dbFieldName, value, newFormData: updated });
       return updated;
     });
 
@@ -1924,18 +2121,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       // Convert empty strings to null for database
       if (dbValue === '') {
         dbValue = null;
-      }
-
-      // Debug logging for specific fields
-      if (field === 'meter_collar_location' || field === 'aggregate_pv_breaker' || field === 'inverter_isnew') {
-        console.log(`🔥 Saving ${field}:`, {
-          formField: field,
-          dbField: dbFieldName,
-          formValue: value,
-          dbValue: dbValue,
-          systemNum: systemNum,
-          inverted: field.endsWith('_isnew')
-        });
       }
 
       // Save to system-details endpoint via hook
@@ -1954,7 +2139,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         if (displayLabel) {
           const teslaGatewayTypeField = `${systemPrefix}_teslagatewaytype`;
           await updateField(teslaGatewayTypeField, displayLabel);
-          console.log(`[EquipmentForm] Auto-saved teslagatewaytype: ${displayLabel}`);
         }
       }
 
@@ -2070,18 +2254,12 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       if (systemFormData) {
         const sysPrefix = prefix(systemNumber);
 
-        // Debug: Log database fields for System 2
-        if (systemNumber === 2) {
-          const inverterFields = Object.keys(systemFormData).filter(k => k.includes('inverter') || k.includes('micro'));
-          console.log(`[mergedFormDataBySystem] System 2 DB fields with 'inverter':`, inverterFields);
-          console.log(`[mergedFormDataBySystem] System 2 DB field sys2_micro_inverter_make =`, systemFormData.sys2_micro_inverter_make);
-        }
-
         // Merge system form data with optimistic updates from formData
         // Check for system-specific database field names in formData and map back to component field names
+        const batteryOnlyDbField = `${sysPrefix}_batteryonly`;
         const optimisticUpdates = {
           show_solar_panel_2: formData.show_solar_panel_2 ?? systemFormData.show_solar_panel_2,
-          batteryonly: formData.batteryonly ?? systemFormData.batteryonly,
+          batteryonly: formData[batteryOnlyDbField] ?? systemFormData.batteryonly,
         };
 
         // Map database field names back to component field names for this system
@@ -2170,17 +2348,11 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           // Priority 1: Check state updates (optimistic updates from formData with database field name)
           if (formData[stateFieldName] !== undefined) {
             optimisticUpdates[component] = formData[stateFieldName];
-            if (component === 'inverter_make' && systemNumber === 2) {
-              console.log(`[mergedFormDataBySystem] System ${systemNumber}: Using state "${stateFieldName}" = "${formData[stateFieldName]}"`);
-            }
           }
           // Priority 2: Check if systemFormData already has the unprefixed component field
           // (hydrateFormData already mapped database→component names)
           else if (systemFormData[component] !== undefined) {
             optimisticUpdates[component] = systemFormData[component];
-            if (component === 'inverter_make' && systemNumber === 2) {
-              console.log(`[mergedFormDataBySystem] System ${systemNumber}: Using DB component field "${component}" = "${systemFormData[component]}"`);
-            }
           }
         });
 
@@ -2195,15 +2367,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           ...systemFormData,
           ...optimisticUpdates,
         };
-
-        // Debug: Log final merged data for System 2
-        if (systemNumber === 2) {
-          console.log(`[mergedFormDataBySystem] System 2 final merged data - inverter fields:`, {
-            inverter_make: merged[systemNumber].inverter_make,
-            inverter_model: merged[systemNumber].inverter_model,
-            inverter_type: merged[systemNumber].inverter_type,
-          });
-        }
       }
     });
     return merged;
@@ -2726,10 +2889,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       // Get utility name from project site data
       const utilityName = projectData?.site?.utility || systemDetails?.utility || '';
 
-      // Debug logging
-      console.log('[BOS Detection] Utility name:', utilityName);
-      console.log('[BOS Detection] systemDetails utility:', systemDetails?.utility);
-
       // Step 1: Try hardcoded utility-specific configurations first (PRIMARY)
       // Pass utility name as second parameter
       const detectionResult = detectProjectConfiguration(systemDetails || {}, utilityName);
@@ -2745,14 +2904,14 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
         const utilityName = systemDetails?.utility || null;
         if (utilityName) {
-          const { getUtilityBOSRequirements } = await import('../services/utilityRequirementsService');
+          const { getUtilityBOSRequirements } = await import('../../services/utilityRequirementsService');
           const dbRequirements = await getUtilityBOSRequirements(utilityName);
 
           if (dbRequirements && dbRequirements.length > 0) {
             logger.log('Equipment', `Database returned ${dbRequirements.length} BOS requirements for ${utilityName}`);
 
             // Convert database requirements to BOS items format
-            const { convertDatabaseToBOSItems } = await import('../utils/bosUtils');
+            const { convertDatabaseToBOSItems } = await import('../../utils/bosUtils');
             const dbBOSItems = await convertDatabaseToBOSItems(
               dbRequirements,
               systemDetails,
@@ -2947,10 +3106,11 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     if (!systemFormData) return null;
 
     // Merge local formData toggles that may have changed since last database sync
+    const batteryOnlyField = `${systemPrefix}_batteryonly`;
     const mergedFormData = {
       ...systemFormData,
       show_solar_panel_2: formData.show_solar_panel_2 ?? systemFormData.show_solar_panel_2,
-      batteryonly: formData.batteryonly ?? systemFormData.batteryonly,
+      batteryonly: formData[batteryOnlyField] ?? systemFormData.batteryonly,
     };
 
     return (
@@ -3038,10 +3198,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           const handleSystemBatchChange = async (fieldUpdates) => {
             if (!fieldUpdates || fieldUpdates.length === 0) return;
 
-            console.log(`[handleSystemBatchChange] System ${systemNumber}: Received ${fieldUpdates.length} field updates:`, fieldUpdates);
-
             const systemPrefix = SYSTEM_PREFIXES[systemNumber];
-            console.log(`[handleSystemBatchChange] System prefix:`, systemPrefix);
 
             const stateUpdates = {};
             const dbUpdates = {};
@@ -3117,8 +3274,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
             // Process each field update
             fieldUpdates.forEach(([field, value]) => {
-              console.log(`[handleSystemBatchChange] Processing field: "${field}" = "${value}"`);
-
               const isBOSField = field.startsWith('bos_sys') || field.startsWith('post_sms_bos_sys') || field.startsWith('postcombine_');
 
               // Map to state and database fields based on system number
@@ -3142,9 +3297,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 dbFieldName = fieldMapping[field];
               }
 
-              console.log(`[handleSystemBatchChange]   → stateFieldName: "${stateFieldName}"`);
-              console.log(`[handleSystemBatchChange]   → dbFieldName: "${dbFieldName}"`);
-
               // Update state
               stateUpdates[stateFieldName] = value;
 
@@ -3156,19 +3308,12 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
               }
             });
 
-            console.log(`[handleSystemBatchChange] Final stateUpdates:`, stateUpdates);
-            console.log(`[handleSystemBatchChange] Final dbUpdates:`, dbUpdates);
-
             // Update local state immediately in ONE call (optimistic update)
             setFormData(prev => {
               const newFormData = {
                 ...prev,
                 ...stateUpdates
               };
-              console.log(`[handleSystemBatchChange] State updated. New formData for key fields:`, {
-                sys2_inverter_make: newFormData.sys2_inverter_make,
-                sys2_inverter_model: newFormData.sys2_inverter_model,
-              });
               return newFormData;
             });
 
@@ -3762,6 +3907,19 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           </div>
         )}
       </ConfirmDialog>
+
+      {/* Equipment Validation Modal (for assessment scraper) */}
+      <EquipmentValidationModal
+        isOpen={showEquipmentValidationModal}
+        onClose={() => {
+          setShowEquipmentValidationModal(false);
+          setPendingEquipmentToPopulate(null);
+          setEquipmentValidationResults([]);
+        }}
+        validationResults={equipmentValidationResults}
+        onSelect={handleEquipmentSuggestionSelect}
+        onProceed={handleProceedWithOriginalValues}
+      />
     </form>
   );
 };
