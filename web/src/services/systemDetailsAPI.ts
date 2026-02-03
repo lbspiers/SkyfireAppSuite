@@ -33,17 +33,19 @@ function pruneNullish<T extends Record<string, any>>(obj: T): T {
  * Returns the row object or null if none exists (404).
  *
  * @param projectUuid - Project UUID
+ * @param signal - Optional AbortSignal to cancel the request
  * @returns System details object or null if not found
  */
 export async function fetchSystemDetails(
-  projectUuid: string
+  projectUuid: string,
+  signal?: AbortSignal
 ): Promise<Record<string, any> | null> {
   try {
     const path = apiEndpoints.PROJECT?.SYSTEM_DETAILS?.GET(projectUuid)
       ?? `/project/${projectUuid}/system-details`;
 
     console.debug('[systemDetailsAPI] GET', path);
-    const resp = await axiosInstance.get(path);
+    const resp = await axiosInstance.get(path, { signal });
 
     if (resp.status === 200 && (resp.data?.success || resp.data?.status === 'SUCCESS')) {
       const data = resp.data.data;

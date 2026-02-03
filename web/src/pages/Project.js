@@ -12,6 +12,7 @@ import projectStyles from '../styles/ProjectAdd.module.css';
 import pageStyles from './Project.module.css';
 import logger from '../services/devLogger';
 import { isCurrentUserAdminAsync } from '../utils/adminUtils';
+import { safeGetJSON } from '../utils/safeStorage';
 
 const TABS = [
   { key: 'site', label: 'Site' },
@@ -78,9 +79,11 @@ const Project = () => {
   }, [selectedCompany]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchProjectData = async () => {
       try {
-        const companyData = JSON.parse(sessionStorage.getItem('companyData') || '{}');
+        const companyData = safeGetJSON('companyData', sessionStorage, {});
         const companyId = companyData.uuid;
 
         if (!projectUuid || !companyId) {
@@ -89,7 +92,15 @@ const Project = () => {
         }
 
         // Fetch project data
-        const response = await axios.get(`/project/${projectUuid}?companyId=${companyId}`);
+        const response = await axios.get(`/project/${projectUuid}?companyId=${companyId}`, {
+          signal: controller.signal
+        });
+
+        // Check if request was aborted
+        if (controller.signal.aborted) {
+          return;
+        }
+
         if (response.data.status === 'SUCCESS' && response.data.project) {
           const project = response.data.project;
           setProjectData(project);
@@ -100,6 +111,11 @@ const Project = () => {
           }
         }
       } catch (error) {
+        // Ignore abort errors
+        if (error.name === 'AbortError' || controller.signal.aborted) {
+          logger.debug('Project', 'Project data fetch aborted');
+          return;
+        }
         logger.error('Project', 'Error fetching project data:', error);
       } finally {
         setLoading(false);
@@ -107,6 +123,10 @@ const Project = () => {
     };
 
     fetchProjectData();
+
+    return () => {
+      controller.abort();
+    };
   }, [projectUuid, isSuperUser]);
 
   const handleLogout = () => {

@@ -115,11 +115,11 @@ const DesignPortal = () => {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchProjectData = async () => {
       try {
-        const userData = JSON.parse(
-          sessionStorage.getItem("userData") || "{}"
-        );
+        const userData = safeGetJSON("userData", sessionStorage, {});
         const companyId = userData?.company?.uuid;
 
         if (!projectUuid) {
@@ -132,7 +132,14 @@ const DesignPortal = () => {
           ? `/project/${projectUuid}?companyId=${companyId}`
           : `/project/${projectUuid}`;
 
-        const response = await axios.get(endpoint);
+        const response = await axios.get(endpoint, {
+          signal: controller.signal
+        });
+
+        // Check if request was aborted
+        if (controller.signal.aborted) {
+          return;
+        }
 
         // Extract project data (API returns data nested in response.data.data)
         const projectData = response.data.data || response.data;
@@ -143,6 +150,11 @@ const DesignPortal = () => {
           logger.warn("Portal", "No project data found in response");
         }
       } catch (error) {
+        // Ignore abort errors
+        if (error.name === 'AbortError' || controller.signal.aborted) {
+          logger.debug("Portal", "Project data fetch aborted");
+          return;
+        }
         logger.error("Portal", "Error fetching project data:", error);
         if (error.response?.data) {
           logger.error("Portal", "Error details:", error.response.data);
@@ -151,6 +163,10 @@ const DesignPortal = () => {
     };
 
     fetchProjectData();
+
+    return () => {
+      controller.abort();
+    };
   }, [projectUuid]);
 
   const handleLogout = () => {

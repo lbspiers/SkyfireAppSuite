@@ -33,7 +33,7 @@ export const useDashboardData = () => {
       setData(prev => ({ ...prev, loading: true, error: null }));
 
       // Get user data from session storage
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      const userData = safeGetJSON('userData', sessionStorage, {});
 
       // Verify admin status with backend
       const isSuperUser = await isCurrentUserAdminAsync();
@@ -215,10 +215,23 @@ export const useDashboardData = () => {
   /**
    * Add a new project to the beginning of the projects list
    * Updates stats and status counts accordingly
+   * Prevents duplicate additions (race condition protection)
    * @param {object} newProject - The new project object to add
    */
   const addProject = useCallback((newProject) => {
     setData(prev => {
+      // Check if project already exists (prevent race condition duplicates)
+      const projectExists = prev.projects.some(p =>
+        p.uuid === newProject.uuid ||
+        p.project_id === newProject.project_id ||
+        p.id === newProject.id
+      );
+
+      if (projectExists) {
+        console.debug('[useDashboardData] Project already exists, skipping duplicate add');
+        return prev;
+      }
+
       // Add project to beginning of array
       const updatedProjects = [newProject, ...prev.projects];
 

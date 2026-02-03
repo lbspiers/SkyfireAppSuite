@@ -56,7 +56,7 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
   const pendingActivityChangesRef = useRef<FieldChange[]>([]);
 
   // Fetch system details
-  const fetch = useCallback(async () => {
+  const fetch = useCallback(async (signal?: AbortSignal) => {
     if (!isAuthenticated || !projectUuid) {
       setData(null);
       setLoading(false);
@@ -74,7 +74,11 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
     setError(null);
 
     try {
-      const result = await fetchSystemDetails(projectUuid);
+      const result = await fetchSystemDetails(projectUuid, signal);
+      // Check if request was aborted
+      if (signal?.aborted) {
+        return;
+      }
       setData(result);
       // Initialize last saved snapshot
       if (result) {
@@ -83,6 +87,11 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
         lastSavedValuesRef.current = { ...result };
       }
     } catch (err: any) {
+      // Ignore abort errors
+      if (err.name === 'AbortError' || signal?.aborted) {
+        console.debug('[useSystemDetails] Fetch aborted');
+        return;
+      }
       console.error('[useSystemDetails] Fetch error:', err);
       setError(err.message || 'Failed to load system details');
     } finally {
@@ -91,11 +100,16 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
     }
   }, [isAuthenticated, projectUuid]);
 
-  // Initial fetch
+  // Initial fetch with abort controller
   useEffect(() => {
-    if (autoFetch) {
-      fetch();
-    }
+    if (!autoFetch) return;
+
+    const controller = new AbortController();
+    fetch(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [fetch, autoFetch]);
 
   // Cleanup: flush pending activity logs on unmount
