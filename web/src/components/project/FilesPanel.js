@@ -6,6 +6,7 @@ import uploadManager from '../../services/uploadManager';
 import { Button, ConfirmDialog, UploadProgressInline } from '../ui';
 import { downloadFileObject, downloadMultipleFiles } from '../../utils/fileDownload';
 import { processFileForUpload, isHeicFile, isImageFile } from '../../utils/imageProcessor';
+import { getThumbUrl } from '../../utils/photoUtils';
 import styles from '../../styles/FilesPanel.module.css';
 
 // Graceful import of documentService (try/catch in case backend not ready)
@@ -396,9 +397,9 @@ const FilesPanel = ({ projectUuid }) => {
 
                 {/* Icon/Thumbnail */}
                 <div className={styles.fileIcon}>
-                  {file.thumbnail_url || file.url ? (
+                  {getThumbUrl(file) ? (
                     <img
-                      src={file.thumbnail_url || file.url}
+                      src={getThumbUrl(file)} // Use optimized thumbnail (~40KB vs 4MB)
                       alt={file.name || file.fileName}
                       className={styles.thumbnail}
                     />

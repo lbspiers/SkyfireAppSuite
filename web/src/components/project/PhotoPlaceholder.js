@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './PhotoPlaceholder.module.css';
+import { getThumbUrl } from '../../utils/photoUtils';
 
 /**
  * PhotoPlaceholder - Visual placeholder for photo thumbnails
@@ -56,8 +57,8 @@ const PhotoPlaceholder = ({
   };
 
   // Check if photo has actual image URL from backend
-  // Prioritize thumbnail for grid view performance (compressed images)
-  const imageUrl = photo.thumbnail_url || photo.thumbUrl || photo.url || photo.photo_url || photo.image_url || photo.s3_url;
+  // Use utility to get optimized thumbnail for grid view performance (~40KB vs 4MB)
+  const imageUrl = getThumbUrl(photo);
   const hasRealImage = !!imageUrl;
 
   return (

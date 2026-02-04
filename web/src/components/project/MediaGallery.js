@@ -16,6 +16,7 @@ import MediaListView from './MediaListView';
 import { mockPhotos, mockVideos, EQUIPMENT_CATEGORIES } from '../../mockData/surveyMockData';
 import { PHOTO_SECTIONS, SECTION_CATEGORIES, formatSectionLabel, getSectionsByCategory } from '../../constants/photoSections';
 import { downloadMultipleFiles } from '../../utils/fileDownload';
+import { getFullUrl, getPreviewUrl, getThumbUrl } from '../../utils/photoUtils';
 import styles from '../../styles/MediaGallery.module.css';
 
 // Toggle for development - set to false to use real backend data
@@ -344,7 +345,7 @@ const MediaGallery = ({
     const selectedFiles = media.filter(m => selectedIds.has(m.id));
 
     await downloadMultipleFiles(selectedFiles, {
-      getUrl: (file) => file.url || file.preview_url || file.thumbnail_url || file.photo_url || file.s3_url,
+      getUrl: (file) => getFullUrl(file), // Use full resolution for downloads
       getName: (file) => file.fileName || file.filename || file.name || file.original_filename || `${mediaType}_${file.id}`,
       componentName: 'MediaGallery',
       delayMs: 300,
@@ -1010,7 +1011,7 @@ const MediaLightbox = ({
                   <motion.img
                     ref={imageRef}
                     key={currentItem.id}
-                    src={currentItem.preview_url || currentItem.url}
+                    src={getPreviewUrl(currentItem)} // Use optimized preview for lightbox (~300KB vs 4MB)
                     alt={currentItem.name}
                     className={styles.lightboxImage}
                     style={{
@@ -1201,7 +1202,7 @@ const MediaLightbox = ({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
-              <img src={item.thumbUrl || item.thumbnail_url || item.url} alt="" />
+              <img src={getThumbUrl(item)} alt="" /> {/* Optimized thumbnail for navigation strip */}
             </motion.button>
           ))}
         </div>

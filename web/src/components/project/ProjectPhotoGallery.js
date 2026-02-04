@@ -6,6 +6,7 @@ import axios from '../../config/axios';
 import logger from '../services/devLogger';
 import PhotoModal from '../ui/PhotoModal';
 import { processFileForUpload } from '../../utils/imageProcessor';
+import { getThumbUrl } from '../../utils/photoUtils';
 
 const ProjectPhotoGallery = ({ projectUuid }) => {
   const [photos, setPhotos] = useState([]);
@@ -186,7 +187,7 @@ const ProjectPhotoGallery = ({ projectUuid }) => {
               onClick={() => handlePhotoClick(photo)}
             >
               <img
-                src={photo.thumbnail_url || photo.url}
+                src={getThumbUrl(photo)} // Use optimized thumbnail (~40KB vs 4MB)
                 alt={photo.name || `Photo ${index + 1}`}
                 className={styles.photoImage}
               />

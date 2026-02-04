@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Modal from './Modal';
 import Button from './Button';
+import { getPreviewUrl, getFullUrl } from '../../utils/photoUtils';
 import styles from './PhotoModal.module.css';
 
 /**
@@ -169,7 +170,7 @@ const PhotoModal = ({ photo, onClose }) => {
         >
           <img
             ref={imageRef}
-            src={photo?.url}
+            src={getPreviewUrl(photo)} // Use optimized preview (~300KB vs 4MB full resolution)
             alt={photo?.name || 'Photo'}
             className={styles.image}
             style={{

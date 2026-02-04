@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './VideoPlaceholder.module.css';
 import { formatDuration } from '../../mockData/surveyMockData';
+import { getVideoThumbUrl } from '../../utils/photoUtils';
 
 /**
  * VideoPlaceholder - Visual placeholder for video thumbnails
@@ -55,8 +56,8 @@ const VideoPlaceholder = ({
   };
 
   // Check if video has actual thumbnail URL from backend
-  const hasRealThumbnail = video.url || video.thumbnail_url || video.thumbUrl;
-  const thumbnailUrl = video.thumbnail_url || video.thumbUrl || video.url;
+  const thumbnailUrl = getVideoThumbUrl(video);
+  const hasRealThumbnail = !!thumbnailUrl;
 
   return (
     <div

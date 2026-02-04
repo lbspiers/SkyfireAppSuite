@@ -9,6 +9,7 @@ import logger from '../../services/devLogger';
 import { PillButton, SectionHeader } from '../ui';
 import useMediaSocket from '../../hooks/useMediaSocket';
 import { toast } from 'react-toastify';
+import { getThumbUrl } from '../../utils/photoUtils';
 import styles from '../../styles/DocumentationPanel.module.css';
 
 // Helper function to get friendly label for section type
@@ -337,7 +338,7 @@ const DocumentationPanel = ({
                           onClick={() => onPhotoClick(sectionPhotos, index)}
                         >
                           <img
-                            src={photo.thumbnail_url || photo.preview_url || photo.photo_url || photo.url}
+                            src={getThumbUrl(photo)} // Use optimized thumbnail (~40KB vs 4MB)
                             alt={photo.notes || `Photo ${photo.id}`}
                             className={styles.thumbnail}
                           />

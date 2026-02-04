@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import logger from '../../services/devLogger';
 import surveyService from '../../services/surveyService';
+import { getPreviewUrl, getThumbUrl } from '../../utils/photoUtils';
 import styles from '../../styles/PhotoPanelViewer.module.css';
 
 /**
@@ -250,8 +251,8 @@ const PhotoPanelViewer = ({
     return <div className={styles.emptyState}>No photo selected</div>;
   }
 
-  // Use preview_url for viewing (optimized for display), fall back to full resolution
-  const photoUrl = currentItem.preview_url || currentItem.previewUrl || currentItem.url;
+  // Use optimized preview for viewing (~300KB vs 4MB full resolution)
+  const photoUrl = getPreviewUrl(currentItem);
 
   return (
     <div className={styles.viewerContainer}>
@@ -356,8 +357,8 @@ const PhotoPanelViewer = ({
             onMouseLeave={handleCarouselMouseUp}
           >
             {media.map((item, index) => {
-              // Use thumb_url for carousel thumbnails (smallest, fastest)
-              const thumbnailUrl = item.thumb_url || item.thumbUrl || item.thumbnail_url || item.url;
+              // Use optimized thumbnail for carousel (~40KB vs 4MB)
+              const thumbnailUrl = getThumbUrl(item);
               const isActive = index === currentIndex;
 
               // Calculate size tier based on hover (if hovering) or selection (if not)
