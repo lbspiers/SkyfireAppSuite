@@ -198,7 +198,7 @@ const DocumentationPanel = ({
       // Update on server
       await Promise.all(
         photoIds.map(photoId =>
-          surveyService.photos.update(projectUuid, photoId, { section: newSection })
+          surveyService.photos.updateMetadata(projectUuid, photoId, { section: newSection })
         )
       );
 
