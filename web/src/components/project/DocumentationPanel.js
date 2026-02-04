@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import surveyService from '../../services/surveyService';
 import logger from '../../services/devLogger';
-import { PillButton, SectionHeader, Button, Dropdown, ConfirmDialog } from '../ui';
+import { PillButton, SectionHeader, ConfirmDialog, TableRowButton } from '../ui';
 import useMediaSocket from '../../hooks/useMediaSocket';
 import { toast } from 'react-toastify';
 import { getThumbUrl } from '../../utils/photoUtils';
@@ -416,30 +416,24 @@ const DocumentationPanel = ({
           </div>
 
           <div className={styles.bulkActionsRight}>
-            <Button
-              variant="secondary"
-              size="small"
+            <TableRowButton
+              variant="outline"
+              label="Unselect All"
               onClick={() => setSelectedPhotoIds(new Set())}
-            >
-              Unselect All
-            </Button>
+            />
 
-            <Button
-              variant="secondary"
-              size="small"
+            <TableRowButton
+              variant="outline"
+              label={`Download (${selectedPhotoIds.size})`}
               onClick={handleBulkDownload}
-            >
-              <DownloadIcon /> Download ({selectedPhotoIds.size})
-            </Button>
+            />
 
             <div className={styles.dropdownWrapper}>
-              <Button
-                variant="secondary"
-                size="small"
+              <TableRowButton
+                variant="outline"
+                label="Change Category"
                 onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-              >
-                <FolderIcon /> Change Category
-              </Button>
+              />
               {showCategoryDropdown && (
                 <div className={styles.categoryDropdown}>
                   {PHOTO_SECTIONS.map((section) => (
@@ -455,13 +449,11 @@ const DocumentationPanel = ({
               )}
             </div>
 
-            <Button
-              variant="danger"
-              size="small"
+            <TableRowButton
+              variant="primary"
+              label={`Delete (${selectedPhotoIds.size})`}
               onClick={() => setShowDeleteConfirm(true)}
-            >
-              <TrashIcon /> Delete ({selectedPhotoIds.size})
-            </Button>
+            />
           </div>
         </div>
       )}
@@ -637,25 +629,6 @@ const EditIcon = () => (
 const DeleteIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M3 4h10M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M13 4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4h10z" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const TrashIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 4h10M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M13 4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4h10z" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M6 7v5M10 7v5" strokeLinecap="round" />
-  </svg>
-);
-
-const DownloadIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3M8 2v9m0 0L5 8m3 3l3-3" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const FolderIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M2 5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3l2 2h6a1 1 0 0 1 1 1" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
