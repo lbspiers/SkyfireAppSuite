@@ -450,7 +450,7 @@ const DocumentationPanel = ({
             </div>
 
             <TableRowButton
-              variant="primary"
+              variant="danger"
               label={`Delete (${selectedPhotoIds.size})`}
               onClick={() => setShowDeleteConfirm(true)}
             />

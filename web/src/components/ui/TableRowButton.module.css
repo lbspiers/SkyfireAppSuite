@@ -78,3 +78,22 @@
   border-color: transparent;
   color: var(--text-primary);
 }
+
+/* Variant: Danger (red outline) */
+.variant-danger {
+  background: transparent;
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+}
+
+.variant-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.8);
+  transform: translateY(-1px);
+}
+
+.variant-danger.active {
+  background: linear-gradient(180deg, #ef4444, #dc2626);
+  border: none;
+  color: #ffffff;
+}
