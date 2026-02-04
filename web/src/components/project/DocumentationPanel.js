@@ -375,13 +375,13 @@ const DocumentationPanel = ({
               </Button>
               {showCategoryDropdown && (
                 <div className={styles.categoryDropdown}>
-                  {Object.entries(PHOTO_SECTIONS).map(([key, label]) => (
+                  {PHOTO_SECTIONS.map((section) => (
                     <button
-                      key={key}
+                      key={section.value}
                       className={styles.categoryOption}
-                      onClick={() => handleBulkCategoryChange(key)}
+                      onClick={() => handleBulkCategoryChange(section.value)}
                     >
-                      {label}
+                      {section.label}
                     </button>
                   ))}
                 </div>
