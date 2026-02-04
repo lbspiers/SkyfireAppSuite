@@ -356,10 +356,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  margin: 12px 16px;
-  background: transparent;
-  border: 2px solid #f97316;
-  border-radius: 8px;
+  margin: 0;
+  background-color: #0A1627;
+  border-bottom: 2px solid #f97316;
+  border-radius: 0;
   position: sticky;
   top: 117px; /* Position below toolbar (57px) + filter tabs (60px) */
   z-index: 8;
