@@ -1,23 +1,40 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MAIN_CIRCUIT_BREAKER_RATINGS } from '../../../utils/constants';
-import { Alert, TableDropdown, FormFieldRow, TableRowButton } from '../../ui';
+import { TableDropdown, TableRowButton } from '../../ui';
 import formStyles from '../../../styles/FormSections.module.css';
+import componentStyles from './GatewayConfigurationSection.module.css';
 
 /**
  * Gateway Configuration Section
  * Tesla Gateway (Backup Gateway 2 or Gateway 3) specific configuration
+ *
+ * Each breaker field supports Auto/Custom mode:
+ * - Auto: System calculates optimal breaker rating (shows tooltip)
+ * - Custom: User manually selects breaker rating from dropdown
  */
 const GatewayConfigurationSection = ({ formData, onChange }) => {
-  const [editPVBreaker, setEditPVBreaker] = useState(false);
-  const [editESSBreaker, setEditESSBreaker] = useState(false);
-  const [editTieInBreaker, setEditTieInBreaker] = useState(false);
-  const gatewayIsNew = formData.gatewayConfigIsNew !== undefined ? formData.gatewayConfigIsNew : true;
+  // Main Breaker
+  const mainBreakerMode = formData.gatewayConfigMainBreakerMode || 'auto';
   const mainBreaker = formData.gatewayConfigMainBreaker || '';
-  const backupPanel = formData.gatewayConfigBackupPanel || '';
-  const activatePCS = formData.gatewayConfigActivatePCS || false;
+
+  // Backup Sub Panel
+  const backupSubPanelMode = formData.gatewayConfigBackupSubPanelMode || 'auto';
+  const backupSubPanel = formData.gatewayConfigBackupSubPanel || '';
+
+  // PV Breaker Rating
+  const pvBreakerMode = formData.gatewayConfigPVBreakerMode || 'auto';
   const pvBreaker = formData.gatewayConfigPVBreaker || '';
+
+  // ESS Breaker Rating
+  const essBreakerMode = formData.gatewayConfigESSBreakerMode || 'auto';
   const essBreaker = formData.gatewayConfigESSBreaker || '';
+
+  // Tie-in Breaker
+  const tieInBreakerMode = formData.gatewayConfigTieInBreakerMode || 'auto';
   const tieInBreaker = formData.gatewayConfigTieInBreaker || '';
+
+  // Activate PCS Toggle
+  const activatePCS = formData.gatewayConfigActivatePCS || false;
 
   // Tie-in breaker options (15-250 amps in increments of 5)
   const tieInBreakerOptions = Array.from({ length: 48 }, (_, i) => {
@@ -25,118 +42,149 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
     return { label: `${value} Amps`, value: value.toString() };
   });
 
+  /**
+   * Renders a breaker field with Auto/Custom toggle and tooltip
+   */
+  const renderBreakerField = (config) => {
+    const {
+      label,
+      modeField,
+      valueField,
+      mode,
+      value,
+      options,
+      placeholder,
+      tooltipText
+    } = config;
+
+    const handleModeChange = (newMode) => {
+      onChange(modeField, newMode);
+      // Clear value when switching to auto
+      if (newMode === 'auto') {
+        onChange(valueField, '');
+      }
+    };
+
+    return (
+      <div className={componentStyles.breakerFieldContainer}>
+        {/* Label with Auto/Custom Toggle and Tooltip */}
+        <div className={componentStyles.breakerHeader}>
+          <span className={formStyles.label}>{label}</span>
+          <div className={componentStyles.toggleWrapper}>
+            <div className={formStyles.toggleGroup}>
+              <TableRowButton
+                label="Auto"
+                variant="secondary"
+                active={mode === 'auto'}
+                onClick={() => handleModeChange('auto')}
+              />
+              <TableRowButton
+                label="Custom"
+                variant="secondary"
+                active={mode === 'custom'}
+                onClick={() => handleModeChange('custom')}
+              />
+            </div>
+            {/* Tooltip icon */}
+            <div className={componentStyles.tooltipIconWrapper}>
+              <img
+                src={require('../../../assets/images/Skyfire Flame Icon.png')}
+                alt=""
+                className={componentStyles.tooltipIcon}
+                title={tooltipText}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Dropdown (only shown in Custom mode) */}
+        {mode === 'custom' && (
+          <div className={componentStyles.breakerContent}>
+            <TableDropdown
+              label=""
+              value={value}
+              onChange={(val) => onChange(valueField, val)}
+              options={options}
+              placeholder={placeholder}
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={formStyles.sectionColumn}>
       {/* Main Breaker */}
-      <TableDropdown
-        label="Main Breaker*"
-        value={mainBreaker}
-        onChange={(value) => onChange('gatewayConfigMainBreaker', value)}
-        options={MAIN_CIRCUIT_BREAKER_RATINGS}
-        placeholder="Select breaker..."
-      />
+      {renderBreakerField({
+        label: 'Main Breaker*',
+        modeField: 'gatewayConfigMainBreakerMode',
+        valueField: 'gatewayConfigMainBreaker',
+        mode: mainBreakerMode,
+        value: mainBreaker,
+        options: MAIN_CIRCUIT_BREAKER_RATINGS,
+        placeholder: 'Select breaker...',
+        tooltipText: 'Main Breaker will be automatically calculated based on the total Gateway max continuous output current.'
+      })}
 
-      {/* Backup Panel */}
-      <TableDropdown
-        label="Backup Panel*"
-        value={backupPanel}
-        onChange={(value) => onChange('gatewayConfigBackupPanel', value)}
-        options={MAIN_CIRCUIT_BREAKER_RATINGS}
-        placeholder="Select breaker..."
-      />
+      {/* Backup Sub Panel */}
+      {renderBreakerField({
+        label: 'Backup Sub Panel*',
+        modeField: 'gatewayConfigBackupSubPanelMode',
+        valueField: 'gatewayConfigBackupSubPanel',
+        mode: backupSubPanelMode,
+        value: backupSubPanel,
+        options: MAIN_CIRCUIT_BREAKER_RATINGS,
+        placeholder: 'Select breaker...',
+        tooltipText: 'Backup Sub Panel breaker will be automatically calculated based on the backup loads requirements.'
+      })}
 
       {/* Activate PCS Toggle */}
-      <FormFieldRow label="Activate PCS (Power Control System)">
+      <div className={componentStyles.activatePCSRow}>
+        <span className={formStyles.label}>Activate PCS (Power Control System)</span>
         <TableRowButton
           label={activatePCS ? 'PCS Activated' : 'Activate PCS'}
           variant="outline"
           active={activatePCS}
           onClick={() => onChange('gatewayConfigActivatePCS', !activatePCS)}
         />
-      </FormFieldRow>
+      </div>
 
-      {/* PV Breaker Rating Override */}
-      <FormFieldRow
-        label="PV Breaker Rating (Override)"
-        showEditToggle={true}
-        isEditing={editPVBreaker}
-        onEditToggle={(editing) => {
-          if (!editing) {
-            onChange('gatewayConfigPVBreaker', '');
-          }
-          setEditPVBreaker(editing);
-        }}
-      >
-        {!editPVBreaker ? (
-          <Alert variant="info">
-            A PV Breaker will be added in the Gateway PV input and will be rated to protect the total PV max continuous output current.
-          </Alert>
-        ) : (
-          <TableDropdown
-            label=""
-            value={pvBreaker}
-            onChange={(value) => onChange('gatewayConfigPVBreaker', value)}
-            options={MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO')}
-            placeholder="Select breaker..."
-          />
-        )}
-      </FormFieldRow>
+      {/* PV Breaker Rating */}
+      {renderBreakerField({
+        label: 'PV Breaker Rating',
+        modeField: 'gatewayConfigPVBreakerMode',
+        valueField: 'gatewayConfigPVBreaker',
+        mode: pvBreakerMode,
+        value: pvBreaker,
+        options: MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO'),
+        placeholder: 'Select breaker...',
+        tooltipText: 'A PV Breaker will be added in the Gateway PV input and will be rated to protect the total PV max continuous output current.'
+      })}
 
-      {/* ESS Breaker Rating Override */}
-      <FormFieldRow
-        label="ESS Breaker Rating (Override)"
-        showEditToggle={true}
-        isEditing={editESSBreaker}
-        onEditToggle={(editing) => {
-          if (!editing) {
-            onChange('gatewayConfigESSBreaker', '');
-          }
-          setEditESSBreaker(editing);
-        }}
-      >
-        {!editESSBreaker ? (
-          <Alert variant="info">
-            An ESS Breaker will be added in the Gateway battery input and will be rated to protect the total Battery max continuous output current.
-          </Alert>
-        ) : (
-          <TableDropdown
-            label=""
-            value={essBreaker}
-            onChange={(value) => onChange('gatewayConfigESSBreaker', value)}
-            options={MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO')}
-            placeholder="Select breaker..."
-          />
-        )}
-      </FormFieldRow>
+      {/* ESS Breaker Rating */}
+      {renderBreakerField({
+        label: 'ESS Breaker Rating',
+        modeField: 'gatewayConfigESSBreakerMode',
+        valueField: 'gatewayConfigESSBreaker',
+        mode: essBreakerMode,
+        value: essBreaker,
+        options: MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO'),
+        placeholder: 'Select breaker...',
+        tooltipText: 'An ESS Breaker will be added in the Gateway battery input and will be rated to protect the total Battery max continuous output current.'
+      })}
 
-      {/* Tie-in Breaker Rating Override */}
-      <FormFieldRow
-        label="Tie-in Breaker Rating (Override)"
-        showEditToggle={true}
-        isEditing={editTieInBreaker}
-        onEditToggle={(editing) => {
-          if (!editing) {
-            onChange('gatewayConfigTieInBreaker', '');
-          }
-          setEditTieInBreaker(editing);
-        }}
-      >
-        {!editTieInBreaker ? (
-          <Alert variant="info">
-            A Tie-in Breaker will be added in the Main Panel (A) and will be rated to protect the total Gateway max continuous output current landed in this Gateway.
-            <br /><br />
-            You can change the Tie-in Location in the Electrical Section.
-          </Alert>
-        ) : (
-          <TableDropdown
-            label=""
-            value={tieInBreaker}
-            onChange={(value) => onChange('gatewayConfigTieInBreaker', value)}
-            options={tieInBreakerOptions}
-            placeholder="Select breaker..."
-          />
-        )}
-      </FormFieldRow>
+      {/* Tie-in Breaker Rating */}
+      {renderBreakerField({
+        label: 'Tie-in Breaker',
+        modeField: 'gatewayConfigTieInBreakerMode',
+        valueField: 'gatewayConfigTieInBreaker',
+        mode: tieInBreakerMode,
+        value: tieInBreaker,
+        options: tieInBreakerOptions,
+        placeholder: 'Select breaker...',
+        tooltipText: 'A Tie-in Breaker will be added in the Main Panel (A) and will be rated to protect the total Gateway max continuous output current landed in this Gateway. You can change the Tie-in Location in the Electrical Section.'
+      })}
     </div>
   );
 };
