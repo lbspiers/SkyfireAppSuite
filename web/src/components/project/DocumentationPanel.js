@@ -498,13 +498,21 @@ const DocumentationPanel = ({
                             <div
                               className={styles.checkbox}
                               onClick={(e) => handlePhotoSelect(photo.id, e)}
+                              role="checkbox"
+                              aria-checked={isSelected}
+                              aria-label={`Select photo ${photo.id}`}
                             >
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={() => {}}
-                                aria-label={`Select photo ${photo.id}`}
-                              />
+                              {isSelected && (
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                  <path
+                                    d="M11.5 3.5L5.5 9.5L2.5 6.5"
+                                    stroke="#f97316"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              )}
                             </div>
 
                             <img
