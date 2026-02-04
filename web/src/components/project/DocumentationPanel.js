@@ -340,65 +340,6 @@ const DocumentationPanel = ({
 
   return (
     <div className={styles.container}>
-      {/* Bulk Actions Toolbar */}
-      {selectedPhotoIds.size > 0 && (
-        <div className={styles.bulkActionsBar}>
-          <div className={styles.bulkActionsLeft}>
-            <button
-              className={styles.deselectButton}
-              onClick={() => setSelectedPhotoIds(new Set())}
-              title="Deselect all"
-            >
-              <CloseIcon />
-            </button>
-            <span className={styles.selectionCount}>
-              {selectedPhotoIds.size} selected
-            </span>
-          </div>
-
-          <div className={styles.bulkActionsRight}>
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={handleBulkDownload}
-            >
-              <DownloadIcon /> Download ({selectedPhotoIds.size})
-            </Button>
-
-            <div className={styles.dropdownWrapper}>
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-              >
-                <FolderIcon /> Change Category
-              </Button>
-              {showCategoryDropdown && (
-                <div className={styles.categoryDropdown}>
-                  {PHOTO_SECTIONS.map((section) => (
-                    <button
-                      key={section.value}
-                      className={styles.categoryOption}
-                      onClick={() => handleBulkCategoryChange(section.value)}
-                    >
-                      {section.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <Button
-              variant="danger"
-              size="small"
-              onClick={() => setShowDeleteConfirm(true)}
-            >
-              <TrashIcon /> Delete ({selectedPhotoIds.size})
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
@@ -457,6 +398,65 @@ const DocumentationPanel = ({
           </PillButton>
         ))}
       </div>
+
+      {/* Bulk Actions Toolbar */}
+      {selectedPhotoIds.size > 0 && (
+        <div className={styles.bulkActionsBar}>
+          <div className={styles.bulkActionsLeft}>
+            <button
+              className={styles.deselectButton}
+              onClick={() => setSelectedPhotoIds(new Set())}
+              title="Deselect all"
+            >
+              <CloseIcon />
+            </button>
+            <span className={styles.selectionCount}>
+              {selectedPhotoIds.size} selected
+            </span>
+          </div>
+
+          <div className={styles.bulkActionsRight}>
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={handleBulkDownload}
+            >
+              <DownloadIcon /> Download ({selectedPhotoIds.size})
+            </Button>
+
+            <div className={styles.dropdownWrapper}>
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              >
+                <FolderIcon /> Change Category
+              </Button>
+              {showCategoryDropdown && (
+                <div className={styles.categoryDropdown}>
+                  {PHOTO_SECTIONS.map((section) => (
+                    <button
+                      key={section.value}
+                      className={styles.categoryOption}
+                      onClick={() => handleBulkCategoryChange(section.value)}
+                    >
+                      {section.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Button
+              variant="danger"
+              size="small"
+              onClick={() => setShowDeleteConfirm(true)}
+            >
+              <TrashIcon /> Delete ({selectedPhotoIds.size})
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       {totalItems === 0 ? (
