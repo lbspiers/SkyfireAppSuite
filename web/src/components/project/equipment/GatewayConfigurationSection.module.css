@@ -51,12 +51,29 @@
   margin-top: var(--spacing-tight);
 }
 
-/* ===== ACTIVATE PCS ROW ===== */
-.activatePCSRow {
+/* ===== ACTIVATE PCS BUTTON CONTAINER ===== */
+.activatePCSButtonContainer {
+  margin-top: var(--spacing);
+  padding-top: var(--spacing);
+  border-top: 2px solid var(--border-default);
+}
+
+/* ===== PCS ACTIVE CONTAINER ===== */
+.pcsActiveContainer {
+  margin-top: var(--spacing);
+  padding-top: var(--spacing);
+  border-top: 2px solid var(--border-default);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-tight) 0;
-  margin-bottom: var(--spacing);
-  border-bottom: 1px solid var(--border-subtle);
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+/* ===== PCS NOTE ===== */
+.pcsNote {
+  padding: var(--spacing-tight);
+  background: var(--gradient-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
 }

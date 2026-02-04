@@ -344,11 +344,17 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     // Gateway Configuration fields (for Backup Gateway 2 or Gateway 3)
     // Note: Gateway Config saves to SMS fields (they're shared in Tesla systems)
     gatewayConfigIsNew: true,
+    gatewayConfigMainBreakerMode: 'auto',
     gatewayConfigMainBreaker: '',
+    gatewayConfigBackupSubPanelMode: 'auto',
     gatewayConfigBackupPanel: '',
     gatewayConfigActivatePCS: false,
+    gatewayConfigPCSAmps: '',
+    gatewayConfigPVBreakerMode: 'auto',
     gatewayConfigPVBreaker: '',
+    gatewayConfigESSBreakerMode: 'auto',
     gatewayConfigESSBreaker: '',
+    gatewayConfigTieInBreakerMode: 'auto',
     gatewayConfigTieInBreaker: '',
 
     // Electrical Section fields
@@ -573,11 +579,17 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
         // Gateway Configuration defaults
         gatewayConfigIsNew: true,
+        gatewayConfigMainBreakerMode: 'auto',
         gatewayConfigMainBreaker: '',
+        gatewayConfigBackupSubPanelMode: 'auto',
         gatewayConfigBackupPanel: '',
         gatewayConfigActivatePCS: false,
+        gatewayConfigPCSAmps: '',
+        gatewayConfigPVBreakerMode: 'auto',
         gatewayConfigPVBreaker: '',
+        gatewayConfigESSBreakerMode: 'auto',
         gatewayConfigESSBreaker: '',
+        gatewayConfigTieInBreakerMode: 'auto',
         gatewayConfigTieInBreaker: '',
 
         // ESS Combiner defaults
@@ -802,6 +814,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       gatewayConfigMainBreaker: systemDetails[`${prefix}_sms_breaker_rating`] || '',
       gatewayConfigBackupPanel: systemDetails[`${prefix}_sms_backup_load_sub_panel_breaker_rating`] || '',
       gatewayConfigActivatePCS: !!systemDetails[`${prefix}_pcs_settings`],
+      gatewayConfigPCSAmps: systemDetails[`${prefix}_pcs_amps`] || '',
       gatewayConfigPVBreaker: systemDetails[`${prefix}_sms_pv_breaker_rating_override`] || '',
       gatewayConfigESSBreaker: systemDetails[`${prefix}_sms_ess_breaker_rating_override`] || '',
       gatewayConfigTieInBreaker: systemDetails[`${prefix}_sms_tie_in_breaker_rating_override`] || '',
@@ -1022,6 +1035,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       gatewayConfigMainBreaker: 'sys1_sms_breaker_rating',
       gatewayConfigBackupPanel: 'sys1_sms_backup_load_sub_panel_breaker_rating',
       gatewayConfigActivatePCS: 'sys1_pcs_settings',
+      gatewayConfigPCSAmps: 'sys1_pcs_amps',
       gatewayConfigPVBreaker: 'sys1_sms_pv_breaker_rating_override',
       gatewayConfigESSBreaker: 'sys1_sms_ess_breaker_rating_override',
       gatewayConfigTieInBreaker: 'sys1_sms_tie_in_breaker_rating_override',
@@ -2057,6 +2071,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       gatewayConfigMainBreaker: `${sysPrefix}_sms_breaker_rating`,
       gatewayConfigBackupPanel: `${sysPrefix}_sms_backup_load_sub_panel_breaker_rating`,
       gatewayConfigActivatePCS: `${sysPrefix}_pcs_settings`,
+      gatewayConfigPCSAmps: `${sysPrefix}_pcs_amps`,
       gatewayConfigPVBreaker: `${sysPrefix}_sms_pv_breaker_rating_override`,
       gatewayConfigESSBreaker: `${sysPrefix}_sms_ess_breaker_rating_override`,
       gatewayConfigTieInBreaker: `${sysPrefix}_sms_tie_in_breaker_rating_override`,

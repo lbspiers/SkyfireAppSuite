@@ -1,6 +1,6 @@
 import React from 'react';
-import { MAIN_CIRCUIT_BREAKER_RATINGS } from '../../../utils/constants';
-import { TableDropdown, TableRowButton } from '../../ui';
+import { MAIN_CIRCUIT_BREAKER_RATINGS, PCS_AMPS_OPTIONS } from '../../../utils/constants';
+import { TableDropdown, TableRowButton, Alert } from '../../ui';
 import formStyles from '../../../styles/FormSections.module.css';
 import componentStyles from './GatewayConfigurationSection.module.css';
 
@@ -33,8 +33,9 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
   const tieInBreakerMode = formData.gatewayConfigTieInBreakerMode || 'auto';
   const tieInBreaker = formData.gatewayConfigTieInBreaker || '';
 
-  // Activate PCS Toggle
+  // Activate PCS
   const activatePCS = formData.gatewayConfigActivatePCS || false;
+  const pcsAmps = formData.gatewayConfigPCSAmps || '';
 
   // Tie-in breaker options (15-250 amps in increments of 5)
   const tieInBreakerOptions = Array.from({ length: 48 }, (_, i) => {
@@ -139,17 +140,6 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         tooltipText: 'Backup Sub Panel breaker will be automatically calculated based on the backup loads requirements.'
       })}
 
-      {/* Activate PCS Toggle */}
-      <div className={componentStyles.activatePCSRow}>
-        <span className={formStyles.label}>Activate PCS (Power Control System)</span>
-        <TableRowButton
-          label={activatePCS ? 'PCS Activated' : 'Activate PCS'}
-          variant="outline"
-          active={activatePCS}
-          onClick={() => onChange('gatewayConfigActivatePCS', !activatePCS)}
-        />
-      </div>
-
       {/* PV Breaker Rating */}
       {renderBreakerField({
         label: 'PV Breaker Rating',
@@ -185,6 +175,53 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         placeholder: 'Select breaker...',
         tooltipText: 'A Tie-in Breaker will be added in the Main Panel (A) and will be rated to protect the total Gateway max continuous output current landed in this Gateway. You can change the Tie-in Location in the Electrical Section.'
       })}
+
+      {/* Activate PCS Button - at bottom of section */}
+      {!activatePCS && (
+        <div className={componentStyles.activatePCSButtonContainer}>
+          <TableRowButton
+            label="Activate PCS"
+            variant="outline"
+            onClick={() => onChange('gatewayConfigActivatePCS', true)}
+            style={{ width: '100%' }}
+          />
+        </div>
+      )}
+
+      {/* PCS Active State - shown when activated */}
+      {activatePCS && (
+        <div className={componentStyles.pcsActiveContainer}>
+          {/* PCS Activation Alert */}
+          <Alert variant="info" collapsible={false}>
+            <strong>Power Control System Active:</strong> Manual activation enabled.
+          </Alert>
+
+          {/* PCS Setting (Amps) Dropdown */}
+          <TableDropdown
+            label="PCS Setting (Amps)"
+            value={pcsAmps}
+            onChange={(value) => onChange('gatewayConfigPCSAmps', value)}
+            options={PCS_AMPS_OPTIONS}
+            placeholder="Select amps..."
+          />
+
+          {/* PCS Note */}
+          <div className={componentStyles.pcsNote}>
+            PCS Settings only throttle the current (amps), if you want to change the SMS breaker rating, see SMS Section.
+          </div>
+
+          {/* Deactivate PCS Button */}
+          <TableRowButton
+            label="Deactivate PCS"
+            variant="outline"
+            onClick={() => {
+              onChange('gatewayConfigActivatePCS', false);
+              onChange('gatewayConfigPCSAmps', '');
+            }}
+            style={{ width: '100%' }}
+          />
+        </div>
+      )}
     </div>
   );
 };
