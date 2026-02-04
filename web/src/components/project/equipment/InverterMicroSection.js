@@ -91,7 +91,7 @@ const InverterMicroSection = ({
   // Gateway Configuration visibility
   const showGatewayConfig = useMemo(() => {
     const gateway = formData.gateway || '';
-    return isPowerWall && (gateway === 'backup_gateway_2' || gateway === 'gateway_3');
+    return isPowerWall && (gateway === 'Backup Gateway 2' || gateway === 'Gateway 3');
   }, [isPowerWall, formData.gateway]);
 
   // Load manufacturers on mount
@@ -280,14 +280,13 @@ const InverterMicroSection = ({
 
   // Wrapper to save toggle defaults when any field changes
   const handleFieldChange = (fieldName, value) => {
-    if (onBatchChange && formData.inverter_isnew === undefined) {
-      onBatchChange([[fieldName, value], ['inverter_isnew', true]], systemNumber);
-    } else {
-      onChange(fieldName, value);
-      // Also save New/Existing toggle default if not already set
-      if (formData.inverter_isnew === undefined) {
-        onChange('inverter_isnew', true);
-      }
+    onChange(fieldName, value);
+
+    // Also save New/Existing toggle default if make or model is selected
+    // This ensures the value is saved even if user never interacts with the toggle
+    if ((fieldName === 'inverter_make' || fieldName === 'inverter_model') && value) {
+      const currentIsNew = formData.inverter_isnew !== false; // Default to true (New)
+      onChange('inverter_isnew', currentIsNew);
     }
   };
 
@@ -310,16 +309,14 @@ const InverterMicroSection = ({
     lastProcessedModelRef.current = null;
 
     if (onBatchChange) {
+      const currentIsNew = formData.inverter_isnew !== false; // Default to true (New)
       const updates = [
         ['inverter_make', value],
         ['inverter_model', ''],
         ['inverter_type', ''],
         ['inverter_max_cont_output_amps', ''],
+        ['inverter_isnew', currentIsNew], // Always include current toggle state
       ];
-      // Also save New/Existing toggle default if not already set
-      if (formData.inverter_isnew === undefined) {
-        updates.push(['inverter_isnew', true]);
-      }
       onBatchChange(updates, systemNumber);
     } else {
       handleFieldChange('inverter_make', value);
@@ -858,7 +855,20 @@ const InverterMicroSection = ({
             title="Optimizer"
             subtitle={
               formData.optimizer_make && formData.optimizer_model
-                ? `${formData.optimizer_make} ${formData.optimizer_model} | ${formData.optimizer_isnew !== false ? 'New' : 'Existing'}`
+                ? (() => {
+                    const parts = [];
+                    // Quantity with N/E indicator - For optimizers, typically 1:1 with solar panels
+                    const solarPanelQty = parseInt(formData.solar_panel_quantity) || 0;
+                    const solarPanelQty2 = parseInt(formData.solar_panel_type2_quantity) || 0;
+                    const quantity = solarPanelQty + solarPanelQty2;
+                    if (quantity > 0) {
+                      const statusLetter = formData.optimizer_isnew !== false ? 'N' : 'E';
+                      parts.push(`${quantity} (${statusLetter})`);
+                    }
+                    // Make and Model
+                    parts.push(`${formData.optimizer_make} ${formData.optimizer_model}`);
+                    return parts.join(' ');
+                  })()
                 : ''
             }
             showNewExistingToggle={true}
@@ -922,17 +932,19 @@ const InverterMicroSection = ({
 
       {/* Gateway Configuration - For Tesla PowerWall Gateway 2 or Gateway 3 */}
       {showGatewayConfig && (
-        <EquipmentRow
-          title={`${formData.gateway === 'gateway_3' ? 'Gateway 3' : 'Backup Gateway 2'} Configuration`}
-          showNewExistingToggle={true}
-          isNew={formData.gatewayConfigIsNew !== false}
-          onNewExistingChange={(isNew) => onChange('gatewayConfigIsNew', isNew)}
-        >
-          <GatewayConfigurationSection
-            formData={formData}
-            onChange={onChange}
-          />
-        </EquipmentRow>
+        <div className={componentStyles.gatewayConfigSection}>
+          <EquipmentRow
+            title={`${formData.gateway === 'Gateway 3' ? 'Gateway 3' : 'Backup Gateway 2'} Configuration`}
+            showNewExistingToggle={true}
+            isNew={formData.gatewayConfigIsNew !== false}
+            onNewExistingChange={(isNew) => onChange('gatewayConfigIsNew', isNew)}
+          >
+            <GatewayConfigurationSection
+              formData={formData}
+              onChange={onChange}
+            />
+          </EquipmentRow>
+        </div>
       )}
 
       {/* Section Clear Modal */}

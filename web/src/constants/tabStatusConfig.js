@@ -44,11 +44,12 @@ export const STATUS_CONFIG = {
 };
 
 // Tab-specific available statuses
+// Note: Backend only accepts: pending, draft, complete, needs_attention, none
 export const TAB_STATUS_OPTIONS = {
-  survey: ['pending', 'in_progress', 'complete'],
-  site_plan: ['pending', 'in_progress', 'complete'],
-  plan_set: ['pending', 'in_progress', 'draft', 'complete'],
-  revisions: ['none', 'pending', 'in_progress', 'needs_attention', 'complete'],
+  survey: ['pending', 'draft', 'complete'],
+  site_plan: ['pending', 'draft', 'complete'],
+  plan_set: ['pending', 'draft', 'complete'],
+  revisions: ['none', 'pending', 'draft', 'needs_attention', 'complete'],
 };
 
 /**

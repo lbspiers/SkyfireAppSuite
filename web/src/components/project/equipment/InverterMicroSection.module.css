@@ -135,3 +135,8 @@
 .optimizerSection {
   margin-top: var(--spacing);
 }
+
+/* ===== GATEWAY CONFIGURATION SECTION ===== */
+.gatewayConfigSection {
+  margin-top: var(--spacing);
+}

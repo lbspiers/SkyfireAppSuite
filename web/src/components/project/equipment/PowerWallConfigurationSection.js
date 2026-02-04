@@ -22,7 +22,7 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
 
   // Conditional visibility
   const showGatewaySelection = backupOption === 'Whole Home' || backupOption === 'Partial Home';
-  const showBackupSwitchLocation = gateway === 'backup_switch';
+  const showBackupSwitchLocation = gateway === 'Backup Switch';
   const showNoBackupNote = backupOption === 'No Backup';
 
   return (

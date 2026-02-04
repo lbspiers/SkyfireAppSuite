@@ -229,11 +229,12 @@ export const useProjectTabStatuses = (
   }, [autoFetch, projectId, refresh]);
 
   // Check for stale statuses on mount
-  useEffect(() => {
-    if (projectId) {
-      checkStale();
-    }
-  }, [projectId, checkStale]);
+  // DISABLED: This was causing statuses to reset to null after loading
+  // useEffect(() => {
+  //   if (projectId) {
+  //     checkStale();
+  //   }
+  // }, [projectId, checkStale]);
 
   // Set up polling if enabled
   useEffect(() => {

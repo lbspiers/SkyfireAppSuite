@@ -285,9 +285,9 @@ export const MOUNT_CATALOG = [
 // Tesla PowerWall Constants
 
 export const TESLA_POWERWALL_GATEWAYS = [
-  { label: "Backup Gateway 2", value: "backup_gateway_2" },
-  { label: "Gateway 3", value: "gateway_3" },
-  { label: "Backup Switch", value: "backup_switch" },
+  { label: "Backup Gateway 2", value: "Backup Gateway 2" },
+  { label: "Gateway 3", value: "Gateway 3" },
+  { label: "Backup Switch", value: "Backup Switch" },
 ];
 
 export const POWERWALL_3_KILOWATT_OPTIONS = [

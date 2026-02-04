@@ -737,7 +737,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // Tesla PowerWall Configuration
       expansionPacks: parseInt(systemDetails[`${prefix}_tesla_extensions`]) || 0,
-      gateway: systemDetails[`${prefix}_gateway`] || '',
+      gateway: systemDetails[`${prefix}_teslagatewaytype`] || '',
       teslagatewaytype: systemDetails[`${prefix}_teslagatewaytype`] || '',
       backupSwitchLocation: systemDetails[`${prefix}_backupswitch_location`] || '',
       batteryExisting: !!systemDetails[`battery${systemNum}_existing`],
@@ -1012,7 +1012,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // Tesla PowerWall fields
       expansionPacks: 'sys1_tesla_extensions',
-      gateway: 'sys1_gateway',
+      gateway: 'sys1_teslagatewaytype',
       teslagatewaytype: 'sys1_teslagatewaytype',
       backupSwitchLocation: 'sys1_backupswitch_location',
       batteryExisting: 'battery1_existing',
@@ -1393,8 +1393,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       return;
     }
 
+    // Skip if gateway hasn't changed
+    if (gateway === prevGateway) {
+      return;
+    }
+
     // Backup Gateway 2 selected - auto-populate SMS
-    if (gateway === 'backup_gateway_2') {
+    if (gateway === 'Backup Gateway 2') {
       const updates = [];
       if (formData.sms_make !== 'Tesla') {
         updates.push(['sms_make', 'Tesla']);
@@ -1411,7 +1416,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     }
 
     // Gateway 3 selected - auto-populate SMS + ESS equipment type
-    if (gateway === 'gateway_3') {
+    if (gateway === 'Gateway 3') {
       const updates = [];
       if (formData.sms_make !== 'Tesla') {
         updates.push(['sms_make', 'Tesla']);
@@ -1432,7 +1437,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     }
 
     // Changed FROM Backup Gateway 2 to something else - clear SMS if auto-set
-    if (prevGateway === 'backup_gateway_2' && gateway !== 'backup_gateway_2') {
+    if (prevGateway === 'Backup Gateway 2' && gateway !== 'Backup Gateway 2') {
       // Only clear if SMS was auto-populated by Backup Gateway 2
       if (formData.sms_make === 'Tesla' && formData.sms_model === 'Backup Gateway 2') {
         handleBatchFieldChange([
@@ -1444,7 +1449,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     }
 
     // Changed FROM Gateway 3 to something else - clear SMS if auto-set
-    if (prevGateway === 'gateway_3' && gateway !== 'gateway_3') {
+    if (prevGateway === 'Gateway 3' && gateway !== 'Gateway 3') {
       // Only clear if SMS was auto-populated by Gateway 3
       if (formData.sms_make === 'Tesla' && formData.sms_model === 'Gateway 3') {
         handleBatchFieldChange([
@@ -2041,7 +2046,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // Tesla PowerWall Configuration
       expansionPacks: `${sysPrefix}_tesla_extensions`,
-      gateway: `${sysPrefix}_gateway`,
+      gateway: `${sysPrefix}_teslagatewaytype`,
       teslagatewaytype: `${sysPrefix}_teslagatewaytype`,
       backupSwitchLocation: `${sysPrefix}_backupswitch_location`,
       batteryExisting: `battery${sysNum}_existing`,
@@ -2082,14 +2087,16 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     // Get database field name from mapping or use field directly for BOS
     const dbFieldName = isBOSField ? field : fieldMapping[field];
 
-    // Debug logging for batteryonly and backup_option field mapping
-    if (field === 'batteryonly' || field === 'backup_option') {
+    // Debug logging for batteryonly, backup_option, and inverter_isnew field mapping
+    if (field === 'batteryonly' || field === 'backup_option' || field === 'inverter_isnew') {
       console.log(`[EquipmentForm handleFieldChange] ${field} field mapping:`, {
         field,
         systemNum,
         systemPrefix,
         'fieldMapping[field]': fieldMapping[field],
         dbFieldName,
+        value,
+        'ends with _isnew': field.endsWith('_isnew'),
         'will save to DB as': { [dbFieldName]: value }
       });
     }
@@ -2126,21 +2133,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       // Save to system-details endpoint via hook
       // The hook automatically handles saving state and deduplication
       await updateField(dbFieldName, dbValue);
-
-      // Special handling for gateway field - save both internal value and display label
-      if (field === 'gateway' && value) {
-        // Map internal value to display label
-        const gatewayLabelMap = {
-          'gateway_3': 'Gateway 3',
-          'backup_gateway_2': 'Backup Gateway 2',
-          'backup_switch': 'Backup Switch'
-        };
-        const displayLabel = gatewayLabelMap[value];
-        if (displayLabel) {
-          const teslaGatewayTypeField = `${systemPrefix}_teslagatewaytype`;
-          await updateField(teslaGatewayTypeField, displayLabel);
-        }
-      }
 
       // Auto-activate system when key equipment is added (isDirty flag pattern)
       // Set sys{N}_selectedsystem field when user selects inverter model

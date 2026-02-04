@@ -78,11 +78,13 @@ export const useSystemDetails = (options: UseSystemDetailsOptions): UseSystemDet
     setError(null);
 
     try {
+      console.log('[useSystemDetails] Fetching system details for project:', projectUuid);
       const result = await fetchSystemDetails(projectUuid, signal);
       // Check if request was aborted
       if (signal?.aborted) {
         return;
       }
+      console.log('[useSystemDetails] Fetch result:', result ? `${Object.keys(result).length} fields` : 'null (404)');
       setData(result);
       // Initialize last saved snapshot
       if (result) {
