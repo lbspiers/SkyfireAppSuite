@@ -419,6 +419,14 @@ const DocumentationPanel = ({
             <Button
               variant="secondary"
               size="small"
+              onClick={() => setSelectedPhotoIds(new Set())}
+            >
+              Unselect All
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="small"
               onClick={handleBulkDownload}
             >
               <DownloadIcon /> Download ({selectedPhotoIds.size})
