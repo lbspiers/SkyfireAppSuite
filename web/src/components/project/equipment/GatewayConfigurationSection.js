@@ -1,8 +1,8 @@
 import React from 'react';
 import { MAIN_CIRCUIT_BREAKER_RATINGS, PCS_AMPS_OPTIONS } from '../../../utils/constants';
-import { TableDropdown, TableRowButton, Alert, FormFieldRow } from '../../ui';
+import { TableDropdown, TableRowButton, Alert, FormFieldRow, Tooltip } from '../../ui';
 import formStyles from '../../../styles/FormSections.module.css';
-import componentStyles from './GatewayConfigurationSection.module.css';
+import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
 
 /**
  * Gateway Configuration Section
@@ -51,7 +51,7 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
 
   /**
    * Renders a breaker field with Auto/Custom toggle and tooltip
-   * Matches the styling of Inverter section rows
+   * Matches the styling of Inverter section Stringing row
    */
   const renderBreakerField = (config) => {
     const {
@@ -77,29 +77,30 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
       <>
         {/* Toggle Row */}
         <FormFieldRow label={label}>
-          <div className={componentStyles.toggleWithTooltip}>
-            <TableRowButton
-              label="Auto"
-              variant="outline"
-              active={mode === 'auto'}
-              onClick={() => handleModeChange('auto')}
-            />
-            <TableRowButton
-              label="Custom"
-              variant="outline"
-              active={mode === 'custom'}
-              onClick={() => handleModeChange('custom')}
-            />
-            <div style={{ display: 'inline-flex', marginLeft: 'var(--spacing-tight)' }}>
-              <div className={componentStyles.tooltipWrapper}>
-                <img
-                  src={require('../../../assets/images/Skyfire Flame Icon.png')}
-                  alt=""
-                  style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }}
-                  title={tooltipText}
-                />
-              </div>
-            </div>
+          <TableRowButton
+            label="Auto"
+            variant="outline"
+            active={mode === 'auto'}
+            onClick={() => handleModeChange('auto')}
+          />
+          <TableRowButton
+            label="Custom"
+            variant="outline"
+            active={mode === 'custom'}
+            onClick={() => handleModeChange('custom')}
+          />
+          <div style={{ display: 'inline-flex', marginLeft: 'var(--spacing-tight)' }}>
+            <Tooltip
+              content={
+                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--leading-normal)' }}>
+                  {tooltipText}
+                </div>
+              }
+              position="bottom"
+              className="alertTooltip"
+            >
+              <img src={flameIcon} alt="" style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }} />
+            </Tooltip>
           </div>
         </FormFieldRow>
 
