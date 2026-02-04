@@ -1,7 +1,6 @@
 import React from 'react';
 import { MAIN_CIRCUIT_BREAKER_RATINGS, PCS_AMPS_OPTIONS } from '../../../utils/constants';
 import { TableDropdown, TableRowButton, Alert, FormFieldRow, Tooltip } from '../../ui';
-import AddSectionButton from '../../ui/AddSectionButton';
 import formStyles from '../../../styles/FormSections.module.css';
 import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
 
@@ -123,7 +122,6 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
   };
 
   return (
-    <>
     <div className={formStyles.sectionColumn}>
       {/* Main Breaker */}
       {renderBreakerField({
@@ -245,15 +243,6 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
       )}
 
     </div>
-
-    {/* Add Inverter BOS Button - at bottom of Gateway Configuration */}
-    {!formData.show_inverter_bos && (
-      <AddSectionButton
-        label="Inverter BOS (Type 1)"
-        onClick={() => onChange('show_inverter_bos', true)}
-      />
-    )}
-    </>
   );
 };
 
