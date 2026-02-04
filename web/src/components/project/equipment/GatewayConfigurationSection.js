@@ -37,6 +37,12 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
   const activatePCS = formData.gatewayConfigActivatePCS || false;
   const pcsAmps = formData.gatewayConfigPCSAmps || '';
 
+  // Main Breaker options (100, 125, 150, 175, 200)
+  const mainBreakerOptions = [100, 125, 150, 175, 200].map((n) => ({
+    label: `${n} Amps`,
+    value: n.toString()
+  }));
+
   // Tie-in breaker options (15-250 amps in increments of 5)
   const tieInBreakerOptions = Array.from({ length: 48 }, (_, i) => {
     const value = 15 + i * 5;
@@ -120,9 +126,9 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         valueField: 'gatewayConfigMainBreaker',
         mode: mainBreakerMode,
         value: mainBreaker,
-        options: MAIN_CIRCUIT_BREAKER_RATINGS,
+        options: mainBreakerOptions,
         placeholder: 'Select breaker...',
-        tooltipText: 'Main Breaker will be automatically calculated based on the total Gateway max continuous output current.'
+        tooltipText: 'Main Breaker is defaulted to MLO. Click Custom to edit if alternate breaker is needed.'
       })}
 
       {/* Backup Sub Panel */}
@@ -132,9 +138,9 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         valueField: 'gatewayConfigBackupSubPanel',
         mode: backupSubPanelMode,
         value: backupSubPanel,
-        options: MAIN_CIRCUIT_BREAKER_RATINGS,
+        options: mainBreakerOptions,
         placeholder: 'Select breaker...',
-        tooltipText: 'Backup Sub Panel breaker will be automatically calculated based on the backup loads requirements.'
+        tooltipText: 'Backup Subpanel is defaulted to MLO. Click Custom to edit if alternate breaker is needed.'
       })}
 
       {/* PV Breaker Rating */}
@@ -146,7 +152,7 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: pvBreaker,
         options: MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO'),
         placeholder: 'Select breaker...',
-        tooltipText: 'A PV Breaker will be added in the Gateway PV input and will be rated to protect the total PV max continuous output current.'
+        tooltipText: 'A minimum PV Breaker will be added in the SMS PV input and will be rated to protect the total PV max continuous output current.'
       })}
 
       {/* ESS Breaker Rating */}
@@ -158,7 +164,7 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: essBreaker,
         options: MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO'),
         placeholder: 'Select breaker...',
-        tooltipText: 'An ESS Breaker will be added in the Gateway battery input and will be rated to protect the total Battery max continuous output current.'
+        tooltipText: 'A minimum Battery Breaker will be added in the SMS Battery input and will be rated to protect the total Battery max continuous output current.'
       })}
 
       {/* Tie-in Breaker Rating */}
@@ -170,7 +176,7 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: tieInBreaker,
         options: tieInBreakerOptions,
         placeholder: 'Select breaker...',
-        tooltipText: 'A Tie-in Breaker will be added in the Main Panel (A) and will be rated to protect the total Gateway max continuous output current landed in this Gateway. You can change the Tie-in Location in the Electrical Section.'
+        tooltipText: 'A minimum SMS Tie-in Breaker will be added in Main Panel (A). If you are landing in another location and/or using an alternate Tie in method, you can edit it in the Electrical section. If Whole Home Backup, the Tie-in breaker will auto size to the bus rating of the Panel it is landing in. If Partial Home Backup, the Tie-in Breaker will auto size to protect the total PV and Battery max continuous output current landed in the SMS. If the total PV and Battery max continuous output current landed in the SMS is larger than the max allowable panel backfeed, then the Power Control System (PCS) will activate and be sized to the max allowable panel backfeed or manually activate below.'
       })}
 
       {/* Activate PCS Button - at bottom of section */}
