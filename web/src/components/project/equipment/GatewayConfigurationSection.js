@@ -62,14 +62,17 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
       value,
       options,
       placeholder,
-      tooltipText
+      tooltipText,
+      defaultValue = '' // For resetting when switching back to Auto
     } = config;
 
     const handleModeChange = (newMode) => {
       onChange(modeField, newMode);
-      // Clear value when switching to auto
+      // Reset to default value when switching to auto
+      // For Main Breaker and Backup Sub Panel, default is MLO (empty in custom mode)
+      // For other breakers, default is empty (auto-calculated)
       if (newMode === 'auto') {
-        onChange(valueField, '');
+        onChange(valueField, defaultValue);
       }
     };
 
@@ -129,7 +132,8 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: mainBreaker,
         options: mainBreakerOptions,
         placeholder: 'Select breaker...',
-        tooltipText: 'Main Breaker is defaulted to MLO. Click Custom to edit if alternate breaker is needed.'
+        tooltipText: 'Main Breaker is defaulted to MLO. Click Custom to edit if alternate breaker is needed.',
+        defaultValue: '' // MLO is default (empty = MLO in Auto mode)
       })}
 
       {/* Backup Sub Panel */}
@@ -141,7 +145,8 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: backupSubPanel,
         options: mainBreakerOptions,
         placeholder: 'Select breaker...',
-        tooltipText: 'Backup Subpanel is defaulted to MLO. Click Custom to edit if alternate breaker is needed.'
+        tooltipText: 'Backup Subpanel is defaulted to MLO. Click Custom to edit if alternate breaker is needed.',
+        defaultValue: '' // MLO is default (empty = MLO in Auto mode)
       })}
 
       {/* PV Breaker Rating */}
@@ -153,7 +158,8 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: pvBreaker,
         options: MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO'),
         placeholder: 'Select breaker...',
-        tooltipText: 'A minimum PV Breaker will be added in the SMS PV input and will be rated to protect the total PV max continuous output current.'
+        tooltipText: 'A minimum PV Breaker will be added in the SMS PV input and will be rated to protect the total PV max continuous output current.',
+        defaultValue: '' // Empty = auto-calculated
       })}
 
       {/* ESS Breaker Rating */}
@@ -165,7 +171,8 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: essBreaker,
         options: MAIN_CIRCUIT_BREAKER_RATINGS.filter(opt => opt.value !== 'MLO'),
         placeholder: 'Select breaker...',
-        tooltipText: 'A minimum Battery Breaker will be added in the SMS Battery input and will be rated to protect the total Battery max continuous output current.'
+        tooltipText: 'A minimum Battery Breaker will be added in the SMS Battery input and will be rated to protect the total Battery max continuous output current.',
+        defaultValue: '' // Empty = auto-calculated
       })}
 
       {/* Tie-in Breaker Rating */}
@@ -177,7 +184,8 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         value: tieInBreaker,
         options: tieInBreakerOptions,
         placeholder: 'Select breaker...',
-        tooltipText: 'A minimum SMS Tie-in Breaker will be added in Main Panel (A). If you are landing in another location and/or using an alternate Tie in method, you can edit it in the Electrical section. If Whole Home Backup, the Tie-in breaker will auto size to the bus rating of the Panel it is landing in. If Partial Home Backup, the Tie-in Breaker will auto size to protect the total PV and Battery max continuous output current landed in the SMS. If the total PV and Battery max continuous output current landed in the SMS is larger than the max allowable panel backfeed, then the Power Control System (PCS) will activate and be sized to the max allowable panel backfeed or manually activate below.'
+        tooltipText: 'A minimum SMS Tie-in Breaker will be added in Main Panel (A). If you are landing in another location and/or using an alternate Tie in method, you can edit it in the Electrical section. If Whole Home Backup, the Tie-in breaker will auto size to the bus rating of the Panel it is landing in. If Partial Home Backup, the Tie-in Breaker will auto size to protect the total PV and Battery max continuous output current landed in the SMS. If the total PV and Battery max continuous output current landed in the SMS is larger than the max allowable panel backfeed, then the Power Control System (PCS) will activate and be sized to the max allowable panel backfeed or manually activate below.',
+        defaultValue: '' // Empty = auto-calculated
       })}
 
       {/* Activate PCS Button - at bottom of section */}
