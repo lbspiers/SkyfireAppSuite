@@ -21,6 +21,7 @@ import IntegratedLoadControllerSection from './equipment/IntegratedLoadControlle
 import BatteryCombinerPanelSection from './equipment/storage/BatteryCombinerPanelSection';
 import PowerWallConfigurationSection from './equipment/PowerWallConfigurationSection';
 import BOSEquipmentSection from './equipment/BOSEquipmentSection';
+import PostCombineBOSSection from './equipment/PostCombineBOSSection';
 import MainCircuitBreakersSection from './electrical/MainCircuitBreakersSection';
 import MainPanelASection from './electrical/MainPanelASection';
 import SubPanelBSection from './electrical/SubPanelBSection';
@@ -31,9 +32,11 @@ import SystemContainer from './equipment/SystemContainer';
 import FormNavigationFooter from './FormNavigationFooter';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import EquipmentValidationModal from '../modals/EquipmentValidationModal';
+import POIPromptModal from '../modals/POIPromptModal';
 import { SectionHeader, Tooltip, AddSectionButton, AddButton, Alert } from '../ui';
 import { detectProjectConfiguration } from '../../utils/bosConfigurationSwitchboard';
 import { prepareBOSPopulation, saveBOSPopulation } from '../../services/bosAutoPopulationService';
+import { patchSystemDetails } from '../../services/systemDetailsAPI';
 import { isTeslaPowerWall, shouldSuppressESS, isPowerWall3, isPowerWallPlus } from '../../utils/powerWallDetection';
 import { ENPHASE_6C_CONFIG, isEnphase6CCombiner, isDuracellInverter, isSolArkInverter } from '../../utils/constants';
 import {
@@ -134,6 +137,11 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   const [showBOSDetectionModal, setShowBOSDetectionModal] = useState(false);
   const [bosDetectionResult, setBosDetectionResult] = useState(null);
   const [bosDetectionSummary, setBosDetectionSummary] = useState('');
+
+  // POI Prompt Modal State (for Oncor/Xcel Energy AC Disconnect)
+  const [showPOIPromptModal, setShowPOIPromptModal] = useState(false);
+  const [poiPromptSystemNumber, setPoiPromptSystemNumber] = useState(1);
+  const [poiPromptCallback, setPoiPromptCallback] = useState(null);
   const [bosItemCount, setBosItemCount] = useState(0);
   const [bosDetectionLoading, setBosDetectionLoading] = useState(false);
   const [bosPayload, setBosPayload] = useState(null);
@@ -2887,6 +2895,90 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     setPendingCombineChoice(null);
   };
 
+  // Helper: Check if utility requires AC Disconnect (Oncor or Xcel Energy)
+  const isOncorOrXcelEnergy = (utilityName) => {
+    if (!utilityName) return false;
+    const normalized = utilityName.toLowerCase().trim();
+    return normalized.includes('oncor') || normalized.includes('xcel energy') || normalized.includes('xcel');
+  };
+
+  // Helper: Determine AC Disconnect type based on POI type
+  const getACDisconnectType = (poiType) => {
+    // Fused AC Disconnect for these POI types
+    const fusedTypes = ['Lug Kit', 'Line Side Connection', 'Line (Supply) Side Tap', 'Line Side Tap'];
+    if (fusedTypes.includes(poiType)) {
+      return 'Fused AC Disconnect';
+    }
+    // Standard AC Disconnect for all other types
+    return 'AC Disconnect';
+  };
+
+  // Helper: Add AC Disconnect to Post Combine BOS
+  const addACDisconnectToBOS = async (systemNumber, disconnectType) => {
+    try {
+      const fieldPrefix = `post_sms_bos_sys${systemNumber}_type1`;
+
+      await patchSystemDetails(projectUuid, {
+        [`${fieldPrefix}_equipment_type`]: disconnectType,
+        [`${fieldPrefix}_is_new`]: true, // Default to new equipment
+      });
+
+      logger.log('Equipment', `Added ${disconnectType} to System ${systemNumber} Post Combine BOS`);
+      return true;
+    } catch (error) {
+      logger.error('Equipment', `Failed to add AC Disconnect to System ${systemNumber}:`, error);
+      throw error;
+    }
+  };
+
+  // Helper: Prompt user for POI details if missing
+  const promptForPOI = (systemNumber) => {
+    return new Promise((resolve) => {
+      setPoiPromptSystemNumber(systemNumber);
+      setPoiPromptCallback(() => resolve);
+      setShowPOIPromptModal(true);
+    });
+  };
+
+  // Handle POI prompt confirmation
+  const handlePOIPromptConfirm = async ({ poiType, poiLocation }) => {
+    try {
+      // Close modal
+      setShowPOIPromptModal(false);
+
+      // Determine which fields to save based on system number and combine status
+      const isCombined = formData.combine_systems === true;
+      const sysNum = isCombined ? 1 : poiPromptSystemNumber;
+
+      // Field names for System 1 or combined systems
+      const poiTypeField = sysNum === 1 ? 'ele_method_of_interconnection' : `sys${sysNum}_ele_method_of_interconnection`;
+      const poiLocationField = sysNum === 1 ? 'ele_breaker_location' : `sys${sysNum}_ele_breaker_location`;
+
+      // Save POI details to database
+      await patchSystemDetails(projectUuid, {
+        [poiTypeField]: poiType,
+        [poiLocationField]: poiLocation,
+      });
+
+      logger.log('Equipment', `Saved POI details for System ${poiPromptSystemNumber}:`, { poiType, poiLocation });
+
+      // Refresh system details to get updated POI values
+      await refreshSystemDetails();
+
+      // Call the stored callback with POI data
+      if (poiPromptCallback) {
+        poiPromptCallback({ poiType, poiLocation });
+        setPoiPromptCallback(null);
+      }
+    } catch (error) {
+      logger.error('Equipment', 'Failed to save POI details:', error);
+      toast.error('Failed to save POI details. Please try again.', {
+        position: 'top-center',
+        autoClose: 3000,
+      });
+    }
+  };
+
   // BOS Detection Handler
   const handleDetectUtilityBOS = async () => {
     try {
@@ -2895,6 +2987,79 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // Get utility name from project site data
       const utilityName = projectData?.site?.utility || systemDetails?.utility || '';
+
+      // ============================================
+      // ONCOR / XCEL ENERGY AC DISCONNECT LOGIC
+      // ============================================
+
+      if (isOncorOrXcelEnergy(utilityName)) {
+        logger.log('Equipment', `Detected Oncor/Xcel Energy utility: ${utilityName}`);
+
+        const isCombined = formData.combine_systems === true;
+        const activeSystems = getActiveSystemsList();
+
+        // Determine which systems need AC Disconnects
+        const systemsToProcess = isCombined ? [1] : activeSystems;
+
+        let acDisconnectsAdded = 0;
+        const acDisconnectSummary = [];
+
+        for (const sysNum of systemsToProcess) {
+          // Get POI type for this system
+          const poiTypeField = sysNum === 1 ? 'ele_method_of_interconnection' : `sys${sysNum}_ele_method_of_interconnection`;
+          const poiLocationField = sysNum === 1 ? 'ele_breaker_location' : `sys${sysNum}_ele_breaker_location`;
+
+          let poiType = systemDetails?.[poiTypeField] || '';
+          let poiLocation = systemDetails?.[poiLocationField] || '';
+
+          // If POI type or location is missing, prompt user
+          if (!poiType || !poiLocation) {
+            logger.log('Equipment', `POI details missing for System ${sysNum}, prompting user...`);
+
+            // Prompt for POI details
+            const poiData = await promptForPOI(sysNum);
+            poiType = poiData.poiType;
+            poiLocation = poiData.poiLocation;
+          }
+
+          // Determine AC Disconnect type based on POI type
+          const disconnectType = getACDisconnectType(poiType);
+
+          // Add AC Disconnect to Post Combine BOS
+          await addACDisconnectToBOS(sysNum, disconnectType);
+          acDisconnectsAdded++;
+          acDisconnectSummary.push(`System ${sysNum}: ${disconnectType}`);
+
+          logger.log('Equipment', `Added ${disconnectType} for System ${sysNum} with POI type: ${poiType}`);
+        }
+
+        // Refresh system details to show new equipment
+        await refreshSystemDetails();
+
+        // Show success summary
+        setBosDetectionResult({ oncorXcelACDisconnect: true });
+        setBosDetectionSummary(`${utilityName} - AC Disconnect Requirement\n\n${acDisconnectSummary.join('\n')}`);
+        setBosItemCount(acDisconnectsAdded);
+        setBosPayload(null); // No additional payload needed
+        setBosDetectionLoading(false);
+
+        toast.success(`Added ${acDisconnectsAdded} AC Disconnect${acDisconnectsAdded !== 1 ? 's' : ''} to Post Combine BOS`, {
+          position: 'top-center',
+          autoClose: 3000,
+        });
+
+        // Close modal automatically after a short delay
+        setTimeout(() => {
+          setShowBOSDetectionModal(false);
+        }, 2000);
+
+        logger.log('Equipment', `Oncor/Xcel Energy AC Disconnects added: ${acDisconnectsAdded}`);
+        return; // Exit early, no need for regular BOS detection
+      }
+
+      // ============================================
+      // STANDARD BOS DETECTION (NON-ONCOR/XCEL)
+      // ============================================
 
       // Step 1: Try hardcoded utility-specific configurations first (PRIMARY)
       // Pass utility name as second parameter
@@ -3516,7 +3681,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
               )}
 
               {/* BOS Equipment - Only show when flag is set (button-triggered from InverterMicroSection) */}
-              {mergedFormData.show_inverter_bos && (() => {
+              {/* Hide BOS sections when systems are combined - they should appear in Post Combine BOS container instead */}
+              {mergedFormData.show_inverter_bos && formData.combine_systems !== true && (() => {
                 // For PowerWall with Gateway Configuration, use Post-SMS BOS (saves to post_sms_bos_sys{N}_type{slot}_*)
                 // For other inverters, use Utility BOS (saves to bos_sys{N}_type{slot}_*)
                 const isPowerWallWithGateway = mergedFormData.inverter_make?.toLowerCase().includes('tesla') &&
@@ -3630,6 +3796,38 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
             </div>
           </SystemContainer>
         )}
+
+        {/* Post Combine BOS Container - Show when systems are combined */}
+        {visibleSystems.length >= 2 && formData.combine_systems === true && (() => {
+          // Check if configuration is complete (all active systems have landing positions)
+          const configData = (() => {
+            try {
+              return formData.ele_combine_positions && typeof formData.ele_combine_positions === 'string'
+                ? JSON.parse(formData.ele_combine_positions)
+                : {};
+            } catch (e) {
+              return {};
+            }
+          })();
+
+          // Check if all active systems have landing positions
+          // The structure is: configData.system_landings.system1, configData.system_landings.system2, etc.
+          const configComplete = configData.active_systems?.every(sysNum => {
+            const landing = configData.system_landings?.[`system${sysNum}`];
+            return landing && landing !== '';
+          });
+
+          return configComplete ? (
+            <SystemContainer systemNumber="Post Combine BOS">
+              <PostCombineBOSSection
+                projectUuid={projectUuid}
+                systemDetails={systemDetails}
+                activeSystems={visibleSystems}
+                utility={systemDetails?.utility || systemDetails?.sys1_utility || ''}
+              />
+            </SystemContainer>
+          ) : null;
+        })()}
 
         {/* BOS Detection Button - Show for 2+ systems (below Combine UI) */}
         {visibleSystems.length >= 2 && (
@@ -3772,6 +3970,22 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
             <p style={{ marginBottom: 'var(--spacing)' }}>
               <strong>Detected {bosItemCount} BOS equipment item{bosItemCount !== 1 ? 's' : ''}</strong>
             </p>
+
+            {/* Oncor/Xcel Energy AC Disconnect Summary */}
+            {bosDetectionResult.oncorXcelACDisconnect && (
+              <div style={{
+                padding: 'var(--spacing)',
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-md)',
+                borderLeft: '3px solid var(--primary-color)',
+                marginBottom: 'var(--spacing)',
+                whiteSpace: 'pre-line'
+              }}>
+                <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                  {bosDetectionSummary}
+                </p>
+              </div>
+            )}
 
             {bosDetectionResult.system1 && (
               <div style={{
@@ -3923,6 +4137,14 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           </div>
         )}
       </ConfirmDialog>
+
+      {/* POI Prompt Modal (for Oncor/Xcel Energy AC Disconnect) */}
+      <POIPromptModal
+        isOpen={showPOIPromptModal}
+        onClose={() => setShowPOIPromptModal(false)}
+        onConfirm={handlePOIPromptConfirm}
+        systemNumber={poiPromptSystemNumber}
+      />
 
       {/* Equipment Validation Modal (for assessment scraper) */}
       <EquipmentValidationModal
