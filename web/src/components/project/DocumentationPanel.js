@@ -6,10 +6,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import surveyService from '../../services/surveyService';
 import logger from '../../services/devLogger';
-import { PillButton, SectionHeader } from '../ui';
+import { PillButton, SectionHeader, Button, Dropdown, ConfirmDialog } from '../ui';
 import useMediaSocket from '../../hooks/useMediaSocket';
 import { toast } from 'react-toastify';
 import { getThumbUrl } from '../../utils/photoUtils';
+import { downloadMultipleFiles } from '../../utils/fileDownload';
+import { PHOTO_SECTIONS } from '../../constants/photoSections';
 import styles from '../../styles/DocumentationPanel.module.css';
 
 // Helper function to get friendly label for section type
@@ -43,6 +45,9 @@ const DocumentationPanel = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editingNoteText, setEditingNoteText] = useState('');
+  const [selectedPhotoIds, setSelectedPhotoIds] = useState(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   // Fetch photos and notes on mount
   useEffect(() => {
@@ -123,6 +128,89 @@ const DocumentationPanel = ({
     } catch (error) {
       logger.error('Documentation', 'Failed to delete note:', error);
       toast.error('Failed to delete note');
+    }
+  };
+
+  // Photo selection handlers
+  const handlePhotoSelect = (photoId, event) => {
+    event?.stopPropagation();
+    const newSelected = new Set(selectedPhotoIds);
+    if (newSelected.has(photoId)) {
+      newSelected.delete(photoId);
+    } else {
+      newSelected.add(photoId);
+    }
+    setSelectedPhotoIds(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedPhotoIds.size === photos.length) {
+      setSelectedPhotoIds(new Set());
+    } else {
+      setSelectedPhotoIds(new Set(photos.map(p => p.id)));
+    }
+  };
+
+  // Bulk delete photos
+  const handleBulkDelete = async () => {
+    if (selectedPhotoIds.size === 0) return;
+
+    try {
+      await surveyService.photos.bulkDelete(projectUuid, Array.from(selectedPhotoIds));
+      setPhotos(prev => prev.filter(p => !selectedPhotoIds.has(p.id)));
+      setSelectedPhotoIds(new Set());
+      setShowDeleteConfirm(false);
+      toast.success(`Deleted ${selectedPhotoIds.size} photo${selectedPhotoIds.size > 1 ? 's' : ''}`);
+    } catch (error) {
+      logger.error('Documentation', 'Failed to delete photos:', error);
+      toast.error('Failed to delete photos');
+    }
+  };
+
+  // Bulk download photos
+  const handleBulkDownload = async () => {
+    if (selectedPhotoIds.size === 0) return;
+
+    const selectedPhotos = photos.filter(p => selectedPhotoIds.has(p.id));
+
+    await downloadMultipleFiles(selectedPhotos, {
+      getUrl: (photo) => photo.url || photo.preview_url || photo.photo_url,
+      getName: (photo) => photo.fileName || photo.filename || photo.name || `photo_${photo.id}`,
+      componentName: 'DocumentationPanel',
+      delayMs: 300,
+    });
+
+    toast.success(`Downloading ${selectedPhotoIds.size} photo${selectedPhotoIds.size > 1 ? 's' : ''}...`);
+  };
+
+  // Bulk change category
+  const handleBulkCategoryChange = async (newSection) => {
+    if (selectedPhotoIds.size === 0) return;
+
+    try {
+      const photoIds = Array.from(selectedPhotoIds);
+
+      // Update photos locally first for instant feedback
+      setPhotos(prev => prev.map(photo =>
+        selectedPhotoIds.has(photo.id) ? { ...photo, section: newSection } : photo
+      ));
+
+      // Update on server
+      await Promise.all(
+        photoIds.map(photoId =>
+          surveyService.photos.update(projectUuid, photoId, { section: newSection })
+        )
+      );
+
+      setSelectedPhotoIds(new Set());
+      setShowCategoryDropdown(false);
+      toast.success(`Updated ${photoIds.length} photo${photoIds.length > 1 ? 's' : ''} to ${newSection}`);
+    } catch (error) {
+      logger.error('Documentation', 'Failed to update photo categories:', error);
+      toast.error('Failed to update categories');
+      // Refresh to get correct state
+      const photosData = await surveyService.photos.list(projectUuid);
+      setPhotos(photosData);
     }
   };
 
@@ -252,12 +340,79 @@ const DocumentationPanel = ({
 
   return (
     <div className={styles.container}>
+      {/* Bulk Actions Toolbar */}
+      {selectedPhotoIds.size > 0 && (
+        <div className={styles.bulkActionsBar}>
+          <div className={styles.bulkActionsLeft}>
+            <button
+              className={styles.deselectButton}
+              onClick={() => setSelectedPhotoIds(new Set())}
+              title="Deselect all"
+            >
+              <CloseIcon />
+            </button>
+            <span className={styles.selectionCount}>
+              {selectedPhotoIds.size} selected
+            </span>
+          </div>
+
+          <div className={styles.bulkActionsRight}>
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={handleBulkDownload}
+            >
+              <DownloadIcon /> Download ({selectedPhotoIds.size})
+            </Button>
+
+            <div className={styles.dropdownWrapper}>
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              >
+                <FolderIcon /> Change Category
+              </Button>
+              {showCategoryDropdown && (
+                <div className={styles.categoryDropdown}>
+                  {Object.entries(PHOTO_SECTIONS).map(([key, label]) => (
+                    <button
+                      key={key}
+                      className={styles.categoryOption}
+                      onClick={() => handleBulkCategoryChange(key)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Button
+              variant="danger"
+              size="small"
+              onClick={() => setShowDeleteConfirm(true)}
+            >
+              <TrashIcon /> Delete ({selectedPhotoIds.size})
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
           <span className={styles.itemCount}>
             {photos.length} photo{photos.length !== 1 ? 's' : ''}, {notes.length} note{notes.length !== 1 ? 's' : ''}
           </span>
+          {photos.length > 0 && (
+            <button
+              className={styles.selectAllButton}
+              onClick={handleSelectAll}
+            >
+              {selectedPhotoIds.size === photos.length ? 'Deselect All' : 'Select All'}
+            </button>
+          )}
         </div>
 
         <div className={styles.toolbarRight}>
@@ -331,22 +486,38 @@ const DocumentationPanel = ({
                   <div className={styles.photosSection}>
                     <h4 className={styles.subsectionTitle}>Photos ({sectionPhotos.length})</h4>
                     <div className={`${styles.photoGrid} ${styles[`grid-${gridSize}`]}`}>
-                      {sectionPhotos.map((photo, index) => (
-                        <div
-                          key={photo.id}
-                          className={styles.photoItem}
-                          onClick={() => onPhotoClick(sectionPhotos, index)}
-                        >
-                          <img
-                            src={getThumbUrl(photo)} // Use optimized thumbnail (~40KB vs 4MB)
-                            alt={photo.notes || `Photo ${photo.id}`}
-                            className={styles.thumbnail}
-                          />
-                          {photo.notes && (
-                            <div className={styles.photoCaption}>{photo.notes}</div>
-                          )}
-                        </div>
-                      ))}
+                      {sectionPhotos.map((photo, index) => {
+                        const isSelected = selectedPhotoIds.has(photo.id);
+                        return (
+                          <div
+                            key={photo.id}
+                            className={`${styles.photoItem} ${isSelected ? styles.selected : ''}`}
+                            onClick={() => onPhotoClick(sectionPhotos, index)}
+                          >
+                            {/* Selection Checkbox */}
+                            <div
+                              className={styles.checkbox}
+                              onClick={(e) => handlePhotoSelect(photo.id, e)}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => {}}
+                                aria-label={`Select photo ${photo.id}`}
+                              />
+                            </div>
+
+                            <img
+                              src={getThumbUrl(photo)} // Use optimized thumbnail (~40KB vs 4MB)
+                              alt={photo.notes || `Photo ${photo.id}`}
+                              className={styles.thumbnail}
+                            />
+                            {photo.notes && (
+                              <div className={styles.photoCaption}>{photo.notes}</div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -412,6 +583,17 @@ const DocumentationPanel = ({
           })}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleBulkDelete}
+        title="Delete Photos"
+        message={`Are you sure you want to delete ${selectedPhotoIds.size} photo${selectedPhotoIds.size > 1 ? 's' : ''}? This action cannot be undone.`}
+        confirmText="Delete"
+        confirmVariant="danger"
+      />
     </div>
   );
 };
@@ -439,6 +621,25 @@ const EditIcon = () => (
 const DeleteIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M3 4h10M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M13 4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4h10z" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M3 4h10M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M13 4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4h10z" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M6 7v5M10 7v5" strokeLinecap="round" />
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3M8 2v9m0 0L5 8m3 3l3-3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const FolderIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M2 5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3l2 2h6a1 1 0 0 1 1 1" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
