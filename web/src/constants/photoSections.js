@@ -16,6 +16,9 @@ export const PHOTO_SECTIONS = [
   { value: 'microinverter', label: 'Microinverter', icon: 'Grid', category: 'equipment' },
   { value: 'optimizer', label: 'Optimizer', icon: 'Sliders', category: 'equipment' },
   { value: 'string_combiner', label: 'String Combiner', icon: 'GitMerge', category: 'equipment' },
+  { value: 'combine', label: 'Combined Systems', icon: 'Layers', category: 'equipment' },
+  { value: 'utility', label: 'Utility Equipment', icon: 'Zap', category: 'equipment' },
+  { value: 'postSMS', label: 'Post-SMS Equipment', icon: 'Box', category: 'equipment' },
 
   // Electrical
   { value: 'main_panel', label: 'Main Panel (MSP)', icon: 'Zap', category: 'electrical' },
@@ -27,10 +30,13 @@ export const PHOTO_SECTIONS = [
 
   // Energy Storage
   { value: 'battery', label: 'Battery', icon: 'Battery', category: 'storage' },
+  { value: 'battery1', label: 'Battery 1', icon: 'Battery', category: 'storage' },
+  { value: 'battery2', label: 'Battery 2', icon: 'Battery', category: 'storage' },
   { value: 'battery_combiner', label: 'Battery Combiner Panel', icon: 'Box', category: 'storage' },
   { value: 'gateway', label: 'Gateway', icon: 'Wifi', category: 'storage' },
   { value: 'sms', label: 'Storage Management System', icon: 'Server', category: 'storage' },
   { value: 'backup_panel', label: 'Backup Load Panel', icon: 'Shield', category: 'storage' },
+  { value: 'backup', label: 'Backup Equipment', icon: 'Shield', category: 'storage' },
 
   // Structural
   { value: 'mounting_plane', label: 'Mounting Plane', icon: 'Square', category: 'structural' },
