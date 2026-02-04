@@ -947,14 +947,6 @@ const InverterMicroSection = ({
         </div>
       )}
 
-      {/* Add Inverter BOS Button - Show after Gateway Configuration for Tesla PowerWall */}
-      {showGatewayConfig && !formData.show_inverter_bos && (
-        <AddSectionButton
-          label="Inverter BOS (Type 1)"
-          onClick={() => onChange('show_inverter_bos', true)}
-        />
-      )}
-
       {/* Section Clear Modal */}
       <SectionClearModal
         isOpen={showClearModal}
