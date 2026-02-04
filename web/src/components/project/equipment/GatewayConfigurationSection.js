@@ -1,6 +1,6 @@
 import React from 'react';
 import { MAIN_CIRCUIT_BREAKER_RATINGS, PCS_AMPS_OPTIONS } from '../../../utils/constants';
-import { TableDropdown, TableRowButton, Alert } from '../../ui';
+import { TableDropdown, TableRowButton, Alert, FormFieldRow } from '../../ui';
 import formStyles from '../../../styles/FormSections.module.css';
 import componentStyles from './GatewayConfigurationSection.module.css';
 
@@ -45,6 +45,7 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
 
   /**
    * Renders a breaker field with Auto/Custom toggle and tooltip
+   * Matches the styling of Inverter section rows
    */
   const renderBreakerField = (config) => {
     const {
@@ -67,50 +68,46 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
     };
 
     return (
-      <div className={componentStyles.breakerFieldContainer}>
-        {/* Label with Auto/Custom Toggle and Tooltip */}
-        <div className={componentStyles.breakerHeader}>
-          <span className={formStyles.label}>{label}</span>
-          <div className={componentStyles.toggleWrapper}>
-            <div className={formStyles.toggleGroup}>
-              <TableRowButton
-                label="Auto"
-                variant="secondary"
-                active={mode === 'auto'}
-                onClick={() => handleModeChange('auto')}
-              />
-              <TableRowButton
-                label="Custom"
-                variant="secondary"
-                active={mode === 'custom'}
-                onClick={() => handleModeChange('custom')}
-              />
-            </div>
-            {/* Tooltip icon */}
-            <div className={componentStyles.tooltipIconWrapper}>
-              <img
-                src={require('../../../assets/images/Skyfire Flame Icon.png')}
-                alt=""
-                className={componentStyles.tooltipIcon}
-                title={tooltipText}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Dropdown (only shown in Custom mode) */}
-        {mode === 'custom' && (
-          <div className={componentStyles.breakerContent}>
-            <TableDropdown
-              label=""
-              value={value}
-              onChange={(val) => onChange(valueField, val)}
-              options={options}
-              placeholder={placeholder}
+      <>
+        {/* Toggle Row */}
+        <FormFieldRow label={label}>
+          <div className={componentStyles.toggleWithTooltip}>
+            <TableRowButton
+              label="Auto"
+              variant="outline"
+              active={mode === 'auto'}
+              onClick={() => handleModeChange('auto')}
             />
+            <TableRowButton
+              label="Custom"
+              variant="outline"
+              active={mode === 'custom'}
+              onClick={() => handleModeChange('custom')}
+            />
+            <div style={{ display: 'inline-flex', marginLeft: 'var(--spacing-tight)' }}>
+              <div className={componentStyles.tooltipWrapper}>
+                <img
+                  src={require('../../../assets/images/Skyfire Flame Icon.png')}
+                  alt=""
+                  style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }}
+                  title={tooltipText}
+                />
+              </div>
+            </div>
           </div>
+        </FormFieldRow>
+
+        {/* Dropdown Row (only shown in Custom mode) */}
+        {mode === 'custom' && (
+          <TableDropdown
+            label=""
+            value={value}
+            onChange={(val) => onChange(valueField, val)}
+            options={options}
+            placeholder={placeholder}
+          />
         )}
-      </div>
+      </>
     );
   };
 
@@ -178,23 +175,24 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
 
       {/* Activate PCS Button - at bottom of section */}
       {!activatePCS && (
-        <div className={componentStyles.activatePCSButtonContainer}>
+        <div style={{ paddingLeft: 'var(--spacing)', paddingRight: 'var(--spacing)', paddingTop: 'var(--spacing-tight)', paddingBottom: 'var(--spacing-tight)' }}>
           <TableRowButton
             label="Activate PCS"
             variant="outline"
             onClick={() => onChange('gatewayConfigActivatePCS', true)}
-            style={{ width: '100%' }}
           />
         </div>
       )}
 
       {/* PCS Active State - shown when activated */}
       {activatePCS && (
-        <div className={componentStyles.pcsActiveContainer}>
+        <>
           {/* PCS Activation Alert */}
-          <Alert variant="info" collapsible={false}>
-            <strong>Power Control System Active:</strong> Manual activation enabled.
-          </Alert>
+          <div style={{ padding: '0 var(--spacing) var(--spacing-tight)' }}>
+            <Alert variant="info" collapsible={false}>
+              <strong>Power Control System Active:</strong> Manual activation enabled.
+            </Alert>
+          </div>
 
           {/* PCS Setting (Amps) Dropdown */}
           <TableDropdown
@@ -206,21 +204,27 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
           />
 
           {/* PCS Note */}
-          <div className={componentStyles.pcsNote}>
+          <div style={{
+            padding: 'var(--spacing-tight) var(--spacing)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--text-muted)',
+            fontStyle: 'italic'
+          }}>
             PCS Settings only throttle the current (amps), if you want to change the SMS breaker rating, see SMS Section.
           </div>
 
           {/* Deactivate PCS Button */}
-          <TableRowButton
-            label="Deactivate PCS"
-            variant="outline"
-            onClick={() => {
-              onChange('gatewayConfigActivatePCS', false);
-              onChange('gatewayConfigPCSAmps', '');
-            }}
-            style={{ width: '100%' }}
-          />
-        </div>
+          <div style={{ paddingLeft: 'var(--spacing)', paddingRight: 'var(--spacing)', paddingTop: 'var(--spacing-tight)', paddingBottom: 'var(--spacing-tight)' }}>
+            <TableRowButton
+              label="Deactivate PCS"
+              variant="outline"
+              onClick={() => {
+                onChange('gatewayConfigActivatePCS', false);
+                onChange('gatewayConfigPCSAmps', '');
+              }}
+            />
+          </div>
+        </>
       )}
     </div>
   );
