@@ -469,25 +469,29 @@
   top: 8px;
   left: 8px;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.95);
+  background: #0A1627;
+  border: 2px solid rgba(249, 115, 22, 0.5);
   border-radius: 4px;
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
 .photoItem:hover .checkbox {
   opacity: 1;
+  border-color: rgba(249, 115, 22, 0.8);
 }
 
 .photoItem.selected .checkbox {
   opacity: 1;
-  background: #f97316;
+  background: #0A1627;
+  border-color: #f97316;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
 }
 
 .photoItem .checkbox input[type="checkbox"] {
@@ -499,7 +503,7 @@
 }
 
 .photoItem.selected .checkbox input[type="checkbox"] {
-  accent-color: #ffffff;
+  accent-color: #f97316;
 }
 
 .photoItem.selected {
