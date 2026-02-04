@@ -123,6 +123,7 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
   };
 
   return (
+    <>
     <div className={formStyles.sectionColumn}>
       {/* Main Breaker */}
       {renderBreakerField({
@@ -243,16 +244,16 @@ const GatewayConfigurationSection = ({ formData, onChange }) => {
         </>
       )}
 
-      {/* Add Inverter BOS Button - at bottom of Gateway Configuration */}
-      {!formData.show_inverter_bos && (
-        <div style={{ paddingTop: 'var(--spacing)' }}>
-          <AddSectionButton
-            label="Inverter BOS (Type 1)"
-            onClick={() => onChange('show_inverter_bos', true)}
-          />
-        </div>
-      )}
     </div>
+
+    {/* Add Inverter BOS Button - at bottom of Gateway Configuration */}
+    {!formData.show_inverter_bos && (
+      <AddSectionButton
+        label="Inverter BOS (Type 1)"
+        onClick={() => onChange('show_inverter_bos', true)}
+      />
+    )}
+    </>
   );
 };
 
