@@ -930,14 +930,6 @@ const InverterMicroSection = ({
         />
       )}
 
-      {/* Add Inverter BOS Button - Show before Gateway Configuration for Tesla PowerWall */}
-      {showGatewayConfig && !formData.show_inverter_bos && (
-        <AddSectionButton
-          label="Inverter BOS (Type 1)"
-          onClick={() => onChange('show_inverter_bos', true)}
-        />
-      )}
-
       {/* Gateway Configuration - For Tesla PowerWall Gateway 2 or Gateway 3 */}
       {showGatewayConfig && (
         <div className={componentStyles.gatewayConfigSection}>
@@ -953,6 +945,14 @@ const InverterMicroSection = ({
             />
           </EquipmentRow>
         </div>
+      )}
+
+      {/* Add Inverter BOS Button - Show after Gateway Configuration for Tesla PowerWall (Post-SMS BOS) */}
+      {showGatewayConfig && !formData.show_inverter_bos && (
+        <AddSectionButton
+          label="Inverter BOS (Type 1)"
+          onClick={() => onChange('show_inverter_bos', true)}
+        />
       )}
 
       {/* Section Clear Modal */}
