@@ -76,7 +76,8 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   // Set default New/Existing toggle to New on mount if solar panel is configured but toggle not set
   useEffect(() => {
     const hasSolarPanel = formData[solarPanelMakeField] || formData[solarPanelModelField];
-    if (hasSolarPanel && formData[solarPanelIsNewField] === undefined) {
+    // Use == null to catch both undefined AND null
+    if (hasSolarPanel && formData[solarPanelIsNewField] == null) {
       onChange(solarPanelIsNewField, true); // Default to New
     }
   }, [formData[solarPanelMakeField], formData[solarPanelModelField], formData[solarPanelIsNewField], onChange, solarPanelMakeField, solarPanelModelField, solarPanelIsNewField]);
@@ -146,7 +147,8 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const handleFieldChange = (fieldName, value) => {
     onChange(fieldName, value, systemNumber);
     // Also save New/Existing toggle default if not already set
-    if (formData[solarPanelIsNewField] === undefined) {
+    // Use == null to catch both undefined AND null
+    if (formData[solarPanelIsNewField] == null) {
       onChange(solarPanelIsNewField, true, systemNumber);
     }
   };
@@ -162,11 +164,9 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         [solarPanelMakeField, value],
         [solarPanelModelField, ''],
         [solarPanelWattageField, ''],
+        // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+        [solarPanelIsNewField, formData[solarPanelIsNewField] ?? true],
       ];
-      // Also save New/Existing toggle default if not already set
-      if (formData[solarPanelIsNewField] === undefined) {
-        updates.push([solarPanelIsNewField, true]);
-      }
       onBatchChange(updates, systemNumber);
     } else {
       handleFieldChange(solarPanelMakeField, value);
@@ -204,10 +204,8 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         updates.push([solarPanelTempCoeffField, tempCoeff]);
       }
 
-      // Also save New/Existing toggle default if not already set
-      if (formData[solarPanelIsNewField] === undefined) {
-        updates.push([solarPanelIsNewField, true]);
-      }
+      // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+      updates.push([solarPanelIsNewField, formData[solarPanelIsNewField] ?? true]);
 
       onBatchChange(updates, systemNumber);
     } else {

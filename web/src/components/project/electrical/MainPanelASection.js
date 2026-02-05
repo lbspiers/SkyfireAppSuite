@@ -9,18 +9,21 @@ import { AddSectionButton, EquipmentRow, FormFieldRow, TableDropdown, TableRowBu
 const MainPanelASection = ({ formData, onChange, onShowSubPanelB, subPanelBVisible = false }) => {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
-  // Set default to Existing on mount if not already set
+  // Set default to Existing on mount if panel data exists but toggle not set
   useEffect(() => {
-    if (formData.mpa_bus_bar_existing === undefined || formData.mpa_bus_bar_existing === null) {
-      onChange('mpa_bus_bar_existing', true);
+    const hasPanelData = formData.ele_bus_bar_rating || formData.ele_main_circuit_breaker_rating;
+
+    // Use == null to catch both undefined AND null
+    if (hasPanelData && formData.mpa_bus_bar_existing == null) {
+      onChange('mpa_bus_bar_existing', true); // Default to Existing
     }
-    if (formData.mpa_main_circuit_breaker_existing === undefined || formData.mpa_main_circuit_breaker_existing === null) {
-      onChange('mpa_main_circuit_breaker_existing', true);
+    if (hasPanelData && formData.mpa_main_circuit_breaker_existing == null) {
+      onChange('mpa_main_circuit_breaker_existing', true); // Default to Existing
     }
-    if (formData.el_mpa_derated === undefined || formData.el_mpa_derated === null) {
-      onChange('el_mpa_derated', false);
+    if (hasPanelData && formData.el_mpa_derated == null) {
+      onChange('el_mpa_derated', false); // Default Derate to false
     }
-  }, [formData.mpa_bus_bar_existing, formData.mpa_main_circuit_breaker_existing, formData.el_mpa_derated, onChange]); // Re-run if these values change
+  }, [formData.ele_bus_bar_rating, formData.ele_main_circuit_breaker_rating, formData.mpa_bus_bar_existing, formData.mpa_main_circuit_breaker_existing, formData.el_mpa_derated, onChange]); // Re-run if these values change
   // Calculate allowable backfeed: (Bus × 1.2) - Main Breaker
   const allowableBackfeed = useMemo(() => {
     const bus = parseInt(formData.ele_bus_bar_rating) || 0;
@@ -77,9 +80,23 @@ const MainPanelASection = ({ formData, onChange, onShowSubPanelB, subPanelBVisib
     }
   };
 
-  // Wrapper to handle field changes
+  // Wrapper to handle field changes and save toggle defaults
   const handleFieldChange = (fieldName, value) => {
     onChange(fieldName, value);
+
+    // Also save toggle defaults if not already set
+    // Use == null to catch both undefined AND null
+    if ((fieldName === 'ele_bus_bar_rating' || fieldName === 'ele_main_circuit_breaker_rating') && value) {
+      if (formData.mpa_bus_bar_existing == null) {
+        onChange('mpa_bus_bar_existing', true); // Default to Existing
+      }
+      if (formData.mpa_main_circuit_breaker_existing == null) {
+        onChange('mpa_main_circuit_breaker_existing', true); // Default to Existing
+      }
+      if (formData.el_mpa_derated == null) {
+        onChange('el_mpa_derated', false);
+      }
+    }
   };
 
   const getSubtitle = () => {
@@ -172,7 +189,7 @@ const MainPanelASection = ({ formData, onChange, onShowSubPanelB, subPanelBVisib
         {/* Main Circuit Breaker */}
         <TableDropdown
           label="Main Circuit Breaker"
-          value={formData.ele_main_circuit_breaker_rating || 'MLO'}
+          value={formData.ele_main_circuit_breaker_rating || ''}
           onChange={(value) => handleFieldChange('ele_main_circuit_breaker_rating', value)}
           options={MAIN_CIRCUIT_BREAKER_RATINGS}
           placeholder="Select breaker..."

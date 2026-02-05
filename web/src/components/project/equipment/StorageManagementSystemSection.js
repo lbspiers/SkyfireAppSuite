@@ -54,6 +54,15 @@ const StorageManagementSystemSection = ({
     }
   }, [formData.sms_make]);
 
+  // Set default New/Existing toggle to New on mount if SMS is configured but toggle not set
+  useEffect(() => {
+    const hasSMS = formData.sms_make && formData.sms_model && formData.sms_make !== 'No SMS';
+    // Use == null to catch both undefined AND null
+    if (hasSMS && formData.sms_isnew == null) {
+      onChange('sms_isnew', true); // Default to New
+    }
+  }, [formData.sms_make, formData.sms_model, formData.sms_isnew, onChange]);
+
   const loadManufacturers = async () => {
     setLoadingManufacturers(true);
     try {
@@ -121,13 +130,8 @@ const StorageManagementSystemSection = ({
         console.log('[SMS] Clearing sys1_sms_equipment_type');
       }
 
-      // Ensure new/existing toggle default is saved (if never set by user)
-      if (formData.sms_isnew === undefined || formData.sms_isnew === null) {
-        updates.push(['sms_isnew', true]);
-        console.log('[SMS] Setting default sms_isnew: true (New)');
-      } else {
-        console.log('[SMS] Keeping existing sms_isnew value:', formData.sms_isnew);
-      }
+      // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+      updates.push(['sms_isnew', formData.sms_isnew ?? true]);
 
       // If "No SMS" selected, clear all other fields
       if (makeValue === 'No SMS') {
@@ -150,11 +154,9 @@ const StorageManagementSystemSection = ({
         console.log('[SMS] Clearing sys1_sms_equipment_type');
       }
 
-      if (formData.sms_isnew === undefined || formData.sms_isnew === null) {
+      // Save default if not already set - use == null to catch both undefined AND null
+      if (formData.sms_isnew == null) {
         onChange('sms_isnew', true);
-        console.log('[SMS] Setting default sms_isnew: true (New)');
-      } else {
-        console.log('[SMS] Keeping existing sms_isnew value:', formData.sms_isnew);
       }
 
       if (makeValue === 'No SMS') {

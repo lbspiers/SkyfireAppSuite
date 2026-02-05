@@ -73,6 +73,16 @@ const BatteryTypeSection = ({
     }
   }, [formData[makeField], loadBatteryModels]);
 
+  // Set default New/Existing toggle to New on mount if battery is configured but toggle not set
+  useEffect(() => {
+    const hasBattery = formData[makeField] || formData[modelField] || formData[quantityField];
+    const isNewField = `${prefix}_isnew`;
+    // Use == null to catch both undefined AND null
+    if (hasBattery && formData[isNewField] == null) {
+      onChange(isNewField, true); // Default to New
+    }
+  }, [formData[makeField], formData[modelField], formData[quantityField], formData[`${prefix}_isnew`], onChange, makeField, modelField, quantityField, prefix]);
+
   // Auto-select Enphase 10C battery when in 6C mode and quantity is entered
   useEffect(() => {
     if (!is6CMode) return;
@@ -150,9 +160,10 @@ const BatteryTypeSection = ({
   };
 
   const handleMakeChange = (value) => {
-    // Always save isnew state when make is selected (defaults to true if not set)
-    const isNewValue = formData[`${prefix}_isnew`] !== false; // true unless explicitly set to false
-    onChange(`${prefix}_isnew`, isNewValue);
+    // Save isnew default if not already set - use == null to catch both undefined AND null
+    if (formData[`${prefix}_isnew`] == null) {
+      onChange(`${prefix}_isnew`, true);
+    }
 
     onChange(`${prefix}_make`, value);
     onChange(`${prefix}_model`, '');
@@ -161,9 +172,10 @@ const BatteryTypeSection = ({
   };
 
   const handleModelChange = (value) => {
-    // Always save isnew state when model is selected (defaults to true if not set)
-    const isNewValue = formData[`${prefix}_isnew`] !== false; // true unless explicitly set to false
-    onChange(`${prefix}_isnew`, isNewValue);
+    // Save isnew default if not already set - use == null to catch both undefined AND null
+    if (formData[`${prefix}_isnew`] == null) {
+      onChange(`${prefix}_isnew`, true);
+    }
 
     onChange(`${prefix}_model`, value);
   };

@@ -102,7 +102,8 @@ const InverterMicroSection = ({
   // Set default New/Existing toggle to New on mount if equipment is configured but toggle not set
   useEffect(() => {
     const hasInverter = formData.inverter_make || formData.inverter_model;
-    if (hasInverter && formData.inverter_isnew === undefined) {
+    // Use == null to catch both undefined AND null
+    if (hasInverter && formData.inverter_isnew == null) {
       onChange('inverter_isnew', true); // Default to New
     }
   }, [formData.inverter_make, formData.inverter_model, formData.inverter_isnew, onChange]);
@@ -146,7 +147,8 @@ const InverterMicroSection = ({
   // Set default New/Existing toggle for optimizer to New on mount if configured but toggle not set
   useEffect(() => {
     const hasOptimizer = formData.optimizer_make || formData.optimizer_model;
-    if (hasOptimizer && formData.optimizer_isnew === undefined) {
+    // Use == null to catch both undefined AND null
+    if (hasOptimizer && formData.optimizer_isnew == null) {
       onChange('optimizer_isnew', true); // Default to New
     }
   }, [formData.optimizer_make, formData.optimizer_model, formData.optimizer_isnew, onChange]);
@@ -231,6 +233,8 @@ const InverterMicroSection = ({
             const updates = [
               ['inverter_type', isMicroinverter ? 'microinverter' : 'inverter'],
               ['inverter_max_cont_output_amps', modelData.max_cont_output_amps],
+              // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+              ['inverter_isnew', formData.inverter_isnew ?? true],
             ];
 
             // Store max_strings_branches for string inverters
@@ -298,22 +302,23 @@ const InverterMicroSection = ({
   const handleFieldChange = (fieldName, value) => {
     onChange(fieldName, value);
 
-    // Also save New/Existing toggle default if make or model is selected
-    // This ensures the value is saved even if user never interacts with the toggle
-    if ((fieldName === 'inverter_make' || fieldName === 'inverter_model') && value) {
-      const currentIsNew = formData.inverter_isnew !== false; // Default to true (New)
-      onChange('inverter_isnew', currentIsNew);
+    // Also save New/Existing toggle default if not already set
+    // Use == null to catch both undefined AND null
+    if ((fieldName === 'inverter_make' || fieldName === 'inverter_model') && value && formData.inverter_isnew == null) {
+      onChange('inverter_isnew', true);
     }
   };
 
   // Wrapper for optimizer fields
   const handleOptimizerFieldChange = (fieldName, value) => {
-    if (onBatchChange && formData.optimizer_isnew === undefined) {
+    // Use == null to catch both undefined AND null
+    if (onBatchChange && formData.optimizer_isnew == null) {
       onBatchChange([[fieldName, value], ['optimizer_isnew', true]], systemNumber);
     } else {
       onChange(fieldName, value);
       // Also save New/Existing toggle default if not already set
-      if (formData.optimizer_isnew === undefined) {
+      // Use == null to catch both undefined AND null
+      if (formData.optimizer_isnew == null) {
         onChange('optimizer_isnew', true);
       }
     }
@@ -330,12 +335,9 @@ const InverterMicroSection = ({
         ['inverter_model', ''],
         ['inverter_type', ''],
         ['inverter_max_cont_output_amps', ''],
+        // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+        ['inverter_isnew', formData.inverter_isnew ?? true],
       ];
-
-      // Only include isnew if it's already been set by the user
-      if (formData.inverter_isnew !== undefined) {
-        updates.push(['inverter_isnew', formData.inverter_isnew]);
-      }
 
       onBatchChange(updates, systemNumber);
     } else {
@@ -388,6 +390,8 @@ const InverterMicroSection = ({
             ['inverter_max_vdc', modelData.voltage_maximum || modelData.max_vdc || ''],
             ['inverter_min_vdc', modelData.voltage_minimum || modelData.min_vdc || ''],
             ['inverter_max_input_isc', modelData.max_input_isc || modelData.max_isc_per_input || ''],
+            // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+            ['inverter_isnew', formData.inverter_isnew ?? true],
           ];
           if (modelData.id) {
             updates.push(['inverter_model_id', modelData.id]);
@@ -426,6 +430,8 @@ const InverterMicroSection = ({
           ['inverter_max_vdc', modelData.voltage_maximum || modelData.max_vdc || ''],
           ['inverter_min_vdc', modelData.voltage_minimum || modelData.min_vdc || ''],
           ['inverter_max_input_isc', modelData.max_input_isc || modelData.max_isc_per_input || ''],
+          // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
+          ['inverter_isnew', formData.inverter_isnew ?? true],
         ];
         if (modelData.id) {
           updates.push(['inverter_model_id', modelData.id]);

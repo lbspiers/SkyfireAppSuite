@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { BUS_BAR_RATING, MAIN_CIRCUIT_BREAKER_RATINGS, FEEDER_LOCATIONS, CONDUCTOR_SIZING_OPTIONS, SPB_TIE_IN_LOCATIONS } from '../../../utils/constants';
 import { AddSectionButton, EquipmentRow, FormFieldRow, TableDropdown, TableRowButton } from '../../ui';
 import styles from './SubPanelBSection.module.css';
@@ -37,9 +37,29 @@ const SubPanelBSection = ({ formData, onChange, onShowSubPanelC, subPanelCVisibl
 
   const isMLO = formData.spb_main_breaker_rating === 'MLO';
 
+  // Set default to New on mount if Sub Panel B data exists but toggle not set
+  useEffect(() => {
+    const hasSPBData = formData.spb_bus_bar_rating || formData.spb_main_breaker_rating;
+
+    // Use == null to catch both undefined AND null
+    if (hasSPBData && formData.spb_subpanel_existing == null) {
+      onChange('spb_subpanel_existing', false); // false = New (default for Sub Panel B)
+    }
+    if (hasSPBData && formData.spb_subpanelb_mcbexisting == null) {
+      onChange('spb_subpanelb_mcbexisting', false); // Default MCB to New when panel is New
+    }
+    if (hasSPBData && formData.el_spb_derated == null) {
+      onChange('el_spb_derated', false); // Default Derate to false
+    }
+    // Save MLO default for main circuit breaker
+    if (hasSPBData && formData.spb_main_breaker_rating == null) {
+      onChange('spb_main_breaker_rating', 'MLO'); // Default to MLO
+    }
+  }, [formData.spb_bus_bar_rating, formData.spb_main_breaker_rating, formData.spb_subpanel_existing, formData.spb_subpanelb_mcbexisting, formData.el_spb_derated, onChange]);
+
   // Determine current toggle states
   const isNew = formData.spb_subpanel_existing === false;
-  const isExisting = formData.spb_subpanel_existing === true || formData.spb_subpanel_existing === undefined;
+  const isExisting = formData.spb_subpanel_existing === true;
   const isDerate = formData.el_spb_derated === true;
 
   const handleNewClick = () => {
@@ -84,8 +104,22 @@ const SubPanelBSection = ({ formData, onChange, onShowSubPanelC, subPanelCVisibl
   // Wrapper to save toggle defaults when any field changes
   const handleFieldChange = (fieldName, value) => {
     onChange(fieldName, value);
-    // Note: Sub panels do NOT auto-default to a panel type selection
-    // User must explicitly choose New, Existing, or Derate
+
+    // Also save toggle defaults if not already set
+    // Use == null to catch both undefined AND null
+    if ((fieldName === 'spb_bus_bar_rating' || fieldName === 'spb_main_breaker_rating') && value) {
+      if (formData.spb_subpanel_existing == null) {
+        onChange('spb_subpanel_existing', false); // Default to New
+      }
+      if (formData.el_spb_derated == null) {
+        onChange('el_spb_derated', false);
+      }
+    }
+
+    // Save MLO default when bus bar is set but breaker not set
+    if (fieldName === 'spb_bus_bar_rating' && value && formData.spb_main_breaker_rating == null) {
+      onChange('spb_main_breaker_rating', 'MLO');
+    }
   };
 
   // Check if there's any data in Sub Panel B (excluding MLO which is the default)
