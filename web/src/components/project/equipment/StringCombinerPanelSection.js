@@ -171,6 +171,14 @@ const StringCombinerPanelSection = ({
     }
   }, []);
 
+  // Set default New/Existing toggle to New on mount if combiner panel is configured but toggle not set
+  useEffect(() => {
+    const hasCombiner = formData.combiner_panel_make || formData.combiner_panel_model;
+    if (hasCombiner && formData.combiner_panel_isnew === undefined) {
+      onChange('combiner_panel_isnew', true); // Default to New
+    }
+  }, [formData.combiner_panel_make, formData.combiner_panel_model, formData.combiner_panel_isnew, onChange]);
+
   // Auto-set Aggregate PV Breaker to 60A for IQ Combiner 6C (only once)
   useEffect(() => {
     if (is6C && !formData.aggregate_pv_breaker && !hasAutoSetAggregateBreaker.current) {

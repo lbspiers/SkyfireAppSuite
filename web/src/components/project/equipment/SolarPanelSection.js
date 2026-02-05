@@ -73,6 +73,14 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
     loadSolarPanelMakes();
   }, [loadSolarPanelMakes]);
 
+  // Set default New/Existing toggle to New on mount if solar panel is configured but toggle not set
+  useEffect(() => {
+    const hasSolarPanel = formData[solarPanelMakeField] || formData[solarPanelModelField];
+    if (hasSolarPanel && formData[solarPanelIsNewField] === undefined) {
+      onChange(solarPanelIsNewField, true); // Default to New
+    }
+  }, [formData[solarPanelMakeField], formData[solarPanelModelField], formData[solarPanelIsNewField], onChange, solarPanelMakeField, solarPanelModelField, solarPanelIsNewField]);
+
   // Load models when manufacturer changes using shared catalog
   useEffect(() => {
     if (formData[solarPanelMakeField]) {

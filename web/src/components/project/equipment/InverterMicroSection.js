@@ -99,6 +99,14 @@ const InverterMicroSection = ({
     loadManufacturers();
   }, []);
 
+  // Set default New/Existing toggle to New on mount if equipment is configured but toggle not set
+  useEffect(() => {
+    const hasInverter = formData.inverter_make || formData.inverter_model;
+    if (hasInverter && formData.inverter_isnew === undefined) {
+      onChange('inverter_isnew', true); // Default to New
+    }
+  }, [formData.inverter_make, formData.inverter_model, formData.inverter_isnew, onChange]);
+
   // Load models when manufacturer changes
   useEffect(() => {
     if (formData.inverter_make) {
@@ -134,6 +142,14 @@ const InverterMicroSection = ({
       setShowOptimizers(false);
     }
   }, [formData.inverter_make, formData.optimizer_make, formData.optimizer_model]);
+
+  // Set default New/Existing toggle for optimizer to New on mount if configured but toggle not set
+  useEffect(() => {
+    const hasOptimizer = formData.optimizer_make || formData.optimizer_model;
+    if (hasOptimizer && formData.optimizer_isnew === undefined) {
+      onChange('optimizer_isnew', true); // Default to New
+    }
+  }, [formData.optimizer_make, formData.optimizer_model, formData.optimizer_isnew, onChange]);
 
   // Load optimizer models when optimizer manufacturer changes
   useEffect(() => {
