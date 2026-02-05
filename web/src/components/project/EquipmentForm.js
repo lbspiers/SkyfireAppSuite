@@ -3682,7 +3682,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
               {/* BOS Equipment - Only show when flag is set (button-triggered from InverterMicroSection) */}
               {/* Hide BOS sections when systems are combined - they should appear in Post Combine BOS container instead */}
-              {mergedFormData.show_inverter_bos && formData.combine_systems !== true && (() => {
+              {/* ONLY for string inverters - microinverters render BOS inside StringCombinerPanelSection */}
+              {mergedFormData.show_inverter_bos && formData.combine_systems !== true && mergedFormData.inverter_type !== 'microinverter' && (() => {
                 // For PowerWall with Gateway Configuration, use Post-SMS BOS (saves to post_sms_bos_sys{N}_type{slot}_*)
                 // For other inverters, use Utility BOS (saves to bos_sys{N}_type{slot}_*)
                 const isPowerWallWithGateway = mergedFormData.inverter_make?.toLowerCase().includes('tesla') &&

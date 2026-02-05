@@ -16,16 +16,16 @@
   background: rgba(10, 22, 40, 0.8);
 }
 
-/* Contained mode - stays within parent container */
+/* Contained mode - overlays on top of the left panel only */
 .overlay.overlayContained {
   position: fixed;
   z-index: 50; /* Lower than full modal z-index, but above panel content */
-  /* Calculate bounds to stay within left panel (30% width) */
+  /* Cover only the left panel area (30% width) */
   left: 0;
-  right: 70%;
+  width: 30%;
   top: 0;
   bottom: 0;
-  /* Center modal within the left panel */
+  /* Center modal within the left panel area */
   display: flex;
   align-items: center;
   justify-content: center;

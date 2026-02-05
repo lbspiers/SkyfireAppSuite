@@ -309,14 +309,18 @@ const InverterMicroSection = ({
     lastProcessedModelRef.current = null;
 
     if (onBatchChange) {
-      const currentIsNew = formData.inverter_isnew !== false; // Default to true (New)
       const updates = [
         ['inverter_make', value],
         ['inverter_model', ''],
         ['inverter_type', ''],
         ['inverter_max_cont_output_amps', ''],
-        ['inverter_isnew', currentIsNew], // Always include current toggle state
       ];
+
+      // Only include isnew if it's already been set by the user
+      if (formData.inverter_isnew !== undefined) {
+        updates.push(['inverter_isnew', formData.inverter_isnew]);
+      }
+
       onBatchChange(updates, systemNumber);
     } else {
       handleFieldChange('inverter_make', value);

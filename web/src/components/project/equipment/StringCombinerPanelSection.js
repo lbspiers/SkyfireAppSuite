@@ -249,17 +249,17 @@ const StringCombinerPanelSection = ({
   };
 
   const handleManufacturerChange = (value) => {
-    // ALWAYS save the current toggle state when make is changed
-    // This ensures the default "New" state gets persisted to the database
-    const currentIsNew = formData.combiner_panel_isnew !== false; // Default to true if undefined
-
     if (onBatchChange) {
-      // BATCH: Update manufacturer and related fields in single operation (up to 5 fields → 1 call)
+      // BATCH: Update manufacturer and related fields in single operation
       const updates = [
-        ['combiner_panel_isnew', currentIsNew],
         ['combiner_panel_make', value],
         ['combiner_panel_model', ''],
       ];
+
+      // Only include isnew if it's already been set by the user
+      if (formData.combiner_panel_isnew !== undefined) {
+        updates.push(['combiner_panel_isnew', formData.combiner_panel_isnew]);
+      }
 
       // Clear Bus Amps and Main Breaker fields when Enphase is selected
       if (value === 'Enphase') {
@@ -270,9 +270,13 @@ const StringCombinerPanelSection = ({
       onBatchChange(updates);
     } else {
       // Fallback: Sequential onChange (backwards compatibility)
-      onChange('combiner_panel_isnew', currentIsNew);
       onChange('combiner_panel_make', value);
       onChange('combiner_panel_model', '');
+
+      // Only save isnew if it's already been set
+      if (formData.combiner_panel_isnew !== undefined) {
+        onChange('combiner_panel_isnew', formData.combiner_panel_isnew);
+      }
 
       if (value === 'Enphase') {
         onChange('combiner_panel_bus_amps', '');
