@@ -944,16 +944,20 @@ const InverterMicroSection = ({
               }
               disabled={!formData.optimizer_make || loadingOptimizerModels}
             />
+
+            {/* Add Inverter BOS Button - Show inside optimizer row when optimizer is configured */}
+            {formData.optimizer_make && formData.optimizer_model && !formData.show_inverter_bos && (
+              <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
+                <TableRowButton
+                  label="+ Inverter BOS (Type 1)"
+                  variant="outline"
+                  onClick={() => onChange('show_inverter_bos', true)}
+                  style={{ width: '100%' }}
+                />
+              </div>
+            )}
           </EquipmentRow>
         </div>
-      )}
-
-      {/* Add Inverter BOS Button - Show after Optimizer when optimizer is configured */}
-      {showOptimizers && formData.optimizer_make && formData.optimizer_model && !formData.show_inverter_bos && (
-        <AddSectionButton
-          label="Inverter BOS (Type 1)"
-          onClick={() => onChange('show_inverter_bos', true)}
-        />
       )}
 
       {/* Gateway Configuration - For Tesla PowerWall Gateway 2 or Gateway 3 */}

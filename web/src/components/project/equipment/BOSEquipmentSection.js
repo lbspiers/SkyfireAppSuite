@@ -346,7 +346,7 @@ const BOSEquipmentSection = ({
   };
 
   return (
-    <div style={{ marginTop: 'var(--spacing)', marginBottom: 'var(--spacing-xs)' }}>
+    <div style={{ marginTop: 'var(--spacing-xs)', marginBottom: 'var(--spacing-xs)' }}>
       {slotsToRender.map((slot, index) => {
         const availableMakes = getAvailableMakes(slot.equipmentType, slot.ampRating);
         const availableModels = getAvailableModels(slot.equipmentType, slot.make, slot.ampRating);

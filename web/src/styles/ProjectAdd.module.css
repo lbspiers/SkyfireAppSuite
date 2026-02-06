@@ -77,6 +77,7 @@
 
 /* Left Panel - 40% */
 .leftPanel {
+  position: relative;
   width: 40%;
   min-width: 450px;
   max-width: 600px;

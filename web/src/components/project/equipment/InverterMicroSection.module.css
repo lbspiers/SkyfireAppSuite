@@ -133,7 +133,7 @@
 
 /* ===== OPTIMIZER SECTION ===== */
 .optimizerSection {
-  margin-top: var(--spacing);
+  margin-top: var(--spacing-xs);
 }
 
 /* ===== GATEWAY CONFIGURATION SECTION ===== */

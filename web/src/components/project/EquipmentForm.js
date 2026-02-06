@@ -3536,6 +3536,29 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
               {/* Stringing Section - MOVED INTO InverterMicroSection */}
               {/* PowerWall Configuration - MOVED INTO InverterMicroSection */}
 
+              {/* BOS Equipment - Only show when flag is set (button-triggered from InverterMicroSection) */}
+              {/* Hide BOS sections when systems are combined - they should appear in Post Combine BOS container instead */}
+              {/* ONLY for string inverters - microinverters render BOS inside StringCombinerPanelSection */}
+              {mergedFormData.show_inverter_bos && formData.combine_systems !== true && mergedFormData.inverter_type !== 'microinverter' && (() => {
+                // For PowerWall with Gateway Configuration, use Post-SMS BOS (saves to post_sms_bos_sys{N}_type{slot}_*)
+                // For other inverters, use Utility BOS (saves to bos_sys{N}_type{slot}_*)
+                const isPowerWallWithGateway = mergedFormData.inverter_make?.toLowerCase().includes('tesla') &&
+                  mergedFormData.inverter_model?.toLowerCase().includes('powerwall') &&
+                  (mergedFormData.gateway === 'Gateway 3' || mergedFormData.gateway === 'Backup Gateway 2');
+                const bosSection = isPowerWallWithGateway ? 'postSMS' : 'utility';
+
+                return (
+                  <BOSEquipmentSection
+                    formData={mergedFormData}
+                    onChange={handleSystemFieldChange}
+                    section={bosSection}
+                    systemNumber={systemNumber}
+                    maxContinuousOutputAmps={maxContinuousOutputAmpsPerSystem[systemNumber]}
+                    loadingMaxOutput={loadingMaxOutput}
+                  />
+                );
+              })()}
+
               {/* Energy Storage System - For String Inverters */}
               {!systemSuppressESS && mergedFormData.inverter_type === 'inverter' && mergedFormData.inverter_model && (
                 <EnergyStorageSection
@@ -3679,29 +3702,6 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                   Total battery quantity ({totalBatteries6C}) exceeds maximum of {ENPHASE_6C_CONFIG.maxTotalBatteries} for Enphase 6C combiner.
                 </Alert>
               )}
-
-              {/* BOS Equipment - Only show when flag is set (button-triggered from InverterMicroSection) */}
-              {/* Hide BOS sections when systems are combined - they should appear in Post Combine BOS container instead */}
-              {/* ONLY for string inverters - microinverters render BOS inside StringCombinerPanelSection */}
-              {mergedFormData.show_inverter_bos && formData.combine_systems !== true && mergedFormData.inverter_type !== 'microinverter' && (() => {
-                // For PowerWall with Gateway Configuration, use Post-SMS BOS (saves to post_sms_bos_sys{N}_type{slot}_*)
-                // For other inverters, use Utility BOS (saves to bos_sys{N}_type{slot}_*)
-                const isPowerWallWithGateway = mergedFormData.inverter_make?.toLowerCase().includes('tesla') &&
-                  mergedFormData.inverter_model?.toLowerCase().includes('powerwall') &&
-                  (mergedFormData.gateway === 'Gateway 3' || mergedFormData.gateway === 'Backup Gateway 2');
-                const bosSection = isPowerWallWithGateway ? 'postSMS' : 'utility';
-
-                return (
-                  <BOSEquipmentSection
-                    formData={mergedFormData}
-                    onChange={handleSystemFieldChange}
-                    section={bosSection}
-                    systemNumber={systemNumber}
-                    maxContinuousOutputAmps={maxContinuousOutputAmpsPerSystem[systemNumber]}
-                    loadingMaxOutput={loadingMaxOutput}
-                  />
-                );
-              })()}
 
               {/* Backup Load Sub Panel - MOVED TO ELECTRICAL TAB */}
 
