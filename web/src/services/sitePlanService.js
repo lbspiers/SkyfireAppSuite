@@ -3,17 +3,17 @@ import logger from './devLogger';
 
 /**
  * Site Plan Service - API methods for site plan upload and management
- * Backend API: /project/:projectId/site-plans
+ * Backend API: /project/:projectUuid/site-plans
  */
 const sitePlanService = {
   /**
    * List all site plans for a project
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @returns {Promise} Response with site plans array
    */
-  async list(projectId) {
+  async list(projectUuid) {
     try {
-      const response = await axios.get(`/project/${projectId}/site-plans`);
+      const response = await axios.get(`/project/${projectUuid}/site-plans`);
       logger.log('SitePlanService', `Fetched ${response.data.data?.length || 0} site plans`);
       return response.data;
     } catch (error) {
@@ -24,12 +24,12 @@ const sitePlanService = {
 
   /**
    * Get published site plan version
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @returns {Promise} Response with published site plan
    */
-  async getPublished(projectId) {
+  async getPublished(projectUuid) {
     try {
-      const response = await axios.get(`/project/${projectId}/site-plans/published`);
+      const response = await axios.get(`/project/${projectUuid}/site-plans/published`);
       logger.log('SitePlanService', 'Fetched published site plan');
       return response.data;
     } catch (error) {
@@ -40,15 +40,15 @@ const sitePlanService = {
 
   /**
    * Get presigned S3 upload URL
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @param {string} fileName - Original file name
    * @param {string} fileType - File MIME type
    * @param {number} fileSize - File size in bytes
    * @returns {Promise} Response with uploadUrl, fileKey, and nextVersion
    */
-  async getUploadUrl(projectId, fileName, fileType, fileSize) {
+  async getUploadUrl(projectUuid, fileName, fileType, fileSize) {
     try {
-      const response = await axios.post(`/project/${projectId}/site-plans/upload-url`, {
+      const response = await axios.post(`/project/${projectUuid}/site-plans/upload-url`, {
         fileName,
         fileType,
         fileSize
@@ -63,7 +63,7 @@ const sitePlanService = {
 
   /**
    * Create site plan record after S3 upload
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @param {Object} data - Site plan data
    * @param {string} data.fileKey - S3 file key
    * @param {string} data.fileName - Original file name
@@ -72,9 +72,9 @@ const sitePlanService = {
    * @param {string} [data.notes] - Optional notes
    * @returns {Promise} Response with created site plan
    */
-  async create(projectId, data) {
+  async create(projectUuid, data) {
     try {
-      const response = await axios.post(`/project/${projectId}/site-plans`, data);
+      const response = await axios.post(`/project/${projectUuid}/site-plans`, data);
       logger.log('SitePlanService', `Created site plan V${data.versionNumber}`);
       return response.data;
     } catch (error) {
@@ -85,13 +85,13 @@ const sitePlanService = {
 
   /**
    * Get presigned download URL for viewing
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @param {string} sitePlanId - Site plan UUID
    * @returns {Promise} Response with downloadUrl
    */
-  async getDownloadUrl(projectId, sitePlanId) {
+  async getDownloadUrl(projectUuid, sitePlanId) {
     try {
-      const response = await axios.get(`/project/${projectId}/site-plans/${sitePlanId}/download-url`);
+      const response = await axios.get(`/project/${projectUuid}/site-plans/${sitePlanId}/download-url`);
       logger.log('SitePlanService', 'Got download URL for site plan');
       return response.data;
     } catch (error) {
@@ -102,13 +102,13 @@ const sitePlanService = {
 
   /**
    * Publish a site plan version
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @param {string} sitePlanId - Site plan UUID
    * @returns {Promise} Response with published site plan
    */
-  async publish(projectId, sitePlanId) {
+  async publish(projectUuid, sitePlanId) {
     try {
-      const response = await axios.put(`/project/${projectId}/site-plans/${sitePlanId}/publish`);
+      const response = await axios.put(`/project/${projectUuid}/site-plans/${sitePlanId}/publish`);
       logger.log('SitePlanService', 'Published site plan');
       return response.data;
     } catch (error) {
@@ -119,19 +119,42 @@ const sitePlanService = {
 
   /**
    * Delete a draft site plan version
-   * @param {number} projectId - The project ID
+   * @param {string} projectUuid - The project UUID
    * @param {string} sitePlanId - Site plan UUID
    * @returns {Promise} Response confirming deletion
    */
-  async delete(projectId, sitePlanId) {
+  async delete(projectUuid, sitePlanId) {
     try {
-      const response = await axios.delete(`/project/${projectId}/site-plans/${sitePlanId}`);
+      const response = await axios.delete(`/project/${projectUuid}/site-plans/${sitePlanId}`);
       logger.log('SitePlanService', 'Deleted site plan');
       return response.data;
     } catch (error) {
       logger.error('SitePlanService', 'Failed to delete site plan:', error);
       throw error;
     }
+  },
+
+  /**
+   * Get the converted PNG image URL for a site plan version.
+   * Response: { status: 'SUCCESS', data: { imageUrl, conversionStatus } }
+   * conversionStatus: 'pending' | 'processing' | 'complete' | 'failed'
+   * imageUrl only present when conversionStatus === 'complete'
+   */
+  async getImageUrl(projectId, sitePlanId) {
+    const response = await axios.get(
+      `/projects/${projectId}/site-plans/${sitePlanId}/image-url`
+    );
+    return response.data;
+  },
+
+  /**
+   * Retry a failed site plan conversion.
+   */
+  async retryConversion(projectId, sitePlanId) {
+    const response = await axios.post(
+      `/projects/${projectId}/site-plans/${sitePlanId}/retry-conversion`
+    );
+    return response.data;
   },
 
   /**

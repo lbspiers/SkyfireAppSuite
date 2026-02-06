@@ -1532,8 +1532,9 @@
 
 .headerLeft {
   display: flex;
-  align-items: center;
-  gap: var(--spacing);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 /* Company Filter Wrapper */
@@ -2474,4 +2475,116 @@
     transform: translateX(0);
     background-color: transparent;
   }
+}
+
+/* ===== SITE PLAN PAGE TABS ===== */
+.pageTabs {
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto;
+  flex-shrink: 0;
+  align-items: center;
+  background: transparent;
+  justify-content: flex-start;
+}
+
+.pageTab {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--border-default, #d0d5dd);
+  border-radius: 12px;
+  background: var(--surface-secondary, #f9fafb);
+  color: var(--text-secondary, #667085);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  min-width: auto;
+  text-align: center;
+  flex-shrink: 0;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pageTab:hover {
+  background: var(--surface-hover, #f3f4f6);
+  border-color: var(--border-hover, #98a2b3);
+}
+
+.pageTabActive {
+  background: var(--color-primary, #2563eb);
+  color: white;
+  border-color: var(--color-primary, #2563eb);
+}
+
+/* ===== ZOOM CONTROLS ===== */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.zoomControls {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  z-index: 10;
+}
+
+.zoomButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid #ff6b35;
+  border-radius: 4px;
+  background: transparent;
+  color: #ff6b35;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.zoomButton:hover:not(:disabled) {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: #ff8c5a;
+  transform: scale(1.05);
+}
+
+.zoomButton:active:not(:disabled) {
+  transform: scale(0.95);
+  background: rgba(255, 107, 53, 0.2);
+}
+
+.zoomButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.zoomDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff6b35;
+  background: transparent;
+  border: 1.5px solid #ff6b35;
+  border-radius: 4px;
+  user-select: none;
 }

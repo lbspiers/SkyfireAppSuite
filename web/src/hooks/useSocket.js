@@ -208,6 +208,23 @@ export const useSocket = () => {
   }, []);
 
   /**
+   * Listen for site plan conversion completion (PDF/DWG → PNG)
+   * Backend emits 'siteplan:converted' to the project room after conversion.
+   * Payload: { sitePlanId, conversionStatus: 'complete'|'failed', imageKey?, error? }
+   */
+  const onSitePlanConverted = useCallback((callback) => {
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    console.log('[Socket] Registering siteplan:converted listener');
+    socket.on('siteplan:converted', callback);
+    return () => {
+      console.log('[Socket] Removing siteplan:converted listener');
+      socket.off('siteplan:converted', callback);
+    };
+  }, []);
+
+  /**
    * Listen for app updates
    * @param {Function} callback - Called when app update available
    * @returns {Function} Cleanup function
@@ -240,6 +257,7 @@ export const useSocket = () => {
     onAutomationComplete,
     onProjectUpdate,
     onPdfReady,
+    onSitePlanConverted,
     onAppUpdate,
     onTaskUpdate,
     joinProject,

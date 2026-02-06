@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-toastify';
-import axios from '../../config/axios';
 import sitePlanService from '../../services/sitePlanService';
 import logger from '../../services/devLogger';
 import styles from '../../styles/Dashboard.module.css';
@@ -8,23 +7,32 @@ import PdfFullScreenModal from '../pdf/PdfFullScreenModal';
 import PdfAnnotationLayer from '../pdf/PdfAnnotationLayer';
 import PdfToolbar from '../pdf/PdfToolbar';
 import { LoadingSpinner, Button, Dropdown, Modal, Textarea } from '../ui';
+import { useSocket } from '../../hooks/useSocket';
 
 /**
  * SitePlanVersions - Site Plan tab with Draft/Published sub-tabs and upload
- * Mirrors PlanSetVersions.js structure with upload functionality added
+ * Now displays converted PNG images instead of raw PDFs.
+ * Listens for 'siteplan:converted' WebSocket events after upload.
  *
- * @param {string} projectUuid - Project UUID (will be converted to ID via API)
+ * @param {string} projectUuid - Project UUID
  * @param {number} projectId - Optional direct project ID
  */
 const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
-  const [projectId, setProjectId] = useState(directProjectId);
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [presignedUrl, setPresignedUrl] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [loadingPdf, setLoadingPdf] = useState(false);
+  const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Conversion state
+  const [conversionPending, setConversionPending] = useState(false);
+
+  // Multi-page state
+  const [pages, setPages] = useState([]);           // Array of { page, label, imageUrl, imageKey }
+  const [activePage, setActivePage] = useState(1);   // Currently selected page number
+  const [pageCount, setPageCount] = useState(1);
 
   // Status tab state: 'draft' or 'published'
   const [statusTab, setStatusTab] = useState('draft');
@@ -37,6 +45,13 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   const [hasChanges, setHasChanges] = useState(false);
   const annotationLayerRef = useRef(null);
 
+  // Zoom state
+  const [zoom, setZoom] = useState(1);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const imageContainerRef = useRef(null);
+
   // Upload state
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -46,50 +61,62 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Fetch project ID from UUID if only UUID is provided
+  // Socket hook
+  const { onSitePlanConverted, joinProject, leaveProject } = useSocket();
+
+  // Join project room for socket events
   useEffect(() => {
-    const fetchProjectId = async () => {
-      if (directProjectId) {
-        setProjectId(directProjectId);
-        return;
-      }
+    if (projectUuid) {
+      joinProject(projectUuid);
+      return () => leaveProject(projectUuid);
+    }
+  }, [projectUuid, joinProject, leaveProject]);
 
-      if (!projectUuid) {
-        setLoading(false);
-        return;
-      }
+  // Listen for conversion completion
+  useEffect(() => {
+    const cleanup = onSitePlanConverted(async (data) => {
+      logger.log('SitePlan', '[WebSocket] siteplan:converted received:', data);
 
-      try {
-        const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
-        const companyId = userData?.company?.uuid;
+      if (data.conversionStatus === 'complete') {
+        setConversionPending(false);
+        toast.success('Site plan image ready!');
 
-        const endpoint = companyId
-          ? `/project/${projectUuid}?companyId=${companyId}`
-          : `/project/${projectUuid}`;
+        // If this is the currently selected version, fetch the PNG URLs (all pages)
+        if (selectedVersion && data.sitePlanId === selectedVersion.id) {
+          try {
+            const imgResponse = await sitePlanService.getImageUrl(projectUuid, data.sitePlanId);
+            const imgData = imgResponse?.data?.data || imgResponse?.data;
 
-        const response = await axios.get(endpoint);
-        const projectData = response.data.data || response.data;
-
-        if (projectData?.id) {
-          setProjectId(projectData.id);
-        } else {
-          logger.error('SitePlan', 'No project ID found in response');
-          setError('Failed to load project information');
-          setLoading(false);
+            if (imgData?.pages && imgData.pages.length > 0) {
+              setPages(imgData.pages);
+              setPageCount(imgData.pageCount || imgData.pages.length);
+              setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+              setActivePage(1);
+            } else if (imgData?.imageUrl) {
+              setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
+              setPageCount(1);
+              setPresignedUrl(imgData.imageUrl);
+              setActivePage(1);
+            }
+          } catch (err) {
+            logger.error('SitePlan', 'Error fetching converted images:', err);
+          }
         }
-      } catch (error) {
-        logger.error('SitePlan', 'Error fetching project ID:', error);
-        setError('Failed to load project information');
-        setLoading(false);
-      }
-    };
 
-    fetchProjectId();
-  }, [projectUuid, directProjectId]);
+        // Refresh versions to get updated conversion_status
+        fetchVersions();
+      } else if (data.conversionStatus === 'failed') {
+        setConversionPending(false);
+        toast.error('Site plan conversion failed. You can retry from the version menu.');
+      }
+    });
+
+    return cleanup;
+  }, [onSitePlanConverted, selectedVersion, projectUuid]);
 
   // Fetch all versions
   const fetchVersions = useCallback(async () => {
-    if (!projectId) {
+    if (!projectUuid) {
       setLoading(false);
       return;
     }
@@ -97,18 +124,15 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await sitePlanService.list(projectId);
+      const response = await sitePlanService.list(projectUuid);
 
       if (response.status === 'SUCCESS' && response.data.length > 0) {
-        // Sort by version number descending
         const sortedVersions = response.data.sort((a, b) => b.versionNumber - a.versionNumber);
         setVersions(sortedVersions);
 
-        // Determine if we have published versions
         const publishedVersions = sortedVersions.filter(v => v.status === 'published');
         const draftVersions = sortedVersions.filter(v => v.status === 'draft');
 
-        // If we have published, show published tab; otherwise show draft
         if (publishedVersions.length > 0) {
           setStatusTab('published');
           const latest = publishedVersions[0];
@@ -128,44 +152,97 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectUuid]);
 
   // Fetch versions on mount
   useEffect(() => {
     fetchVersions();
   }, [fetchVersions]);
 
-  // Fetch presigned URL when version changes
-  useEffect(() => {
-    const fetchPresignedUrl = async () => {
-      if (!projectId || !selectedVersion) {
-        return;
-      }
+  /**
+   * Fetch the converted PNG image URL for a site plan version.
+   * Falls back to the original PDF download URL if no image is available yet.
+   * Handles multi-page PDFs by setting up page tabs.
+   */
+  const fetchImageUrl = useCallback(async (version) => {
+    if (!projectUuid || !version) return;
 
+    try {
+      setLoadingImage(true);
+      setPresignedUrl(null);
+      setPages([]);
+      setActivePage(1);
+      setPageCount(1);
+
+      // Try the image-url endpoint first (PNG)
       try {
-        setLoadingPdf(true);
-        setPresignedUrl(null);
-        const response = await sitePlanService.getDownloadUrl(projectId, selectedVersion.id);
+        const imgResponse = await sitePlanService.getImageUrl(projectUuid, version.id);
+        const imgData = imgResponse?.data?.data || imgResponse?.data;
 
-        if (response.status === 'SUCCESS') {
-          setPresignedUrl(response.data.downloadUrl);
+        if (imgResponse.status === 'SUCCESS') {
+          // Multi-page response
+          if (imgData?.pages && imgData.pages.length > 0) {
+            setPages(imgData.pages);
+            setPageCount(imgData.pageCount || imgData.pages.length);
+            setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+            setActivePage(1);
+            setConversionPending(false);
+            return;
+          }
+
+          // Single image (backward compat)
+          if (imgData?.imageUrl) {
+            setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
+            setPageCount(1);
+            setPresignedUrl(imgData.imageUrl);
+            setActivePage(1);
+            setConversionPending(false);
+            return;
+          }
         }
-      } catch (error) {
-        logger.error('SitePlan', 'Error fetching presigned URL:', error);
-        setError('Failed to load site plan PDF');
-      } finally {
-        setLoadingPdf(false);
-      }
-    };
 
-    fetchPresignedUrl();
-  }, [projectId, selectedVersion]);
+        // If conversion is still pending
+        if (imgData?.conversionStatus === 'pending' || imgData?.conversionStatus === 'processing') {
+          setConversionPending(true);
+          return;
+        }
+      } catch (imgErr) {
+        // image-url endpoint might not exist yet or conversion not done
+        logger.debug('SitePlan', 'Image URL not available, falling back to PDF:', imgErr.message);
+      }
+
+      // Fallback: get the original PDF download URL
+      const response = await sitePlanService.getDownloadUrl(projectUuid, version.id);
+      if (response.status === 'SUCCESS') {
+        setPresignedUrl(response.data.downloadUrl);
+        setPages([]);
+        setPageCount(1);
+      }
+    } catch (error) {
+      logger.error('SitePlan', 'Error fetching URL:', error);
+      setError('Failed to load site plan');
+    } finally {
+      setLoadingImage(false);
+    }
+  }, [projectUuid]);
+
+  // Fetch image URL when version changes
+  useEffect(() => {
+    if (selectedVersion) {
+      fetchImageUrl(selectedVersion);
+    }
+  }, [selectedVersion, fetchImageUrl]);
 
   // Handle version selection
   const handleVersionClick = (versionId) => {
     const version = versions.find(v => v.id === versionId);
     setSelectedVersion(version);
     setPresignedUrl(null);
+    setConversionPending(false);
+    // Reset page state when switching versions
+    setPages([]);
+    setActivePage(1);
+    setPageCount(1);
   };
 
   // Get filtered versions based on current status tab
@@ -177,7 +254,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   const handleStatusTabChange = (newStatus) => {
     setStatusTab(newStatus);
 
-    // Auto-select first version in the new tab
     const filteredVersions = versions.filter(v => v.status === newStatus);
 
     if (filteredVersions.length > 0) {
@@ -187,7 +263,65 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
       setSelectedVersion(null);
       setPresignedUrl(null);
     }
+
+    // Reset page state when switching status tabs
+    setPages([]);
+    setActivePage(1);
+    setPageCount(1);
+    // Reset zoom
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
   };
+
+  // Zoom handlers
+  const handleWheel = useCallback((e) => {
+    e.preventDefault();
+
+    const delta = e.deltaY * -0.001;
+    const newZoom = Math.min(Math.max(0.5, zoom + delta), 5);
+
+    setZoom(newZoom);
+  }, [zoom]);
+
+  const handleMouseDown = useCallback((e) => {
+    if (e.button === 0 && zoom > 1) {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      e.preventDefault();
+    }
+  }, [zoom, panOffset]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (isPanning) {
+      setPanOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
+    }
+  }, [isPanning, panStart]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+
+  const handleZoomReset = useCallback(() => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    setZoom(prev => Math.min(prev + 0.25, 5));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setZoom(prev => Math.max(prev - 0.25, 0.5));
+  }, []);
+
+  // Reset zoom when switching versions or pages
+  useEffect(() => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  }, [selectedVersion, activePage]);
 
   // Upload handlers
   const handleDragOver = (e) => {
@@ -210,10 +344,14 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const file = files[0];
-      if (file.type === 'application/pdf') {
+      const validTypes = ['application/pdf', ''];
+      const validExtensions = ['.pdf', '.dwg'];
+      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+
+      if (validTypes.includes(file.type) || validExtensions.includes(ext)) {
         setUploadFile(file);
       } else {
-        toast.error('Only PDF files are allowed');
+        toast.error('Only PDF and DWG files are allowed');
       }
     }
   };
@@ -222,10 +360,12 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
-      if (file.type === 'application/pdf') {
+      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+
+      if (file.type === 'application/pdf' || ext === '.pdf' || ext === '.dwg') {
         setUploadFile(file);
       } else {
-        toast.error('Only PDF files are allowed');
+        toast.error('Only PDF and DWG files are allowed');
       }
     }
   };
@@ -233,11 +373,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   const handleUpload = async () => {
     if (!uploadFile) return;
 
-    // Validate file
-    if (uploadFile.type !== 'application/pdf') {
-      toast.error('Only PDF files are allowed');
-      return;
-    }
     if (uploadFile.size > 50 * 1024 * 1024) {
       toast.error('File must be less than 50MB');
       return;
@@ -249,9 +384,9 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     try {
       // 1. Get presigned URL
       const urlResponse = await sitePlanService.getUploadUrl(
-        projectId,
+        projectUuid,
         uploadFile.name,
-        uploadFile.type,
+        uploadFile.type || 'application/octet-stream',
         uploadFile.size
       );
       const { uploadUrl, fileKey, nextVersion } = urlResponse.data;
@@ -259,8 +394,8 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
       // 2. Upload to S3 with progress
       await sitePlanService.uploadToS3(uploadUrl, uploadFile, setUploadProgress);
 
-      // 3. Create record in backend
-      await sitePlanService.create(projectId, {
+      // 3. Create record in backend (triggers conversion)
+      await sitePlanService.create(projectUuid, {
         fileKey,
         fileName: uploadFile.name,
         fileSize: uploadFile.size,
@@ -268,14 +403,15 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
         notes: uploadNotes
       });
 
-      // 4. Success - close modal and refresh
-      toast.success(`Site plan V${nextVersion} uploaded successfully`);
+      // 4. Success - close modal and show converting state
+      toast.success(`Site plan V${nextVersion} uploaded — converting to image...`);
       setShowUploadModal(false);
       setUploadFile(null);
       setUploadNotes('');
       setUploadProgress(0);
+      setConversionPending(true);
 
-      // 5. Refresh versions list
+      // 5. Refresh versions list (will show new version with 'pending' conversion)
       await fetchVersions();
     } catch (error) {
       logger.error('SitePlan', 'Upload failed:', error);
@@ -285,14 +421,27 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     }
   };
 
-  // Publish current draft version
-  const handlePublish = async () => {
-    if (!projectId || !selectedVersion) {
-      return;
-    }
+  // Retry conversion for a failed version
+  const handleRetryConversion = async () => {
+    if (!projectUuid || !selectedVersion) return;
 
     try {
-      const response = await sitePlanService.publish(projectId, selectedVersion.id);
+      setConversionPending(true);
+      await sitePlanService.retryConversion(projectUuid, selectedVersion.id);
+      toast.info('Retrying conversion...');
+    } catch (err) {
+      logger.error('SitePlan', 'Retry conversion failed:', err);
+      toast.error('Failed to retry conversion');
+      setConversionPending(false);
+    }
+  };
+
+  // Publish current draft version
+  const handlePublish = async () => {
+    if (!projectUuid || !selectedVersion) return;
+
+    try {
+      const response = await sitePlanService.publish(projectUuid, selectedVersion.id);
 
       if (response.status === 'SUCCESS') {
         toast.success(`Version ${selectedVersion.versionNumber} published successfully!`, {
@@ -300,7 +449,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
           autoClose: 3000
         });
 
-        // Refetch versions to update UI
         await fetchVersions();
       }
     } catch (error) {
@@ -313,13 +461,9 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   };
 
   // Annotation handlers
-  const handleFullScreen = () => {
-    setIsModalOpen(true);
-  };
+  const handleFullScreen = () => setIsModalOpen(true);
 
-  const handleToggleAnnotationMode = () => {
-    setIsAnnotationMode(!isAnnotationMode);
-  };
+  const handleToggleAnnotationMode = () => setIsAnnotationMode(!isAnnotationMode);
 
   const handleAnnotationsChange = (newAnnotations) => {
     setAnnotations(newAnnotations);
@@ -329,24 +473,243 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   const handleSaveMarkup = async () => {
     if (statusTab === 'draft' && hasChanges) {
       await handlePublish();
-    } else {
-      logger.debug('SitePlan', 'Save markup clicked - no changes to publish');
     }
   };
 
-  // Define view steps for sub-tab navigation
+  // Determine if the presigned URL is a PNG (image) or PDF
+  const isImageUrl = presignedUrl && (
+    presignedUrl.includes('preview.png') ||
+    presignedUrl.includes('.png') ||
+    selectedVersion?.imageKey
+  );
+
   const viewSteps = [
     { key: 'draft', label: 'Draft' },
     { key: 'published', label: 'Published' },
   ];
 
+  // Render the site plan content area
+  const renderContent = () => {
+    if (error) {
+      return (
+        <div className={styles.errorAlert}>
+          ⚠️ {error}
+        </div>
+      );
+    }
+
+    if (loading) {
+      return (
+        <div className={styles.flexCenter} style={{ flex: 1 }}>
+          <LoadingSpinner size="lg" label="Loading versions..." />
+        </div>
+      );
+    }
+
+    if (getFilteredVersions().length === 0) {
+      return (
+        <div className={styles.flexCenter} style={{ flex: 1 }}>
+          <div className={styles.emptyStateContainer}>
+            <div className={styles.emptyStateIcon}>📄</div>
+            <h3 className={styles.emptyStateHeading}>
+              No {statusTab === 'draft' ? 'Draft' : 'Published'} Site Plans
+            </h3>
+            <p className={styles.emptyStateText}>
+              {statusTab === 'draft'
+                ? 'Upload a site plan PDF or DWG to get started'
+                : 'Publish a draft to see it here'}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Conversion in progress
+    if (conversionPending) {
+      return (
+        <div className={styles.flexCenter} style={{ flex: 1 }}>
+          <div style={{ textAlign: 'center' }}>
+            <LoadingSpinner size="lg" />
+            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
+              Converting site plan to image...
+            </p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-disabled)', marginTop: '0.5rem' }}>
+              This usually takes a few seconds
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Conversion failed
+    if (selectedVersion?.conversionStatus === 'failed') {
+      return (
+        <div className={styles.flexCenter} style={{ flex: 1 }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⚠️</div>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              Image conversion failed for this version
+            </p>
+            <Button variant="outline" onClick={handleRetryConversion}>
+              Retry Conversion
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (loadingImage) {
+      return (
+        <div className={styles.flexCenter} style={{ flex: 1 }}>
+          <LoadingSpinner size="lg" label="Loading site plan..." />
+        </div>
+      );
+    }
+
+    if (!presignedUrl) {
+      return (
+        <div className={styles.flexCenter} style={{ flex: 1 }}>
+          <div className={styles.textCenter} style={{ color: 'var(--text-disabled)' }}>
+            <p>Select a version to view the site plan</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Display PNG image or fallback to PDF iframe
+    if (isImageUrl) {
+      return (
+        <>
+          <div
+            ref={imageContainerRef}
+            className={styles.imageContainer}
+            onWheel={handleWheel}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            style={{
+              cursor: isPanning ? 'grabbing' : zoom > 1 ? 'grab' : 'default',
+              overflow: 'hidden',
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <img
+              src={presignedUrl}
+              alt={`Site Plan Version ${selectedVersion?.versionNumber}`}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                backgroundColor: 'var(--bg-secondary, #f5f5f5)',
+                transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
+                transformOrigin: 'center center',
+                transition: isPanning ? 'none' : 'transform 0.1s ease-out',
+              }}
+            />
+
+            {/* Floating Zoom Controls */}
+            <div className={styles.zoomControls}>
+              <button
+                className={styles.zoomButton}
+                onClick={handleZoomIn}
+                disabled={zoom >= 5}
+                title="Zoom In"
+              >
+                +
+              </button>
+              <div className={styles.zoomDisplay}>
+                {Math.round(zoom * 100)}%
+              </div>
+              <button
+                className={styles.zoomButton}
+                onClick={handleZoomOut}
+                disabled={zoom <= 0.5}
+                title="Zoom Out"
+              >
+                −
+              </button>
+              <button
+                className={styles.zoomButton}
+                onClick={handleZoomReset}
+                disabled={zoom === 1 && panOffset.x === 0 && panOffset.y === 0}
+                title="Reset Zoom"
+              >
+                ⟲
+              </button>
+            </div>
+          </div>
+
+          {/* Annotation Layer Overlay */}
+          <PdfAnnotationLayer
+            ref={annotationLayerRef}
+            isActive={isAnnotationMode}
+            currentTool={currentTool}
+            currentColor={currentColor}
+            annotations={annotations}
+            onAnnotationsChange={handleAnnotationsChange}
+            onToolChange={setCurrentTool}
+            currentPage={1}
+          />
+
+          {/* Annotation Toolbar */}
+          {isAnnotationMode && (
+            <PdfToolbar
+              currentTool={currentTool}
+              onToolChange={setCurrentTool}
+              currentColor={currentColor}
+              onColorChange={setCurrentColor}
+              canSave={hasChanges}
+              onSave={handleSaveMarkup}
+              statusTab={statusTab}
+            />
+          )}
+        </>
+      );
+    }
+
+    // Fallback: PDF iframe (for versions without PNG conversion)
+    return (
+      <>
+        <iframe
+          src={presignedUrl}
+          className={styles.pdfIframe}
+          title={`Site Plan Version ${selectedVersion?.versionNumber}`}
+        />
+
+        <PdfAnnotationLayer
+          ref={annotationLayerRef}
+          isActive={isAnnotationMode}
+          currentTool={currentTool}
+          currentColor={currentColor}
+          annotations={annotations}
+          onAnnotationsChange={handleAnnotationsChange}
+          onToolChange={setCurrentTool}
+          currentPage={1}
+        />
+
+        {isAnnotationMode && (
+          <PdfToolbar
+            currentTool={currentTool}
+            onToolChange={setCurrentTool}
+            currentColor={currentColor}
+            onColorChange={setCurrentColor}
+            canSave={hasChanges}
+            onSave={handleSaveMarkup}
+            statusTab={statusTab}
+          />
+        )}
+      </>
+    );
+  };
+
   return (
     <div className={styles.mainContainer}>
       {/* Header: Sub-tab Navigation + Version Dropdown */}
       <div className={styles.headerSection}>
-        {/* Left Side: Sub-tab Navigation + Version Dropdown */}
         <div className={styles.headerLeft}>
-          {/* Sub-tab Navigation */}
           <div className={styles.viewNavigation}>
             {viewSteps.map((view, index) => (
               <a
@@ -397,11 +760,28 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
               </Dropdown>
             )}
           </div>
+
+          {/* Page tabs - only show for multi-page documents */}
+          {pageCount > 1 && pages.length > 0 && !loading && !conversionPending && (
+            <div className={styles.pageTabs}>
+              {pages.map((pg) => (
+                <button
+                  key={pg.page}
+                  className={`${styles.pageTab} ${activePage === pg.page ? styles.pageTabActive : ''}`}
+                  onClick={() => {
+                    setActivePage(pg.page);
+                    setPresignedUrl(pg.imageUrl);
+                  }}
+                >
+                  {pg.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
         <div className={styles.actionButtons}>
-          {/* Upload Button */}
           <Button
             variant="primary"
             onClick={() => setShowUploadModal(true)}
@@ -410,7 +790,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             Upload
           </Button>
 
-          {/* Publish Button - Only visible for draft versions */}
           {selectedVersion && statusTab === 'draft' && (
             <Button
               variant="outline"
@@ -421,8 +800,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             </Button>
           )}
 
-          {/* Tools Button - Only visible when PDF is loaded */}
-          {presignedUrl && (
+          {presignedUrl && !conversionPending && (
             <button
               onClick={handleToggleAnnotationMode}
               className={`${styles.pillButton} ${isAnnotationMode ? styles.pillButtonPrimary : styles.pillButtonOutlinePrimary}`}
@@ -431,8 +809,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             </button>
           )}
 
-          {/* Full Screen Button - Only visible when PDF is loaded */}
-          {presignedUrl && (
+          {presignedUrl && !conversionPending && (
             <button
               onClick={handleFullScreen}
               className={`${styles.pillButton} ${isModalOpen ? styles.pillButtonPrimary : styles.pillButtonSecondary}`}
@@ -445,76 +822,8 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
 
       {/* Content Area */}
       <div className={styles.contentArea}>
-        {/* PDF Viewer Container */}
         <div className={styles.pdfContainer}>
-          {error && (
-            <div className={styles.errorAlert}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          {loading ? (
-            <div className={styles.flexCenter} style={{ flex: 1 }}>
-              <LoadingSpinner size="lg" label="Loading versions..." />
-            </div>
-          ) : getFilteredVersions().length === 0 ? (
-            <div className={styles.flexCenter} style={{ flex: 1 }}>
-              <div className={styles.emptyStateContainer}>
-                <div className={styles.emptyStateIcon}>📄</div>
-                <h3 className={styles.emptyStateHeading}>
-                  No {statusTab === 'draft' ? 'Draft' : 'Published'} Site Plans
-                </h3>
-                <p className={styles.emptyStateText}>
-                  {statusTab === 'draft'
-                    ? 'Upload a site plan PDF to get started'
-                    : 'Publish a draft to see it here'}
-                </p>
-              </div>
-            </div>
-          ) : loadingPdf ? (
-            <div className={styles.flexCenter} style={{ flex: 1 }}>
-              <LoadingSpinner size="lg" label="Loading PDF..." />
-            </div>
-          ) : presignedUrl ? (
-            <>
-              <iframe
-                src={presignedUrl}
-                className={styles.pdfIframe}
-                title={`Site Plan Version ${selectedVersion?.versionNumber}`}
-              />
-
-              {/* Annotation Layer Overlay */}
-              <PdfAnnotationLayer
-                ref={annotationLayerRef}
-                isActive={isAnnotationMode}
-                currentTool={currentTool}
-                currentColor={currentColor}
-                annotations={annotations}
-                onAnnotationsChange={handleAnnotationsChange}
-                onToolChange={setCurrentTool}
-                currentPage={1}
-              />
-
-              {/* Annotation Toolbar */}
-              {isAnnotationMode && (
-                <PdfToolbar
-                  currentTool={currentTool}
-                  onToolChange={setCurrentTool}
-                  currentColor={currentColor}
-                  onColorChange={setCurrentColor}
-                  canSave={hasChanges}
-                  onSave={handleSaveMarkup}
-                  statusTab={statusTab}
-                />
-              )}
-            </>
-          ) : (
-            <div className={styles.flexCenter} style={{ flex: 1 }}>
-              <div className={styles.textCenter} style={{ color: 'var(--text-disabled)' }}>
-                <p>Select a version to view the site plan</p>
-              </div>
-            </div>
-          )}
+          {renderContent()}
         </div>
       </div>
 
@@ -534,7 +843,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
         title="Upload Site Plan"
       >
         <div className={styles.uploadModalContent}>
-          {/* Drop Zone */}
           <div
             className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
             onDragOver={handleDragOver}
@@ -545,7 +853,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf"
+              accept=".pdf,.dwg"
               onChange={handleFileSelect}
               style={{ display: 'none' }}
             />
@@ -559,13 +867,12 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             ) : (
               <>
                 <div className={styles.dropIcon}>📄</div>
-                <p>Drop PDF here or click to browse</p>
-                <p className={styles.hint}>PDF files only, max 50MB</p>
+                <p>Drop PDF or DWG here or click to browse</p>
+                <p className={styles.hint}>PDF or DWG files, max 50MB</p>
               </>
             )}
           </div>
 
-          {/* Notes Field */}
           <Textarea
             label="Notes (optional)"
             value={uploadNotes}
@@ -574,7 +881,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             rows={2}
           />
 
-          {/* Progress Bar */}
           {isUploading && (
             <div className={styles.progressContainer}>
               <div className={styles.progressBar}>
@@ -587,7 +893,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             </div>
           )}
 
-          {/* Actions */}
           <div className={styles.modalActions}>
             <Button
               variant="ghost"
