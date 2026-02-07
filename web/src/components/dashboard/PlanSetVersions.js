@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from '../../config/axios';
 import { toast } from 'react-toastify';
 import logger from '../../services/devLogger';
+import planSetService from '../../services/planSetService';
+import { useSocket } from '../../hooks/useSocket';
 import styles from '../../styles/Dashboard.module.css';
 import PdfFullScreenModal from '../pdf/PdfFullScreenModal';
 import PdfAnnotationLayer from '../pdf/PdfAnnotationLayer';
@@ -12,8 +13,8 @@ import SpecSheetGrid from './SpecSheetGrid';
 
 /**
  * PlanSetVersions - Version tabs for viewing different plan set iterations
- * Fetches versions from API and displays PDFs with presigned URLs
- * Listens for real-time PDF upload notifications via Socket.io
+ * Now displays converted PNG images instead of raw PDFs.
+ * Listens for 'planset:converted' WebSocket events after upload.
  */
 const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [versions, setVersions] = useState([]);
@@ -23,6 +24,14 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Conversion state
+  const [conversionPending, setConversionPending] = useState(false);
+
+  // Multi-page state
+  const [pages, setPages] = useState([]);           // Array of { page, label, imageUrl, imageKey }
+  const [activePage, setActivePage] = useState(1);   // Currently selected page number
+  const [pageCount, setPageCount] = useState(1);
 
   // Status tab state: 'draft' or 'published'
   const [statusTab, setStatusTab] = useState('draft');
@@ -36,7 +45,14 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [currentColor, setCurrentColor] = useState('var(--color-danger)'); // Red default
   const [annotations, setAnnotations] = useState([]);
   const [hasChanges, setHasChanges] = useState(false);
-  const annotationLayerRef = React.useRef(null);
+  const annotationLayerRef = useRef(null);
+
+  // Zoom state
+  const [zoom, setZoom] = useState(1);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const imageContainerRef = useRef(null);
 
   // QC Checklist panel state - now supports 'site' and 'design' types
   const [activeQCType, setActiveQCType] = useState(null); // null, 'site', or 'design'
@@ -45,6 +61,9 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [specSheetAttachments, setSpecSheetAttachments] = useState([]);
   const [loadingSpecSheets, setLoadingSpecSheets] = useState(false);
   const [viewingSpecSheet, setViewingSpecSheet] = useState(null);
+
+  // Socket.io hooks
+  const { joinProject, leaveProject, onPlanSetConverted } = useSocket();
 
   // Fetch all versions (extracted to useCallback so it can be called from socket listener)
   const fetchVersions = useCallback(async () => {
@@ -133,88 +152,193 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     });
   };
 
-  // Fetch presigned URL when version changes
+  // Join project room for WebSocket updates
   useEffect(() => {
-    const fetchPresignedUrl = async () => {
-      if (!projectUuid || !selectedVersion) {
-        return;
-      }
-
-      try {
-        setLoadingPdf(true);
-        setPresignedUrl(null);
-        const response = await axios.get(`/project/${projectUuid}/versions/${selectedVersion}/presigned-url`);
-
-        if (response.data.success) {
-          setPresignedUrl(response.data.presigned_url);
-        }
-      } catch (error) {
-        logger.error('Dashboard', 'Error fetching presigned URL:', error);
-        setError(`Failed to load Version ${selectedVersion} PDF`);
-      } finally {
-        setLoadingPdf(false);
-      }
-    };
-
-    fetchPresignedUrl();
-  }, [projectUuid, selectedVersion]);
-
-  // Socket.io real-time PDF notifications
-  useEffect(() => {
-    if (!projectUuid) {
-      return;
+    if (projectUuid) {
+      joinProject(projectUuid);
+      return () => leaveProject(projectUuid);
     }
+  }, [projectUuid, joinProject, leaveProject]);
 
-    logger.debug('Dashboard', '[PlanSetVersions] Initializing Socket.io connection');
+  // Listen for conversion completion
+  useEffect(() => {
+    const cleanup = onPlanSetConverted(async (data) => {
+      logger.log('PlanSet', '[WebSocket] planset:converted received:', data);
 
-    const socket = io('https://api.skyfireapp.io', {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5
+      if (data.conversionStatus === 'complete') {
+        setConversionPending(false);
+        toast.success('Plan set image ready!');
+
+        // If this is the currently selected version, fetch the PNG URLs (all pages)
+        if (selectedVersion && data.versionId === selectedVersion) {
+          await fetchImageUrl(selectedVersion);
+        }
+
+        // Refresh versions to get updated conversion_status
+        fetchVersions();
+      } else if (data.conversionStatus === 'failed') {
+        setConversionPending(false);
+        toast.error('Plan set conversion failed. You can retry from the version menu.');
+      }
     });
 
-    socket.on('connect', () => {
-      logger.log('Dashboard', '[PlanSetVersions] Socket connected, joining project room:', projectUuid);
-      socket.emit('join-project', projectUuid);
-    });
+    return cleanup;
+  }, [onPlanSetConverted, selectedVersion, projectUuid, fetchVersions]);
 
-    socket.on('disconnect', (reason) => {
-      logger.log('Dashboard', '[PlanSetVersions] Socket disconnected:', reason);
-    });
+  /**
+   * Fetch the converted PNG image URL for a plan set version.
+   * Falls back to the original PDF presigned URL if no image is available yet.
+   * Handles multi-page PDFs by setting up page tabs.
+   */
+  const fetchImageUrl = useCallback(async (versionNumber) => {
+    if (!projectUuid || !versionNumber) return;
 
-    socket.on('connect_error', (error) => {
-      logger.error('Dashboard', '[PlanSetVersions] Socket connection error:', error);
-    });
+    try {
+      setLoadingPdf(true);
+      setPresignedUrl(null);
+      setPages([]);
+      setActivePage(1);
+      setPageCount(1);
 
-    socket.on('pdf-ready', (data) => {
-      logger.log('Dashboard', '[PlanSetVersions] PDF ready notification received:', data);
+      // Try the image-url endpoint first (PNG)
+      try {
+        const imgResponse = await planSetService.getImageUrl(projectUuid, versionNumber);
+        const imgData = imgResponse?.data?.data || imgResponse?.data;
 
-      // Show toast notification
-      toast.success(`Plan Set V${data.version_number} is ready!`, {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
+        logger.debug('PlanSet', 'Image URL response:', {
+          status: imgResponse.status,
+          hasPages: !!imgData?.pages,
+          hasSingleImage: !!imgData?.imageUrl,
+          conversionStatus: imgData?.conversionStatus
+        });
 
-      // Refetch versions to show new PDF
-      fetchVersions();
-    });
+        // Check if we have image URLs (conversion complete)
+        if (imgData?.pages && imgData.pages.length > 0) {
+          // Multi-page response
+          setPages(imgData.pages);
+          setPageCount(imgData.pageCount || imgData.pages.length);
+          setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+          setActivePage(1);
+          setConversionPending(false);
+          logger.log('PlanSet', `Loaded ${imgData.pages.length} pages for version ${versionNumber}`);
+          return;
+        }
 
-    return () => {
-      logger.debug('Dashboard', '[PlanSetVersions] Cleaning up Socket.io connection');
-      socket.emit('leave-project', projectUuid);
-      socket.disconnect();
-    };
-  }, [projectUuid, fetchVersions]);
+        if (imgData?.imageUrl) {
+          // Single image (backward compat)
+          setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
+          setPageCount(1);
+          setPresignedUrl(imgData.imageUrl);
+          setActivePage(1);
+          setConversionPending(false);
+          logger.log('PlanSet', `Loaded single image for version ${versionNumber}`);
+          return;
+        }
+
+        // If conversion is still pending
+        if (imgData?.conversionStatus === 'pending' || imgData?.conversionStatus === 'processing') {
+          logger.log('PlanSet', `Conversion pending for version ${versionNumber}`);
+          setConversionPending(true);
+          return;
+        }
+
+        // If we get here, conversion may have failed or not started
+        logger.warn('PlanSet', `No image data and no pending status for version ${versionNumber}`);
+      } catch (imgErr) {
+        // image-url endpoint might not exist yet or conversion not done
+        logger.debug('PlanSet', 'Image URL not available, falling back to PDF:', imgErr.message);
+      }
+
+      // Fallback: get the original PDF presigned URL
+      const response = await axios.get(`/project/${projectUuid}/versions/${versionNumber}/presigned-url`);
+      if (response.data.success) {
+        setPresignedUrl(response.data.presigned_url);
+        setPages([]);
+        setPageCount(1);
+      }
+    } catch (error) {
+      logger.error('PlanSet', 'Error fetching URL:', error);
+      setError(`Failed to load Version ${versionNumber}`);
+    } finally {
+      setLoadingPdf(false);
+    }
+  }, [projectUuid]);
+
+  // Fetch image URL when version changes
+  useEffect(() => {
+    if (selectedVersion) {
+      fetchImageUrl(selectedVersion);
+    }
+  }, [selectedVersion, fetchImageUrl]);
 
   const handleVersionClick = (versionNumber) => {
     setSelectedVersion(versionNumber);
-    setPresignedUrl(null); // Clear current PDF while loading new one
+    setPresignedUrl(null);
+    setConversionPending(false);
+    // Reset page state when switching versions
+    setPages([]);
+    setActivePage(1);
+    setPageCount(1);
   };
+
+  // Zoom handlers
+  const handleMouseDown = useCallback((e) => {
+    if (e.button === 0 && zoom > 1) {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      e.preventDefault();
+    }
+  }, [zoom, panOffset]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (isPanning) {
+      setPanOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
+    }
+  }, [isPanning, panStart]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+
+  const handleZoomReset = useCallback(() => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    setZoom(prev => Math.min(prev + 0.25, 5));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setZoom(prev => Math.max(prev - 0.25, 0.5));
+  }, []);
+
+  // Reset zoom when switching versions or pages
+  useEffect(() => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  }, [selectedVersion, activePage]);
+
+  // Attach wheel event listener with { passive: false } to allow preventDefault
+  useEffect(() => {
+    const container = imageContainerRef.current;
+    if (!container) return;
+
+    const wheelHandler = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY * -0.001;
+      setZoom(prevZoom => {
+        const newZoom = Math.min(Math.max(0.5, prevZoom + delta), 5);
+        return newZoom;
+      });
+    };
+
+    container.addEventListener('wheel', wheelHandler, { passive: false });
+    return () => container.removeEventListener('wheel', wheelHandler);
+  }, []);
 
   const handleFullScreen = () => {
     setIsModalOpen(true);
@@ -401,6 +525,24 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
               )}
             </a>
           </div>
+
+          {/* Page tabs - only show for multi-page documents */}
+          {currentView === 'planset' && pageCount > 1 && pages.length > 0 && !loading && !conversionPending && (
+            <div className={styles.pageTabs}>
+              {pages.map((pg) => (
+                <button
+                  key={pg.page}
+                  className={`${styles.pageTab} ${activePage === pg.page ? styles.pageTabActive : ''}`}
+                  onClick={() => {
+                    setActivePage(pg.page);
+                    setPresignedUrl(pg.imageUrl);
+                  }}
+                >
+                  {pg.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -451,15 +593,88 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
 
         {loadingPdf ? (
           <div className={styles.flexCenter} style={{ flex: 1 }}>
-            <LoadingSpinner size="lg" label="Loading PDF..." />
+            <LoadingSpinner size="lg" label="Loading plan set..." />
+          </div>
+        ) : conversionPending ? (
+          <div className={styles.flexCenter} style={{ flex: 1 }}>
+            <div className={styles.textCenter}>
+              <LoadingSpinner size="lg" label="Converting to image..." />
+              <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>
+                This may take a minute for large files
+              </p>
+            </div>
           </div>
         ) : presignedUrl ? (
           <>
-            <iframe
-              src={presignedUrl}
-              className={styles.pdfIframe}
-              title={`Plan Set Version ${selectedVersion}`}
-            />
+            {/* Check if URL is an image (PNG) or PDF */}
+            {presignedUrl.includes('.png') || presignedUrl.includes('image') || pages.length > 0 ? (
+              <div
+                ref={imageContainerRef}
+                className={styles.imageContainer}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                style={{
+                  cursor: isPanning ? 'grabbing' : zoom > 1 ? 'grab' : 'default',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                }}
+              >
+                <img
+                  src={presignedUrl}
+                  alt={`Plan Set Version ${selectedVersion}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    backgroundColor: 'var(--bg-secondary, #f5f5f5)',
+                    transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
+                    transformOrigin: 'center center',
+                    transition: isPanning ? 'none' : 'transform 0.1s ease-out',
+                  }}
+                />
+
+                {/* Floating Zoom Controls */}
+                <div className={styles.zoomControls}>
+                  <button
+                    className={styles.zoomButton}
+                    onClick={handleZoomIn}
+                    disabled={zoom >= 5}
+                    title="Zoom In"
+                  >
+                    +
+                  </button>
+                  <div className={styles.zoomDisplay}>
+                    {Math.round(zoom * 100)}%
+                  </div>
+                  <button
+                    className={styles.zoomButton}
+                    onClick={handleZoomOut}
+                    disabled={zoom <= 0.5}
+                    title="Zoom Out"
+                  >
+                    −
+                  </button>
+                  <button
+                    className={styles.zoomButton}
+                    onClick={handleZoomReset}
+                    disabled={zoom === 1 && panOffset.x === 0 && panOffset.y === 0}
+                    title="Reset Zoom"
+                  >
+                    ⟲
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <iframe
+                src={presignedUrl}
+                className={styles.pdfIframe}
+                title={`Plan Set Version ${selectedVersion}`}
+              />
+            )}
 
             {/* Annotation Layer Overlay */}
             <PdfAnnotationLayer
@@ -470,7 +685,7 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
               annotations={annotations}
               onAnnotationsChange={handleAnnotationsChange}
               onToolChange={setCurrentTool}
-              currentPage={1}
+              currentPage={activePage}
             />
 
             {/* Annotation Toolbar */}

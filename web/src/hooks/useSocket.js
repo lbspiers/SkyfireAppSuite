@@ -225,6 +225,23 @@ export const useSocket = () => {
   }, []);
 
   /**
+   * Listen for plan set conversion completion (PDF → PNG)
+   * Backend emits 'planset:converted' to the project room after conversion.
+   * Payload: { versionId, conversionStatus: 'complete'|'failed', imageKey?, error? }
+   */
+  const onPlanSetConverted = useCallback((callback) => {
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    console.log('[Socket] Registering planset:converted listener');
+    socket.on('planset:converted', callback);
+    return () => {
+      console.log('[Socket] Removing planset:converted listener');
+      socket.off('planset:converted', callback);
+    };
+  }, []);
+
+  /**
    * Listen for app updates
    * @param {Function} callback - Called when app update available
    * @returns {Function} Cleanup function
@@ -258,6 +275,7 @@ export const useSocket = () => {
     onProjectUpdate,
     onPdfReady,
     onSitePlanConverted,
+    onPlanSetConverted,
     onAppUpdate,
     onTaskUpdate,
     joinProject,
