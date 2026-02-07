@@ -224,12 +224,15 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
               10: 'PV 8'
             };
 
-            imgData.pages = imgData.pages.map(p => ({
-              ...p,
-              imageUrl: p.imageUrl || p.image_url,
-              imageKey: p.imageKey || p.image_key,
-              label: pvLabelMap[p.page] || p.label || `Page ${p.page}`
-            }));
+            // Filter out pages 2 and 3 (PV 2 and PV 3), then map labels
+            imgData.pages = imgData.pages
+              .filter(p => p.page !== 2 && p.page !== 3)
+              .map(p => ({
+                ...p,
+                imageUrl: p.imageUrl || p.image_url,
+                imageKey: p.imageKey || p.image_key,
+                label: pvLabelMap[p.page] || p.label || `Page ${p.page}`
+              }));
           }
         }
 
