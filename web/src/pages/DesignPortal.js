@@ -30,6 +30,7 @@ import styles from '../styles/Dashboard.module.css';
 import portalStyles from '../styles/Portal.module.css';
 import { CSS_GRADIENTS } from '../styles/gradient';
 import { canAccessDevPortal } from '../constants/devPortalConstants';
+import { DevPortal } from '../components/dev';
 
 /**
  * Design Portal Page
@@ -379,15 +380,7 @@ const DesignPortal = () => {
                   <p>Inventory management coming soon...</p>
                 </div>
               ),
-              devportal: (
-                <div className={portalStyles.menuContent}>
-                  <h3>Dev Portal</h3>
-                  <p>Internal task tracking for the dev team.</p>
-                  <button onClick={() => navigate('/dev-portal')} className={portalStyles.logoutButton}>
-                    Open Dev Portal
-                  </button>
-                </div>
-              ),
+              devportal: <DevPortal />,
               logout: (
                 <div className={portalStyles.menuContent}>
                   <h3>Logout</h3>
@@ -472,7 +465,6 @@ const DesignPortal = () => {
             {selectedOverviewTab === 'overview' && projectUuid && (
               <SitePlanVersions
                 projectUuid={projectUuid}
-                projectName={projectId}
               />
             )}
             {selectedOverviewTab === 'survey' && projectUuid && (
