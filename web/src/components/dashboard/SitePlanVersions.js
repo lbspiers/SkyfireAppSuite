@@ -179,33 +179,40 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
         const imgResponse = await sitePlanService.getImageUrl(projectUuid, version.id);
         const imgData = imgResponse?.data?.data || imgResponse?.data;
 
-        if (imgResponse.status === 'SUCCESS') {
-          // Multi-page response
-          if (imgData?.pages && imgData.pages.length > 0) {
-            setPages(imgData.pages);
-            setPageCount(imgData.pageCount || imgData.pages.length);
-            setPresignedUrl(imgData.pages[0]?.imageUrl || null);
-            setActivePage(1);
-            setConversionPending(false);
-            return;
-          }
+        logger.debug('SitePlan', 'Image URL response:', { status: imgResponse.status, hasPages: !!imgData?.pages, hasSingleImage: !!imgData?.imageUrl, conversionStatus: imgData?.conversionStatus });
 
+        // Check if we have image URLs (conversion complete)
+        if (imgData?.pages && imgData.pages.length > 0) {
+          // Multi-page response
+          setPages(imgData.pages);
+          setPageCount(imgData.pageCount || imgData.pages.length);
+          setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+          setActivePage(1);
+          setConversionPending(false);
+          logger.log('SitePlan', `Loaded ${imgData.pages.length} pages for version ${version.versionNumber}`);
+          return;
+        }
+
+        if (imgData?.imageUrl) {
           // Single image (backward compat)
-          if (imgData?.imageUrl) {
-            setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
-            setPageCount(1);
-            setPresignedUrl(imgData.imageUrl);
-            setActivePage(1);
-            setConversionPending(false);
-            return;
-          }
+          setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
+          setPageCount(1);
+          setPresignedUrl(imgData.imageUrl);
+          setActivePage(1);
+          setConversionPending(false);
+          logger.log('SitePlan', `Loaded single image for version ${version.versionNumber}`);
+          return;
         }
 
         // If conversion is still pending
         if (imgData?.conversionStatus === 'pending' || imgData?.conversionStatus === 'processing') {
+          logger.log('SitePlan', `Conversion pending for version ${version.versionNumber}`);
           setConversionPending(true);
           return;
         }
+
+        // If we get here, conversion may have failed or not started
+        logger.warn('SitePlan', `No image data and no pending status for version ${version.versionNumber}`);
       } catch (imgErr) {
         // image-url endpoint might not exist yet or conversion not done
         logger.debug('SitePlan', 'Image URL not available, falling back to PDF:', imgErr.message);
@@ -274,15 +281,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   };
 
   // Zoom handlers
-  const handleWheel = useCallback((e) => {
-    e.preventDefault();
-
-    const delta = e.deltaY * -0.001;
-    const newZoom = Math.min(Math.max(0.5, zoom + delta), 5);
-
-    setZoom(newZoom);
-  }, [zoom]);
-
   const handleMouseDown = useCallback((e) => {
     if (e.button === 0 && zoom > 1) {
       setIsPanning(true);
@@ -322,6 +320,24 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     setZoom(1);
     setPanOffset({ x: 0, y: 0 });
   }, [selectedVersion, activePage]);
+
+  // Attach wheel event listener with { passive: false } to allow preventDefault
+  useEffect(() => {
+    const container = imageContainerRef.current;
+    if (!container) return;
+
+    const wheelHandler = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY * -0.001;
+      setZoom(prevZoom => {
+        const newZoom = Math.min(Math.max(0.5, prevZoom + delta), 5);
+        return newZoom;
+      });
+    };
+
+    container.addEventListener('wheel', wheelHandler, { passive: false });
+    return () => container.removeEventListener('wheel', wheelHandler);
+  }, []);
 
   // Upload handlers
   const handleDragOver = (e) => {
@@ -583,7 +599,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
           <div
             ref={imageContainerRef}
             className={styles.imageContainer}
-            onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
