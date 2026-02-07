@@ -171,7 +171,13 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
 
         // If this is the currently selected version, fetch the PNG URLs (all pages)
         if (selectedVersion && data.versionId === selectedVersion) {
+          logger.log('PlanSet', 'Conversion complete for current version, fetching image URL');
           await fetchImageUrl(selectedVersion);
+        } else {
+          logger.log('PlanSet', 'Conversion complete but not for current version:', {
+            received: data.versionId,
+            current: selectedVersion
+          });
         }
 
         // Refresh versions to get updated conversion_status
@@ -183,7 +189,7 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     });
 
     return cleanup;
-  }, [onPlanSetConverted, selectedVersion, projectUuid, fetchVersions]);
+  }, [onPlanSetConverted, selectedVersion, projectUuid, fetchVersions, fetchImageUrl]);
 
   /**
    * Fetch the converted PNG image URL for a plan set version.
@@ -192,6 +198,8 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
    */
   const fetchImageUrl = useCallback(async (versionNumber) => {
     if (!projectUuid || !versionNumber) return;
+
+    logger.log('PlanSet', `Fetching image URL for version ${versionNumber}`);
 
     try {
       setLoadingPdf(true);
@@ -202,14 +210,16 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
 
       // Try the image-url endpoint first (PNG)
       try {
+        logger.log('PlanSet', `Calling planSetService.getImageUrl(${projectUuid}, ${versionNumber})`);
         const imgResponse = await planSetService.getImageUrl(projectUuid, versionNumber);
         const imgData = imgResponse?.data?.data || imgResponse?.data;
 
-        logger.debug('PlanSet', 'Image URL response:', {
+        logger.log('PlanSet', 'Image URL response:', {
           status: imgResponse.status,
           hasPages: !!imgData?.pages,
           hasSingleImage: !!imgData?.imageUrl,
-          conversionStatus: imgData?.conversionStatus
+          conversionStatus: imgData?.conversionStatus,
+          fullResponse: imgData
         });
 
         // Check if we have image URLs (conversion complete)

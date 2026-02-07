@@ -15,13 +15,13 @@ const planSetService = {
    */
   async getImageUrl(projectUuid, versionId) {
     try {
-      const response = await axios.get(
-        `/project/${projectUuid}/versions/${versionId}/image-url`
-      );
-      logger.log('PlanSetService', 'Fetched image URL for version:', versionId);
+      const endpoint = `/project/${projectUuid}/versions/${versionId}/image-url`;
+      logger.log('PlanSetService', `Calling GET ${endpoint}`);
+      const response = await axios.get(endpoint);
+      logger.log('PlanSetService', 'Fetched image URL for version:', versionId, 'Response:', response.data);
       return response.data;
     } catch (error) {
-      logger.error('PlanSetService', 'Failed to get image URL:', error);
+      logger.error('PlanSetService', `Failed to get image URL for version ${versionId}:`, error.response?.status, error.message);
       throw error;
     }
   },
