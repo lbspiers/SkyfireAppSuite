@@ -24,10 +24,11 @@ const revisionService = {
    * Get presigned URL for uploading a revision document
    * @param {string} projectId - Project UUID
    * @param {string} fileName - Original filename
+   * @param {string} contentType - File MIME type
    * @returns {Promise<{uploadUrl: string, s3Key: string, expiresIn: number}>}
    */
-  async getUploadUrl(projectId, fileName) {
-    const url = `${API_BASE}/project/${projectId}/revisions/upload-url?fileName=${encodeURIComponent(fileName)}`;
+  async getUploadUrl(projectId, fileName, contentType) {
+    const url = `${API_BASE}/project/${projectId}/revisions/upload-url?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`;
 
     logger.log('RevisionService', `[Upload] Getting presigned URL for ${fileName}`);
 
@@ -120,7 +121,8 @@ const revisionService = {
     logger.log('RevisionService', `[Submit] Starting revision submission for ${metadata.revisionType}`);
 
     // Step 1: Get presigned upload URL
-    const { uploadUrl, s3Key } = await this.getUploadUrl(projectId, file.name);
+    const contentType = file.type || 'application/octet-stream';
+    const { uploadUrl, s3Key } = await this.getUploadUrl(projectId, file.name, contentType);
 
     // Step 2: Upload file to S3
     await this.uploadToS3(uploadUrl, file);

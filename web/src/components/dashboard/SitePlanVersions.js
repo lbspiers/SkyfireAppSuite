@@ -72,48 +72,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     }
   }, [projectUuid, joinProject, leaveProject]);
 
-  // Listen for conversion completion
-  useEffect(() => {
-    const cleanup = onSitePlanConverted(async (data) => {
-      logger.log('SitePlan', '[WebSocket] siteplan:converted received:', data);
-
-      if (data.conversionStatus === 'complete') {
-        setConversionPending(false);
-        toast.success('Site plan image ready!');
-
-        // If this is the currently selected version, fetch the PNG URLs (all pages)
-        if (selectedVersion && data.sitePlanId === selectedVersion.id) {
-          try {
-            const imgResponse = await sitePlanService.getImageUrl(projectUuid, data.sitePlanId);
-            const imgData = imgResponse?.data?.data || imgResponse?.data;
-
-            if (imgData?.pages && imgData.pages.length > 0) {
-              setPages(imgData.pages);
-              setPageCount(imgData.pageCount || imgData.pages.length);
-              setPresignedUrl(imgData.pages[0]?.imageUrl || null);
-              setActivePage(1);
-            } else if (imgData?.imageUrl) {
-              setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
-              setPageCount(1);
-              setPresignedUrl(imgData.imageUrl);
-              setActivePage(1);
-            }
-          } catch (err) {
-            logger.error('SitePlan', 'Error fetching converted images:', err);
-          }
-        }
-
-        // Refresh versions to get updated conversion_status
-        fetchVersions();
-      } else if (data.conversionStatus === 'failed') {
-        setConversionPending(false);
-        toast.error('Site plan conversion failed. You can retry from the version menu.');
-      }
-    });
-
-    return cleanup;
-  }, [onSitePlanConverted, selectedVersion, projectUuid]);
-
   // Fetch all versions
   const fetchVersions = useCallback(async () => {
     if (!projectUuid) {
@@ -154,11 +112,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     }
   }, [projectUuid]);
 
-  // Fetch versions on mount
-  useEffect(() => {
-    fetchVersions();
-  }, [fetchVersions]);
-
   /**
    * Fetch the converted PNG image URL for a site plan version.
    * Falls back to the original PDF download URL if no image is available yet.
@@ -174,10 +127,28 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
       setActivePage(1);
       setPageCount(1);
 
+      // Track if images were successfully loaded
+      let imagesLoaded = false;
+
       // Try the image-url endpoint first (PNG)
       try {
         const imgResponse = await sitePlanService.getImageUrl(projectUuid, version.id);
-        const imgData = imgResponse?.data?.data || imgResponse?.data;
+        const imgData = imgResponse?.data || imgResponse;
+
+        // Normalize snake_case API response to camelCase
+        if (imgData) {
+          if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
+          if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
+          if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
+          if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
+          if (imgData.pages) {
+            imgData.pages = imgData.pages.map(p => ({
+              ...p,
+              imageUrl: p.imageUrl || p.image_url,
+              imageKey: p.imageKey || p.image_key,
+            }));
+          }
+        }
 
         logger.debug('SitePlan', 'Image URL response:', { status: imgResponse.status, hasPages: !!imgData?.pages, hasSingleImage: !!imgData?.imageUrl, conversionStatus: imgData?.conversionStatus });
 
@@ -189,6 +160,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
           setPresignedUrl(imgData.pages[0]?.imageUrl || null);
           setActivePage(1);
           setConversionPending(false);
+          imagesLoaded = true;
           logger.log('SitePlan', `Loaded ${imgData.pages.length} pages for version ${version.versionNumber}`);
           return;
         }
@@ -200,6 +172,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
           setPresignedUrl(imgData.imageUrl);
           setActivePage(1);
           setConversionPending(false);
+          imagesLoaded = true;
           logger.log('SitePlan', `Loaded single image for version ${version.versionNumber}`);
           return;
         }
@@ -218,12 +191,14 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
         logger.debug('SitePlan', 'Image URL not available, falling back to PDF:', imgErr.message);
       }
 
-      // Fallback: get the original PDF download URL
-      const response = await sitePlanService.getDownloadUrl(projectUuid, version.id);
-      if (response.status === 'SUCCESS') {
-        setPresignedUrl(response.data.downloadUrl);
-        setPages([]);
-        setPageCount(1);
+      // Fallback: get the original PDF download URL (only if images weren't loaded)
+      if (!imagesLoaded) {
+        const response = await sitePlanService.getDownloadUrl(projectUuid, version.id);
+        if (response.status === 'SUCCESS') {
+          setPresignedUrl(response.data.downloadUrl);
+          setPages([]);
+          setPageCount(1);
+        }
       }
     } catch (error) {
       logger.error('SitePlan', 'Error fetching URL:', error);
@@ -232,6 +207,68 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
       setLoadingImage(false);
     }
   }, [projectUuid]);
+
+  // Listen for conversion completion
+  useEffect(() => {
+    const cleanup = onSitePlanConverted(async (data) => {
+      logger.log('SitePlan', '[WebSocket] siteplan:converted received:', data);
+
+      if (data.conversionStatus === 'complete') {
+        setConversionPending(false);
+        toast.success('Site plan image ready!');
+
+        // If this is the currently selected version, fetch the PNG URLs (all pages)
+        if (selectedVersion && data.sitePlanId === selectedVersion.id) {
+          try {
+            const imgResponse = await sitePlanService.getImageUrl(projectUuid, data.sitePlanId);
+            const imgData = imgResponse?.data || imgResponse;
+
+            // Normalize snake_case API response to camelCase
+            if (imgData) {
+              if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
+              if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
+              if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
+              if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
+              if (imgData.pages) {
+                imgData.pages = imgData.pages.map(p => ({
+                  ...p,
+                  imageUrl: p.imageUrl || p.image_url,
+                  imageKey: p.imageKey || p.image_key,
+                }));
+              }
+            }
+
+            if (imgData?.pages && imgData.pages.length > 0) {
+              setPages(imgData.pages);
+              setPageCount(imgData.pageCount || imgData.pages.length);
+              setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+              setActivePage(1);
+            } else if (imgData?.imageUrl) {
+              setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
+              setPageCount(1);
+              setPresignedUrl(imgData.imageUrl);
+              setActivePage(1);
+            }
+          } catch (err) {
+            logger.error('SitePlan', 'Error fetching converted images:', err);
+          }
+        }
+
+        // Refresh versions to get updated conversion_status
+        fetchVersions();
+      } else if (data.conversionStatus === 'failed') {
+        setConversionPending(false);
+        toast.error('Site plan conversion failed. You can retry from the version menu.');
+      }
+    });
+
+    return cleanup;
+  }, [onSitePlanConverted, selectedVersion, projectUuid, fetchVersions]);
+
+  // Fetch versions on mount
+  useEffect(() => {
+    fetchVersions();
+  }, [fetchVersions]);
 
   // Fetch image URL when version changes
   useEffect(() => {

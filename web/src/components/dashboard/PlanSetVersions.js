@@ -17,6 +17,8 @@ import SpecSheetGrid from './SpecSheetGrid';
  * Listens for 'planset:converted' WebSocket events after upload.
  */
 const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
+  logger.log('PlanSet', `[Component] PlanSetVersions mounted/rendered with projectUuid=${projectUuid}`);
+
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [presignedUrl, setPresignedUrl] = useState(null);
@@ -67,7 +69,10 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
 
   // Fetch all versions (extracted to useCallback so it can be called from socket listener)
   const fetchVersions = useCallback(async () => {
+    logger.log('PlanSet', `[fetchVersions] Called with projectUuid=${projectUuid}`);
+
     if (!projectUuid) {
+      logger.warn('PlanSet', '[fetchVersions] Early return - no projectUuid');
       setLoading(false);
       return;
     }
@@ -75,30 +80,37 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     try {
       setLoading(true);
       setError(null);
+      logger.log('PlanSet', `[fetchVersions] Fetching versions from /project/${projectUuid}/versions`);
       const response = await axios.get(`/project/${projectUuid}/versions`);
 
       if (response.data.success && response.data.versions.length > 0) {
+        logger.log('PlanSet', `[fetchVersions] Got ${response.data.versions.length} versions`);
         setVersions(response.data.versions);
 
         // Determine if we have published versions
         const publishedVersions = response.data.versions.filter(v => v.status === 'published');
         const draftVersions = response.data.versions.filter(v => v.status === 'draft' || !v.status);
 
+        logger.log('PlanSet', `[fetchVersions] Published: ${publishedVersions.length}, Draft: ${draftVersions.length}`);
+
         // If we have published, show published tab; otherwise show draft
         if (publishedVersions.length > 0) {
           setStatusTab('published');
           const latestPublished = publishedVersions.find(v => v.is_latest) || publishedVersions[publishedVersions.length - 1];
           setSelectedVersion(latestPublished.version_number);
+          logger.log('PlanSet', `[fetchVersions] Selected published version ${latestPublished.version_number}`);
         } else if (draftVersions.length > 0) {
           setStatusTab('draft');
           const latestDraft = draftVersions.find(v => v.is_latest) || draftVersions[draftVersions.length - 1];
           setSelectedVersion(latestDraft.version_number);
+          logger.log('PlanSet', `[fetchVersions] Selected draft version ${latestDraft.version_number}`);
         }
       } else {
+        logger.warn('PlanSet', '[fetchVersions] No versions found or unsuccessful response');
         setVersions([]);
       }
     } catch (error) {
-      logger.error('Dashboard', 'Error fetching versions:', error);
+      logger.error('PlanSet', '[fetchVersions] Error fetching versions:', error);
       setError('Failed to load plan set versions');
       setVersions([]);
     } finally {
@@ -160,6 +172,116 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     }
   }, [projectUuid, joinProject, leaveProject]);
 
+  /**
+   * Fetch the converted PNG image URL for a plan set version.
+   * Falls back to the original PDF presigned URL if no image is available yet.
+   * Handles multi-page PDFs by setting up page tabs.
+   */
+  const fetchImageUrl = useCallback(async (versionNumber) => {
+    logger.log('PlanSet', `[fetchImageUrl] Called with versionNumber=${versionNumber}, projectUuid=${projectUuid}`);
+
+    if (!projectUuid || !versionNumber) {
+      logger.warn('PlanSet', `[fetchImageUrl] Early return - projectUuid or versionNumber missing`);
+      return;
+    }
+
+    logger.log('PlanSet', `[fetchImageUrl] Fetching image URL for version ${versionNumber}`);
+
+    try {
+      setLoadingPdf(true);
+      setPresignedUrl(null);
+      setPages([]);
+      setActivePage(1);
+      setPageCount(1);
+
+      // Track if images were successfully loaded
+      let imagesLoaded = false;
+
+      // Try the image-url endpoint first (PNG)
+      try {
+        logger.log('PlanSet', `Calling planSetService.getImageUrl(${projectUuid}, ${versionNumber})`);
+        const imgResponse = await planSetService.getImageUrl(projectUuid, versionNumber);
+        const imgData = imgResponse?.data || imgResponse;
+
+        // Normalize snake_case API response to camelCase
+        if (imgData) {
+          if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
+          if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
+          if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
+          if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
+          if (imgData.pages) {
+            imgData.pages = imgData.pages.map(p => ({
+              ...p,
+              imageUrl: p.imageUrl || p.image_url,
+              imageKey: p.imageKey || p.image_key,
+            }));
+          }
+        }
+
+        logger.log('PlanSet', 'Image URL response:', {
+          status: imgResponse.status,
+          hasPages: !!imgData?.pages,
+          hasSingleImage: !!imgData?.imageUrl,
+          conversionStatus: imgData?.conversionStatus,
+          fullResponse: imgData
+        });
+
+        // Check if we have image URLs (conversion complete)
+        if (imgData?.pages && imgData.pages.length > 0) {
+          // Multi-page response
+          setPages(imgData.pages);
+          setPageCount(imgData.pageCount || imgData.pages.length);
+          setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+          setActivePage(1);
+          setConversionPending(false);
+          imagesLoaded = true;
+          logger.log('PlanSet', `Loaded ${imgData.pages.length} pages for version ${versionNumber}`);
+          return;
+        }
+
+        if (imgData?.imageUrl) {
+          // Single image (backward compat)
+          setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
+          setPageCount(1);
+          setPresignedUrl(imgData.imageUrl);
+          setActivePage(1);
+          setConversionPending(false);
+          imagesLoaded = true;
+          logger.log('PlanSet', `Loaded single image for version ${versionNumber}`);
+          return;
+        }
+
+        // If conversion is still pending
+        if (imgData?.conversionStatus === 'pending' || imgData?.conversionStatus === 'processing') {
+          logger.log('PlanSet', `Conversion pending for version ${versionNumber}`);
+          setConversionPending(true);
+          return;
+        }
+
+        // If we get here, conversion may have failed or not started
+        logger.warn('PlanSet', `No image data and no pending status for version ${versionNumber}`);
+      } catch (imgErr) {
+        // image-url endpoint might not exist yet or conversion not done
+        logger.debug('PlanSet', 'Image URL not available, falling back to PDF:', imgErr.message);
+      }
+
+      // Fallback: get the original PDF presigned URL (only if images weren't loaded)
+      if (!imagesLoaded) {
+        const response = await axios.get(`/project/${projectUuid}/versions/${versionNumber}/presigned-url`);
+        if (response.data.success) {
+          setPresignedUrl(response.data.presigned_url);
+          setPages([]);
+          setPageCount(1);
+        }
+      }
+    } catch (error) {
+      logger.error('PlanSet', 'Error fetching URL:', error);
+      setError(`Failed to load Version ${versionNumber}`);
+    } finally {
+      setLoadingPdf(false);
+    }
+  }, [projectUuid]);
+
   // Listen for conversion completion
   useEffect(() => {
     const cleanup = onPlanSetConverted(async (data) => {
@@ -191,93 +313,14 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     return cleanup;
   }, [onPlanSetConverted, selectedVersion, projectUuid, fetchVersions, fetchImageUrl]);
 
-  /**
-   * Fetch the converted PNG image URL for a plan set version.
-   * Falls back to the original PDF presigned URL if no image is available yet.
-   * Handles multi-page PDFs by setting up page tabs.
-   */
-  const fetchImageUrl = useCallback(async (versionNumber) => {
-    if (!projectUuid || !versionNumber) return;
-
-    logger.log('PlanSet', `Fetching image URL for version ${versionNumber}`);
-
-    try {
-      setLoadingPdf(true);
-      setPresignedUrl(null);
-      setPages([]);
-      setActivePage(1);
-      setPageCount(1);
-
-      // Try the image-url endpoint first (PNG)
-      try {
-        logger.log('PlanSet', `Calling planSetService.getImageUrl(${projectUuid}, ${versionNumber})`);
-        const imgResponse = await planSetService.getImageUrl(projectUuid, versionNumber);
-        const imgData = imgResponse?.data?.data || imgResponse?.data;
-
-        logger.log('PlanSet', 'Image URL response:', {
-          status: imgResponse.status,
-          hasPages: !!imgData?.pages,
-          hasSingleImage: !!imgData?.imageUrl,
-          conversionStatus: imgData?.conversionStatus,
-          fullResponse: imgData
-        });
-
-        // Check if we have image URLs (conversion complete)
-        if (imgData?.pages && imgData.pages.length > 0) {
-          // Multi-page response
-          setPages(imgData.pages);
-          setPageCount(imgData.pageCount || imgData.pages.length);
-          setPresignedUrl(imgData.pages[0]?.imageUrl || null);
-          setActivePage(1);
-          setConversionPending(false);
-          logger.log('PlanSet', `Loaded ${imgData.pages.length} pages for version ${versionNumber}`);
-          return;
-        }
-
-        if (imgData?.imageUrl) {
-          // Single image (backward compat)
-          setPages([{ page: 1, label: 'pg1', imageUrl: imgData.imageUrl, imageKey: imgData.imageKey }]);
-          setPageCount(1);
-          setPresignedUrl(imgData.imageUrl);
-          setActivePage(1);
-          setConversionPending(false);
-          logger.log('PlanSet', `Loaded single image for version ${versionNumber}`);
-          return;
-        }
-
-        // If conversion is still pending
-        if (imgData?.conversionStatus === 'pending' || imgData?.conversionStatus === 'processing') {
-          logger.log('PlanSet', `Conversion pending for version ${versionNumber}`);
-          setConversionPending(true);
-          return;
-        }
-
-        // If we get here, conversion may have failed or not started
-        logger.warn('PlanSet', `No image data and no pending status for version ${versionNumber}`);
-      } catch (imgErr) {
-        // image-url endpoint might not exist yet or conversion not done
-        logger.debug('PlanSet', 'Image URL not available, falling back to PDF:', imgErr.message);
-      }
-
-      // Fallback: get the original PDF presigned URL
-      const response = await axios.get(`/project/${projectUuid}/versions/${versionNumber}/presigned-url`);
-      if (response.data.success) {
-        setPresignedUrl(response.data.presigned_url);
-        setPages([]);
-        setPageCount(1);
-      }
-    } catch (error) {
-      logger.error('PlanSet', 'Error fetching URL:', error);
-      setError(`Failed to load Version ${versionNumber}`);
-    } finally {
-      setLoadingPdf(false);
-    }
-  }, [projectUuid]);
-
   // Fetch image URL when version changes
   useEffect(() => {
+    logger.log('PlanSet', '[useEffect] selectedVersion changed:', selectedVersion);
     if (selectedVersion) {
+      logger.log('PlanSet', '[useEffect] Calling fetchImageUrl for version:', selectedVersion);
       fetchImageUrl(selectedVersion);
+    } else {
+      logger.log('PlanSet', '[useEffect] selectedVersion is null/undefined, skipping fetchImageUrl');
     }
   }, [selectedVersion, fetchImageUrl]);
 
