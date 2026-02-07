@@ -224,9 +224,9 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
               10: 'PV 8'
             };
 
-            // Filter out pages 2 and 3 (PV 2 and PV 3), then map labels
+            // Filter out pages 2, 3, and 9 (PV 2, PV 3, and PV 7), then map labels
             imgData.pages = imgData.pages
-              .filter(p => p.page !== 2 && p.page !== 3)
+              .filter(p => p.page !== 2 && p.page !== 3 && p.page !== 9)
               .map(p => ({
                 ...p,
                 imageUrl: p.imageUrl || p.image_url,
