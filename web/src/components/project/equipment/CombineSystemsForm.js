@@ -286,16 +286,6 @@ const CombineSystemsForm = ({
             );
           })}
 
-          {/* Completion Message */}
-          {configComplete && (
-            <div className={styles.messageBox}>
-              <span className={`${styles.messageIcon} ${styles.success}`}>✓</span>
-              <p className={styles.messageText}>
-                All systems configured. Click any row to edit.
-              </p>
-            </div>
-          )}
-
           {/* Combiner Panel Form (if selected) */}
           {hasCombinerPanelSelection && (
             <div className={styles.combinerPanelSection}>
@@ -307,15 +297,6 @@ const CombineSystemsForm = ({
             </div>
           )}
 
-          {/* Post-Combine BOS Section - shows when all systems configured */}
-          {configComplete && (
-            <PostCombineBOSSection
-              projectUuid={projectUuid}
-              systemDetails={systemData}
-              activeSystems={activeSystems}
-              utility={systemData?.utility || systemData?.sys1_utility || ''}
-            />
-          )}
         </>
       )}
 

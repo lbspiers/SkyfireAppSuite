@@ -279,7 +279,7 @@ const PostCombineBOSSlot = ({
   return (
     <>
       <EquipmentRow
-        title={`BOS Equipment Type ${slotNumber}`}
+        title={`Post Combine BOS (Type ${slotNumber})`}
         subtitle={subtitle}
         showNewExistingToggle={true}
         isNew={!isExisting}
@@ -353,7 +353,7 @@ const PostCombineBOSSlot = ({
               onClick={() => {}}
               style={{ borderRadius: '9999px' }}
             >
-              + BOS Equipment Type {slotNumber + 1}
+              +Post Combine BOS (Type {slotNumber + 1})
             </Button>
           </div>
         )}

@@ -46,6 +46,7 @@ export { default as LaunchButton } from './LaunchButton';
 export { default as SendButton } from './SendButton';
 export { default as TableRowButton } from './TableRowButton';
 export { default as TableDropdown } from './TableDropdown';
+export { default as TableTextInput } from './TableTextInput';
 export { default as TableSelect } from './TableSelect';
 export { default as AddSectionButton } from './AddSectionButton';
 export { default as AddButton } from './AddButton';

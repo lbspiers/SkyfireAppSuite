@@ -12,18 +12,20 @@ export function useServiceWorker() {
 
   useEffect(() => {
     // Register the service worker
-    register({
-      onUpdate: (reg) => {
-        setRegistration(reg);
-        setUpdateAvailable(true);
-      },
-      onSuccess: () => {
-        // Content cached for offline use
-      }
-    });
+    // TEMPORARILY DISABLED FOR DEVELOPMENT - ENABLE BEFORE PRODUCTION DEPLOY
+    // register({
+    //   onUpdate: (reg) => {
+    //     setRegistration(reg);
+    //     setUpdateAvailable(true);
+    //   },
+    //   onSuccess: () => {
+    //     // Content cached for offline use
+    //   }
+    // });
 
     // Setup auto-reload when new SW takes control
-    setupControllerChangeReload();
+    // TEMPORARILY DISABLED FOR DEVELOPMENT
+    // setupControllerChangeReload();
 
     // Monitor online/offline status
     const handleOnline = () => setIsOffline(false);

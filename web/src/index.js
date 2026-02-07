@@ -34,4 +34,5 @@ root.render(
 // Register service worker for PWA functionality
 // Note: The actual registration with update callbacks happens in useServiceWorker hook
 // This initial call ensures SW is registered even if App hasn't mounted yet
-register();
+// TEMPORARILY DISABLED FOR DEVELOPMENT - ENABLE BEFORE PRODUCTION DEPLOY
+// register();

@@ -34,6 +34,7 @@ const validationSchema = Yup.object().shape({
   apn: Yup.string(),
   jurisdiction: Yup.string(),
   utility: Yup.string(),
+  utility_meter_number: Yup.string(),
 });
 
 /**
@@ -56,6 +57,7 @@ const SiteInfoOptimized = () => {
     apn: "",
     jurisdiction: "",
     utility: "",
+    utility_meter_number: "",
   });
 
   // Load site info using optimized API function
@@ -87,6 +89,7 @@ const SiteInfoOptimized = () => {
           apn: data.apn || "",
           jurisdiction: data.jurisdiction || "",
           utility: data.utility || "",
+          utility_meter_number: data.utility_meter_number || "",
         });
         
         console.log('[SiteInfo] Loaded optimized data - 7 fields fetched');
@@ -100,6 +103,7 @@ const SiteInfoOptimized = () => {
           apn: "",
           jurisdiction: "",
           utility: "",
+          utility_meter_number: "",
         });
       }
     } catch (error) {
@@ -307,6 +311,23 @@ const SiteInfoOptimized = () => {
                 autoCapitalize="words"
               />
             </View>
+
+            {/* Utility Meter Number - Conditional for Xcel Energy */}
+            {values.utility === 'Xcel Energy' && (
+              <View style={styles.inputContainer}>
+                <ThemedTextInput
+                  label="Utility Meter Number"
+                  value={values.utility_meter_number}
+                  onChangeText={(text) => {
+                    // Only allow alphanumeric characters (no spaces or dashes)
+                    const sanitized = text.replace(/[^a-zA-Z0-9]/g, '');
+                    handleChange("utility_meter_number")(sanitized);
+                  }}
+                  onBlur={handleBlur("utility_meter_number")}
+                  placeholder="Enter meter number"
+                />
+              </View>
+            )}
 
             {/* Performance Note */}
             <View style={styles.performanceNote}>

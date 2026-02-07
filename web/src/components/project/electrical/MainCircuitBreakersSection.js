@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SERVICE_TYPE_OPTIONS } from '../../../utils/constants';
-import { EquipmentRow, TableDropdown, SectionClearModal, TableRowButton } from '../../ui';
+import { EquipmentRow, TableDropdown, FormFieldRow, SectionClearModal, TableRowButton } from '../../ui';
 import styles from './MainCircuitBreakersSection.module.css';
 import axios from '../../../config/axios';
 import logger from '../../../services/devLogger';
@@ -164,6 +164,7 @@ const MainCircuitBreakersSection = ({ formData, onChange, projectData }) => {
     onChange('ele_main_circuit_breakers_qty', 1);
     onChange('utility_service_amps', '');
     onChange('utility_company', '');
+    onChange('utility_meter_number', '');
     setShowClearConfirm(false);
   };
 
@@ -183,6 +184,27 @@ const MainCircuitBreakersSection = ({ formData, onChange, projectData }) => {
           placeholder={loadingUtilities ? "Loading utilities..." : zipCode ? "Select utility provider..." : "Enter zip code first..."}
           disabled={loadingUtilities || utilities.length === 0}
         />
+
+        {/* Utility Meter Number - Conditional for Xcel Energy */}
+        {formData.utility_company === 'Xcel Energy' && (
+          <FormFieldRow label="Utility Meter Number">
+            <input
+              type="text"
+              value={formData.utility_meter_number || ''}
+              onChange={(e) => {
+                // Only allow alphanumeric characters (no spaces or dashes)
+                const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+                handleFieldChange('utility_meter_number', sanitized);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
+              placeholder="Enter meter number"
+            />
+          </FormFieldRow>
+        )}
 
         {/* Service Size - Required for SolarAPP+ */}
         <TableDropdown

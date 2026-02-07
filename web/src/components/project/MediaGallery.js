@@ -6,6 +6,7 @@ import logger from '../../services/devLogger';
 import surveyService from '../../services/surveyService';
 import useMediaSocket from '../../hooks/useMediaSocket';
 import uploadManager from '../../services/uploadManager';
+import axiosInstance from '../../api/axiosInstance';
 import { Button, SectionHeader, Dropdown } from '../ui';
 import PhotoPlaceholder from './PhotoPlaceholder';
 import VideoPlaceholder from './VideoPlaceholder';
@@ -13,6 +14,7 @@ import PhotoAnnotationLayer from '../survey/PhotoAnnotationLayer';
 import PhotoToolbar from '../survey/PhotoToolbar';
 import PerformanceMonitor from '../debug/PerformanceMonitor';
 import MediaListView from './MediaListView';
+import CategoryManager from '../survey/CategoryManager';
 import { mockPhotos, mockVideos, EQUIPMENT_CATEGORIES } from '../../mockData/surveyMockData';
 import { PHOTO_SECTIONS, SECTION_CATEGORIES, formatSectionLabel, getSectionsByCategory } from '../../constants/photoSections';
 import { downloadMultipleFiles } from '../../utils/fileDownload';
@@ -59,6 +61,7 @@ const MediaGallery = ({
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [perfMonitorEnabled, setPerfMonitorEnabled] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const fileInputRef = useRef(null);
   const lastSelectedRef = useRef(null);
@@ -77,6 +80,28 @@ const MediaGallery = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [perfMonitorEnabled]);
+
+  // Fetch media categories from API on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axiosInstance.get('/api/media-categories');
+        if (res.data?.status === 'SUCCESS') {
+          setCategories(res.data.data);
+        }
+      } catch (err) {
+        logger.warn('MediaGallery', 'Failed to fetch categories, using defaults:', err);
+        // Fallback to PHOTO_SECTIONS constant
+        setCategories(PHOTO_SECTIONS.map(s => ({
+          ...s,
+          parent_category: s.category,
+          is_default: true,
+          uuid: s.value
+        })));
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Trigger upload when uploadTrigger changes (only if uploads are enabled)
   useEffect(() => {
@@ -377,6 +402,15 @@ const MediaGallery = ({
     }
   };
 
+  // CategoryManager handlers
+  const handleCategoryAdded = useCallback((newCat) => {
+    setCategories(prev => [...prev, newCat]);
+  }, []);
+
+  const handleCategoryDeleted = useCallback((uuid) => {
+    setCategories(prev => prev.filter(c => c.uuid !== uuid));
+  }, []);
+
   // Upload handlers (only active if uploads are enabled)
   const handleUpload = () => {
     if (enableUploads) {
@@ -502,6 +536,13 @@ const MediaGallery = ({
           </button>
         ))}
       </div>
+
+      {/* CategoryManager - Custom categories with Claude AI suggestions */}
+      <CategoryManager
+        categories={categories}
+        onCategoryAdded={handleCategoryAdded}
+        onCategoryDeleted={handleCategoryDeleted}
+      />
 
       {/* Selection toolbar - shown when items are selected */}
       {selectedIds.size > 0 && (
@@ -1101,21 +1142,22 @@ const MediaLightbox = ({
                       onChange={(e) => setEditData(prev => ({ ...prev, section: e.target.value }))}
                       className={styles.metadataSelect}
                     >
-                      {PHOTO_SECTIONS.map(section => (
-                        <option key={section.value} value={section.value}>
-                          {section.label}
+                      {categories.map(cat => (
+                        <option key={cat.value} value={cat.value}>
+                          {cat.label}
                         </option>
                       ))}
                     </select>
                   ) : (
                     <div className={styles.sectionBadge}>
                       {(() => {
-                        const section = PHOTO_SECTIONS.find(s => s.value === currentItem.section);
+                        const section = categories.find(s => s.value === currentItem.section)
+                          || PHOTO_SECTIONS.find(s => s.value === currentItem.section);
                         const IconComp = section ? Icons[section.icon] : Icons.Folder;
                         return (
                           <>
                             {IconComp && <IconComp size={14} />}
-                            {formatSectionLabel(currentItem.section)}
+                            {section?.label || formatSectionLabel(currentItem.section)}
                           </>
                         );
                       })()}

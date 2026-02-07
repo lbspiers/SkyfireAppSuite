@@ -158,6 +158,7 @@ const apiEndpoints = {
     VERIFY_ACCESS: "/api/admin/verify-access",
     NOTIFICATIONS: "/notify/notifications",
     MARK_NOTIFICATION_READ: (notificationId: string) => `/notify/notifications/${notificationId}/read`,
+    AHJ_CODE_YEARS: '/ahj/code-years',
   },
 
   ANALYTICS: {
@@ -205,6 +206,14 @@ const apiEndpoints = {
     ATTACH_TO_PROJECT: (projectUuid: string) => `/api/spec-sheets/project/${projectUuid}/attach`,
     AUTO_MATCH: (projectUuid: string) => `/api/spec-sheets/project/${projectUuid}/auto-match`,
     REMOVE_ATTACHMENT: (projectUuid: string, attachmentUuid: string) => `/api/spec-sheets/project/${projectUuid}/attachments/${attachmentUuid}`,
+  },
+
+  MEDIA_CATEGORIES: {
+    LIST: '/api/media-categories',
+    CREATE: '/api/media-categories',
+    UPDATE: (uuid: string) => `/api/media-categories/${uuid}`,
+    DELETE: (uuid: string) => `/api/media-categories/${uuid}`,
+    SUGGEST: '/api/media-categories/suggest',
   },
 };
 

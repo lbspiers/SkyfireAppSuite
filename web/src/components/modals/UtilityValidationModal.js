@@ -143,7 +143,6 @@ const UtilityValidationModal = ({ isOpen, onClose, onSave, zipCode, projectUuid,
       onClose={onClose}
       title="Utility Required"
       size="sm"
-      contained={true}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>

@@ -534,6 +534,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         ele_main_circuit_breakers_qty: 0,
         utility_service_amps: '',
         utility_company: '',
+        utility_meter_number: '',
         mpa_bus_bar_existing: true, // Default to "Existing"
         mpa_main_circuit_breaker_existing: true, // Default to "Existing"
         ele_bus_bar_rating: '',
@@ -543,6 +544,8 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         backup_option: '',
         backup_loads_landing: '',
         backup_panel_selection: '',
+        backuploads_panel_option: '',
+        backuploads_panel_selection: '',
         backup_system_size: '',
         backup_panel_make: '',
         backup_panel_model: '',
@@ -666,6 +669,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       ele_main_circuit_breakers_qty: getField('ele_main_circuit_breakers_qty', 0),
       utility_service_amps: getField('utility_service_amps', ''),
       utility_company: getField('utility_company', ''),
+      utility_meter_number: getField('utility_meter_number', ''),
 
       // Main Panel A
       mpa_bus_bar_existing: getField('mpa_bus_bar_existing', true),
@@ -679,6 +683,8 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       backup_option: getField('sys1_backup_option', ''),
       backup_loads_landing: getField('sys1_backupconfig', ''),
       backup_panel_selection: getField('sys1_backupconfig_selectpanel', ''),
+      backuploads_panel_option: getField('backuploads_panel_option', ''),
+      backuploads_panel_selection: getField('backuploads_panel_selection', ''),
       backup_system_size: getField('utility_service_amps', ''),
       backup_panel_make: getField('backup_panel_make', ''),
       backup_panel_model: getField('backup_panel_model', ''),

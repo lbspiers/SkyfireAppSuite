@@ -83,7 +83,7 @@ const MediaListView = ({
   return (
     <div className={styles.listViewContainer}>
       <div className={styles.listHeader}>
-        <div className={styles.headerCell} style={{ width: '40px' }}>
+        <div className={`${styles.headerCell} ${styles.colCheckbox}`}>
           <input
             type="checkbox"
             checked={selectedIds.size === media.length && media.length > 0}
@@ -100,13 +100,13 @@ const MediaListView = ({
             }}
           />
         </div>
-        <div className={styles.headerCell} style={{ width: '80px' }}>Preview</div>
-        <div className={styles.headerCell} style={{ flex: '2', minWidth: '200px' }}>Filename</div>
-        <div className={styles.headerCell} style={{ flex: '1', minWidth: '120px' }}>Section</div>
-        <div className={styles.headerCell} style={{ flex: '1', minWidth: '100px' }}>Tag</div>
-        <div className={styles.headerCell} style={{ flex: '2', minWidth: '200px' }}>Notes</div>
-        <div className={styles.headerCell} style={{ flex: '1', minWidth: '140px' }}>Date</div>
-        <div className={styles.headerCell} style={{ width: '80px' }}>Actions</div>
+        <div className={`${styles.headerCell} ${styles.colPreview}`}>Preview</div>
+        <div className={`${styles.headerCell} ${styles.colFilename}`}>Filename</div>
+        <div className={`${styles.headerCell} ${styles.colSection}`}>Section</div>
+        <div className={`${styles.headerCell} ${styles.colTag}`}>Tag</div>
+        <div className={`${styles.headerCell} ${styles.colNotes}`}>Notes</div>
+        <div className={`${styles.headerCell} ${styles.colDate}`}>Date</div>
+        <div className={`${styles.headerCell} ${styles.colActions}`}>Actions</div>
       </div>
 
       <div className={styles.listBody}>
@@ -115,7 +115,7 @@ const MediaListView = ({
             key={item.id}
             className={`${styles.listRow} ${selectedIds.has(item.id) ? styles.selected : ''}`}
           >
-            <div className={styles.cell} style={{ width: '40px' }}>
+            <div className={`${styles.cell} ${styles.colCheckbox}`}>
               <input
                 type="checkbox"
                 checked={selectedIds.has(item.id)}
@@ -124,8 +124,7 @@ const MediaListView = ({
             </div>
 
             <div
-              className={styles.cell}
-              style={{ width: '80px', cursor: 'pointer' }}
+              className={`${styles.cell} ${styles.colPreview}`}
               onClick={() => onLightboxOpen && onLightboxOpen(media.indexOf(item))}
             >
               <div className={styles.thumbnail}>
@@ -157,19 +156,19 @@ const MediaListView = ({
               </div>
             </div>
 
-            <div className={styles.cell} style={{ flex: '2', minWidth: '200px' }}>
+            <div className={`${styles.cell} ${styles.colFilename}`}>
               <div className={styles.filename}>
                 {item.filename || 'Untitled'}
               </div>
             </div>
 
-            <div className={styles.cell} style={{ flex: '1', minWidth: '120px' }}>
+            <div className={`${styles.cell} ${styles.colSection}`}>
               <div className={styles.section}>
                 {getSectionLabel(item.section)}
               </div>
             </div>
 
-            <div className={styles.cell} style={{ flex: '1', minWidth: '100px' }}>
+            <div className={`${styles.cell} ${styles.colTag}`}>
               <div className={styles.tag}>
                 {item.tag ? (
                   <span className={styles.tagBadge}>
@@ -182,7 +181,7 @@ const MediaListView = ({
               </div>
             </div>
 
-            <div className={styles.cell} style={{ flex: '2', minWidth: '200px' }}>
+            <div className={`${styles.cell} ${styles.colNotes}`}>
               {editingId === item.id ? (
                 <div className={styles.editField}>
                   <input
@@ -214,14 +213,14 @@ const MediaListView = ({
               )}
             </div>
 
-            <div className={styles.cell} style={{ flex: '1', minWidth: '140px' }}>
+            <div className={`${styles.cell} ${styles.colDate}`}>
               <div className={styles.date}>
                 <Calendar size={12} />
                 {formatDate(item.uploadedAt || item.createdAt)}
               </div>
             </div>
 
-            <div className={styles.cell} style={{ width: '80px' }}>
+            <div className={`${styles.cell} ${styles.colActions}`}>
               <div className={styles.actions}>
                 <button
                   className={styles.actionBtn}

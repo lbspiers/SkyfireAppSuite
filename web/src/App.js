@@ -14,7 +14,7 @@ import PWAUpdateModal from './components/common/UpdateModal';
 import FloatingNoteButton from './components/common/FloatingNoteButton';
 // Upload Context
 import { UploadProvider, useUploadContext } from './contexts/UploadContext';
-import { UploadProgressModal, UploadFloatingIndicator } from './components/ui';
+import { UploadProgressModal } from './components/ui';
 import { BUILD_SIZE } from './config/version';
 
 // Auth
@@ -71,6 +71,7 @@ import DrafterHelpPage from './pages/DrafterPortal/DrafterHelpPage';
 
 // Admin Pages
 import PendingRegistrations from './pages/Admin/PendingRegistrations';
+import BillingPortal from './pages/Admin/BillingPortal';
 
 // Dev Tools
 import DevPanel from './components/dev/DevPanel';
@@ -91,18 +92,11 @@ const FloatingNoteWrapper = () => {
  * Only this component re-renders during uploads, NOT the entire app
  */
 const UploadStateHandler = () => {
-  const { status: uploadStatus, isModalOpen, openModal, closeModal } = useUploadContext();
+  const { isModalOpen, closeModal } = useUploadContext();
 
   return (
     <>
       <UploadProgressModal isOpen={isModalOpen} onClose={closeModal} onMinimize={closeModal} />
-      <UploadFloatingIndicator
-        isVisible={uploadStatus.total > 0 && !isModalOpen}
-        completed={uploadStatus.completed}
-        total={uploadStatus.total}
-        onClick={openModal}
-        onDismiss={() => {}}
-      />
     </>
   );
 };
@@ -297,6 +291,7 @@ function App() {
 
           {/* Admin Routes - Protected (Admin Only) */}
           <Route path="/admin/pending-registrations" element={<PrivateRoute requireAdmin><PendingRegistrations /></PrivateRoute>} />
+          <Route path="/admin/billing" element={<PrivateRoute requireAdmin><BillingPortal /></PrivateRoute>} />
 
           {/* Dev Portal Route - Protected */}
           <Route path="/dev-portal" element={<PrivateRoute><DevPortalPage /></PrivateRoute>} />

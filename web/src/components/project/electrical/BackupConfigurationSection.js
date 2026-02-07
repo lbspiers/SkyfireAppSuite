@@ -21,35 +21,36 @@ const BackupConfigurationSection = ({
     { value: 'Relocate Loads to New Backup Sub Panel', label: 'Relocate Loads to New Backup Sub Panel' },
   ];
 
-  // Get current selections
-  const backupLoadsLanding = formData.backup_loads_landing || '';
+  // Get current selections (using new field names)
+  const backupLoadsOption = formData.backuploads_panel_option || '';
+  const backupPanelSelection = formData.backuploads_panel_selection || '';
 
   // Determine which step to show
-  const showPanelButtons = backupLoadsLanding === 'Backup Existing Panel';
-  const showBackupLoadSubPanel = backupLoadsLanding === 'Relocate Loads to New Backup Sub Panel';
+  const showPanelButtons = backupLoadsOption === 'Backup Existing Panel';
+  const showBackupLoadSubPanel = backupLoadsOption === 'Relocate Loads to New Backup Sub Panel';
 
   // Handle Step 1 dropdown change
   const handleBackupOptionChange = (value) => {
-    onChange('backup_loads_landing', value);
+    onChange('backuploads_panel_option', value);
 
     // Clear any previous panel selection when changing the main option
     if (value === 'Relocate Loads to New Backup Sub Panel') {
       // Clear panel selections
-      onChange('backup_panel_selection', '');
+      onChange('backuploads_panel_selection', '');
       // Mark backup panel as new
       onChange('backup_panel_isnew', true);
     } else if (value === 'Backup Existing Panel') {
       // Clear panel selection, they'll choose in step 2
-      onChange('backup_panel_selection', '');
+      onChange('backuploads_panel_selection', '');
     } else {
       // Clear everything if selecting empty option
-      onChange('backup_panel_selection', '');
+      onChange('backuploads_panel_selection', '');
     }
   };
 
   // Handle Step 2 panel button selection
   const handlePanelSelection = (panel) => {
-    onChange('backup_panel_selection', panel);
+    onChange('backuploads_panel_selection', panel);
 
     // If they choose Sub Panel B, activate it and set to Existing
     if (panel === 'Sub Panel (B)') {
@@ -76,17 +77,16 @@ const BackupConfigurationSection = ({
 
   // Generate subtitle for the section header
   const getSubtitle = () => {
-    if (!backupLoadsLanding) {
+    if (!backupLoadsOption) {
       return 'Not configured';
     }
 
     // Show the panel selection if one has been made
-    const panelSelection = formData.backup_panel_selection;
-    if (backupLoadsLanding === 'Backup Existing Panel' && panelSelection) {
-      return `${backupLoadsLanding} - ${panelSelection}`;
+    if (backupLoadsOption === 'Backup Existing Panel' && backupPanelSelection) {
+      return `${backupLoadsOption} - ${backupPanelSelection}`;
     }
 
-    return backupLoadsLanding;
+    return backupLoadsOption;
   };
 
   return (
@@ -99,7 +99,7 @@ const BackupConfigurationSection = ({
           {/* Step 1: Backup Option Dropdown */}
           <TableDropdown
             label="Backup Option"
-            value={backupLoadsLanding}
+            value={backupLoadsOption}
             onChange={handleBackupOptionChange}
             options={BACKUP_OPTION_DROPDOWN}
             placeholder="Select backup option..."
@@ -112,19 +112,19 @@ const BackupConfigurationSection = ({
               <TableRowButton
                 label="Main Panel (A)"
                 variant="outline"
-                active={formData.backup_panel_selection === 'Main Panel (A)'}
+                active={backupPanelSelection === 'Main Panel (A)'}
                 onClick={() => handlePanelSelection('Main Panel (A)')}
               />
               <TableRowButton
                 label="Sub Panel (B)"
                 variant="outline"
-                active={formData.backup_panel_selection === 'Sub Panel (B)'}
+                active={backupPanelSelection === 'Sub Panel (B)'}
                 onClick={() => handlePanelSelection('Sub Panel (B)')}
               />
               <TableRowButton
                 label="Sub Panel (C)"
                 variant="outline"
-                active={formData.backup_panel_selection === 'Sub Panel (C)'}
+                active={backupPanelSelection === 'Sub Panel (C)'}
                 onClick={() => handlePanelSelection('Sub Panel (C)')}
               />
             </FormFieldRow>

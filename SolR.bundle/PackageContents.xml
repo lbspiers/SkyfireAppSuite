@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage
+  SchemaVersion="1.0"
+  Version="1.0.0"
+  ProductCode="{B7E3F4A1-9C2D-4E8F-A6B0-1D5E7F9C3A2B}"
+  Name="SolR"
+  Description="SolR Solar Plan Set Generator - Block insertion, value replacement, PDF output"
+  Author="Skyfire">
+
+  <CompanyDetails Name="Skyfire" />
+  <RuntimeRequirements OS="Win64" Platform="AutoCAD" />
+
+  <Components>
+    <ComponentEntry
+      AppName="SolR"
+      ModuleName="./Contents/SolR Server V1.dll"
+      AppDescription="SolR Solar Plan Set Automation"
+      LoadOnAutoCADStartup="True">
+      <Commands GroupName="SolRCommands">
+        <Command Global="SOLR_PROCESS" Local="SOLR_PROCESS" />
+      </Commands>
+    </ComponentEntry>
+  </Components>
+</ApplicationPackage>

@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { getThumbUrl } from '../../utils/photoUtils';
 import { downloadMultipleFiles } from '../../utils/fileDownload';
 import { PHOTO_SECTIONS } from '../../constants/photoSections';
+import MediaListView from './MediaListView';
 import styles from '../../styles/DocumentationPanel.module.css';
 
 // Helper function to get friendly label for section type
@@ -35,6 +36,7 @@ const getSectionLabel = (sectionId) => {
 const DocumentationPanel = ({
   projectUuid,
   gridSize,
+  viewMode = 'grid',
   onCountChange,
   onPhotoClick
 }) => {
@@ -471,7 +473,43 @@ const DocumentationPanel = ({
           <h4 className={styles.emptyTitle}>No Results Found</h4>
           <p className={styles.emptyText}>Try a different search term or filter</p>
         </div>
+      ) : viewMode === 'list' ? (
+        /* LIST VIEW - Show all photos in flat list */
+        <MediaListView
+          media={photos.filter(photo =>
+            activeFilter === 'all' || photo.section?.startsWith(activeFilter)
+          )}
+          selectedIds={selectedPhotoIds}
+          onSelect={handlePhotoSelect}
+          onDelete={async (photoId) => {
+            try {
+              await surveyService.photos.delete(projectUuid, photoId);
+              setPhotos(prev => prev.filter(p => p.id !== photoId));
+              toast.success('Photo deleted');
+            } catch (error) {
+              logger.error('Documentation', 'Failed to delete photo:', error);
+              toast.error('Failed to delete photo');
+            }
+          }}
+          onEdit={async (photoId, updates) => {
+            try {
+              await surveyService.photos.updateMetadata(projectUuid, photoId, updates);
+              setPhotos(prev => prev.map(p => p.id === photoId ? { ...p, ...updates } : p));
+              toast.success('Photo updated');
+            } catch (error) {
+              logger.error('Documentation', 'Failed to update photo:', error);
+              toast.error('Failed to update photo');
+            }
+          }}
+          onLightboxOpen={(index) => {
+            const filteredPhotos = photos.filter(photo =>
+              activeFilter === 'all' || photo.section?.startsWith(activeFilter)
+            );
+            onPhotoClick(filteredPhotos, index);
+          }}
+        />
       ) : (
+        /* GRID VIEW - Show photos organized by sections */
         <div className={styles.sectionList}>
           {searchFilteredSections.map(sectionId => {
             const sectionPhotos = photosBySection[sectionId] || [];

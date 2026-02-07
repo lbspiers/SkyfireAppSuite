@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { POI_TYPE_OPTIONS, BREAKER_RATING_OPTIONS } from '../../../utils/constants';
 import { usePCSCalculations } from '../../../hooks/usePCSCalculations';
 import { Alert, EquipmentRow, TableDropdown, FormFieldRow, FormInput, TableRowButton, SectionClearModal, Modal, Button } from '../../ui';
@@ -56,6 +56,7 @@ const PointOfInterconnectionSection = ({
   const [showTapDisconnectPrompt, setShowTapDisconnectPrompt] = useState(false);
   const [showAddTapDisconnectPrompt, setShowAddTapDisconnectPrompt] = useState(false);
   const [existingDisconnect, setExistingDisconnect] = useState(null);
+  const isInitialMount = useRef(true);
 
   // ============================================
   // DYNAMIC FIELD NAMES (System-aware)
@@ -213,22 +214,53 @@ const PointOfInterconnectionSection = ({
   // ============================================
 
   // Auto-select and save recommended PCS amps if available and not already set
-  // ONLY for battery systems that should auto-trigger PCS
+  // ONLY for battery systems that should auto-trigger PCS AND POI type is PV Breaker (OCPD)
   useEffect(() => {
-    if (pcsCalculations.shouldAutoTriggerPCS && pcsCalculations.recommendedPcsAmps && !formData[pcsFieldName]) {
+    if (pcsCalculations.shouldAutoTriggerPCS && poiType === 'PV Breaker (OCPD)' && pcsCalculations.recommendedPcsAmps && !formData[pcsFieldName]) {
       const pcsSettingsField = systemNumber === 1 ? 'sys1_pcs_settings' : 'sys2_pcs_settings';
       // Save amp value to pcs_amps (integer field)
       onChange(pcsFieldName, pcsCalculations.recommendedPcsAmps);
       // Save true to pcs_settings (boolean field) to indicate PCS is active
       onChange(pcsSettingsField, true);
     }
-  }, [pcsCalculations.shouldAutoTriggerPCS, pcsCalculations.recommendedPcsAmps, formData[pcsFieldName], pcsFieldName, onChange, systemNumber]);
+  }, [pcsCalculations.shouldAutoTriggerPCS, poiType, pcsCalculations.recommendedPcsAmps, formData[pcsFieldName], pcsFieldName, onChange, systemNumber]);
+
+  // ============================================
+  // CLEAR AUTO-ACTIVATED PCS WHEN POI TYPE CHANGES
+  // ============================================
+
+  // When POI type changes away from "PV Breaker (OCPD)", clear auto-activated PCS
+  // Skip on initial mount to prevent clearing on page load
+  useEffect(() => {
+    // Skip on initial mount to prevent clearing on page load
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const pcsValue = formData[pcsFieldName];
+
+    // Only clear if:
+    // 1. POI type is set and NOT "PV Breaker (OCPD)"
+    // 2. PCS value exists
+    // 3. PCS should auto-trigger (meaning it's a battery system)
+    // 4. PCS was NOT manually activated (only clear auto-activated PCS)
+    if (poiType && poiType !== 'PV Breaker (OCPD)' && pcsValue && pcsCalculations.shouldAutoTriggerPCS && !manualPcsActivated) {
+      console.debug('[POI] Clearing auto-activated PCS because POI type is not PV Breaker (OCPD)');
+      const pcsSettingsField = systemNumber === 1 ? 'sys1_pcs_settings' : 'sys2_pcs_settings';
+      onChange(pcsFieldName, '');
+      onChange(pcsSettingsField, false);
+    }
+  }, [poiType]);
 
   // ============================================
   // DERIVED STATE
   // ============================================
 
-  const showPowerControl = pcsCalculations.shouldAutoTriggerPCS || manualPcsActivated;
+  // PCS auto-activates only when POI type is PV Breaker (OCPD) AND shouldAutoTriggerPCS is true
+  // For all other POI types, PCS can only be manually activated
+  const shouldAutoActivatePCS = pcsCalculations.shouldAutoTriggerPCS && poiType === 'PV Breaker (OCPD)';
+  const showPowerControl = shouldAutoActivatePCS || manualPcsActivated;
   const showBreakerRating = poiType === 'PV Breaker (OCPD)' || poiType === 'Lug Kit';
   const showDisconnectRating = poiType === 'Line (Supply) Side Tap' || poiType === 'Load Side Tap' || poiType === 'Meter Collar Adapter';
 
@@ -398,14 +430,30 @@ const PointOfInterconnectionSection = ({
   };
 
   // ============================================
-  // FILTERED POI OPTIONS (120% RULE)
+  // FILTERED POI OPTIONS (120% RULE & BACKUP CONFIG)
   // ============================================
 
   const getFilteredPoiOptions = () => {
+    let options = [...POI_TYPE_OPTIONS];
+
+    // Filter out PV Breaker if violates 120% rule
     if (pcsCalculations.violates120Rule) {
-      return POI_TYPE_OPTIONS.filter(opt => opt.value !== 'PV Breaker (OCPD)');
+      options = options.filter(opt => opt.value !== 'PV Breaker (OCPD)');
     }
-    return POI_TYPE_OPTIONS;
+
+    // Filter out Line Side Connection unless backup config allows it
+    // Only show Line Side Connection when:
+    // - backuploads_panel_option === 'Backup Existing Panel'
+    // - backuploads_panel_selection === 'Main Panel (A)'
+    const backupLoadsOption = formData.backuploads_panel_option || '';
+    const backupPanelSelection = formData.backuploads_panel_selection || '';
+    const allowLineSideConnection = backupLoadsOption === 'Backup Existing Panel' && backupPanelSelection === 'Main Panel (A)';
+
+    if (!allowLineSideConnection) {
+      options = options.filter(opt => opt.value !== 'Line Side Connection');
+    }
+
+    return options;
   };
 
   const filteredPoiOptions = getFilteredPoiOptions();
@@ -420,6 +468,31 @@ const PointOfInterconnectionSection = ({
       onChange(poiTypeFieldName, '');
     }
   }, [pcsCalculations.violates120Rule, poiType, onChange, poiTypeFieldName]);
+
+  // ============================================
+  // AUTO-CLEAR PCS WHEN POI TYPE CHANGES AWAY FROM PV BREAKER
+  // ============================================
+
+  useEffect(() => {
+    // Skip on initial mount to prevent clearing on page load
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // If POI type is NOT "PV Breaker (OCPD)" and PCS is currently active
+    // AND it should have been auto-triggered (meaning it was likely auto-activated)
+    // AND manual PCS is not activated
+    // Then clear the PCS settings (manual activations should remain)
+    const pcsValue = formData[pcsFieldName];
+    if (poiType && poiType !== 'PV Breaker (OCPD)' && pcsValue && pcsCalculations.shouldAutoTriggerPCS && !manualPcsActivated) {
+      console.debug('[POI] Clearing auto-activated PCS because POI type is not PV Breaker (OCPD)');
+      const pcsSettingsField = systemNumber === 1 ? 'sys1_pcs_settings' : 'sys2_pcs_settings';
+      onChange(pcsFieldName, '');
+      onChange(pcsSettingsField, false);
+    }
+    // Only depend on poiType to avoid infinite loops - we only want to run when POI type changes
+  }, [poiType]);
 
   // ============================================
   // AUTO-SELECT CONDUCTOR SIZE WHEN BREAKER CHANGES
@@ -829,16 +902,9 @@ const PointOfInterconnectionSection = ({
         <>
           {/* Alert Message */}
           <div style={{ padding: '0 var(--spacing) var(--spacing-tight)' }}>
-            {pcsCalculations.shouldAutoTriggerPCS ? (
-              <Alert variant="warning" collapsible={false}>
-                <strong>Power Control System Activated:</strong> System output exceeds
-                allowable backfeed. PCS will throttle current to {pcsCalculations.allowableBackfeed} Amps.
-              </Alert>
-            ) : (
-              <Alert variant="info" collapsible={false}>
-                <strong>Power Control System Active:</strong> Manual activation enabled.
-              </Alert>
-            )}
+            <Alert variant="info" collapsible={false}>
+              <strong>Power Control System Active:</strong> {shouldAutoActivatePCS ? 'Automatically activated.' : 'Manual activation enabled.'}
+            </Alert>
           </div>
 
           {/* PCS Amps Dropdown */}
@@ -866,33 +932,31 @@ const PointOfInterconnectionSection = ({
             rating, see the SMS Section.
           </div>
 
-          {/* Deactivate Button (Manual PCS only) */}
-          {manualPcsActivated && !pcsCalculations.shouldAutoTriggerPCS && (
-            <div style={{ padding: '0 var(--spacing) var(--spacing)' }}>
-              <button
-                type="button"
-                onClick={handleDeactivatePcs}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  padding: 'var(--spacing-tight)',
-                  background: 'transparent',
-                  border: 'var(--border-thin) solid var(--color-error)',
-                  borderRadius: 'var(--radius-md)',
-                  color: 'var(--color-error)',
-                  fontSize: 'var(--text-sm)',
-                  cursor: 'pointer',
-                  transition: 'var(--transition-base)',
-                }}
-                onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-error-light)'}
-                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                Deactivate Power Control System
-              </button>
-            </div>
-          )}
+          {/* Deactivate Button - Always shown when PCS is active */}
+          <div style={{ padding: '0 var(--spacing) var(--spacing)' }}>
+            <button
+              type="button"
+              onClick={handleDeactivatePcs}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                padding: 'var(--spacing-tight)',
+                background: 'transparent',
+                border: 'var(--border-thin) solid var(--color-error)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--color-error)',
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+                transition: 'var(--transition-base)',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-error-light)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              Deactivate Power Control System
+            </button>
+          </div>
         </>
       )}
 

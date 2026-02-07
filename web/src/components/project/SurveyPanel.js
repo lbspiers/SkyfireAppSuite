@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Grid, List } from 'lucide-react';
 import CompactTabs from '../common/CompactTabs';
 import DocumentationPanel from './DocumentationPanel';
-import EquipmentSectionGroup from './EquipmentSectionGroup';
 import ComingSoon from '../common/ComingSoon';
 import PhotoPanelViewer from './PhotoPanelViewer';
 import MapPanel from '../maps/MapPanel';
@@ -57,7 +56,7 @@ const GridIcon4x4 = () => (
  * SurveyPanel - Parent container for survey-related content with sub-tabs
  * Replaces the old Gallery tab with organized survey data
  *
- * Sub-tabs: Documentation (Photos & Notes), All, SS Report, Map
+ * Sub-tabs: Documentation (Photos & Notes), SS Report, Map
  *
  * @param {string} projectUuid - Project UUID for fetching survey data
  * @param {object} projectData - Full project data object containing site info for Map
@@ -140,8 +139,8 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   };
 
   const renderControls = (activeTab) => {
-    if (activeTab === 'documentation' || activeTab === 'all') {
-      const count = activeTab === 'documentation' ? photoCount : null;
+    if (activeTab === 'documentation') {
+      const count = photoCount;
 
       return (
         <React.Fragment>
@@ -253,7 +252,6 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   };
 
   const tabContent = {
-    all: <EquipmentSectionGroup projectUuid={projectUuid} gridSize={gridSize} />,
     documentation: viewerState.isOpen ? (
       <PhotoPanelViewer
         media={viewerState.media}
@@ -272,6 +270,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
       <DocumentationPanel
         projectUuid={projectUuid}
         gridSize={gridSize}
+        viewMode={viewMode}
         onCountChange={setPhotoCount}
         onPhotoClick={handleOpenPhoto}
       />
@@ -299,7 +298,6 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
     <div className={styles.surveyPanel}>
       <CompactTabs
         tabs={[
-          { id: 'all', label: 'All' },
           { id: 'documentation', label: 'Documentation' },
           { id: 'map', label: 'Map' },
           { id: 'report', label: 'SS Report' },

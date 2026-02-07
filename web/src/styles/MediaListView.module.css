@@ -29,6 +29,48 @@
   padding-right: var(--spacing);
 }
 
+/* Column widths */
+.colCheckbox {
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.colPreview {
+  width: 80px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.colFilename {
+  flex: 2;
+  min-width: 200px;
+}
+
+.colSection {
+  flex: 1;
+  min-width: 120px;
+}
+
+.colTag {
+  flex: 1;
+  min-width: 100px;
+}
+
+.colNotes {
+  flex: 2;
+  min-width: 200px;
+}
+
+.colDate {
+  flex: 1;
+  min-width: 140px;
+}
+
+.colActions {
+  width: 80px;
+  flex-shrink: 0;
+}
+
 /* ===== BODY ===== */
 .listBody {
   flex: 1;

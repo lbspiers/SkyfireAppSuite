@@ -46,15 +46,25 @@ const FloatingNoteButton = () => {
 
       if (createResponse.status === 'SUCCESS') {
         const noteId = createResponse.data.id;
+        console.log('[FloatingNoteButton] Note created with ID:', noteId);
 
         // Send note immediately
-        await sendNoteAPI(noteId);
+        const sendResponse = await sendNoteAPI(noteId);
+        console.log('[FloatingNoteButton] Send response:', sendResponse);
 
-        // Clear and close
-        setNoteContent('');
-        setIsOpen(false);
+        if (sendResponse.status === 'SUCCESS') {
+          // Clear and close
+          setNoteContent('');
+          setIsOpen(false);
 
-        toast.success('Note sent successfully');
+          toast.success('Note sent successfully');
+        } else {
+          console.error('[FloatingNoteButton] Send failed:', sendResponse);
+          toast.error('Failed to send note: ' + (sendResponse.message || 'Unknown error'));
+        }
+      } else {
+        console.error('[FloatingNoteButton] Create failed:', createResponse);
+        toast.error('Failed to create note: ' + (createResponse.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Failed to send note:', error);

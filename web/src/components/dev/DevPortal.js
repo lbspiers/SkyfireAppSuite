@@ -145,8 +145,24 @@ const DevPortal = () => {
     const loadNotes = async () => {
       try {
         const response = await getNotes();
+        console.log('[DevPortal] Notes loaded:', response);
         if (response.status === 'SUCCESS') {
-          setNotes(response.data || []);
+          console.log('[DevPortal] Number of notes:', response.data?.length);
+          console.log('[DevPortal] Notes:', response.data);
+          const loadedNotes = response.data || [];
+          setNotes(loadedNotes);
+
+          // Auto-select the most recent draft note if no note is selected
+          if (!selectedNoteId && loadedNotes.length > 0) {
+            const mostRecentDraft = loadedNotes
+              .filter(n => n.status === 'draft')
+              .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+
+            if (mostRecentDraft) {
+              setSelectedNoteId(mostRecentDraft.id);
+              setNoteContent(mostRecentDraft.content);
+            }
+          }
         }
       } catch (error) {
         console.error('Failed to load notes:', error);
@@ -204,6 +220,20 @@ const DevPortal = () => {
       }
     });
 
+    socket.on('dev-notes:updated', async (data) => {
+      // Silently refresh notes list when new notes are created/sent
+      console.log('[DevPortal] dev-notes:updated event received:', data);
+      try {
+        const response = await getNotes();
+        console.log('[DevPortal] Refreshed notes after socket event:', response);
+        if (response.status === 'SUCCESS') {
+          setNotes(response.data || []);
+        }
+      } catch (error) {
+        console.error('Failed to refresh notes:', error);
+      }
+    });
+
     socket.on('disconnect', (reason) => {
       if (process.env.NODE_ENV === 'development') {
         console.log('[DevPortal] Socket disconnected:', reason);
@@ -221,6 +251,7 @@ const DevPortal = () => {
 
     return () => {
       socket.off('dev-tasks:updated');
+      socket.off('dev-notes:updated');
       socket.disconnect();
     };
   }, []);
@@ -1051,8 +1082,12 @@ const DevPortal = () => {
       const response = await sendNoteAPI(noteId);
 
       if (response.status === 'SUCCESS') {
-        // Remove sent note from list
-        setNotes(notes.filter(n => n.id !== noteId));
+        // Update the sent note's status in the list (keep it visible)
+        setNotes(notes.map(n =>
+          n.id === noteId
+            ? { ...n, status: 'sent', title: autoTitle, content: noteContent }
+            : n
+        ));
 
         // Clear content and create new blank note
         setNoteContent('');
@@ -1065,9 +1100,15 @@ const DevPortal = () => {
         });
 
         if (newNoteResponse.status === 'SUCCESS') {
-          setNotes([newNoteResponse.data]);
+          setNotes([newNoteResponse.data, ...notes.map(n =>
+            n.id === noteId
+              ? { ...n, status: 'sent', title: autoTitle, content: noteContent }
+              : n
+          )]);
           setSelectedNoteId(newNoteResponse.data.id);
         }
+
+        toast.success('Note sent for processing');
 
         // Reload tasks to show newly created tasks (no toast here)
         setTimeout(async () => {
@@ -2037,6 +2078,14 @@ const DevPortal = () => {
                 <Brain size={16} style={{ display: 'inline', marginRight: '4px' }} />
                 Equipment Review
               </button>
+              <button
+                className={styles.viewButton}
+                onClick={() => setShowNotesPanel(true)}
+                title="Dev Notes - Convert ideas to tasks"
+              >
+                <FileText size={16} style={{ display: 'inline', marginRight: '4px' }} />
+                Notes ({notes.length})
+              </button>
               <span style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-color)', margin: '0 8px' }}></span>
               <button
                 className={`${styles.viewButton} ${view === 'list' ? styles.viewButtonActive : ''}`}
@@ -2738,9 +2787,16 @@ const DevPortal = () => {
                 <div className={styles.noteEditorEmpty}>
                   <FileText size={48} color="var(--gray-400)" />
                   <p>No note selected</p>
-                  <button className={styles.primaryButton} onClick={createNote}>
-                    Create New Note
-                  </button>
+                  <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginTop: 'var(--spacing-md)' }}>
+                    <button className={styles.primaryButton} onClick={createNote}>
+                      Create New Note
+                    </button>
+                    {notes.length > 0 && (
+                      <button className={styles.secondaryButton} onClick={() => setNotesView('list')}>
+                        View All Notes ({notes.length})
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
