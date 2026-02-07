@@ -2498,7 +2498,7 @@
   font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   background: transparent;
-  border: var(--border-thin) solid var(--border-elevated);
+  border: var(--border-thin) solid var(--color-primary);
   color: var(--text-muted);
   cursor: pointer;
   white-space: nowrap;
