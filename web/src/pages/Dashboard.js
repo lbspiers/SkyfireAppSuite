@@ -240,20 +240,20 @@ const Dashboard = () => {
         <div className={styles.headerLeft}>
           <h1 className={styles.dashboardTitle}>
             {getTimeBasedGreeting(userName)}
+            {/* Super User Company Filter - directly right of greeting */}
+            {isSuperUser && companies.length > 0 && (
+              <div className={styles.companyFilterWrapper}>
+                <FormSelect
+                  options={companies}
+                  value={companyFilter}
+                  onChange={(e) => setCompanyFilter(e.target.value)}
+                  fullWidth={false}
+                  size="md"
+                />
+              </div>
+            )}
             <NotificationBell />
           </h1>
-          {/* Super User Company Filter */}
-          {isSuperUser && companies.length > 0 && (
-            <div className={styles.companyFilterWrapper}>
-              <FormSelect
-                options={companies}
-                value={companyFilter}
-                onChange={(e) => setCompanyFilter(e.target.value)}
-                fullWidth={false}
-                size="md"
-              />
-            </div>
-          )}
         </div>
 
         <nav className={styles.topNav}>
