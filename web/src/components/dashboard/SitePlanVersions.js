@@ -655,7 +655,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                backgroundColor: 'var(--bg-secondary, #f5f5f5)',
+                backgroundColor: 'var(--bg-panel)',
                 transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
                 transformOrigin: 'center center',
                 transition: isPanning ? 'none' : 'transform 0.1s ease-out',
