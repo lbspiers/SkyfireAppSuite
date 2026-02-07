@@ -20,7 +20,10 @@ import ChatterPanel from '../components/chatter/ChatterPanel';
 import TabbedPanel from '../components/common/TabbedPanel';
 import QCChecklistPanel from '../components/pdf/QCChecklistPanel';
 import Account from './Account';
+import Inventory from './Inventory';
 import SupportPanel from '../components/support/SupportPanel';
+import AHJInfoPanel from '../components/Admin/AHJInfoPanel';
+import BillingPortal from './Admin/BillingPortal';
 import { ProjectHeader, FormSelect } from '../components/ui';
 import ProjectChatTab from '../components/project/ProjectChatTab';
 import RevisionsPanel from '../components/revisions/RevisionsPanel';
@@ -354,12 +357,14 @@ const DesignPortal = () => {
 
       {/* Show either Menu Panel or Project Details */}
       {showMenuPanel ? (
-        <div className={portalStyles.menuPanelContainer}>
+        <div className={styles.menuPanelContainer}>
           <TabbedPanel
             tabs={[
               { id: 'account', label: 'Account' },
               { id: 'support', label: 'Support' },
               { id: 'inventory', label: 'Inventory' },
+              ...(isSuperUser ? [{ id: 'billing', label: 'Billing' }] : []),
+              ...(showDevPortalTab ? [{ id: 'ahjinfo', label: 'AHJ Info' }] : []),
               ...(showDevPortalTab ? [{ id: 'devportal', label: 'Dev Portal' }] : []),
               { id: 'logout', label: 'Logout' }
             ]}
@@ -370,22 +375,19 @@ const DesignPortal = () => {
                 <Account />
               ),
               support: (
-                <div className={portalStyles.menuContent}>
+                <div className={styles.menuTabContent}>
                   <SupportPanel />
                 </div>
               ),
-              inventory: (
-                <div className={portalStyles.menuContent}>
-                  <h3>Inventory</h3>
-                  <p>Inventory management coming soon...</p>
-                </div>
-              ),
+              inventory: <Inventory />,
+              billing: <BillingPortal />,
+              ahjinfo: <AHJInfoPanel />,
               devportal: <DevPortal />,
               logout: (
-                <div className={portalStyles.menuContent}>
-                  <h3>Logout</h3>
-                  <p>Are you sure you want to logout?</p>
-                  <button onClick={handleLogout} className={portalStyles.logoutButton}>
+                <div className={styles.menuTabContent}>
+                  <h3 className={styles.tabContentTitle}>Logout</h3>
+                  <p className={styles.tabContentPlaceholder}>Are you sure you want to logout?</p>
+                  <button onClick={handleLogout} className={styles.logoutButton}>
                     Confirm Logout
                   </button>
                 </div>
