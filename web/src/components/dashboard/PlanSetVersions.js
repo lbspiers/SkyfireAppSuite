@@ -203,17 +203,32 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
         const imgResponse = await planSetService.getImageUrl(projectUuid, versionNumber);
         const imgData = imgResponse?.data || imgResponse;
 
-        // Normalize snake_case API response to camelCase
+        // Normalize snake_case API response to camelCase and apply custom PV labels
         if (imgData) {
           if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
           if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
           if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
           if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
           if (imgData.pages) {
+            // Custom PV label mapping for plan sets
+            const pvLabelMap = {
+              1: 'PV 1',
+              2: 'PV 2',
+              3: 'PV 3',
+              4: 'PV 4',
+              5: 'PV 5',
+              6: 'PV 5.1',
+              7: 'PV 5.2',
+              8: 'PV 6',
+              9: 'PV 7',
+              10: 'PV 8'
+            };
+
             imgData.pages = imgData.pages.map(p => ({
               ...p,
               imageUrl: p.imageUrl || p.image_url,
               imageKey: p.imageKey || p.image_key,
+              label: pvLabelMap[p.page] || p.label || `Page ${p.page}`
             }));
           }
         }
