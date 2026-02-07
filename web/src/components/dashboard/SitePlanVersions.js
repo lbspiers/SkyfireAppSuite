@@ -135,17 +135,25 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
         const imgResponse = await sitePlanService.getImageUrl(projectUuid, version.id);
         const imgData = imgResponse?.data || imgResponse;
 
-        // Normalize snake_case API response to camelCase
+        // Normalize snake_case API response to camelCase and apply custom PV labels for site plans
         if (imgData) {
           if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
           if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
           if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
           if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
           if (imgData.pages) {
+            // Custom PV label mapping for site plans
+            const sitePlanLabelMap = {
+              1: 'PV 2',
+              2: 'PV 3',
+              3: 'PV 7'
+            };
+
             imgData.pages = imgData.pages.map(p => ({
               ...p,
               imageUrl: p.imageUrl || p.image_url,
               imageKey: p.imageKey || p.image_key,
+              label: sitePlanLabelMap[p.page] || p.label || `Page ${p.page}`
             }));
           }
         }
@@ -223,17 +231,25 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
             const imgResponse = await sitePlanService.getImageUrl(projectUuid, data.sitePlanId);
             const imgData = imgResponse?.data || imgResponse;
 
-            // Normalize snake_case API response to camelCase
+            // Normalize snake_case API response to camelCase and apply custom PV labels for site plans
             if (imgData) {
               if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
               if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
               if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
               if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
               if (imgData.pages) {
+                // Custom PV label mapping for site plans
+                const sitePlanLabelMap = {
+                  1: 'PV 2',
+                  2: 'PV 3',
+                  3: 'PV 7'
+                };
+
                 imgData.pages = imgData.pages.map(p => ({
                   ...p,
                   imageUrl: p.imageUrl || p.image_url,
                   imageKey: p.imageKey || p.image_key,
+                  label: sitePlanLabelMap[p.page] || p.label || `Page ${p.page}`
                 }));
               }
             }
