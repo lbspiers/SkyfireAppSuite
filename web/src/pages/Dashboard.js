@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import logger from '../services/devLogger';
 import StatusTabs from '../components/dashboard/StatusTabs';
@@ -15,6 +15,8 @@ import Account from './Account';
 import Inventory from './Inventory';
 import SupportPanel from '../components/support/SupportPanel';
 import { DevPortal } from '../components/dev';
+import AHJInfoPanel from '../components/Admin/AHJInfoPanel';
+import BillingPortal from './Admin/BillingPortal';
 import useDashboardData from '../hooks/useDashboardData';
 import { useDevNotes } from '../hooks/useDevNotes';
 import { useSocket } from '../hooks/useSocket';
@@ -238,8 +240,9 @@ const Dashboard = () => {
         <div className={styles.headerLeft}>
           <h1 className={styles.dashboardTitle}>
             {getTimeBasedGreeting(userName)}
+            <NotificationBell />
           </h1>
-          {/* Super User Company Filter - Left of NotificationBell */}
+          {/* Super User Company Filter */}
           {isSuperUser && companies.length > 0 && (
             <div className={styles.companyFilterWrapper}>
               <FormSelect
@@ -251,17 +254,6 @@ const Dashboard = () => {
               />
             </div>
           )}
-          {/* Dev Notes Icon - Super Admin Only */}
-          {showDevPortalTab && (
-            <button
-              className={styles.devNotesIcon}
-              onClick={openPanel}
-              title="Dev Notes"
-            >
-              <FileText size={20} />
-            </button>
-          )}
-          <NotificationBell />
         </div>
 
         <nav className={styles.topNav}>
@@ -392,6 +384,8 @@ const Dashboard = () => {
                   { id: 'account', label: 'Account' },
                   { id: 'support', label: 'Support' },
                   { id: 'inventory', label: 'Inventory' },
+                  ...(isSuperUser ? [{ id: 'billing', label: 'Billing' }] : []),
+                  ...(showDevPortalTab ? [{ id: 'ahjinfo', label: 'AHJ Info' }] : []),
                   ...(showDevPortalTab ? [{ id: 'devportal', label: 'Dev Portal' }] : []),
                   { id: 'logout', label: 'Logout' }
                 ]}
@@ -407,6 +401,8 @@ const Dashboard = () => {
                     </div>
                   ),
                   inventory: <Inventory />,
+                  billing: <BillingPortal />,
+                  ahjinfo: <AHJInfoPanel />,
                   devportal: <DevPortal />,
                   logout: (
                     <div className={styles.menuTabContent}>

@@ -78,6 +78,8 @@
   padding: 0;
   text-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
   display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 /* Deployment Info - Super Admin Only */
