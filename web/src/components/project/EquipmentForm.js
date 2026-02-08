@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback, memo, useReducer } from 'react';
+﻿import React, { useState, useMemo, useEffect, useRef, useCallback, memo, useReducer } from 'react';
 import { toast } from 'react-toastify';
 import axios from '../../config/axios';
 import logger from '../../services/devLogger';
@@ -177,7 +177,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   const [loadingMaxOutput, setLoadingMaxOutput] = useState(false);
 
   // Form state - matches API field names from audit
-  const [formData, setFormData] = useState({
+  const [formDataRaw, setFormDataRaw] = useState({
     // Solar Panel fields
     solar_panel_isnew: true,
     solar_panel_make: '',
@@ -409,6 +409,10 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     ele_subpanel_b_main_breaker: '',
     ele_subpanel_b_upstream_breaker: '',
   });
+
+  // Create stable setFormData function (no dependencies to avoid breaking memoization)
+  const setFormData = setFormDataRaw;
+  const formData = formDataRaw;
 
   // Hydrate form data for a specific system
   const hydrateFormData = useCallback((systemNum) => {
@@ -649,11 +653,11 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_quantity: systemDetails[`${prefix}_solar_panel_qty`] || '',
 
       // Solar Panel Type 2 visibility flag
-      show_solar_panel_2: !!systemDetails[`${prefix}_mixed_panel_system`],
+      show_solar_panel_2: !!systemDetails[`${prefix}_show_second_panel_type`],
       batteryonly: !!systemDetails[`${prefix}_batteryonly`],
 
       // Solar Panel Type 2 fields
-      solar_panel_type2_is_new: !systemDetails[`${prefix}_solar_panel_type2_existing`],
+      solar_panel_type2_is_new: systemDetails[`${prefix}_solar_panel_type2_is_new`] ?? true,
       solar_panel_type2_manufacturer: systemDetails[`${prefix}_solar_panel_type2_manufacturer`] || '',
       solar_panel_type2_model: systemDetails[`${prefix}_solar_panel_type2_model`] || '',
       solar_panel_type2_quantity: systemDetails[`${prefix}_solar_panel_type2_quantity`] || '',
@@ -760,18 +764,19 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       gateway: systemDetails[`${prefix}_teslagatewaytype`] || '',
       teslagatewaytype: systemDetails[`${prefix}_teslagatewaytype`] || '',
       backupSwitchLocation: systemDetails[`${prefix}_backupswitch_location`] || '',
-      batteryExisting: !!systemDetails[`battery${systemNum}_existing`],
+      batteryExisting: !!systemDetails[`${prefix}_battery1_existing`],
       pcs_settings: !!systemDetails[`${prefix}_pcs_settings`],
 
       // SMS (Storage Management System)
+      // NOTE: SMS fields are NOT prefixed in the database (they're global, not system-specific)
       sms_equipment_type: systemDetails[`${prefix}_sms_equipment_type`] || '',
       sms_isnew: !systemDetails[`${prefix}_sms_existing`],
       sms_make: systemDetails[`${prefix}_sms_make`] || '',
       sms_model: systemDetails[`${prefix}_sms_model`] || '',
       sms_main_breaker: systemDetails[`${prefix}_sms_breaker_rating`] || 'MLO',
-      sms_pv_breaker: systemDetails[`${prefix}_sms_pv_breaker`] || '',
-      sms_ess_breaker: systemDetails[`${prefix}_sms_ess_breaker`] || '',
-      sms_tie_in_breaker: systemDetails[`${prefix}_sms_tie_in_breaker`] || '',
+      sms_pv_breaker: systemDetails[`${prefix}_sms_pv_breaker_rating_override`] || '',
+      sms_ess_breaker: systemDetails[`${prefix}_sms_ess_breaker_rating_override`] || '',
+      sms_tie_in_breaker: systemDetails[`${prefix}_sms_tie_in_breaker_rating_override`] || '',
       sms_has_rsd: !!systemDetails[`${prefix}_sms_rsd_enabled`],
       sms_backup_load_sub_panel_breaker_rating: systemDetails[`${prefix}_sms_backup_load_sub_panel_breaker_rating`] || '',
       sms_pv_breaker_rating_override: systemDetails[`${prefix}_sms_pv_breaker_rating_override`] || '',
@@ -779,7 +784,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       sms_tie_in_breaker_rating_override: systemDetails[`${prefix}_sms_tie_in_breaker_rating_override`] || '',
 
       // Battery Type 1
-      battery1_isnew: !systemDetails[`${prefix}_battery_1_existing`],
+      // NOTE: battery1 core fields (make/model/qty/config) are system-prefixed in the database
+      battery1_isnew: !systemDetails[`${prefix}_battery1_existing`],
       battery1_quantity: systemDetails[`${prefix}_battery_1_qty`] || '',
       battery1_make: systemDetails[`${prefix}_battery_1_make`] || '',
       battery1_model: systemDetails[`${prefix}_battery_1_model`] || '',
@@ -788,7 +794,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       battery1_mount_type: systemDetails[`${prefix}_battery1_mount_type`] || '',
 
       // Battery Type 2
-      battery2_isnew: !systemDetails[`${prefix}_battery_2_existing`],
+      // NOTE: battery2 core fields are system-prefixed in the database
+      battery2_isnew: !systemDetails[`${prefix}_battery2_existing`],
       battery2_quantity: systemDetails[`${prefix}_battery_2_qty`] || '',
       battery2_make: systemDetails[`${prefix}_battery_2_make`] || '',
       battery2_model: systemDetails[`${prefix}_battery_2_model`] || '',
@@ -801,21 +808,22 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       // Backup Load Sub Panel
       backup_loads_landing: systemDetails[`${prefix}_backupconfig`] || '',
       backup_panel_selection: systemDetails[`${prefix}_backupconfig_selectpanel`] || '',
+      // NOTE: backup_panel core fields (make/model/bus/breakers) are NOT prefixed in the database
       backup_panel_isnew: !systemDetails[`bls${systemNum}_backuploader_existing`],
-      backup_panel_make: systemDetails[`bls${systemNum}_backup_load_sub_panel_make`] || '',
-      backup_panel_model: systemDetails[`bls${systemNum}_backup_load_sub_panel_model`] || '',
-      backup_panel_bus_amps: systemDetails[`bls${systemNum}_backuploader_bus_bar_rating`] || '',
-      backup_panel_main_breaker: systemDetails[`bls${systemNum}_backuploader_main_breaker_rating`] || 'MLO',
-      backup_panel_tie_in_breaker: systemDetails[`bls${systemNum}_backuploader_upstream_breaker_rating`] || '',
+      backup_panel_make: systemDetails.backup_panel_make || '',
+      backup_panel_model: systemDetails.backup_panel_model || '',
+      backup_panel_bus_amps: systemDetails.backup_panel_bus_amps || '',
+      backup_panel_main_breaker: systemDetails.backup_panel_main_breaker || 'MLO',
+      backup_panel_tie_in_breaker: systemDetails.backup_panel_tie_in_breaker || '',
       backup_sp_tie_in_breaker_location: systemDetails[`sys${systemNum}_backup_sp_tie_in_breaker_location`] || '',
 
       // Battery Combiner Panel
       battery_combiner_panel_isnew: !systemDetails[`bcp${systemNum}_existing`],
-      battery_combiner_panel_make: systemDetails[`bcp${systemNum}_Make`] || '',
+      battery_combiner_panel_make: systemDetails[`bcp${systemNum}_make`] || '',
       battery_combiner_panel_model: systemDetails[`bcp${systemNum}_model`] || '',
       battery_combiner_panel_bus_amps: systemDetails[`bcp${systemNum}_busbar`] || '',
       battery_combiner_panel_main_breaker: systemDetails[`bcp${systemNum}_mainbreaker1`] || 'MLO',
-      battery_combiner_panel_tie_in_breaker: systemDetails[`bcp${systemNum}_TieInBreaker`] || '',
+      battery_combiner_panel_tie_in_breaker: systemDetails[`bcp${systemNum}_tieinbreaker`] || '',
 
       // Gateway Configuration
       gatewayConfigIsNew: !systemDetails[`${prefix}_sms_existing`],
@@ -879,7 +887,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_isnew: getSchemaField(sysNum, 'solar_panel_existing'),
       solar_panel_make: `${sysPrefix}_solar_panel_make`,
       solar_panel_model: `${sysPrefix}_solar_panel_model`,
-      solar_panel_quantity: `${sysPrefix}_solar_panel_quantity`,
+      solar_panel_quantity: `${sysPrefix}_solar_panel_qty`,
       solar_panel_watts: `${sysPrefix}_solar_panel_watts`,
       solar_panel_vmp: `${sysPrefix}_solar_panel_vmp`,
       solar_panel_imp: `${sysPrefix}_solar_panel_imp`,
@@ -887,31 +895,31 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_isc: `${sysPrefix}_solar_panel_isc`,
 
       // Solar Panel 2 (for mixed systems)
-      solar_panel_type2_is_new: getSchemaField(sysNum, 'solar_panel_type2_existing'),
+      solar_panel_type2_is_new: getSchemaField(sysNum, 'solar_panel_type2_is_new'),
       solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
       solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
       solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
-      solar_panel_type2_wattage: `${sysPrefix}_solar_panel_type2_watts`,
-      solar_panel_type2_vmp: `${sysPrefix}_solar_panel_type2_vmp`,
-      solar_panel_type2_imp: `${sysPrefix}_solar_panel_type2_imp`,
-      solar_panel_type2_voc: `${sysPrefix}_solar_panel_type2_voc`,
-      solar_panel_type2_isc: `${sysPrefix}_solar_panel_type2_isc`,
-      solar_panel_type2_model_id: `${sysPrefix}_solar_panel_type2_model_id`,
-      solar_panel_type2_temp_coeff_voc: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
-      show_solar_panel_2: `${sysPrefix}_mixed_panel_system`,
+      // solar_panel_type2_wattage removed - spec sheet derived, not in DB
+      // solar_panel_type2_vmp removed - spec sheet derived, not in DB
+      // solar_panel_type2_imp removed - spec sheet derived, not in DB
+      // solar_panel_type2_voc removed - spec sheet derived, not in DB
+      // solar_panel_type2_isc removed - spec sheet derived, not in DB
+      // solar_panel_type2_model_id removed - spec sheet derived, not in DB
+      // solar_panel_type2_temp_coeff_voc removed - spec sheet derived, not in DB
+      show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
       batteryonly: `${sysPrefix}_batteryonly`,
 
       // Inverter/Microinverter
       inverter_isnew: getSchemaField(sysNum, 'micro_inverter_existing'),
-      inverter_make: `${sysPrefix}_inverter_make`,
-      inverter_model: `${sysPrefix}_inverter_model`,
-      inverter_type: `${sysPrefix}_inverter_type`,
+      inverter_make: `${sysPrefix}_micro_inverter_make`,
+      inverter_model: `${sysPrefix}_micro_inverter_model`,
+      // inverter_type removed - derived from sys1_selectedsystem, not in DB
       inverter_max_cont_output_amps: `${sysPrefix}_inv_max_continuous_output`,
       inverter_max_strings_branches: `${sysPrefix}_inv_max_strings_branches`,
       inverter_max_vdc: `${sysPrefix}_inv_max_vdc`,
       inverter_min_vdc: `${sysPrefix}_inv_min_vdc`,
       inverter_max_input_isc: `${sysPrefix}_inv_max_input_isc`,
-      inverter_model_id: `${sysPrefix}_inverter_model_id`,
+      inverter_model_id: `${sysPrefix}_micro_inverter_id`,
 
       // Hoymiles/APSystems Granular Microinverter Panel Tracking
       micro1Panels: `${sysPrefix}_micro1Panels`,
@@ -949,13 +957,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       combiner_panel_isnew: getSchemaField(sysNum, 'combiner_existing'),
       combiner_panel_make: `${sysPrefix}_combiner_panel_make`,
       combiner_panel_model: `${sysPrefix}_combiner_panel_model`,
-      combiner_panel_bus_amps: `${sysPrefix}_combiner_panel_bus_amps`,
-      combiner_panel_main_breaker: `${sysPrefix}_combiner_panel_main_breaker`,
+      combiner_panel_bus_amps: `${sysPrefix}_combinerpanel_bus_rating`,
+      combiner_panel_main_breaker: `${sysPrefix}_combinerpanel_main_breaker_rating`,
       combiner_panel_tie_in_breaker: `${sysPrefix}_combiner_panel_tie_in_breaker`,
       aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
 
       // BOS Visibility Flags
-      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      // show_inverter_bos removed - UI toggle, not in DB
       show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
       show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
 
@@ -969,7 +977,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       sys1_ap_hoy_breaker_size: 'sys1_ap_hoy_breaker_size',
 
       // Energy Storage System (ESS)
-      backup_option: 'backup_option',
+      backup_option: `${sysPrefix}_backup_option`,
       backup_system_size: 'backup_system_size',
 
       // IQ Combiner 6C
@@ -981,73 +989,73 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       iq_meter_collar_type: `${sysPrefix}_meter_collar_setting`,
 
       // Storage Management System (SMS)
-      sms_equipment_type: 'sms_equipment_type',
-      sms_isnew: 'sms_existing',
-      sms_make: 'sms_make',
-      sms_model: 'sms_model',
-      sms_main_breaker: 'sms_main_breaker',
-      sms_pv_breaker: 'sms_pv_breaker',
-      sms_ess_breaker: 'sms_ess_breaker',
-      sms_tie_in_breaker: 'sms_tie_in_breaker',
-      sms_has_rsd: 'sms_has_rsd',
-      sms_pv_breaker_rating_override: 'sms_pv_breaker_rating_override',
-      sms_ess_breaker_rating_override: 'sms_ess_breaker_rating_override',
-      sms_tie_in_breaker_rating_override: 'sms_tie_in_breaker_rating_override',
-      sms_backup_load_sub_panel_breaker_rating: 'sms_backup_load_sub_panel_breaker_rating',
+      sms_equipment_type: `${sysPrefix}_sms_equipment_type`,
+      sms_isnew: `${sysPrefix}_sms_existing`,
+      sms_make: `${sysPrefix}_sms_make`,
+      sms_model: `${sysPrefix}_sms_model`,
+      sms_main_breaker: `${sysPrefix}_sms_breaker_rating`,
+      // sms_pv_breaker removed - redundant, use sms_pv_breaker_rating_override
+      // sms_ess_breaker removed - redundant, use sms_ess_breaker_rating_override
+      // sms_tie_in_breaker removed - redundant, use sms_tie_in_breaker_rating_override
+      sms_has_rsd: `${sysPrefix}_sms_rsd_enabled`,
+      sms_pv_breaker_rating_override: `${sysPrefix}_sms_pv_breaker_rating_override`,
+      sms_ess_breaker_rating_override: `${sysPrefix}_sms_ess_breaker_rating_override`,
+      sms_tie_in_breaker_rating_override: `${sysPrefix}_sms_tie_in_breaker_rating_override`,
+      sms_backup_load_sub_panel_breaker_rating: `${sysPrefix}_sms_backup_load_sub_panel_breaker_rating`,
 
       // Battery Type 1
-      battery1_isnew: 'battery1_existing',
-      battery1_make: 'battery1_make',
-      battery1_model: 'battery1_model',
-      battery1_quantity: 'battery1_quantity',
-      battery1_configuration: 'battery1_configuration',
-      battery1_tie_in_location: 'battery1_tie_in_location',
-      battery1_mount_type: 'sys1_battery1_mount_type',
+      battery1_isnew: `${sysPrefix}_battery1_existing`,
+      battery1_make: `${sysPrefix}_battery_1_make`,
+      battery1_model: `${sysPrefix}_battery_1_model`,
+      battery1_quantity: `${sysPrefix}_battery_1_qty`,
+      battery1_configuration: `${sysPrefix}_battery_configuration`,
+      battery1_tie_in_location: `${sysPrefix}_battery1_tie_in_location`,
+      // battery1_mount_type removed - not in DB or calc
 
       // Battery Type 2
-      battery2_isnew: 'battery2_existing',
-      battery2_make: 'battery2_make',
-      battery2_model: 'battery2_model',
-      battery2_quantity: 'battery2_quantity',
-      battery2_tie_in_location: 'battery2_tie_in_location',
-      battery2_mount_type: 'sys1_battery2_mount_type',
-      show_battery_type_2: 'show_battery_type_2',
+      battery2_isnew: `${sysPrefix}_battery2_existing`,
+      battery2_make: `${sysPrefix}_battery_2_make`,
+      battery2_model: `${sysPrefix}_battery_2_model`,
+      battery2_quantity: `${sysPrefix}_battery_2_qty`,
+      battery2_tie_in_location: `${sysPrefix}_battery2_tie_in_location`,
+      // battery2_mount_type removed - not in DB or calc
+      // show_battery_type_2 removed - UI toggle, not in DB
 
       // Backup Load Sub Panel
       backup_loads_landing: 'sys1_backupconfig',
       backup_panel_selection: 'sys1_backupconfig_selectpanel',
-      backup_panel_isnew: 'backup_panel_existing',
-      backup_panel_make: 'backup_panel_make',
-      backup_panel_model: 'backup_panel_model',
-      backup_panel_bus_amps: 'backup_panel_bus_amps',
-      backup_panel_main_breaker: 'backup_panel_main_breaker',
-      backup_panel_tie_in_breaker: 'backup_panel_tie_in_breaker',
+      backup_panel_isnew: `bls${sysNum}_backuploader_existing`,
+      backup_panel_make: `bls${sysNum}_backup_load_sub_panel_make`,
+      backup_panel_model: `bls${sysNum}_backup_load_sub_panel_model`,
+      backup_panel_bus_amps: `bls${sysNum}_backuploader_bus_bar_rating`,
+      backup_panel_main_breaker: `bls${sysNum}_backuploader_main_breaker_rating`,
+      backup_panel_tie_in_breaker: `bls${sysNum}_backuploader_upstream_breaker_rating`,
 
       // Battery Combiner Panel
-      battery_combiner_panel_isnew: 'battery_combiner_panel_existing',
-      battery_combiner_panel_make: 'battery_combiner_panel_make',
-      battery_combiner_panel_model: 'battery_combiner_panel_model',
-      battery_combiner_panel_bus_amps: 'battery_combiner_panel_bus_amps',
-      battery_combiner_panel_main_breaker: 'battery_combiner_panel_main_breaker',
-      battery_combiner_panel_tie_in_breaker: 'battery_combiner_panel_tie_in_breaker',
+      battery_combiner_panel_isnew: `bcp${sysNum}_existing`,
+      battery_combiner_panel_make: `bcp${sysNum}_Make`,
+      battery_combiner_panel_model: `bcp${sysNum}_model`,
+      battery_combiner_panel_bus_amps: `bcp${sysNum}_busbar`,
+      battery_combiner_panel_main_breaker: `bcp${sysNum}_mainbreaker1`,
+      battery_combiner_panel_tie_in_breaker: `bcp${sysNum}_TieInBreaker`,
 
       // Tesla PowerWall fields
-      expansionPacks: 'sys1_tesla_extensions',
-      gateway: 'sys1_teslagatewaytype',
-      teslagatewaytype: 'sys1_teslagatewaytype',
-      backupSwitchLocation: 'sys1_backupswitch_location',
-      batteryExisting: 'battery1_existing',
+      expansionPacks: `${sysPrefix}_tesla_extensions`,
+      // gateway removed - redundant, use teslagatewaytype
+      teslagatewaytype: `${sysPrefix}_teslagatewaytype`,
+      backupSwitchLocation: `${sysPrefix}_backupswitch_location`,
+      batteryExisting: `${sysPrefix}_battery1_existing`,
 
       // Tesla Gateway Config fields
-      gatewayConfigIsNew: 'sys1_sms_existing',
-      gatewayConfigMainBreaker: 'sys1_sms_breaker_rating',
-      gatewayConfigBackupPanel: 'sys1_sms_backup_load_sub_panel_breaker_rating',
-      gatewayConfigActivatePCS: 'sys1_pcs_settings',
+      gatewayConfigIsNew: `${sysPrefix}_sms_existing`,
+      gatewayConfigMainBreaker: `${sysPrefix}_sms_breaker_rating`,
+      gatewayConfigBackupPanel: `${sysPrefix}_sms_backup_load_sub_panel_breaker_rating`,
+      gatewayConfigActivatePCS: `${sysPrefix}_pcs_settings`,
       gatewayConfigPCSAmps: 'sys1_pcs_amps',
-      gatewayConfigPVBreaker: 'sys1_sms_pv_breaker_rating_override',
-      gatewayConfigESSBreaker: 'sys1_sms_ess_breaker_rating_override',
-      gatewayConfigTieInBreaker: 'sys1_sms_tie_in_breaker_rating_override',
-      pcs_settings: 'pcs_settings',
+      gatewayConfigPVBreaker: `${sysPrefix}_sms_pv_breaker_rating_override`,
+      gatewayConfigESSBreaker: `${sysPrefix}_sms_ess_breaker_rating_override`,
+      gatewayConfigTieInBreaker: `${sysPrefix}_sms_tie_in_breaker_rating_override`,
+      pcs_settings: `${sysPrefix}_pcs_settings`,
     });
 
     const fieldMapping = getFieldMapping(selectedSystem, systemPrefix);
@@ -1205,7 +1213,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     const validateAndPopulateEquipment = async () => {
       try {
         const equipment = JSON.parse(pendingEquipment);
-        logger.log('EquipmentForm', '⚡ Auto-populating from assessment:', equipment);
+        logger.log('EquipmentForm', 'Ã¢Å¡Â¡ Auto-populating from assessment:', equipment);
 
         // Validate equipment against database
         const validationResults = [];
@@ -1284,7 +1292,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
         // If we have unmatched equipment, show validation modal
         if (validationResults.length > 0) {
-          logger.log('EquipmentForm', '⚠️ Equipment validation warnings:', validationResults);
+          logger.log('EquipmentForm', 'Ã¢Å¡Â Ã¯Â¸Â Equipment validation warnings:', validationResults);
           setPendingEquipmentToPopulate(equipment);
           setEquipmentValidationResults(validationResults);
           setShowEquipmentValidationModal(true);
@@ -1805,7 +1813,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           return;
         }
 
-        // Calculate: ISC × quantity × 1.25
+        // Calculate: ISC Ãƒâ€” quantity Ãƒâ€” 1.25
         const totalAmps = iscValue * batteryQty * 1.25;
         setBatteryMaxContinuousOutputAmpsPerSystem(prev => ({
           ...prev,
@@ -1888,22 +1896,22 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_make: `${sysPrefix}_solar_panel_make`,
       solar_panel_model: `${sysPrefix}_solar_panel_model`,
       solar_panel_model_id: getSchemaField(sysNum, 'solarpanel_id'),
-      solar_panel_wattage: `${sysPrefix}_solar_panel_wattage`,
+      // solar_panel_wattage removed - spec sheet derived, not in DB
       solar_panel_quantity: `${sysPrefix}_solar_panel_qty`,
 
       // Solar Panel Type 2 (for mixed systems)
-      solar_panel_type2_is_new: `${sysPrefix}_solar_panel_type2_existing`,
+      solar_panel_type2_is_new: `${sysPrefix}_solar_panel_type2_is_new`,
       solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
       solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
       solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
-      solar_panel_type2_wattage: `${sysPrefix}_solar_panel_type2_watts`,
-      solar_panel_type2_vmp: `${sysPrefix}_solar_panel_type2_vmp`,
-      solar_panel_type2_imp: `${sysPrefix}_solar_panel_type2_imp`,
-      solar_panel_type2_voc: `${sysPrefix}_solar_panel_type2_voc`,
-      solar_panel_type2_isc: `${sysPrefix}_solar_panel_type2_isc`,
-      solar_panel_type2_model_id: `${sysPrefix}_solar_panel_type2_model_id`,
-      solar_panel_type2_temp_coeff_voc: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
-      show_solar_panel_2: `${sysPrefix}_mixed_panel_system`,
+      // solar_panel_type2_wattage removed - spec sheet derived, not in DB
+      // solar_panel_type2_vmp removed - spec sheet derived, not in DB
+      // solar_panel_type2_imp removed - spec sheet derived, not in DB
+      // solar_panel_type2_voc removed - spec sheet derived, not in DB
+      // solar_panel_type2_isc removed - spec sheet derived, not in DB
+      // solar_panel_type2_model_id removed - spec sheet derived, not in DB
+      // solar_panel_type2_temp_coeff_voc removed - spec sheet derived, not in DB
+      show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
       batteryonly: `${sysPrefix}_batteryonly`,
 
       // Inverter/Microinverter
@@ -1911,7 +1919,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       inverter_make: `${sysPrefix}_micro_inverter_make`,
       inverter_model: `${sysPrefix}_micro_inverter_model`,
       inverter_model_id: `${sysPrefix}_micro_inverter_id`,
-      inverter_type: `${sysPrefix}_inverter_type`,
+      // inverter_type removed - derived from sys1_selectedsystem, not in DB
       inverter_max_cont_output_amps: `${sysPrefix}_inv_max_continuous_output`,
       inverter_qty: `${sysPrefix}_micro_inverter_qty`,
       sys1_ap_hoy_breaker_size: 'sys1_ap_hoy_breaker_size',
@@ -1931,7 +1939,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
 
       // BOS Visibility Flags
-      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      // show_inverter_bos removed - UI toggle, not in DB
       show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
       show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
 
@@ -1954,17 +1962,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       branch_string_9: `${sysPrefix}_branch_string_9`,
       branch_string_10: `${sysPrefix}_branch_string_10`,
 
-      // String Inverter Panels Per String (for MPPT custom stringing)
-      branch_panels_per_string_1: `${sysPrefix}_branch_panels_per_string_1`,
-      branch_panels_per_string_2: `${sysPrefix}_branch_panels_per_string_2`,
-      branch_panels_per_string_3: `${sysPrefix}_branch_panels_per_string_3`,
-      branch_panels_per_string_4: `${sysPrefix}_branch_panels_per_string_4`,
-      branch_panels_per_string_5: `${sysPrefix}_branch_panels_per_string_5`,
-      branch_panels_per_string_6: `${sysPrefix}_branch_panels_per_string_6`,
-      branch_panels_per_string_7: `${sysPrefix}_branch_panels_per_string_7`,
-      branch_panels_per_string_8: `${sysPrefix}_branch_panels_per_string_8`,
-      branch_panels_per_string_9: `${sysPrefix}_branch_panels_per_string_9`,
-      branch_panels_per_string_10: `${sysPrefix}_branch_panels_per_string_10`,
+      // String Inverter Panels Per String - removed, not in calc or DB
+      // sys1_branch_string_* are the real columns (already mapped above)
 
       // Hoymiles/APSystems Granular Microinverter Panel Tracking
       micro1Panels: `${sysPrefix}_micro1Panels`,
@@ -2011,9 +2010,9 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       sms_make: `${sysPrefix}_sms_make`,
       sms_model: `${sysPrefix}_sms_model`,
       sms_main_breaker: `${sysPrefix}_sms_breaker_rating`,
-      sms_pv_breaker: `${sysPrefix}_sms_pv_breaker`,
-      sms_ess_breaker: `${sysPrefix}_sms_ess_breaker`,
-      sms_tie_in_breaker: `${sysPrefix}_sms_tie_in_breaker`,
+      // sms_pv_breaker removed - redundant, use sms_pv_breaker_rating_override
+      // sms_ess_breaker removed - redundant, use sms_ess_breaker_rating_override
+      // sms_tie_in_breaker removed - redundant, use sms_tie_in_breaker_rating_override
       sms_has_rsd: `${sysPrefix}_sms_rsd_enabled`,
       sms_backup_load_sub_panel_breaker_rating: `${sysPrefix}_sms_backup_load_sub_panel_breaker_rating`,
       sms_pv_breaker_rating_override: `${sysPrefix}_sms_pv_breaker_rating_override`,
@@ -2026,21 +2025,21 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       sys4_sms_equipment_type: 'sys4_sms_equipment_type',
 
       // Battery Type 1
-      battery1_isnew: `${sysPrefix}_battery_1_existing`,
+      battery1_isnew: `${sysPrefix}_battery1_existing`,
       battery1_quantity: `${sysPrefix}_battery_1_qty`,
       battery1_make: `${sysPrefix}_battery_1_make`,
       battery1_model: `${sysPrefix}_battery_1_model`,
       battery1_configuration: `${sysPrefix}_battery_configuration`,
       battery1_tie_in_location: `${sysPrefix}_battery1_tie_in_location`,
-      battery1_mount_type: `${sysPrefix}_battery1_mount_type`,
+      // battery1_mount_type removed - not in DB or calc
 
       // Battery Type 2
-      battery2_isnew: `${sysPrefix}_battery_2_existing`,
+      battery2_isnew: `${sysPrefix}_battery2_existing`,
       battery2_quantity: `${sysPrefix}_battery_2_qty`,
       battery2_make: `${sysPrefix}_battery_2_make`,
       battery2_model: `${sysPrefix}_battery_2_model`,
       battery2_tie_in_location: `${sysPrefix}_battery2_tie_in_location`,
-      battery2_mount_type: `${sysPrefix}_battery2_mount_type`,
+      // battery2_mount_type removed - not in DB or calc
 
       // Battery Combination Method (shared field for both battery types)
       [`sys${sysNum}_combination_method`]: `${sysPrefix}_combination_method`,
@@ -2060,15 +2059,15 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // Battery Combiner Panel
       battery_combiner_panel_isnew: `bcp${sysNum}_existing`,
-      battery_combiner_panel_make: `bcp${sysNum}_Make`,
+      battery_combiner_panel_make: `bcp${sysNum}_make`,
       battery_combiner_panel_model: `bcp${sysNum}_model`,
       battery_combiner_panel_bus_amps: `bcp${sysNum}_busbar`,
       battery_combiner_panel_main_breaker: `bcp${sysNum}_mainbreaker1`,
-      battery_combiner_panel_tie_in_breaker: `bcp${sysNum}_TieInBreaker`,
+      battery_combiner_panel_tie_in_breaker: `bcp${sysNum}_tieinbreaker`,
 
       // Tesla PowerWall Configuration
       expansionPacks: `${sysPrefix}_tesla_extensions`,
-      gateway: `${sysPrefix}_teslagatewaytype`,
+      // gateway removed - redundant, use teslagatewaytype
       teslagatewaytype: `${sysPrefix}_teslagatewaytype`,
       backupSwitchLocation: `${sysPrefix}_backupswitch_location`,
       batteryExisting: `battery${sysNum}_existing`,
@@ -2102,7 +2101,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
       // Note: backup_option is system-specific (sys1_backup_option, sys2_backup_option, etc.)
       // It's defined earlier in the mapping as `${sysPrefix}_backup_option`
-      show_battery_type_2: 'show_battery_type_2',
+      // show_battery_type_2 removed - UI toggle, not in DB
     });
 
     const fieldMapping = getFieldMapping(systemNum, systemPrefix);
@@ -2272,8 +2271,9 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         // Merge system form data with optimistic updates from formData
         // Check for system-specific database field names in formData and map back to component field names
         const batteryOnlyDbField = `${sysPrefix}_batteryonly`;
+        const showSolarPanel2DbField = `${sysPrefix}_show_second_panel_type`;
         const optimisticUpdates = {
-          show_solar_panel_2: formData.show_solar_panel_2 ?? systemFormData.show_solar_panel_2,
+          show_solar_panel_2: formData[showSolarPanel2DbField] ?? formData.show_solar_panel_2 ?? systemFormData.show_solar_panel_2,
           batteryonly: formData[batteryOnlyDbField] ?? systemFormData.batteryonly,
         };
 
@@ -2290,7 +2290,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
         // Map system-specific inverter fields to component field names
         // IMPORTANT: systemFormData already contains unprefixed component field names
-        // because hydrateFormData() does the database→component mapping
+        // because hydrateFormData() does the databaseÃ¢â€ â€™component mapping
         // State stores fields using DATABASE field names (e.g., sys2_micro_inverter_make)
         // Component expects unprefixed names: 'inverter_make', 'inverter_model', etc.
 
@@ -2345,7 +2345,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           { component: 'branch_string_9', state: `${sysPrefix}_branch_string_9` },
           { component: 'branch_string_10', state: `${sysPrefix}_branch_string_10` },
           // Gateway fields
-          { component: 'gateway', state: `${sysPrefix}_gateway` },
+          { component: 'gateway', state: `${sysPrefix}_teslagatewaytype` },
           { component: 'gateway_meter_type', state: `${sysPrefix}_gateway_meter_type` },
           { component: 'backup_loads_label', state: `${sysPrefix}_backup_loads_label` },
           // BOS Visibility Flags
@@ -2357,15 +2357,52 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           { component: 'show_battery1', state: `${sysPrefix}_show_battery1` },
           { component: 'show_battery2', state: `${sysPrefix}_show_battery2` },
           { component: 'show_backup_panel', state: `${sysPrefix}_show_backup_panel` },
+          // SMS fields (global, not system-specific)
+          // IMPORTANT: State field names match what handleSystemBatchChange saves to formData
+          { component: 'sms_make', state: `${sysPrefix}_sms_make` },
+          { component: 'sms_model', state: `${sysPrefix}_sms_model` },
+          { component: 'sms_isnew', state: `${sysPrefix}_sms_existing` },
+          { component: 'sms_main_breaker', state: `${sysPrefix}_sms_breaker_rating` },
+          { component: 'sms_pv_breaker', state: `${sysPrefix}_sms_pv_breaker_rating_override` },
+          { component: 'sms_ess_breaker', state: `${sysPrefix}_sms_ess_breaker_rating_override` },
+          { component: 'sms_tie_in_breaker', state: `${sysPrefix}_sms_tie_in_breaker_rating_override` },
+          { component: 'sms_has_rsd', state: `${sysPrefix}_sms_rsd_enabled` },
+          { component: 'sys1_sms_equipment_type', state: 'sys1_sms_equipment_type' },
+          // Battery Type 1 fields
+          { component: 'battery1_isnew', state: `${sysPrefix}_battery_1_existing` },
+          { component: 'battery1_make', state: `${sysPrefix}_battery_1_make` },
+          { component: 'battery1_model', state: `${sysPrefix}_battery_1_model` },
+          { component: 'battery1_quantity', state: `${sysPrefix}_battery_1_qty` },
+          { component: 'battery1_configuration', state: `${sysPrefix}_battery_configuration` },
+          { component: 'battery1_tie_in_location', state: `${sysPrefix}_battery1_tie_in_location` },
+          // Battery Type 2 fields
+          { component: 'battery2_isnew', state: `${sysPrefix}_battery_2_existing` },
+          { component: 'battery2_make', state: `${sysPrefix}_battery_2_make` },
+          { component: 'battery2_model', state: `${sysPrefix}_battery_2_model` },
+          { component: 'battery2_quantity', state: `${sysPrefix}_battery_2_qty` },
+          { component: 'battery2_tie_in_location', state: `${sysPrefix}_battery2_tie_in_location` },
+          // Backup Panel fields
+          { component: 'backup_panel_isnew', state: `bls${systemNumber}_backuploader_existing` },
+          { component: 'backup_panel_make', state: `bls${systemNumber}_backup_load_sub_panel_make` },
+          { component: 'backup_panel_model', state: `bls${systemNumber}_backup_load_sub_panel_model` },
+          { component: 'backup_panel_bus_amps', state: `bls${systemNumber}_backuploader_bus_bar_rating` },
+          { component: 'backup_panel_main_breaker', state: `bls${systemNumber}_backuploader_main_breaker_rating` },
+          { component: 'backup_panel_tie_in_breaker', state: `bls${systemNumber}_backuploader_upstream_breaker_rating` },
+          // ESS fields
+          { component: 'backup_option', state: `${sysPrefix}_backup_option` },
         ];
 
         inverterFieldMappings.forEach(({ component, state: stateFieldName }) => {
           // Priority 1: Check state updates (optimistic updates from formData with database field name)
           if (formData[stateFieldName] !== undefined) {
             optimisticUpdates[component] = formData[stateFieldName];
+            // Debug SMS fields
+            if (component.startsWith('sms_')) {
+              console.log(`[mergedFormData] System ${systemNumber}: ${component} = ${formData[stateFieldName]} (from formData.${stateFieldName})`);
+            }
           }
           // Priority 2: Check if systemFormData already has the unprefixed component field
-          // (hydrateFormData already mapped database→component names)
+          // (hydrateFormData already mapped databaseÃ¢â€ â€™component names)
           else if (systemFormData[component] !== undefined) {
             optimisticUpdates[component] = systemFormData[component];
           }
@@ -2403,7 +2440,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   const handleDeleteSystem = async (systemNumber) => {
     // CRITICAL: Prevent System 1 deletion - multiple safeguards
     if (systemNumber === 1) {
-      console.error('❌ BLOCKED: Cannot delete System 1');
+      console.error('Ã¢ÂÅ’ BLOCKED: Cannot delete System 1');
       toast.error('System 1 cannot be deleted. You can clear individual sections, but System 1 must always exist.', {
         position: 'top-center',
         autoClose: 4000,
@@ -2412,7 +2449,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     }
 
     if (systemNumber <= 1 || !systemNumber) {
-      console.error('❌ BLOCKED: Invalid system number for deletion:', systemNumber);
+      console.error('Ã¢ÂÅ’ BLOCKED: Invalid system number for deletion:', systemNumber);
       return;
     }
 
@@ -2426,7 +2463,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_isnew: getSchemaField(sysNum, 'solar_panel_existing'),
       solar_panel_make: `${sysPrefix}_solar_panel_make`,
       solar_panel_model: `${sysPrefix}_solar_panel_model`,
-      solar_panel_quantity: `${sysPrefix}_solar_panel_quantity`,
+      solar_panel_quantity: `${sysPrefix}_solar_panel_qty`,
       solar_panel_watts: `${sysPrefix}_solar_panel_watts`,
       solar_panel_vmp: `${sysPrefix}_solar_panel_vmp`,
       solar_panel_imp: `${sysPrefix}_solar_panel_imp`,
@@ -2434,31 +2471,31 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       solar_panel_isc: `${sysPrefix}_solar_panel_isc`,
 
       // Solar Panel 2 (for mixed systems)
-      solar_panel_type2_is_new: getSchemaField(sysNum, 'solar_panel_type2_existing'),
+      solar_panel_type2_is_new: getSchemaField(sysNum, 'solar_panel_type2_is_new'),
       solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
       solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
       solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
-      solar_panel_type2_wattage: `${sysPrefix}_solar_panel_type2_watts`,
-      solar_panel_type2_vmp: `${sysPrefix}_solar_panel_type2_vmp`,
-      solar_panel_type2_imp: `${sysPrefix}_solar_panel_type2_imp`,
-      solar_panel_type2_voc: `${sysPrefix}_solar_panel_type2_voc`,
-      solar_panel_type2_isc: `${sysPrefix}_solar_panel_type2_isc`,
-      solar_panel_type2_model_id: `${sysPrefix}_solar_panel_type2_model_id`,
-      solar_panel_type2_temp_coeff_voc: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
-      show_solar_panel_2: `${sysPrefix}_mixed_panel_system`,
+      // solar_panel_type2_wattage removed - spec sheet derived, not in DB
+      // solar_panel_type2_vmp removed - spec sheet derived, not in DB
+      // solar_panel_type2_imp removed - spec sheet derived, not in DB
+      // solar_panel_type2_voc removed - spec sheet derived, not in DB
+      // solar_panel_type2_isc removed - spec sheet derived, not in DB
+      // solar_panel_type2_model_id removed - spec sheet derived, not in DB
+      // solar_panel_type2_temp_coeff_voc removed - spec sheet derived, not in DB
+      show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
       batteryonly: `${sysPrefix}_batteryonly`,
 
       // Inverter/Microinverter
       inverter_isnew: getSchemaField(sysNum, 'micro_inverter_existing'),
-      inverter_make: `${sysPrefix}_inverter_make`,
-      inverter_model: `${sysPrefix}_inverter_model`,
-      inverter_type: `${sysPrefix}_inverter_type`,
+      inverter_make: `${sysPrefix}_micro_inverter_make`,
+      inverter_model: `${sysPrefix}_micro_inverter_model`,
+      // inverter_type removed - derived from sys1_selectedsystem, not in DB
       inverter_max_cont_output_amps: `${sysPrefix}_inv_max_continuous_output`,
       inverter_max_strings_branches: `${sysPrefix}_inv_max_strings_branches`,
       inverter_max_vdc: `${sysPrefix}_inv_max_vdc`,
       inverter_min_vdc: `${sysPrefix}_inv_min_vdc`,
       inverter_max_input_isc: `${sysPrefix}_inv_max_input_isc`,
-      inverter_model_id: `${sysPrefix}_inverter_model_id`,
+      inverter_model_id: `${sysPrefix}_micro_inverter_id`,
 
       // Hoymiles/APSystems Granular Microinverter Panel Tracking
       micro1Panels: `${sysPrefix}_micro1Panels`,
@@ -2496,13 +2533,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       combiner_panel_isnew: getSchemaField(sysNum, 'combiner_existing'),
       combiner_panel_make: `${sysPrefix}_combiner_panel_make`,
       combiner_panel_model: `${sysPrefix}_combiner_panel_model`,
-      combiner_panel_bus_amps: `${sysPrefix}_combiner_panel_bus_amps`,
-      combiner_panel_main_breaker: `${sysPrefix}_combiner_panel_main_breaker`,
+      combiner_panel_bus_amps: `${sysPrefix}_combinerpanel_bus_rating`,
+      combiner_panel_main_breaker: `${sysPrefix}_combinerpanel_main_breaker_rating`,
       combiner_panel_tie_in_breaker: `${sysPrefix}_combiner_panel_tie_in_breaker`,
       aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
 
       // BOS Visibility Flags
-      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
+      // show_inverter_bos removed - UI toggle, not in DB
       show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
       show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
 
@@ -2529,7 +2566,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     setVisibleSystems(prev => {
       // Double-check: Never allow System 1 to be removed from visibleSystems
       if (systemNumber === 1) {
-        console.error('❌ BLOCKED: Attempted to remove System 1 from visibleSystems');
+        console.error('Ã¢ÂÅ’ BLOCKED: Attempted to remove System 1 from visibleSystems');
         return prev;
       }
       return prev.filter(s => s !== systemNumber);
@@ -3179,17 +3216,17 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
   // Navigation handlers for footer
   const handlePrev = () => {
     if (selectedView === 'bos') {
-      // BOS → Combine (if exists) or Equipment
+      // BOS Ã¢â€ â€™ Combine (if exists) or Equipment
       if (showCombineStep) {
         setSelectedView('combine');
       } else {
         setSelectedView('equipment');
       }
     } else if (selectedView === 'combine') {
-      // Combine → Equipment
+      // Combine Ã¢â€ â€™ Equipment
       setSelectedView('equipment');
     } else if (selectedView === 'equipment') {
-      // Equipment → Previous System's Equipment (if not System 1)
+      // Equipment Ã¢â€ â€™ Previous System's Equipment (if not System 1)
       if (selectedSystem > 1) {
         setSelectedSystem(selectedSystem - 1);
         // Stay on Equipment view of previous system
@@ -3243,10 +3280,10 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     } else {
       // User doesn't want additional system
       if (selectedView === 'equipment') {
-        // From Equipment → go to Combine
+        // From Equipment Ã¢â€ â€™ go to Combine
         setSelectedView('combine');
       } else if (selectedView === 'bos') {
-        // From BOS → go to Electrical tab
+        // From BOS Ã¢â€ â€™ go to Electrical tab
         if (onNavigateToTab) {
           onNavigateToTab('electrical');
         }
@@ -3279,9 +3316,10 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
     // Merge local formData toggles that may have changed since last database sync
     const batteryOnlyField = `${systemPrefix}_batteryonly`;
+    const showSolarPanel2Field = `${systemPrefix}_show_second_panel_type`;
     const mergedFormData = {
       ...systemFormData,
-      show_solar_panel_2: formData.show_solar_panel_2 ?? systemFormData.show_solar_panel_2,
+      show_solar_panel_2: formData[showSolarPanel2Field] ?? formData.show_solar_panel_2 ?? systemFormData.show_solar_panel_2,
       batteryonly: formData[batteryOnlyField] ?? systemFormData.batteryonly,
     };
 
@@ -3337,7 +3375,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         {loading ? (
           <div className={equipStyles.loadingContainer}>
             <div className={equipStyles.loadingContent}>
-              <div className={equipStyles.loadingIcon}>⚙️</div>
+              <div className={equipStyles.loadingIcon}>Ã¢Å¡â„¢Ã¯Â¸Â</div>
               <div>Loading equipment data...</div>
             </div>
           </div>
@@ -3368,9 +3406,19 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
           // Create system-specific batch handler
           const handleSystemBatchChange = async (fieldUpdates) => {
-            if (!fieldUpdates || fieldUpdates.length === 0) return;
+            console.log(`[System ${systemNumber}] handleSystemBatchChange ENTRY:`, { fieldUpdates, length: fieldUpdates?.length });
+            console.log(`[System ${systemNumber}] Step 1: Checking if empty...`);
+            if (!fieldUpdates || fieldUpdates.length === 0) {
+              console.log(`[System ${systemNumber}] Batch change SKIPPED - empty or null updates`);
+              return;
+            }
+            console.log(`[System ${systemNumber}] Step 2: Not empty, proceeding...`);
+
+            logger.log('EquipmentForm', `[System ${systemNumber}] Batch change called with ${fieldUpdates.length} updates:`, fieldUpdates);
+            console.log(`[System ${systemNumber}] Step 3: After logger.log`);
 
             const systemPrefix = SYSTEM_PREFIXES[systemNumber];
+            console.log(`[System ${systemNumber}] Step 4: systemPrefix = ${systemPrefix}`);
 
             const stateUpdates = {};
             const dbUpdates = {};
@@ -3395,13 +3443,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
               solar_panel_type2_model_id: `${systemPrefix}_solar_panel_type2_model_id`,
               solar_panel_type2_quantity: `${systemPrefix}_solar_panel_type2_qty`,
               solar_panel_type2_wattage: `${systemPrefix}_solar_panel_type2_wattage`,
-              solar_panel_type2_is_new: getSchemaField(systemNumber, 'solar_panel_type2_existing'),
+              solar_panel_type2_is_new: getSchemaField(systemNumber, 'solar_panel_type2_is_new'),
               solar_panel_type2_voc: `${systemPrefix}_solar_panel_type2_voc`,
               solar_panel_type2_isc: `${systemPrefix}_solar_panel_type2_isc`,
               solar_panel_type2_vmp: `${systemPrefix}_solar_panel_type2_vmp`,
               solar_panel_type2_imp: `${systemPrefix}_solar_panel_type2_imp`,
               solar_panel_type2_temp_coeff_voc: `${systemPrefix}_solar_panel_type2_temp_coeff_voc`,
-              show_solar_panel_2: `${systemPrefix}_mixed_panel_system`,
+              show_solar_panel_2: `${systemPrefix}_show_second_panel_type`,
               batteryonly: `${systemPrefix}_batteryonly`,
               // Inverter fields
               inverter_isnew: getSchemaField(systemNumber, 'micro_inverter_existing'),
@@ -3442,10 +3490,55 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
               show_inverter_bos: `${systemPrefix}_show_inverter_bos`,
               show_battery1_bos: `${systemPrefix}_show_battery1_bos`,
               show_battery2_bos: `${systemPrefix}_show_battery2_bos`,
+              // SMS fields
+              sms_isnew: `${systemPrefix}_sms_existing`,
+              sms_make: `${systemPrefix}_sms_make`,
+              sms_model: `${systemPrefix}_sms_model`,
+              sms_main_breaker: `${systemPrefix}_sms_breaker_rating`,
+              sms_pv_breaker: `${systemPrefix}_sms_pv_breaker`,
+              sms_ess_breaker: `${systemPrefix}_sms_ess_breaker`,
+              sms_tie_in_breaker: `${systemPrefix}_sms_tie_in_breaker`,
+              sms_has_rsd: `${systemPrefix}_sms_rsd_enabled`,
+              sys1_sms_equipment_type: 'sys1_sms_equipment_type',
+              // ESS Section fields
+              backup_option: `${systemPrefix}_backup_option`,
+              backup_system_size: 'utility_service_amps',
+              // Battery Type 1 fields
+              battery1_isnew: `${systemPrefix}_battery_1_existing`,
+              battery1_make: `${systemPrefix}_battery_1_make`,
+              battery1_model: `${systemPrefix}_battery_1_model`,
+              battery1_quantity: `${systemPrefix}_battery_1_qty`,
+              battery1_configuration: `${systemPrefix}_battery_configuration`,
+              battery1_tie_in_location: `${systemPrefix}_battery1_tie_in_location`,
+              // battery1_mount_type removed - not in DB or calc
+              // Battery Type 2 fields
+              battery2_isnew: `${systemPrefix}_battery_2_existing`,
+              battery2_make: `${systemPrefix}_battery_2_make`,
+              battery2_model: `${systemPrefix}_battery_2_model`,
+              battery2_quantity: `${systemPrefix}_battery_2_qty`,
+              battery2_tie_in_location: `${systemPrefix}_battery2_tie_in_location`,
+              battery2_mount_type: `${systemPrefix}_battery2_mount_type`,
+              show_battery_type_2: 'show_battery_type_2',
+              // Backup Panel fields
+              backup_loads_landing: 'sys1_backupconfig',
+              backup_panel_selection: 'sys1_backupconfig_selectpanel',
+              backup_panel_isnew: `bls${systemNumber}_backuploader_existing`,
+              backup_panel_make: `bls${systemNumber}_backup_load_sub_panel_make`,
+              backup_panel_model: `bls${systemNumber}_backup_load_sub_panel_model`,
+              backup_panel_bus_amps: `bls${systemNumber}_backuploader_bus_bar_rating`,
+              backup_panel_main_breaker: `bls${systemNumber}_backuploader_main_breaker_rating`,
+              backup_panel_tie_in_breaker: `bls${systemNumber}_backuploader_upstream_breaker_rating`,
+              // ESS visibility flags
+              show_sms: `${systemPrefix}_show_sms`,
+              show_battery1: `${systemPrefix}_show_battery1`,
+              show_battery2: `${systemPrefix}_show_battery2`,
+              show_backup_panel: `${systemPrefix}_show_backup_panel`,
             };
 
             // Process each field update
-            fieldUpdates.forEach(([field, value]) => {
+            console.log(`[System ${systemNumber}] Step 5: Starting forEach loop, ${fieldUpdates.length} items`);
+            fieldUpdates.forEach(([field, value], index) => {
+              console.log(`[System ${systemNumber}] Processing field ${index}:`, { field, value });
               const isBOSField = field.startsWith('bos_sys') || field.startsWith('post_sms_bos_sys') || field.startsWith('postcombine_');
 
               // Map to state and database fields based on system number
@@ -3471,32 +3564,54 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
 
               // Update state
               stateUpdates[stateFieldName] = value;
+              // Also store under DB field name for optimistic update layer
+              if (dbFieldName) { stateUpdates[dbFieldName] = value; }
 
               // Update database
               if (dbFieldName) {
                 let dbValue = value;
+                // Invert "isNew" fields to "existing" fields
+                if (field.endsWith('_isnew')) {
+                  dbValue = !value; // isNew=true means existing=false
+                }
                 if (dbValue === '') dbValue = null;
                 dbUpdates[dbFieldName] = dbValue;
+              } else {
+                logger.warn('EquipmentForm', `[System ${systemNumber}] No field mapping found for: ${field}`);
               }
             });
 
+            console.log(`[System ${systemNumber}] Step 6: forEach complete. stateUpdates:`, stateUpdates);
+            console.log(`[System ${systemNumber}] Step 7: dbUpdates:`, dbUpdates);
+
             // Update local state immediately in ONE call (optimistic update)
+            console.log(`[System ${systemNumber}] Step 8: Calling setFormData...`);
             setFormData(prev => {
               const newFormData = {
                 ...prev,
                 ...stateUpdates
               };
+              console.log(`[System ${systemNumber}] Step 9: setFormData merging:`, { prev: Object.keys(prev).length, stateUpdates, result: Object.keys(newFormData).length });
               return newFormData;
             });
+            console.log(`[System ${systemNumber}] Step 10: setFormData complete`);
 
             // Save to database in ONE call
+            console.log(`[System ${systemNumber}] Step 11: About to save to DB, dbUpdates count:`, Object.keys(dbUpdates).length);
             try {
               if (Object.keys(dbUpdates).length > 0) {
+                console.log(`[System ${systemNumber}] Step 12: Calling updateFields...`);
                 await updateFields(dbUpdates);
+                console.log(`[System ${systemNumber}] Step 13: updateFields completed`);
+                logger.log('EquipmentForm', `[System ${systemNumber}] Batch saved ${Object.keys(dbUpdates).length} fields:`, dbUpdates);
+              } else {
+                console.log(`[System ${systemNumber}] Step 12: No DB updates to save (dbUpdates empty)`);
               }
             } catch (error) {
-              logger.error('EquipmentForm', 'Failed to batch save fields:', error);
+              console.error(`[System ${systemNumber}] Step ERROR: Database save failed:`, error);
+              logger.error('EquipmentForm', `[System ${systemNumber}] Failed to batch save fields:`, error);
             }
+            console.log(`[System ${systemNumber}] Step 14: handleSystemBatchChange COMPLETE`);
           };
 
           return (
@@ -3644,7 +3759,9 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                !systemIsPowerWall &&
                !systemIsSolArkInverter &&
                !systemIsDuracellInverter &&
-               mergedFormData.show_sms && (
+               mergedFormData.show_sms && (() => {
+                console.log(`[System ${systemNumber}] Rendering SMS section, handleSystemBatchChange exists?`, typeof handleSystemBatchChange);
+                return (
                 <StorageManagementSystemSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
@@ -3653,12 +3770,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                   maxContinuousOutputAmps={postSMSMinAmpFilter}
                   loadingMaxOutput={loadingMaxOutput}
                 />
-              )}
+                );
+              })()}
 
               {/* Gateway SMS Info (PowerWall Only) */}
               {systemIsGatewaySMS && (
                 <div className={`${formStyles.infoBox} ${equipStyles.infoBoxMarginTight}`}>
-                  <span className={formStyles.infoBoxIcon}>ℹ️</span>
+                  <span className={formStyles.infoBoxIcon}>Ã¢â€žÂ¹Ã¯Â¸Â</span>
                   <span className={formStyles.infoBoxContent}>
                     {mergedFormData.sms_model} is automatically configured as the Storage Management System for this PowerWall installation.
                   </span>
@@ -3670,6 +3788,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 <BatteryTypeSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
+                  onBatchChange={handleSystemBatchChange}
                   batteryNumber={1}
                   showAddButton={!mergedFormData.show_battery_type_2 && !systemIsEnphaseCombiner6C && !systemIsDuracellInverter}
                   onAddBatteryType2={handleAddBatteryType2}
@@ -3686,6 +3805,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
                 <BatteryTypeSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
+                  onBatchChange={handleSystemBatchChange}
                   batteryNumber={2}
                   showAddButton={false}
                   isEnphase6CMode={systemIsEnphaseCombiner6C}
