@@ -808,13 +808,13 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       // Backup Load Sub Panel
       backup_loads_landing: systemDetails[`${prefix}_backupconfig`] || '',
       backup_panel_selection: systemDetails[`${prefix}_backupconfig_selectpanel`] || '',
-      // NOTE: backup_panel core fields (make/model/bus/breakers) are NOT prefixed in the database
+      // backup_panel core fields use bls_ prefix in the database
       backup_panel_isnew: !systemDetails[`bls${systemNum}_backuploader_existing`],
-      backup_panel_make: systemDetails.backup_panel_make || '',
-      backup_panel_model: systemDetails.backup_panel_model || '',
-      backup_panel_bus_amps: systemDetails.backup_panel_bus_amps || '',
-      backup_panel_main_breaker: systemDetails.backup_panel_main_breaker || 'MLO',
-      backup_panel_tie_in_breaker: systemDetails.backup_panel_tie_in_breaker || '',
+      backup_panel_make: systemDetails[`bls${systemNum}_backup_load_sub_panel_make`] || '',
+      backup_panel_model: systemDetails[`bls${systemNum}_backup_load_sub_panel_model`] || '',
+      backup_panel_bus_amps: systemDetails[`bls${systemNum}_backuploader_bus_bar_rating`] || '',
+      backup_panel_main_breaker: systemDetails[`bls${systemNum}_backuploader_main_breaker_rating`] || 'MLO',
+      backup_panel_tie_in_breaker: systemDetails[`bls${systemNum}_backuploader_upstream_breaker_rating`] || '',
       backup_sp_tie_in_breaker_location: systemDetails[`sys${systemNum}_backup_sp_tie_in_breaker_location`] || '',
 
       // Battery Combiner Panel
@@ -862,6 +862,17 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           [`${bosPrefix}_block_name`]: systemDetails[`${bosPrefix}_block_name`] || '',
         };
       }).reduce((acc, curr) => ({ ...acc, ...curr }), {}),
+
+      // BOS Visibility Flags
+      show_inverter_bos: !!systemDetails[`${prefix}_show_inverter_bos`],
+      show_battery1_bos: !!systemDetails[`${prefix}_show_battery1_bos`],
+      show_battery2_bos: !!systemDetails[`${prefix}_show_battery2_bos`],
+
+      // ESS Section Visibility Flags
+      show_sms: !!systemDetails[`${prefix}_show_sms`],
+      show_battery1: !!systemDetails[`${prefix}_show_battery1`],
+      show_battery2: !!systemDetails[`${prefix}_show_battery2`],
+      show_backup_panel: !!systemDetails[`${prefix}_show_backup_panel`],
 
       // Include site data for utility-specific BOS translations
       site: projectSiteData.site,
@@ -963,7 +974,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
 
       // BOS Visibility Flags
-      // show_inverter_bos removed - UI toggle, not in DB
+      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
       show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
       show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
 
@@ -1939,7 +1950,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
 
       // BOS Visibility Flags
-      // show_inverter_bos removed - UI toggle, not in DB
+      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
       show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
       show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
 
@@ -2280,12 +2291,12 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         // Map database field names back to component field names for this system
         const dbFieldName = getSchemaField(systemNumber, 'micro_inverter_existing');
         if (formData[dbFieldName] !== undefined) {
-          optimisticUpdates.inverter_isnew = formData[dbFieldName];
+          optimisticUpdates.inverter_isnew = !formData[dbFieldName]; // Invert: DB stores "existing", component uses "isNew"
         }
 
         const optimizerDbField = getSchemaField(systemNumber, 'optimizer_existing');
         if (formData[optimizerDbField] !== undefined) {
-          optimisticUpdates.optimizer_isnew = formData[optimizerDbField];
+          optimisticUpdates.optimizer_isnew = !formData[optimizerDbField]; // Invert: DB stores "existing", component uses "isNew"
         }
 
         // Map system-specific inverter fields to component field names
@@ -2369,14 +2380,14 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           { component: 'sms_has_rsd', state: `${sysPrefix}_sms_rsd_enabled` },
           { component: 'sys1_sms_equipment_type', state: 'sys1_sms_equipment_type' },
           // Battery Type 1 fields
-          { component: 'battery1_isnew', state: `${sysPrefix}_battery_1_existing` },
+          { component: 'battery1_isnew', state: `${sysPrefix}_battery1_existing` },
           { component: 'battery1_make', state: `${sysPrefix}_battery_1_make` },
           { component: 'battery1_model', state: `${sysPrefix}_battery_1_model` },
           { component: 'battery1_quantity', state: `${sysPrefix}_battery_1_qty` },
           { component: 'battery1_configuration', state: `${sysPrefix}_battery_configuration` },
           { component: 'battery1_tie_in_location', state: `${sysPrefix}_battery1_tie_in_location` },
           // Battery Type 2 fields
-          { component: 'battery2_isnew', state: `${sysPrefix}_battery_2_existing` },
+          { component: 'battery2_isnew', state: `${sysPrefix}_battery2_existing` },
           { component: 'battery2_make', state: `${sysPrefix}_battery_2_make` },
           { component: 'battery2_model', state: `${sysPrefix}_battery_2_model` },
           { component: 'battery2_quantity', state: `${sysPrefix}_battery_2_qty` },
@@ -2395,10 +2406,15 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
         inverterFieldMappings.forEach(({ component, state: stateFieldName }) => {
           // Priority 1: Check state updates (optimistic updates from formData with database field name)
           if (formData[stateFieldName] !== undefined) {
-            optimisticUpdates[component] = formData[stateFieldName];
+            let value = formData[stateFieldName];
+            // Invert _existing database fields to _isnew component fields
+            if (component.endsWith('_isnew') && stateFieldName.includes('_existing')) {
+              value = !value; // DB stores "existing", component uses "isNew"
+            }
+            optimisticUpdates[component] = value;
             // Debug SMS fields
             if (component.startsWith('sms_')) {
-              console.log(`[mergedFormData] System ${systemNumber}: ${component} = ${formData[stateFieldName]} (from formData.${stateFieldName})`);
+              console.log(`[mergedFormData] System ${systemNumber}: ${component} = ${value} (from formData.${stateFieldName})`);
             }
           }
           // Priority 2: Check if systemFormData already has the unprefixed component field
@@ -2539,7 +2555,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
       aggregate_pv_breaker: `${sysPrefix}_aggregate_pv_breaker`,
 
       // BOS Visibility Flags
-      // show_inverter_bos removed - UI toggle, not in DB
+      show_inverter_bos: `${sysPrefix}_show_inverter_bos`,
       show_battery1_bos: `${sysPrefix}_show_battery1_bos`,
       show_battery2_bos: `${sysPrefix}_show_battery2_bos`,
 
