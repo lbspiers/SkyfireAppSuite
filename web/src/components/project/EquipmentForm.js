@@ -2144,7 +2144,8 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
     setFormData(prev => {
       const updated = {
         ...prev,
-        [dbFieldName]: value  // Store using DB field name to keep systems separate
+        [dbFieldName]: value,  // Store using DB field name to keep systems separate
+        [field]: value  // ALSO store using component field name for immediate UI updates
       };
       return updated;
     });
