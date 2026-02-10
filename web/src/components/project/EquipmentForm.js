@@ -2318,6 +2318,7 @@ const EquipmentForm = ({ projectUuid, projectData, onNavigateToTab, initialSubTa
           { component: 'solar_panel_imp', state: `${sysPrefix}_solar_panel_imp` },
           { component: 'solar_panel_temp_coeff_voc', state: `${sysPrefix}_solar_panel_temp_coeff_voc` },
           // Solar Panel Type 2 fields
+          { component: 'show_solar_panel_2', state: `${sysPrefix}_show_second_panel_type` },
           { component: 'solar_panel_type2_manufacturer', state: `${sysPrefix}_solar_panel_type2_manufacturer` },
           { component: 'solar_panel_type2_model', state: `${sysPrefix}_solar_panel_type2_model` },
           { component: 'solar_panel_type2_model_id', state: `${sysPrefix}_solar_panel_type2_model_id` },
