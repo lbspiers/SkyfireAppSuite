@@ -97,11 +97,9 @@
 /* ════ Inline Stats Bar ════ */
 
 .statsBar {
-  flex: 1;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  justify-content: center;
 }
 
 .statPill {
