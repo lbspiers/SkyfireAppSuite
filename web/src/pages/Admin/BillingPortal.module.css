@@ -142,6 +142,10 @@
 .statOk .statNum { color: #34D399; }
 .statOk svg { color: #34D399; }
 
+.statAccent { border-color: rgba(139,92,246,0.25); }
+.statAccent .statNum { color: #A78BFA; }
+.statAccent svg { color: #A78BFA; }
+
 .statMuted { border-color: rgba(107,114,128,0.25); }
 .statMuted .statNum { color: var(--text-tertiary); }
 

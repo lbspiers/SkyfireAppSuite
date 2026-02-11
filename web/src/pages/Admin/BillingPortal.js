@@ -357,13 +357,23 @@ const BillingPortal = () => {
         </div>
         <div className={`${styles.statPill} ${styles.statInfo}`}>
           <FileText size={13} />
-          <span className={styles.statNum}>{Number(s.invoiced_count) || 0}</span>
-          <span className={styles.statLbl}>{formatPrice(Number(s.outstanding_amount) || 0)}</span>
+          <span className={styles.statNum}>{formatPrice(Number(s.outstanding_amount) || 0)}</span>
+          <span className={styles.statLbl}>{Number(s.invoiced_count) || 0} invoices</span>
         </div>
         <div className={`${styles.statPill} ${styles.statOk}`}>
           <CheckCircle size={13} />
-          <span className={styles.statNum}>{Number(s.paid_count) || 0}</span>
-          <span className={styles.statLbl}>{formatPrice(Number(s.paid_amount) || 0)}</span>
+          <span className={styles.statNum}>{formatPrice(Number(s.paid_amount) || 0)}</span>
+          <span className={styles.statLbl}>{Number(s.paid_count) || 0} projects</span>
+        </div>
+        <div className={`${styles.statPill} ${styles.statAccent}`}>
+          <Activity size={13} />
+          <span className={styles.statNum}>{formatPrice(Number(s.total_revenue) || 0)}</span>
+          <span className={styles.statLbl}>Total</span>
+        </div>
+        <div className={styles.statPill}>
+          <DollarSign size={13} />
+          <span className={styles.statNum}>{formatPrice(Number(s.avg_project_value) || 150)}</span>
+          <span className={styles.statLbl}>per project</span>
         </div>
         {Number(s.held_canceled_count) > 0 && (
           <div className={`${styles.statPill} ${styles.statMuted}`}>
