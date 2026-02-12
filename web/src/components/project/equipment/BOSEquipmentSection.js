@@ -346,7 +346,7 @@ const BOSEquipmentSection = ({
   };
 
   return (
-    <div style={{ marginTop: 'var(--spacing-xs)', marginBottom: 'var(--spacing-xs)' }}>
+    <div>
       {slotsToRender.map((slot, index) => {
         const availableMakes = getAvailableMakes(slot.equipmentType, slot.ampRating);
         const availableModels = getAvailableModels(slot.equipmentType, slot.make, slot.ampRating);
@@ -372,28 +372,27 @@ const BOSEquipmentSection = ({
         const availableAmpRatings = getAvailableAmpRatings(slot.equipmentType);
 
         return (
-          <EquipmentRow
-            key={slot.slotNumber}
-            title={slot.equipmentType || getSectionTitle(slot.slotNumber)}
-            subtitle={getSubtitle()}
-            showNewExistingToggle={true}
-            isNew={slot.isNew}
-            onNewExistingChange={(isNew) => onChange(`${slot.prefix}_is_new`, isNew)}
-            toggleRowRightContent={
-              maxContinuousOutputAmps > 0 ? (
-                <span style={{
-                  fontSize: 'var(--font-size-xs)',
-                  color: '#ff6b35',
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                }}>
-                  Min: {Math.ceil(maxContinuousOutputAmps * 1.25)}A
-                </span>
-              ) : null
-            }
-            onDelete={() => handleDeleteSlot(slot.slotNumber)}
-            style={{ marginBottom: 'var(--spacing)' }}
-          >
+          <div key={slot.slotNumber} style={{ marginBottom: 'var(--spacing-xs)' }}>
+            <EquipmentRow
+              title={slot.equipmentType || getSectionTitle(slot.slotNumber)}
+              subtitle={getSubtitle()}
+              showNewExistingToggle={true}
+              isNew={slot.isNew}
+              onNewExistingChange={(isNew) => onChange(`${slot.prefix}_is_new`, isNew)}
+              toggleRowRightContent={
+                maxContinuousOutputAmps > 0 ? (
+                  <span style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: '#ff6b35',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                  }}>
+                    Min: {Math.ceil(maxContinuousOutputAmps * 1.25)}A
+                  </span>
+                ) : null
+              }
+              onDelete={() => handleDeleteSlot(slot.slotNumber)}
+            >
             <TableDropdown
               label="Equipment Type"
               value={slot.equipmentType || ''}
@@ -471,6 +470,7 @@ const BOSEquipmentSection = ({
               </div>
             )}
           </EquipmentRow>
+          </div>
         );
       })}
     </div>

@@ -20,10 +20,17 @@ export const shouldShowBOSSection = (formData, section, systemNumber) => {
 
   switch (section) {
     case 'utility':
-      // Show when String Combiner Panel has make AND model
+      // Show when String Combiner Panel has make AND model OR when inverter exists
       const scpMake = formData?.[`${sysPrefix}string_combiner_panel_make`];
       const scpModel = formData?.[`${sysPrefix}string_combiner_panel_model`];
-      return !!(scpMake && scpModel);
+      const hasStringCombiner = !!(scpMake && scpModel);
+
+      // Also check for inverter (micro or string)
+      const inverterMake = formData?.[`${sysPrefix}micro_inverter_make`] || formData?.[`${sysPrefix}inverter_make`];
+      const inverterModel = formData?.[`${sysPrefix}micro_inverter_model`] || formData?.[`${sysPrefix}inverter_model`];
+      const hasInverter = !!(inverterMake && inverterModel);
+
+      return hasStringCombiner || hasInverter;
 
     case 'battery1':
       // Show when Battery Type 1 has quantity > 0
@@ -112,7 +119,7 @@ export const getTriggerEquipmentDetails = (formData, section, systemNumber) => {
           make: formData?.[`${sysPrefix}solar_panel_make`],
           model: formData?.[`${sysPrefix}solar_panel_model`],
           quantity: formData?.[`${sysPrefix}solar_panel_quantity`],
-          isNew: formData?.[`${sysPrefix}solar_panel_isnew`] ?? true,
+          isNew: !formData?.[`${sysPrefix}solar_panel_existing`],
         },
         inverter: {
           present: !!formData?.[`${sysPrefix}micro_inverter_make`] || !!formData?.[`${sysPrefix}inverter_make`],
