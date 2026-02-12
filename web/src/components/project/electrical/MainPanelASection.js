@@ -54,14 +54,14 @@ const MainPanelASection = ({ formData, onChange, onShowSubPanelB, subPanelBVisib
   };
 
   const handleExistingClick = () => {
-    if (isExisting && !isMPU) {
-      // Already existing and not MPU, do nothing
+    if (isExisting && !isMPU && !isDerate) {
+      // Already in Existing state, do nothing
       return;
     }
     // Turn on Existing
     onChange('mpa_bus_bar_existing', true);
     onChange('mpa_main_circuit_breaker_existing', true);
-    // Note: Don't touch el_mpa_derated - Existing and Derate CAN coexist
+    onChange('el_mpa_derated', false); // Clear derate - mutually exclusive
   };
 
   const handleDerateClick = () => {
@@ -166,7 +166,7 @@ const MainPanelASection = ({ formData, onChange, onShowSubPanelB, subPanelBVisib
           <TableRowButton
             label="Existing"
             variant="outline"
-            active={isExisting && !isMPU}
+            active={isExisting && !isMPU && !isDerate}
             onClick={handleExistingClick}
           />
           <TableRowButton
