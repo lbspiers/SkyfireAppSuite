@@ -451,7 +451,7 @@ export function detectSRPPVOnlyString(equipment: EquipmentState): ConfigurationM
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'DER Meter Disconnect Switch',
+      equipmentType: 'Utility AC Disconnect Switch',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -554,7 +554,7 @@ export function detectSRPPVOnlyMicro(equipment: EquipmentState): ConfigurationMa
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'DER Meter Disconnect Switch',
+      equipmentType: 'Utility AC Disconnect Switch',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,

@@ -219,6 +219,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
 
   // Extract field values (these are stable primitive values)
   const eleCombinePositionsValue = getField('ele_combine_positions');
+  const eleCombineSystemsValue = getField('ele_combine_systems');
   const sys1InvMaxOutput = getField('sys1_inv_max_continuous_output');
   const sys2InvMaxOutput = getField('sys2_inv_max_continuous_output');
   const sys3InvMaxOutput = getField('sys3_inv_max_continuous_output');
@@ -236,15 +237,16 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
 
   // Detection: Are systems combined?
   const isCombinedSystem = useMemo(() => {
-    // NULL/empty/"Do Not" = NOT combined, Has JSON = combined
+    // Check 1: ele_combine_systems boolean flag (set when user clicks Combine)
+    if (eleCombineSystemsValue === true || eleCombineSystemsValue === "true") return true;
+
+    // Check 2: ele_combine_positions has JSON (not null/empty/"Do Not")
     if (!eleCombinePositionsValue || !eleCombinePositionsValue.trim) return false;
     const trimmed = eleCombinePositionsValue.trim();
     if (trimmed.length === 0 || trimmed === 'Do Not') return false;
 
-    const combined = true; // Has a value that's not "Do Not"
-    console.debug('[ElectricalForm] isCombinedSystem:', combined, 'ele_combine_positions:', eleCombinePositionsValue);
-    return combined;
-  }, [eleCombinePositionsValue]);
+    return true; // Has a combine positions value that's not "Do Not"
+  }, [eleCombinePositionsValue, eleCombineSystemsValue]);
 
   // Parse active systems array
   const combinePositions = useMemo(() => {
@@ -552,14 +554,14 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         backup_panel_bus_amps: '',
         backup_panel_main_breaker: 'MLO',
         backup_panel_tie_in_breaker: '',
-        backup_panel_isnew: true,
+        backup_panel_existing: true,
         backup_sp_tie_in_breaker_location: '',
         combiner_panel_make: '',
         combiner_panel_model: '',
         sms_equipment_type: '',
         sms_make: '',
         sms_model: '',
-        sms_isnew: true,
+        sms_existing: true,
         show_sub_panel_b: false,
         spb_activated: false,
         spb_subpanel_existing: false,
@@ -663,6 +665,12 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       };
     }
 
+    // Helper to coerce varchar boolean fields to actual booleans
+    const getBooleanField = (fieldName, defaultValue) => {
+      const value = getField(fieldName, defaultValue);
+      return typeof value === 'string' ? value === 'true' : Boolean(value);
+    };
+
     return {
       // Main Circuit Breakers
       ele_ses_type: getField('ele_ses_type', ''),
@@ -672,12 +680,12 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       utility_meter_number: getField('utility_meter_number', ''),
 
       // Main Panel A
-      mpa_bus_bar_existing: getField('mpa_bus_bar_existing', true),
-      mpa_main_circuit_breaker_existing: getField('mpa_main_circuit_breaker_existing', true),
+      mpa_bus_bar_existing: getBooleanField('mpa_bus_bar_existing', true),
+      mpa_main_circuit_breaker_existing: getBooleanField('mpa_main_circuit_breaker_existing', true),
       ele_bus_bar_rating: getField('ele_bus_bar_rating', ''),
       ele_main_circuit_breaker_rating: getField('ele_main_circuit_breaker_rating', 'MLO'),
       ele_feeder_location_on_bus_bar: getField('ele_feeder_location_on_bus_bar', ''),
-      el_mpa_derated: getField('el_mpa_derated', false),
+      el_mpa_derated: getBooleanField('el_mpa_derated', false),
 
       // Backup Configuration
       backup_option: getField('sys1_backup_option', ''),
@@ -691,14 +699,14 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       backup_panel_bus_amps: getField('backup_panel_bus_amps', ''),
       backup_panel_main_breaker: getField('backup_panel_main_breaker', 'MLO'),
       backup_panel_tie_in_breaker: getField('backup_panel_tie_in_breaker', ''),
-      backup_panel_isnew: getField('backup_panel_isnew', true),
+      backup_panel_existing: getField('backup_panel_existing', false),
       backup_sp_tie_in_breaker_location: getField('backup_sp_tie_in_breaker_location', ''),
       combiner_panel_make: getField('combiner_panel_make', ''),
       combiner_panel_model: getField('combiner_panel_model', ''),
       sms_equipment_type: getField('sms_equipment_type', ''),
       sms_make: getField('sms_make', ''),
       sms_model: getField('sms_model', ''),
-      sms_isnew: getField('sms_isnew', true),
+      sms_existing: getField('sms_existing', false),
 
       // Sub Panel B
       show_sub_panel_b: getField('show_sub_panel_b', false),
@@ -711,7 +719,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       spb_upstream_breaker_rating: getField('spb_upstream_breaker_rating', ''),
       spb_conductor_sizing: getField('spb_conductor_sizing', ''),
       spb_tie_in_location: getField('spb_tie_in_location', ''),
-      el_spb_derated: getField('el_spb_derated', false),
+      el_spb_derated: getBooleanField('el_spb_derated', false),
 
       // Sub Panel C
       show_sub_panel_c: getField('show_sub_panel_c', false),
@@ -723,7 +731,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       spc_upstream_breaker_rating: getField('spc_upstream_breaker_rating', ''),
       spc_conductor_sizing: getField('spc_conductor_sizing', ''),
       spc_tie_in_location: getField('spc_tie_in_location', ''),
-      el_spc_derated: getField('el_spc_derated', false),
+      el_spc_derated: getBooleanField('el_spc_derated', false),
 
       // Sub Panel D
       show_sub_panel_d: getField('show_sub_panel_d', false),
@@ -735,7 +743,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       spd_upstream_breaker_rating: getField('spd_upstream_breaker_rating', ''),
       spd_conductor_sizing: getField('spd_conductor_sizing', ''),
       spd_tie_in_location: getField('spd_tie_in_location', ''),
-      el_spd_derated: getField('el_spd_derated', false),
+      el_spd_derated: getBooleanField('el_spd_derated', false),
 
       // Point of Interconnection (shared fields)
       ele_method_of_interconnection: getField('ele_method_of_interconnection', ''),
