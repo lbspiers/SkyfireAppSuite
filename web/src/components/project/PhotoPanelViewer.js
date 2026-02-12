@@ -20,6 +20,7 @@ const PhotoPanelViewer = ({
   mediaType = 'photo',
   zoom,
   pan,
+  rotation = 0,
   setZoom,
   setPan
 }) => {
@@ -330,7 +331,8 @@ const PhotoPanelViewer = ({
           <div
             className={styles.imageWrapper}
             style={{
-              transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+              transform: `rotate(${rotation}deg) scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+              transition: (isPanning || isRotaryScrolling) ? 'none' : 'transform 0.3s ease-out',
               cursor: zoom > 1
                 ? (isPanning ? 'grabbing' : 'grab')
                 : (isRotaryScrolling ? 'grabbing' : 'grab')

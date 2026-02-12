@@ -84,6 +84,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   // Zoom state for photo viewer
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [rotation, setRotation] = useState(0);
 
   const handleGridSizeChange = (size) => {
     setGridSize(size);
@@ -109,9 +110,10 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
       media: [],
       currentIndex: 0
     });
-    // Reset zoom when closing viewer
+    // Reset zoom and rotation when closing viewer
     setZoom(1);
     setPan({ x: 0, y: 0 });
+    setRotation(0);
   };
 
   const handleNavigateViewer = (direction) => {
@@ -119,14 +121,27 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
       ...prev,
       currentIndex: Math.max(0, Math.min(prev.media.length - 1, prev.currentIndex + direction))
     }));
-    // Reset zoom when navigating
+    // Reset zoom and rotation when navigating
     setZoom(1);
     setPan({ x: 0, y: 0 });
+    setRotation(0);
   };
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.25, 5));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.5));
-  const handleZoomReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+  const handleZoomReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); setRotation(0); };
+  const handleRotateClockwise = () => setRotation(prev => {
+    // Just add 90, don't wrap - let it continue past 360
+    const newRotation = prev + 90;
+    console.log('🔄 Rotate CW:', { prev, newRotation });
+    return newRotation;
+  });
+  const handleRotateCounterClockwise = () => setRotation(prev => {
+    // Just subtract 90, don't wrap - let it go negative
+    const newRotation = prev - 90;
+    console.log('🔄 Rotate CCW:', { prev, newRotation });
+    return newRotation;
+  });
 
   const handleUpdatePhoto = (photoId, updates) => {
     // Update the photo in the viewer state
@@ -150,6 +165,28 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
               <button
                 type="button"
                 className={styles.zoomBtn}
+                onClick={handleRotateCounterClockwise}
+                title="Rotate Counter-Clockwise"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M3 3v5h5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={styles.zoomBtn}
+                onClick={handleRotateClockwise}
+                title="Rotate Clockwise"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 3v5h-5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={styles.zoomBtn}
                 onClick={handleZoomOut}
                 disabled={zoom <= 0.5}
                 title="Zoom Out"
@@ -170,8 +207,8 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
                 type="button"
                 className={styles.resetBtn}
                 onClick={handleZoomReset}
-                disabled={zoom === 1 && pan.x === 0 && pan.y === 0}
-                title="Reset"
+                disabled={zoom === 1 && pan.x === 0 && pan.y === 0 && rotation === 0}
+                title="Reset Zoom & Rotation"
               >
                 Reset
               </button>
@@ -263,6 +300,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
         mediaType="photo"
         zoom={zoom}
         pan={pan}
+        rotation={rotation}
         setZoom={setZoom}
         setPan={setPan}
       />

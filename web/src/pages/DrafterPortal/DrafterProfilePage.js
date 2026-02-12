@@ -57,11 +57,6 @@ const DrafterProfilePage = () => {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      addToast('Image must be less than 5MB', 'error');
-      return;
-    }
-
     try {
       await uploadPhoto(file);
       addToast('Photo uploaded successfully', 'success');
@@ -167,7 +162,7 @@ const DrafterProfilePage = () => {
                 Remove Photo
               </Button>
             )}
-            <div className={styles.photoHint}>JPG, PNG or GIF (max 5MB)</div>
+            <div className={styles.photoHint}>JPG, PNG or GIF</div>
           </div>
         </div>
       </section>

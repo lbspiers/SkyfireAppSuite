@@ -116,6 +116,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
    * Fetch the converted PNG image URL for a site plan version.
    * Falls back to the original PDF download URL if no image is available yet.
    * Handles multi-page PDFs by setting up page tabs.
+   * For published versions, shows PDF instead of PNG.
    */
   const fetchImageUrl = useCallback(async (version) => {
     if (!projectUuid || !version) return;
@@ -130,7 +131,18 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
       // Track if images were successfully loaded
       let imagesLoaded = false;
 
-      // Try the image-url endpoint first (PNG)
+      // For published versions, fetch PDF directly instead of PNG
+      if (statusTab === 'published') {
+        const response = await sitePlanService.getDownloadUrl(projectUuid, version.id);
+        if (response.status === 'SUCCESS') {
+          setPresignedUrl(response.data.downloadUrl);
+          setPages([]);
+          setPageCount(1);
+        }
+        return;
+      }
+
+      // For draft versions, try the image-url endpoint first (PNG)
       try {
         const imgResponse = await sitePlanService.getImageUrl(projectUuid, version.id);
         const imgData = imgResponse?.data || imgResponse;
@@ -214,7 +226,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
     } finally {
       setLoadingImage(false);
     }
-  }, [projectUuid]);
+  }, [projectUuid, statusTab]);
 
   // Listen for conversion completion
   useEffect(() => {
@@ -442,11 +454,6 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   const handleUpload = async () => {
     if (!uploadFile) return;
 
-    if (uploadFile.size > 50 * 1024 * 1024) {
-      toast.error('File must be less than 50MB');
-      return;
-    }
-
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -546,7 +553,8 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
   };
 
   // Determine if the presigned URL is a PNG (image) or PDF
-  const isImageUrl = presignedUrl && (
+  // Published versions should show as PDF, draft versions as PNG
+  const isImageUrl = presignedUrl && statusTab === 'draft' && (
     presignedUrl.includes('preview.png') ||
     presignedUrl.includes('.png') ||
     selectedVersion?.imageKey
@@ -936,7 +944,7 @@ const SitePlanVersions = ({ projectUuid, projectId: directProjectId }) => {
               <>
                 <div className={styles.dropIcon}>📄</div>
                 <p>Drop PDF or DWG here or click to browse</p>
-                <p className={styles.hint}>PDF or DWG files, max 50MB</p>
+                <p className={styles.hint}>PDF or DWG files</p>
               </>
             )}
           </div>

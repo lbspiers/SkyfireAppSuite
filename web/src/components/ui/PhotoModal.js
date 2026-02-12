@@ -20,6 +20,7 @@ import styles from './PhotoModal.module.css';
 const PhotoModal = ({ photo, onClose }) => {
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const imageRef = useRef(null);
@@ -28,6 +29,7 @@ const PhotoModal = ({ photo, onClose }) => {
   const MIN_SCALE = 1;
   const MAX_SCALE = 5;
   const ZOOM_STEP = 0.25;
+  const ROTATION_STEP = 90;
 
   // Handle mouse wheel zoom
   const handleWheel = (e) => {
@@ -62,10 +64,31 @@ const PhotoModal = ({ photo, onClose }) => {
     }
   };
 
-  // Handle reset zoom
+  // Handle reset zoom and rotation
   const handleReset = () => {
     setScale(MIN_SCALE);
     setPosition({ x: 0, y: 0 });
+    setRotation(0);
+  };
+
+  // Handle rotate clockwise
+  const handleRotateClockwise = () => {
+    setRotation((prev) => {
+      // Just add 90, don't wrap - let it continue past 360
+      const newRotation = prev + ROTATION_STEP;
+      console.log('🔄 PhotoModal Rotate CW:', { prev, newRotation });
+      return newRotation;
+    });
+  };
+
+  // Handle rotate counter-clockwise
+  const handleRotateCounterClockwise = () => {
+    setRotation((prev) => {
+      // Just subtract 90, don't wrap - let it go negative
+      const newRotation = prev - ROTATION_STEP;
+      console.log('🔄 PhotoModal Rotate CCW:', { prev, newRotation });
+      return newRotation;
+    });
   };
 
   // Mouse drag handlers
@@ -123,6 +146,30 @@ const PhotoModal = ({ photo, onClose }) => {
         <div className={styles.zoomControls}>
           <Button
             variant="ghost"
+            onClick={handleRotateCounterClockwise}
+            title="Rotate Counter-Clockwise"
+            className={styles.zoomButton}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 3v5h5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Button>
+
+          <Button
+            variant="ghost"
+            onClick={handleRotateClockwise}
+            title="Rotate Clockwise"
+            className={styles.zoomButton}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 3v5h-5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Button>
+
+          <Button
+            variant="ghost"
             onClick={handleZoomOut}
             disabled={scale <= MIN_SCALE}
             title="Zoom Out"
@@ -154,8 +201,8 @@ const PhotoModal = ({ photo, onClose }) => {
           <Button
             variant="ghost"
             onClick={handleReset}
-            disabled={scale === MIN_SCALE && position.x === 0 && position.y === 0}
-            title="Reset Zoom"
+            disabled={scale === MIN_SCALE && position.x === 0 && position.y === 0 && rotation === 0}
+            title="Reset Zoom & Rotation"
             className={styles.resetButton}
           >
             Reset
@@ -174,7 +221,8 @@ const PhotoModal = ({ photo, onClose }) => {
             alt={photo?.name || 'Photo'}
             className={styles.image}
             style={{
-              transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+              transform: `rotate(${rotation}deg) scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+              transition: isDragging ? 'none' : 'transform 0.3s ease-out',
               cursor: scale > MIN_SCALE ? (isDragging ? 'grabbing' : 'grab') : 'default',
             }}
             onMouseDown={handleMouseDown}

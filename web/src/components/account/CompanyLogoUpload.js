@@ -24,15 +24,6 @@ const CompanyLogoUpload = ({ logoUrl, onUpload, onRemove, loading = false }) => 
       return;
     }
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB', {
-        position: 'top-center',
-        autoClose: 4000,
-      });
-      return;
-    }
-
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -108,7 +99,7 @@ const CompanyLogoUpload = ({ logoUrl, onUpload, onRemove, loading = false }) => 
       </div>
 
       <div className={styles.uploadHint}>
-        Recommended: Square image, at least 200x200px. Max 5MB.
+        Recommended: Square image, at least 200x200px.
       </div>
     </div>
   );
