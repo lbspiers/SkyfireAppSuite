@@ -1007,11 +1007,11 @@ export function detectAPSPVOnlyStringSMS(equipment: EquipmentState): Configurati
   const preCombineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const preCombineCalculation = `${inverterMaxContOutput}A × 1.25 = ${preCombineAmps}A`;
 
-  // Pre-Combine Slot 1: Uni-Directional Meter
+  // Pre-Combine Slot 1: Uni-Directional Meter Line Side Disconnect
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -1022,14 +1022,14 @@ export function detectAPSPVOnlyStringSMS(equipment: EquipmentState): Configurati
     });
   }
 
-  // Pre-Combine Slot 2: Utility Disconnect
+  // Pre-Combine Slot 2: Uni-Directional Meter
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Utility Disconnect',
+      equipmentType: 'Uni-Directional Meter',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -1040,14 +1040,14 @@ export function detectAPSPVOnlyStringSMS(equipment: EquipmentState): Configurati
     });
   }
 
-  // Pre-Combine Slot 3: Uni-Directional Meter Line Side Disconnect
+  // Pre-Combine Slot 3: Utility Disconnect
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
       section: 'utility',
       systemNumber,
@@ -1135,7 +1135,7 @@ export function detectAPSPVOnlyStringNoSMS(equipment: EquipmentState): Configura
   const combineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const combineCalculation = `${inverterMaxContOutput}A × 1.25 = ${combineAmps}A`;
 
-  // Combine Slot 1: Uni-Directional Meter
+  // Slot 1: Uni-Directional Meter (PV Meter - production meter)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
@@ -1150,7 +1150,7 @@ export function detectAPSPVOnlyStringNoSMS(equipment: EquipmentState): Configura
     });
   }
 
-  // Combine Slot 2: Utility Disconnect
+  // Slot 2: Utility Disconnect (Utility-side lockable disconnect - required for all APS)
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
@@ -1159,24 +1159,6 @@ export function detectAPSPVOnlyStringNoSMS(equipment: EquipmentState): Configura
     bosEquipment.push({
       equipmentType: 'Utility Disconnect',
       position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Combine Slot 3: Uni-Directional Meter Line Side Disconnect
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot3,
       section: 'utility',
       systemNumber,
       minAmpRating: combineAmps,
@@ -1263,11 +1245,11 @@ export function detectAPSPVOnlyMicroSMS(equipment: EquipmentState): Configuratio
   const preCombineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const preCombineCalculation = `${inverterMaxContOutput}A × 1.25 = ${preCombineAmps}A`;
 
-  // Pre-Combine Slot 1: Uni-Directional Meter
+  // Pre-Combine Slot 1: Uni-Directional Meter Line Side Disconnect
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -1278,14 +1260,14 @@ export function detectAPSPVOnlyMicroSMS(equipment: EquipmentState): Configuratio
     });
   }
 
-  // Pre-Combine Slot 2: Utility Disconnect
+  // Pre-Combine Slot 2: Uni-Directional Meter
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Utility Disconnect',
+      equipmentType: 'Uni-Directional Meter',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -1296,14 +1278,14 @@ export function detectAPSPVOnlyMicroSMS(equipment: EquipmentState): Configuratio
     });
   }
 
-  // Pre-Combine Slot 3: Uni-Directional Meter Line Side Disconnect
+  // Pre-Combine Slot 3: Utility Disconnect
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
       section: 'utility',
       systemNumber,
@@ -1391,11 +1373,11 @@ export function detectAPSPVOnlyMicroNoSMS(equipment: EquipmentState): Configurat
   const combineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const combineCalculation = `${inverterMaxContOutput}A × 1.25 = ${combineAmps}A`;
 
-  // Combine Slot 1: Uni-Directional Meter
+  // Combine Slot 1: Uni-Directional Meter Line Side Disconnect
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -1406,14 +1388,14 @@ export function detectAPSPVOnlyMicroNoSMS(equipment: EquipmentState): Configurat
     });
   }
 
-  // Combine Slot 2: Utility Disconnect
+  // Combine Slot 2: Uni-Directional Meter
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Utility Disconnect',
+      equipmentType: 'Uni-Directional Meter',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -1424,14 +1406,14 @@ export function detectAPSPVOnlyMicroNoSMS(equipment: EquipmentState): Configurat
     });
   }
 
-  // Combine Slot 3: Uni-Directional Meter Line Side Disconnect
+  // Combine Slot 3: Utility Disconnect
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
       section: 'utility',
       systemNumber,
