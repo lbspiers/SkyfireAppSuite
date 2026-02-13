@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo, useEffect, useRef } from 'react';
 import { EquipmentRow, FormFieldRow, TableRowButton, TableDropdown, AddSectionButton, SectionClearModal, SectionRemoveModal, Alert } from '../../ui';
 import { useSectionDelete, DELETE_BEHAVIOR } from '../../../hooks/useSectionDelete';
 
@@ -9,6 +9,55 @@ import { useSectionDelete, DELETE_BEHAVIOR } from '../../../hooks/useSectionDele
  * Shows AddSectionButton when no backup option is selected
  */
 const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
+  const hasInitialized = useRef(false);
+
+  // Initialize visibility flags based on existing data on mount
+  useEffect(() => {
+    if (hasInitialized.current) return;
+
+    const backupOption = formData.backup_option;
+    const hasSMSData = formData.sms_make && formData.sms_make !== 'No SMS';
+    const hasBattery1Data = formData.battery1_make;
+
+    console.log('[ESS Init] Initializing visibility flags:', {
+      backupOption,
+      sms_make: formData.sms_make,
+      hasSMSData,
+      show_sms_before: formData.show_sms,
+      battery1_make: formData.battery1_make,
+      hasBattery1Data,
+      show_battery1_before: formData.show_battery1,
+    });
+
+    // If there's ANY backup option selected (including No Backup), ensure SMS and Battery sections are visible
+    if (backupOption === 'Whole Home' || backupOption === 'Partial Home' || backupOption === 'No Backup') {
+      // SMS Section - always show for any backup option
+      if (formData.show_sms !== true) {
+        console.log('[ESS Init] Setting show_sms to true');
+        onChange('show_sms', true);
+      } else {
+        console.log('[ESS Init] NOT changing show_sms:', { hasSMSData, currentShowSMS: formData.show_sms, sms_make: formData.sms_make });
+      }
+
+      // Battery Type 1 Section - always show for any backup option
+      if (formData.show_battery1 !== true) {
+        console.log('[ESS Init] Setting show_battery1 to true');
+        onChange('show_battery1', true);
+      } else {
+        console.log('[ESS Init] NOT setting show_battery1:', { hasBattery1Data, currentShowBattery1: formData.show_battery1 });
+      }
+
+      // Backup Panel - only show for Whole/Partial Home (not for No Backup)
+      if ((backupOption === 'Whole Home' || backupOption === 'Partial Home') && formData.show_backup_panel !== true) {
+        console.log('[ESS Init] Setting show_backup_panel to true');
+        onChange('show_backup_panel', true);
+      }
+    }
+
+    hasInitialized.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
+
   // Backup System Size options - Whole Home (matches mobile app spec)
   const wholeHomeOptions = [
     { label: '100 Amps', value: '100' },
@@ -51,7 +100,7 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
       ['show_backup_panel', false],
 
     // SMS fields
-      ['sms_isnew', true],
+      ['sms_existing', false],
       ['sms_make', ''],
       ['sms_model', ''],
       ['sms_main_breaker', ''],
@@ -65,7 +114,7 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
       ['sms_backup_load_sub_panel_breaker_rating', ''],
 
       // Clear Battery Type 1 fields
-      ['battery1_isnew', true],
+      ['battery1_existing', false],
       ['battery1_make', ''],
       ['battery1_model', ''],
       ['battery1_quantity', ''],
@@ -74,7 +123,7 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
       ['battery1_mount_type', ''],
 
       // Clear Battery Type 2 fields
-      ['battery2_isnew', true],
+      ['battery2_existing', false],
       ['battery2_make', ''],
       ['battery2_model', ''],
       ['battery2_quantity', ''],
@@ -117,7 +166,7 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
       ['battery2_bos_type3_is_new', true],
 
       // Clear Backup Load Sub Panel fields
-      ['backup_panel_isnew', true],
+      ['backup_panel_existing', false],
       ['backup_panel_make', ''],
       ['backup_panel_model', ''],
       ['backup_panel_bus_amps', ''],
@@ -126,7 +175,7 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
       ['backup_sp_tie_in_breaker_location', ''],
 
       // Clear Battery Combiner Panel fields
-      ['battery_combiner_panel_isnew', true],
+      ['battery_combiner_panel_existing', false],
       ['battery_combiner_panel_make', ''],
       ['battery_combiner_panel_model', ''],
       ['battery_combiner_panel_bus_amps', ''],
@@ -178,42 +227,60 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
   });
 
   const handleBackupOptionChange = (option) => {
-    // Update backup option
-    onChange('backup_option', option);
+    console.log('[ESS] Backup option changed to:', option);
 
     // Skip all other logic if just expanding the section
     if (option === 'expand') {
+      onChange('backup_option', option);
       return;
     }
 
-    // Clear backup system size when changing options
-    // (No Backup doesn't use size, Whole/Partial have different options)
-    onChange('backup_system_size', '');
+    // Prepare batch updates
+    const updates = [
+      ['backup_option', option],
+      ['backup_system_size', ''], // Clear size when changing options
+    ];
 
     // Toggle visibility flags based on backup option
-    if (option === 'Whole Home' || option === 'Partial Home') {
-      // Show ESS-related sections
-      onChange('show_sms', true);
-      onChange('show_battery1', true);
-      onChange('show_backup_panel', true);
+    if (option === 'Whole Home' || option === 'Partial Home' || option === 'No Backup') {
+      console.log('[ESS] Setting visibility flags for any backup option:', option);
+      // Show SMS and Battery Type 1 for ALL backup options (including No Backup)
+      updates.push(
+        ['show_sms', true],
+        ['show_battery1', true]
+      );
+
+      // Only show backup panel for Whole Home and Partial Home
+      if (option === 'Whole Home' || option === 'Partial Home') {
+        updates.push(['show_backup_panel', true]);
+      } else if (option === 'No Backup') {
+        // Hide backup panel for No Backup (grid-tied only)
+        updates.push(
+          ['show_backup_panel', false],
+          ['meter_collar_location', '']
+        );
+      }
       // Note: Battery Type 2 and BOS sections remain manually controlled
-    } else if (option === 'No Backup') {
-      // Hide all ESS-related sections for No Backup
-      onChange('show_sms', false);
-      onChange('show_battery1', false);
-      onChange('show_battery2', false);
-      onChange('show_battery1_bos', false);
-      onChange('show_battery2_bos', false);
-      onChange('show_backup_panel', false);
-      onChange('meter_collar_location', '');
     } else {
+      console.log('[ESS] Hiding all sections (no option selected)');
       // No option selected or empty - hide all
-      onChange('show_sms', false);
-      onChange('show_battery1', false);
-      onChange('show_battery2', false);
-      onChange('show_battery1_bos', false);
-      onChange('show_battery2_bos', false);
-      onChange('show_backup_panel', false);
+      updates.push(
+        ['show_sms', false],
+        ['show_battery1', false],
+        ['show_battery2', false],
+        ['show_battery1_bos', false],
+        ['show_battery2_bos', false],
+        ['show_backup_panel', false]
+      );
+    }
+
+    console.log('[ESS] Applying batch updates:', updates);
+
+    // Use batch update if available, fallback to sequential onChange
+    if (onBatchChange) {
+      onBatchChange(updates);
+    } else {
+      updates.forEach(([field, value]) => onChange(field, value));
     }
   };
 
@@ -296,13 +363,6 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
           />
         )}
       </EquipmentRow>
-
-      {/* Partial Home Backup Warning - Only show for IQ Combiner 6C */}
-      {backupOption === 'Partial Home' && (
-        <Alert variant="warning" style={{ marginTop: 'var(--spacing)' }}>
-          <strong>Planned Feature - Not Yet Supported:</strong> Partial Home Backup is a planned configuration that is currently not supported by Enphase. This configuration requires a Stand Alone Meter and will be enabled via a future Enphase software update during commissioning.
-        </Alert>
-      )}
 
       {/* Section Clear Modal */}
       <SectionClearModal
