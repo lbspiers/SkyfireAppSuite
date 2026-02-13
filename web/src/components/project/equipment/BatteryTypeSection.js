@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
-import { EquipmentRow, FormFieldRow, TableDropdown, AddSectionButton, PreferredButton, ConfirmDialog, TableRowButton } from '../../ui';
+import { EquipmentRow, FormFieldRow, TableDropdown, AddSectionButton, PreferredButton, ConfirmDialog, TableRowButton, AddButton } from '../../ui';
 import Tooltip from '../../ui/Tooltip';
 import { PreferredEquipmentModal } from '../../equipment';
 import BOSEquipmentSection from './BOSEquipmentSection';
@@ -16,6 +16,7 @@ import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
 const BatteryTypeSection = ({
   formData,
   onChange,
+  onBatchChange,
   batteryNumber = 1,
   showAddButton = false,
   onAddBatteryType2 = null,
@@ -28,7 +29,7 @@ const BatteryTypeSection = ({
   maxContinuousOutputAmps = null,
   loadingMaxOutput = false,
 }) => {
-  console.log('🔋 BatteryTypeSection RENDER - Battery', batteryNumber);
+  // console.log('🔋 BatteryTypeSection RENDER - Battery', batteryNumber); // Commented out - causing console spam
 
   // Use shared equipment catalog
   const {
@@ -81,7 +82,8 @@ const BatteryTypeSection = ({
     if (hasBattery && formData[isNewField] == null) {
       onChange(isNewField, true); // Default to New
     }
-  }, [formData[makeField], formData[modelField], formData[quantityField], formData[`${prefix}_isnew`], onChange, makeField, modelField, quantityField, prefix]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData[makeField], formData[modelField], formData[quantityField], formData[`${prefix}_isnew`], makeField, modelField, quantityField, prefix]);
 
   // Auto-select Enphase 10C battery when in 6C mode and quantity is entered
   useEffect(() => {
@@ -109,7 +111,8 @@ const BatteryTypeSection = ({
         onChange(modelField, ENPHASE_6C_CONFIG.compatibleBattery.model);
       }
     }
-  }, [is6CMode, formData[quantityField], formData[makeField], formData[modelField], onChange, quantityField, makeField, modelField, batteryNumber]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [is6CMode, formData[quantityField], formData[makeField], formData[modelField], quantityField, makeField, modelField, batteryNumber]);
 
   // Validation: Reset to compatible battery if user somehow sets incompatible in 6C mode
   useEffect(() => {
@@ -132,7 +135,8 @@ const BatteryTypeSection = ({
         onChange(modelField, ENPHASE_6C_CONFIG.compatibleBattery.model);
       }
     }
-  }, [is6CMode, formData[makeField], formData[modelField], formData[quantityField], onChange, makeField, modelField, quantityField]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [is6CMode, formData[makeField], formData[modelField], formData[quantityField], makeField, modelField, quantityField]);
 
   // Get current models from shared catalog
   const currentModels = getBatteryModels(formData[makeField]);
@@ -160,24 +164,58 @@ const BatteryTypeSection = ({
   };
 
   const handleMakeChange = (value) => {
-    // Save isnew default if not already set - use == null to catch both undefined AND null
-    if (formData[`${prefix}_isnew`] == null) {
-      onChange(`${prefix}_isnew`, true);
+    console.log(`[Battery${batteryNumber}] Make changed to:`, value);
+
+    if (onBatchChange) {
+      // BATCH: Update make, model, and isnew in single operation
+      const updates = [
+        [`${prefix}_make`, value],
+        [`${prefix}_model`, ''],
+      ];
+
+      // Save isnew default if not already set - use == null to catch both undefined AND null
+      if (formData[`${prefix}_isnew`] == null) {
+        updates.push([`${prefix}_isnew`, true]);
+      }
+
+      console.log(`[Battery${batteryNumber}] Calling onBatchChange with:`, updates);
+      onBatchChange(updates);
+    } else {
+      // Fallback: Sequential onChange
+      if (formData[`${prefix}_isnew`] == null) {
+        onChange(`${prefix}_isnew`, true);
+      }
+      onChange(`${prefix}_make`, value);
+      onChange(`${prefix}_model`, '');
     }
 
-    onChange(`${prefix}_make`, value);
-    onChange(`${prefix}_model`, '');
     // Reset manually cleared flag when user selects new equipment
     setManuallyCleared(false);
   };
 
   const handleModelChange = (value) => {
-    // Save isnew default if not already set - use == null to catch both undefined AND null
-    if (formData[`${prefix}_isnew`] == null) {
-      onChange(`${prefix}_isnew`, true);
-    }
+    console.log(`[Battery${batteryNumber}] Model changed to:`, value);
 
-    onChange(`${prefix}_model`, value);
+    if (onBatchChange) {
+      // BATCH: Update model and isnew in single operation
+      const updates = [
+        [`${prefix}_model`, value],
+      ];
+
+      // Save isnew default if not already set - use == null to catch both undefined AND null
+      if (formData[`${prefix}_isnew`] == null) {
+        updates.push([`${prefix}_isnew`, true]);
+      }
+
+      console.log(`[Battery${batteryNumber}] Calling onBatchChange with:`, updates);
+      onBatchChange(updates);
+    } else {
+      // Fallback: Sequential onChange
+      if (formData[`${prefix}_isnew`] == null) {
+        onChange(`${prefix}_isnew`, true);
+      }
+      onChange(`${prefix}_model`, value);
+    }
   };
 
   const handleQuantityChange = (e) => {
@@ -322,7 +360,8 @@ const BatteryTypeSection = ({
         console.log('✅ Already set correctly - Batt' + batteryNumber);
       }
     }
-  }, [isFranklinAPower, formData[configurationField], formData[combinationMethodField], onChange, configurationField, combinationMethodField, batteryNumber, systemNumber]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFranklinAPower, formData[configurationField], formData[combinationMethodField], configurationField, combinationMethodField, batteryNumber, systemNumber]);
 
   const isComplete = formData[makeField] && formData[modelField] && formData[quantityField];
 
@@ -490,7 +529,8 @@ const BatteryTypeSection = ({
       console.log('🔌 Auto-selecting tie-in location:', tieInLocationOptions[0].value);
       onChange(tieInLocationField, tieInLocationOptions[0].value);
     }
-  }, [tieInLocationOptions, formData[tieInLocationField], tieInLocationField, onChange, manuallyCleared]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tieInLocationOptions, formData[tieInLocationField], tieInLocationField, manuallyCleared]);
 
   // Determine section title based on 6C mode
   const sectionTitle = is6CMode
@@ -629,7 +669,7 @@ const BatteryTypeSection = ({
 
       {/* Battery Type 2 Button - Show when Battery Type 1 is complete and BT2 hasn't been added */}
       {batteryNumber === 1 && showAddButton && (
-        <AddSectionButton
+        <AddButton
           label="Battery (Type 2)"
           onClick={onAddBatteryType2}
           disabled={!isComplete}
