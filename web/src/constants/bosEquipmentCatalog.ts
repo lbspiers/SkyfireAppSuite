@@ -11,6 +11,9 @@ export const EQUIPMENT_TYPE_OPTIONS = [
   { label: "Fused AC Disconnect", value: "Fused AC Disconnect" },
   { label: "Combiner Panel", value: "Combiner Panel" },
   { label: "PV Meter", value: "PV Meter" },
+  { label: "Bi-Directional Meter", value: "Bi-Directional Meter" },
+  { label: "Bi-Directional Meter DER Side Disconnect", value: "Bi-Directional Meter DER Side Disconnect" },
+  { label: "Bi-Directional Meter Line Side Disconnect", value: "Bi-Directional Meter Line Side Disconnect" },
   { label: "Junction Box", value: "Junction Box" },
 ] as const;
 
@@ -22,6 +25,9 @@ export const BOS_EQUIPMENT_TRANSLATION: Record<string, Record<string, string>> =
     "Fused AC Disconnect": "Fused AC Disconnect",
     "Combiner Panel": "Combiner Panel",
     "PV Meter": "PV Meter",
+    "Bi-Directional Meter": "Bi-Directional Meter",
+    "Bi-Directional Meter DER Side Disconnect": "Bi-Directional Meter DER Side Disconnect",
+    "Bi-Directional Meter Line Side Disconnect": "Bi-Directional Meter Line Side Disconnect",
     "Junction Box": "Junction Box",
   },
   APS: {
@@ -29,6 +35,9 @@ export const BOS_EQUIPMENT_TRANSLATION: Record<string, Record<string, string>> =
     "AC Disconnect": "Uni-Directional Meter Line Side Disconnect",  // FIXED: DER-side non-fused disconnect
     "Combiner Panel": "Dedicated Photovoltaic System Combiner Panel",
     "PV Meter": "Uni-Directional Meter",  // FIXED: Production meter
+    "Bi-Directional Meter": "Bi-Directional Meter",
+    "Bi-Directional Meter DER Side Disconnect": "Bi-Directional Meter DER Side Disconnect",
+    "Bi-Directional Meter Line Side Disconnect": "Bi-Directional Meter Line Side Disconnect",
     "Junction Box": "Junction Box",
   },
   SRP: {
@@ -39,7 +48,7 @@ export const BOS_EQUIPMENT_TRANSLATION: Record<string, Record<string, string>> =
     "Junction Box": "Junction Box",
   },
   TEP: {
-    "AC Disconnect": "DG Disconnect Switch",
+    "AC Disconnect": "Utility DG Disconnect",
     "Fused AC Disconnect": "Fused AC Disconnect",
     "Combiner Panel": "Combiner Panel",
     "PV Meter": "Utility DG Meter",
@@ -53,7 +62,7 @@ export const BOS_EQUIPMENT_TRANSLATION: Record<string, Record<string, string>> =
     "Junction Box": "Junction Box",
   },
   UniSource: {
-    "AC Disconnect": "AC Disconnect",
+    "AC Disconnect": "Utility DG Disconnect",
     "Fused AC Disconnect": "Fused AC Disconnect",
     "Combiner Panel": "Combiner Panel",
     "PV Meter": "Utility DG Meter",
@@ -155,6 +164,23 @@ export const BOS_EQUIPMENT_CATALOG = [
   { type: "PV Meter", make: "MILBANK", model: "U4518-XL-W", amp: "200" },
   { type: "PV Meter", make: "MILBANK", model: "U1104-RL-PG-KK", amp: "200" },
   { type: "PV Meter", make: "SIEMENS", model: "UAT111-BPCC", amp: "135" },
+
+  // Bi-Directional Meter (for ESS/Battery systems)
+  { type: "Bi-Directional Meter", make: "ITRON", model: "C1SR", amp: "200" },
+  { type: "Bi-Directional Meter", make: "LANDIS+GYR", model: "FOCUS AXE-SD", amp: "200" },
+  { type: "Bi-Directional Meter", make: "SENSUS", model: "iCon A", amp: "200" },
+
+  // Bi-Directional Meter DER Side Disconnect (AC Disconnect on DER side of bi-di meter)
+  { type: "Bi-Directional Meter DER Side Disconnect", make: "EATON", model: "DG221URB", amp: "30" },
+  { type: "Bi-Directional Meter DER Side Disconnect", make: "EATON", model: "DG222URB", amp: "60" },
+  { type: "Bi-Directional Meter DER Side Disconnect", make: "EATON", model: "DG223URB", amp: "100" },
+  { type: "Bi-Directional Meter DER Side Disconnect", make: "EATON", model: "DG324URK", amp: "200" },
+
+  // Bi-Directional Meter Line Side Disconnect (AC Disconnect on line side of bi-di meter)
+  { type: "Bi-Directional Meter Line Side Disconnect", make: "EATON", model: "DG221URB", amp: "30" },
+  { type: "Bi-Directional Meter Line Side Disconnect", make: "EATON", model: "DG222URB", amp: "60" },
+  { type: "Bi-Directional Meter Line Side Disconnect", make: "EATON", model: "DG223URB", amp: "100" },
+  { type: "Bi-Directional Meter Line Side Disconnect", make: "EATON", model: "DG324URK", amp: "200" },
 
   // Junction Box
   { type: "Junction Box", make: "VYNCKIER", model: "RU2LP", amp: "" },
