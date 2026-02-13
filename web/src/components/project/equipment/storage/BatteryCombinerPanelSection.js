@@ -140,8 +140,8 @@ const BatteryCombinerPanelSection = ({ formData, onChange }) => {
 
     // ALWAYS save the current toggle state when make is changed
     // This ensures the default "New" state gets persisted to the database
-    const currentIsNew = formData.battery_combiner_panel_isnew !== false; // Default to true if undefined
-    onChange('battery_combiner_panel_isnew', currentIsNew);
+    const currentIsNew = formData.battery_combiner_panel_existing !== true; // Default to true if undefined
+    onChange('battery_combiner_panel_existing', !currentIsNew);
 
     onChange('battery_combiner_panel_make', value);
     // Clear model when manufacturer changes
@@ -151,13 +151,35 @@ const BatteryCombinerPanelSection = ({ formData, onChange }) => {
   // Handle New/Existing toggle
   const handleToggleChange = (value) => {
     console.log('🔧 BCP isNew changed:', value);
-    onChange('battery_combiner_panel_isnew', value);
+    onChange('battery_combiner_panel_existing', !value);
+  };
+
+  // Build subtitle for collapsed state
+  const getSubtitle = () => {
+    const parts = [];
+    if (formData.battery_combiner_panel_make) {
+      parts.push(formData.battery_combiner_panel_make);
+    }
+    if (formData.battery_combiner_panel_model) {
+      parts.push(formData.battery_combiner_panel_model);
+    }
+    if (formData.battery_combiner_panel_bus_amps) {
+      parts.push(`${formData.battery_combiner_panel_bus_amps}A Bus`);
+    }
+    if (formData.battery_combiner_panel_main_breaker) {
+      parts.push(`${formData.battery_combiner_panel_main_breaker} Main`);
+    }
+    if (formData.battery_combiner_panel_tie_in_breaker) {
+      parts.push(`${formData.battery_combiner_panel_tie_in_breaker}A Tie-in`);
+    }
+    return parts.length > 0 ? parts.join(' | ') : null;
   };
 
   return (
     <EquipmentRow
       title="Battery Combiner Panel"
-      isNew={formData.battery_combiner_panel_isnew}
+      subtitle={getSubtitle()}
+      isNew={!formData.battery_combiner_panel_existing}
       onToggleChange={handleToggleChange}
       showToggle={true}
     >
