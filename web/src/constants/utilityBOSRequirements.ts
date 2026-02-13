@@ -87,27 +87,28 @@ export const APS_BOS_CONFIG: UtilityBOSConfig = {
       preferredMake: 'ITRON',
       notes: 'Required for all APS solar installations',
     },
+    // COMMENTED OUT 2026-02-13: Removed from APS PV-only requirements
+    // {
+    //   equipmentType: 'Uni-Directional Meter Line Side Disconnect',  // DER-side disconnect (previously PV-Only slot 2)
+    //   standardType: 'AC Disconnect',
+    //   section: 'utility',
+    //   blockName: 'PRE COMBINE',
+    //   required: true,
+    //   order: 2,
+    //   ampSizing: 'inverter',
+    //   preferredMake: 'EATON',
+    //   notes: 'DER-side non-fused disconnect',
+    // },
     {
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',  // DER-side disconnect (PV-Only slot 2)
-      standardType: 'AC Disconnect',
-      section: 'utility',
-      blockName: 'PRE COMBINE',
-      required: true,
-      order: 2,
-      ampSizing: 'inverter',
-      preferredMake: 'EATON',
-      notes: 'DER-side non-fused disconnect',
-    },
-    {
-      equipmentType: 'Utility Disconnect',  // Utility-side disconnect (AC-Coupled/Battery configs only)
+      equipmentType: 'Utility Disconnect',  // Utility-side disconnect (now PV-Only slot 2)
       standardType: 'Fused AC Disconnect',
       section: 'utility',
       blockName: 'PRE COMBINE',
-      required: false,  // Only for battery/AC-coupled systems
-      order: 3,
+      required: true,  // Now required for PV-only systems (2 BOS pieces total)
+      order: 2,  // Moved from order 3 to order 2
       ampSizing: 'inverter',
       preferredMake: 'EATON',
-      notes: 'Utility-side lockable disconnect - required for battery systems',
+      notes: 'Utility-side lockable disconnect - required for all APS systems',
     },
   ],
 
@@ -206,18 +207,17 @@ export const SRP_BOS_CONFIG: UtilityBOSConfig = {
 export const TEP_BOS_CONFIG: UtilityBOSConfig = {
   utilityCode: 'TEP',
   utilityName: 'Tucson Electric Power (TEP)',
-  notes: 'TEP requires DG disconnect switch and may require dedicated meter.',
+  notes: 'TEP requires utility DG disconnect and may require dedicated meter.',
 
   utilityBOS: [
     {
-      equipmentType: 'DG Disconnect Switch',  // TEP-specific name
+      equipmentType: 'Utility DG Disconnect',  // TEP-specific name
       standardType: 'AC Disconnect',
       section: 'utility',
       blockName: 'PRE COMBINE',
       required: true,
       order: 1,
       ampSizing: 'inverter',
-      preferredMake: 'EATON',
       notes: 'TEP Distributed Generation disconnect',
     },
     {
@@ -229,7 +229,6 @@ export const TEP_BOS_CONFIG: UtilityBOSConfig = {
       order: 2,
       ampSizing: 'fixed',
       fixedAmp: '200A',
-      preferredMake: 'ITRON',
       notes: 'May be required depending on system size',
     },
   ],
@@ -274,6 +273,58 @@ export const TRICO_BOS_CONFIG: UtilityBOSConfig = {
       ampSizing: 'inverter',
       preferredMake: 'EATON',
       notes: 'TRICO co-generation disconnect requirement',
+    },
+  ],
+
+  batteryBOS: [
+    {
+      equipmentType: 'AC Disconnect',
+      standardType: 'AC Disconnect',
+      section: 'battery1',
+      blockName: 'BATTERY CHAIN',
+      required: true,
+      order: 1,
+      ampSizing: 'battery',
+      preferredMake: 'EATON',
+    },
+  ],
+
+  backupBOS: [],
+
+  postSMSBOS: [],
+
+  combineBOS: [],
+};
+
+// ============================================
+// UNISOURCE - UniSource Energy Services
+// ============================================
+
+export const UNISOURCE_BOS_CONFIG: UtilityBOSConfig = {
+  utilityCode: 'UNISOURCE',
+  utilityName: 'UniSource Energy Services (UNISOURCE)',
+  notes: 'UNISOURCE requires utility DG disconnect and utility DG meter.',
+
+  utilityBOS: [
+    {
+      equipmentType: 'Utility DG Disconnect',  // UNISOURCE-specific name (BOS type 1)
+      standardType: 'AC Disconnect',
+      section: 'utility',
+      blockName: 'PRE COMBINE',
+      required: true,
+      order: 1,
+      ampSizing: 'inverter',
+      notes: 'UNISOURCE utility DG disconnect requirement',
+    },
+    {
+      equipmentType: 'Utility DG Meter',  // UNISOURCE-specific name (BOS type 2)
+      standardType: 'PV Meter',
+      section: 'utility',
+      blockName: 'PRE COMBINE',
+      required: true,
+      order: 2,
+      ampSizing: 'inverter',
+      notes: 'UNISOURCE utility DG meter requirement',
     },
   ],
 
@@ -360,6 +411,13 @@ export const UTILITY_BOS_CONFIGS: Record<string, UtilityBOSConfig> = {
   'TRICO': TRICO_BOS_CONFIG,
   'Trico Electric Cooperative': TRICO_BOS_CONFIG,
   'Trico Electric Cooperative (TRICO)': TRICO_BOS_CONFIG,
+
+  'UNISOURCE': UNISOURCE_BOS_CONFIG,
+  'UniSource': UNISOURCE_BOS_CONFIG,
+  'UniSource Energy Services': UNISOURCE_BOS_CONFIG,
+  'UniSource Energy Services (UNISOURCE)': UNISOURCE_BOS_CONFIG,
+  'UNS Electric': UNISOURCE_BOS_CONFIG,
+  'UNS Electric, Inc': UNISOURCE_BOS_CONFIG,
 
   'DEFAULT': DEFAULT_BOS_CONFIG,
 };
