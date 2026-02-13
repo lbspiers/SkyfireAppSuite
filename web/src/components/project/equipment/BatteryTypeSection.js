@@ -653,6 +653,17 @@ const BatteryTypeSection = ({
             />
           </div>
         )}
+        {/* Add Battery Type 2 Button - Show inside Battery Type 1 when BT1 is complete and BT2 hasn't been added */}
+        {batteryNumber === 1 && showAddButton && isComplete && (
+          <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
+            <TableRowButton
+              label="+ Battery (Type 2)"
+              variant="outline"
+              onClick={onAddBatteryType2}
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
       </EquipmentRow>
 
       {/* BOS Equipment - Only show if flag is set */}
@@ -664,15 +675,6 @@ const BatteryTypeSection = ({
           systemNumber={systemNumber}
           maxContinuousOutputAmps={maxContinuousOutputAmps}
           loadingMaxOutput={loadingMaxOutput}
-        />
-      )}
-
-      {/* Battery Type 2 Button - Show when Battery Type 1 is complete and BT2 hasn't been added */}
-      {batteryNumber === 1 && showAddButton && (
-        <AddButton
-          label="Battery (Type 2)"
-          onClick={onAddBatteryType2}
-          disabled={!isComplete}
         />
       )}
 
