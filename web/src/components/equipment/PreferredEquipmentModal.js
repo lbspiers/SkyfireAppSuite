@@ -69,10 +69,29 @@ const PreferredEquipmentModal = ({
   };
 
   const handleGoToInventory = () => {
+    // Set the active tab to 'inventory' in the design portal menu
+    sessionStorage.setItem('designPortalMenuTab', 'inventory');
+
     // Save current project location for return navigation
     sessionStorage.setItem('returnToProject', location.pathname);
+
+    // Close the modal
     onClose();
-    navigate('/account', { state: { openInventory: true } });
+
+    // Navigate to the current project's design portal with flag to open menu panel
+    if (location.pathname.includes('/project/')) {
+      // Extract project UUID from current path
+      const projectUuid = location.pathname.split('/project/')[1]?.split('/')[0];
+      if (projectUuid) {
+        navigate(`/project/${projectUuid}/design`, { state: { openMenuPanel: true } });
+      } else {
+        // Fallback: navigate to account page
+        navigate('/account', { state: { openInventory: true } });
+      }
+    } else {
+      // Not in a project view - navigate to account page
+      navigate('/account', { state: { openInventory: true } });
+    }
   };
 
   return (

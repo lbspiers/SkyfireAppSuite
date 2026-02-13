@@ -41,10 +41,12 @@ import { DevPortal } from '../components/dev';
  */
 const DesignPortal = () => {
   const { projectUuid } = useParams();
+  const location = useLocation();
   const { stats, statusCounts, statusChanges, loading, error, refetch } = useDashboardData();
   const [selectedStatus, setSelectedStatus] = useState('equipment');
   const [equipmentInitialSubTab, setEquipmentInitialSubTab] = useState(null); // Track where to land in Equipment
   const [selectedOverviewTab, setSelectedOverviewTab] = useState('survey');
+  const [planSetRefreshTrigger, setPlanSetRefreshTrigger] = useState(0);
   const [projectData, setProjectData] = useState(null);
   const [showMenuPanel, setShowMenuPanel] = useState(false); // Toggle menu/settings panel
   const [showQCPanel, setShowQCPanel] = useState(false);
@@ -87,6 +89,15 @@ const DesignPortal = () => {
     };
     checkAdminStatus();
   }, []);
+
+  // Handle navigation state to open menu panel (e.g., from "Go to Inventory" button)
+  useEffect(() => {
+    if (location.state?.openMenuPanel) {
+      setShowMenuPanel(true);
+      // Clear the state to prevent reopening on subsequent navigations
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   // Fetch companies for super user dropdown
   useEffect(() => {
@@ -447,6 +458,10 @@ const DesignPortal = () => {
                 projectUuid={projectUuid}
                 projectData={projectData}
                 onNavigateToTab={handleNavigateToTab}
+                onSwitchToPlanSetTab={() => {
+                  setSelectedOverviewTab('planset');
+                  setPlanSetRefreshTrigger(prev => prev + 1);
+                }}
               />
             )}
             {selectedStatus === 'chat' && projectUuid && (
@@ -480,6 +495,7 @@ const DesignPortal = () => {
               <PlanSetVersions
                 projectUuid={projectUuid}
                 onQCPanelChange={handleQCPanelChange}
+                refreshTrigger={planSetRefreshTrigger}
               />
             )}
             {selectedOverviewTab === 'revisions' && projectUuid && (
