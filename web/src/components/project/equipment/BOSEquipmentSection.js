@@ -372,7 +372,10 @@ const BOSEquipmentSection = ({
         const availableAmpRatings = getAvailableAmpRatings(slot.equipmentType);
 
         return (
-          <div key={slot.slotNumber} style={{ marginBottom: 'var(--spacing-xs)' }}>
+          <div key={slot.slotNumber} style={{
+            marginBottom: 'var(--spacing-xs)',
+            marginTop: index === 0 ? 'var(--spacing-xs)' : '0'
+          }}>
             <EquipmentRow
               title={slot.equipmentType || getSectionTitle(slot.slotNumber)}
               subtitle={getSubtitle()}

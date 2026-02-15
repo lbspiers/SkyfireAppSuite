@@ -83,6 +83,13 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     const fieldMap = {
       'backup_loads_landing': 'sys1_backupconfig',
       'backup_panel_selection': 'sys1_backupconfig_selectpanel',
+      'backup_panel_existing': 'bls1_backuploader_existing',
+      'backup_panel_make': 'bls1_backup_load_sub_panel_make',
+      'backup_panel_model': 'bls1_backup_load_sub_panel_model',
+      'backup_panel_bus_amps': 'bls1_backuploader_bus_bar_rating',
+      'backup_panel_main_breaker': 'bls1_backuploader_main_breaker_rating',
+      'backup_panel_tie_in_breaker': 'bls1_backuploader_upstream_breaker_rating',
+      'backup_sp_tie_in_breaker_location': 'sys1_backup_sp_tie_in_breaker_location',
     };
 
     const dbFieldName = fieldMap[field] || field;
@@ -694,13 +701,13 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       backuploads_panel_option: getField('backuploads_panel_option', ''),
       backuploads_panel_selection: getField('backuploads_panel_selection', ''),
       backup_system_size: getField('utility_service_amps', ''),
-      backup_panel_make: getField('backup_panel_make', ''),
-      backup_panel_model: getField('backup_panel_model', ''),
-      backup_panel_bus_amps: getField('backup_panel_bus_amps', ''),
-      backup_panel_main_breaker: getField('backup_panel_main_breaker', 'MLO'),
-      backup_panel_tie_in_breaker: getField('backup_panel_tie_in_breaker', ''),
-      backup_panel_existing: getField('backup_panel_existing', false),
-      backup_sp_tie_in_breaker_location: getField('backup_sp_tie_in_breaker_location', ''),
+      backup_panel_make: getField('bls1_backup_load_sub_panel_make', ''),
+      backup_panel_model: getField('bls1_backup_load_sub_panel_model', ''),
+      backup_panel_bus_amps: getField('bls1_backuploader_bus_bar_rating', ''),
+      backup_panel_main_breaker: getField('bls1_backuploader_main_breaker_rating', 'MLO'),
+      backup_panel_tie_in_breaker: getField('bls1_backuploader_upstream_breaker_rating', ''),
+      backup_panel_existing: getField('bls1_backuploader_existing', false),
+      backup_sp_tie_in_breaker_location: getField('sys1_backup_sp_tie_in_breaker_location', ''),
       combiner_panel_make: getField('combiner_panel_make', ''),
       combiner_panel_model: getField('combiner_panel_model', ''),
       sms_equipment_type: getField('sms_equipment_type', ''),
@@ -1026,7 +1033,7 @@ const ElectricalForm = ({ projectUuid, projectData, onNavigateToTab }) => {
               : `POI - System ${systemNum}`;
 
             // Add top margin for System 2+ sections
-            const sectionStyle = index > 0 ? { marginTop: 'var(--spacing-md)' } : undefined;
+            const sectionStyle = index > 0 ? { marginTop: 'var(--spacing-xs)' } : undefined;
 
             return (
               <div key={`poi-system-${systemNum}`} style={sectionStyle}>

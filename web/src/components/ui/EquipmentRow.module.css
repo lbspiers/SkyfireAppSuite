@@ -44,8 +44,15 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-tight);
-  flex: 1;
+  flex: 1; /* Default: take available space when collapsed */
   min-width: 0;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* When expanded, use 25/75 split */
+.row.expanded .headerLeft {
+  flex: 0 0 25%; /* Match toggleLabel width */
 }
 
 .chevron {
@@ -72,6 +79,28 @@
   white-space: nowrap;
 }
 
+/* Allow title to wrap when expanded and constrained to 25% */
+.row.expanded .title {
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+/* Override: prevent wrapping for specific titles (e.g., POI sections) */
+/* POI sections get 75/25 split (title takes 75%, actions take 25%) */
+.row.expanded .headerLeft:has(.titleNoWrap) {
+  flex: 0 0 75%; /* Title area takes 75% instead of 25% */
+  overflow: hidden;
+}
+
+.row.expanded .titleNoWrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
+}
+
 .subtitle {
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
@@ -91,7 +120,19 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-tight);
-  flex-shrink: 0;
+  flex-shrink: 0; /* Default: just fit content when collapsed */
+  justify-content: flex-end;
+}
+
+/* When expanded, take remaining 75% */
+.row.expanded .headerRight {
+  flex: 1;
+}
+
+.headerRightContent {
+  display: flex;
+  align-items: center;
+  margin-right: auto; /* Push to the left edge of the 75% area */
 }
 
 .badge {

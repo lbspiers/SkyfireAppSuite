@@ -167,24 +167,24 @@ const StringCombinerPanelSection = ({
   // Set default MLO on mount
   useEffect(() => {
     if (!formData.combiner_panel_main_breaker) {
-      onChange('combiner_panel_main_breaker', 'MLO');
+      onChange('combiner_panel_main_breaker', 'MLO', systemNumber);
     }
   }, []);
 
   // Set default New/Existing toggle to New on mount if combiner panel is configured but toggle not set
   useEffect(() => {
     const hasCombiner = formData.combiner_panel_make || formData.combiner_panel_model;
-    if (hasCombiner && formData.combiner_panel_isnew === undefined) {
-      onChange('combiner_panel_isnew', true); // Default to New
+    if (hasCombiner && formData.combiner_panel_existing == null) {
+      onChange('combiner_panel_existing', false, systemNumber); // Default to New
     }
-  }, [formData.combiner_panel_make, formData.combiner_panel_model, formData.combiner_panel_isnew, onChange]);
+  }, [formData.combiner_panel_make, formData.combiner_panel_model, formData.combiner_panel_existing, onChange]);
 
   // Auto-set Aggregate PV Breaker to 60A for IQ Combiner 6C (only once)
   useEffect(() => {
     if (is6C && !formData.aggregate_pv_breaker && !hasAutoSetAggregateBreaker.current) {
       hasAutoSetAggregateBreaker.current = true;
       console.log('🔥 useEffect: AUTO-SETTING aggregate_pv_breaker to 60A for 6C model');
-      onChange('aggregate_pv_breaker', '60');
+      onChange('aggregate_pv_breaker', '60', systemNumber);
       logger.log('StringCombinerPanel', 'Auto-set Aggregate PV Breaker to 60A (default) via useEffect');
     }
     // Reset ref when not 6C or when breaker is manually set
@@ -232,12 +232,12 @@ const StringCombinerPanelSection = ({
 
 
   const handleDelete = () => {
-    onChange('combiner_panel_make', '');
-    onChange('combiner_panel_model', '');
-    onChange('combiner_panel_bus_amps', '');
-    onChange('combiner_panel_main_breaker', 'MLO');
-    onChange('combiner_panel_tie_in_breaker', '');
-    onChange('combiner_panel_isnew', true);
+    onChange('combiner_panel_make', '', systemNumber);
+    onChange('combiner_panel_model', '', systemNumber);
+    onChange('combiner_panel_bus_amps', '', systemNumber);
+    onChange('combiner_panel_main_breaker', 'MLO', systemNumber);
+    onChange('combiner_panel_tie_in_breaker', '', systemNumber);
+    onChange('combiner_panel_existing', false, systemNumber);
 
     // NEW: Clear 6C state
     if (onEnphase6CChange) {
@@ -247,16 +247,17 @@ const StringCombinerPanelSection = ({
 
   // Preferred equipment handlers
   const handlePreferredSelect = (selected) => {
-    onChange('combiner_panel_make', selected.make);
-    onChange('combiner_panel_model', selected.model);
+    onChange('combiner_panel_make', selected.make, systemNumber);
+    onChange('combiner_panel_model', selected.model, systemNumber);
   };
 
   const handleSelectOther = () => {
-    onChange('combiner_panel_make', '');
-    onChange('combiner_panel_model', '');
+    onChange('combiner_panel_make', '', systemNumber);
+    onChange('combiner_panel_model', '', systemNumber);
   };
 
   const handleManufacturerChange = (value) => {
+    console.log('[StringCombinerPanel] handleManufacturerChange called:', { value, hasOnBatchChange: !!onBatchChange });
     if (onBatchChange) {
       // BATCH: Update manufacturer and related fields in single operation
       const updates = [
@@ -264,10 +265,10 @@ const StringCombinerPanelSection = ({
         ['combiner_panel_model', ''],
       ];
 
-      // Only include isnew if it's already been set by the user
-      if (formData.combiner_panel_isnew !== undefined) {
-        updates.push(['combiner_panel_isnew', formData.combiner_panel_isnew]);
-      }
+      // ALWAYS include toggle - use existing value or default to false (New)
+      updates.push(['combiner_panel_existing', formData.combiner_panel_existing ?? false]);
+
+
 
       // Clear Bus Amps and Main Breaker fields when Enphase is selected
       if (value === 'Enphase') {
@@ -275,20 +276,19 @@ const StringCombinerPanelSection = ({
         updates.push(['combiner_panel_main_breaker', '']);
       }
 
+      console.log('[StringCombinerPanel] Calling onBatchChange with updates:', updates);
       onBatchChange(updates);
     } else {
       // Fallback: Sequential onChange (backwards compatibility)
-      onChange('combiner_panel_make', value);
-      onChange('combiner_panel_model', '');
+      onChange('combiner_panel_make', value, systemNumber);
+      onChange('combiner_panel_model', '', systemNumber);
 
-      // Only save isnew if it's already been set
-      if (formData.combiner_panel_isnew !== undefined) {
-        onChange('combiner_panel_isnew', formData.combiner_panel_isnew);
-      }
+      // ALWAYS save toggle - use existing value or default to false (New)
+      onChange('combiner_panel_existing', formData.combiner_panel_existing ?? false, systemNumber);
 
       if (value === 'Enphase') {
-        onChange('combiner_panel_bus_amps', '');
-        onChange('combiner_panel_main_breaker', '');
+        onChange('combiner_panel_bus_amps', '', systemNumber);
+        onChange('combiner_panel_main_breaker', '', systemNumber);
       }
     }
 
@@ -301,7 +301,7 @@ const StringCombinerPanelSection = ({
 
   const handleModelChange = (value) => {
     const modelValue = value;
-    onChange('combiner_panel_model', modelValue);
+    onChange('combiner_panel_model', modelValue, systemNumber);
 
     // Auto-set bus amps if the model contains an amp rating (e.g., "200 Amps" -> 200)
     // Skip for Enphase since they don't use bus amps
@@ -309,14 +309,14 @@ const StringCombinerPanelSection = ({
       const ampMatch = modelValue.match(/(\d+)\s*Amp/i);
       if (ampMatch) {
         const amps = ampMatch[1];
-        onChange('combiner_panel_bus_amps', amps);
+        onChange('combiner_panel_bus_amps', amps, systemNumber);
       }
     }
 
     // Auto-set Aggregate PV Breaker to 60A default when model is first selected (IQ Combiner 6C only)
     const is6CModel = isEnphase6CCombiner(formData.combiner_panel_make, modelValue);
     if (is6CModel && modelValue && !formData.aggregate_pv_breaker) {
-      onChange('aggregate_pv_breaker', '60');
+      onChange('aggregate_pv_breaker', '60', systemNumber);
       logger.log('StringCombinerPanel', 'Auto-set Aggregate PV Breaker to 60A (default)');
     }
 
@@ -329,7 +329,7 @@ const StringCombinerPanelSection = ({
   };
 
   const handleClearTieInBreaker = () => {
-    onChange('combiner_panel_tie_in_breaker', '');
+    onChange('combiner_panel_tie_in_breaker', '', systemNumber);
     setEditTieInBreaker(false);
   };
 
@@ -339,12 +339,12 @@ const StringCombinerPanelSection = ({
 
   // Handle stringing type change (auto/custom)
   const handleStringingTypeChange = (type) => {
-    onChange('stringing_type', type);
+    onChange('stringing_type', type, systemNumber);
 
     // Clear all branch data when switching to auto
     if (type === 'auto') {
       for (let i = 1; i <= 10; i++) {
-        onChange(`branch_string_${i}`, '');
+        onChange(`branch_string_${i}`, '', systemNumber);
       }
     }
   };
@@ -352,7 +352,7 @@ const StringCombinerPanelSection = ({
   // Handle branch panel qty change
   const handleBranchStringChange = (index, value) => {
     const numericValue = value.replace(/[^0-9]/g, '');
-    onChange(`branch_string_${index}`, numericValue);
+    onChange(`branch_string_${index}`, numericValue, systemNumber);
   };
 
   // Auto-calculate distribution
@@ -371,13 +371,13 @@ const StringCombinerPanelSection = ({
 
     // Clear all branches first
     for (let i = 1; i <= 10; i++) {
-      onChange(`branch_string_${i}`, '');
+      onChange(`branch_string_${i}`, '', systemNumber);
     }
 
     // Populate with calculated values
     distribution.branches.forEach((branch) => {
       const i = branch.branchIndex;
-      onChange(`branch_string_${i}`, String(branch.panelQty || 0));
+      onChange(`branch_string_${i}`, String(branch.panelQty || 0), systemNumber);
     });
   };
 
@@ -412,7 +412,7 @@ const StringCombinerPanelSection = ({
     if (!hasCombinerPanel) return '';
 
     // Quantity (always 1) with New/Existing indicator
-    const statusLetter = formData.combiner_panel_isnew !== false ? 'N' : 'E';
+    const statusLetter = formData.combiner_panel_existing !== true ? 'N' : 'E';
     const parts = [`1 (${statusLetter}) ${formData.combiner_panel_make} ${formData.combiner_panel_model}`];
 
     // Custom Stringing Configuration
@@ -456,6 +456,12 @@ const StringCombinerPanelSection = ({
         title="String Combiner Panel"
         subtitle={getSubtitle()}
         onDelete={handleDelete}
+        showNewExistingToggle={!isNoCombiner}
+        isExisting={formData.combiner_panel_existing}
+        onExistingChange={(val) => {
+          console.log('[StringCombiner] Toggle changed to:', val ? 'Existing' : 'New');
+          onChange('combiner_panel_existing', val, systemNumber);
+        }}
         headerRightContent={
           <PreferredButton onClick={() => setShowPreferredModal(true)} />
         }
@@ -469,34 +475,11 @@ const StringCombinerPanelSection = ({
               label="No String Combiner Panel"
               variant="outline"
               onClick={() => {
-                onChange('combiner_panel_make', 'No String Combiner Panel');
-                onChange('combiner_panel_model', '');
-                onChange('combiner_panel_main_breaker', 'MLO');
+                onChange('combiner_panel_make', 'No String Combiner Panel', systemNumber);
+                onChange('combiner_panel_model', '', systemNumber);
+                onChange('combiner_panel_main_breaker', 'MLO', systemNumber);
               }}
               style={{ width: '100%' }}
-            />
-          </div>
-        )}
-
-        {/* Row 2: New/Existing Toggle - Always visible (except when "No String Combiner Panel") */}
-        {!isNoCombiner && (
-          <div style={{
-            display: 'flex',
-            gap: 'var(--spacing-tight)',
-            padding: 'var(--spacing-tight) var(--spacing)',
-            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
-          }}>
-            <TableRowButton
-              label="New"
-              variant="outline"
-              active={formData.combiner_panel_isnew !== false}
-              onClick={() => onChange('combiner_panel_isnew', true)}
-            />
-            <TableRowButton
-              label="Existing"
-              variant="outline"
-              active={formData.combiner_panel_isnew === false}
-              onClick={() => onChange('combiner_panel_isnew', false)}
             />
           </div>
         )}
@@ -544,7 +527,7 @@ const StringCombinerPanelSection = ({
           <TableDropdown
             label="Bus (Amps)"
             value={formData.combiner_panel_bus_amps || ''}
-            onChange={(value) => onChange('combiner_panel_bus_amps', value)}
+            onChange={(value) => onChange('combiner_panel_bus_amps', value, systemNumber)}
             options={busAmpOptions.map(amps => ({ value: amps, label: amps.toString() }))}
             placeholder="Select amps"
           />
@@ -555,7 +538,7 @@ const StringCombinerPanelSection = ({
           <TableDropdown
             label="Main Circuit Breaker (Amps)"
             value={formData.combiner_panel_main_breaker || 'MLO'}
-            onChange={(value) => onChange('combiner_panel_main_breaker', value)}
+            onChange={(value) => onChange('combiner_panel_main_breaker', value, systemNumber)}
             options={mainBreakerOptions.map(option => ({ value: option, label: option.toString() }))}
             placeholder="Select breaker"
           />
@@ -565,7 +548,7 @@ const StringCombinerPanelSection = ({
         <FormFieldRow label="Tie-in Breaker">
           <TableRowButton
             label="Auto"
-            variant="secondary"
+            variant="outline"
             active={!editTieInBreaker}
             onClick={() => {
               handleClearTieInBreaker();
@@ -573,7 +556,7 @@ const StringCombinerPanelSection = ({
           />
           <TableRowButton
             label="Custom"
-            variant="secondary"
+            variant="outline"
             active={editTieInBreaker}
             onClick={() => setEditTieInBreaker(true)}
           />
@@ -602,7 +585,7 @@ const StringCombinerPanelSection = ({
           <TableDropdown
             label="Breaker Rating"
             value={formData.combiner_panel_tie_in_breaker || ''}
-            onChange={(value) => onChange('combiner_panel_tie_in_breaker', value)}
+            onChange={(value) => onChange('combiner_panel_tie_in_breaker', value, systemNumber)}
             options={tieInBreakerOptions.map(rating => ({ value: rating, label: rating.toString() }))}
             placeholder="Select rating..."
           />
@@ -615,13 +598,13 @@ const StringCombinerPanelSection = ({
             <FormFieldRow label="Stringing">
               <TableRowButton
                 label="Auto"
-                variant="secondary"
+                variant="outline"
                 active={stringingType === 'auto'}
                 onClick={() => handleStringingTypeChange('auto')}
               />
               <TableRowButton
                 label="Custom"
-                variant="secondary"
+                variant="outline"
                 active={stringingType === 'custom'}
                 onClick={() => handleStringingTypeChange('custom')}
               />
@@ -662,14 +645,12 @@ const StringCombinerPanelSection = ({
 
                 {/* Auto-Calculate Button */}
                 {totalPanelQty > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 'var(--spacing)' }}>
-                    <Button
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing)' }}>
+                    <TableRowButton
                       variant="outline"
-                      size="sm"
                       onClick={handleAutoCalculate}
-                    >
-                      Auto-Calculate Distribution
-                    </Button>
+                      label="Auto-Calculate Distribution"
+                    />
                   </div>
                 )}
 
@@ -701,19 +682,19 @@ const StringCombinerPanelSection = ({
                 label="60A"
                 variant="outline"
                 active={formData.aggregate_pv_breaker === '60'}
-                onClick={() => onChange('aggregate_pv_breaker', '60')}
+                onClick={() => onChange('aggregate_pv_breaker', '60', systemNumber)}
               />
               <TableRowButton
                 label="80A"
                 variant="outline"
                 active={formData.aggregate_pv_breaker === '80'}
-                onClick={() => onChange('aggregate_pv_breaker', '80')}
+                onClick={() => onChange('aggregate_pv_breaker', '80', systemNumber)}
               />
               <TableRowButton
                 label="100A"
                 variant="outline"
                 active={formData.aggregate_pv_breaker === '100'}
-                onClick={() => onChange('aggregate_pv_breaker', '100')}
+                onClick={() => onChange('aggregate_pv_breaker', '100', systemNumber)}
               />
             </FormFieldRow>
 
@@ -722,7 +703,7 @@ const StringCombinerPanelSection = ({
             {/* <TableDropdown
               label="Aggregate EV Breaker"
               value={formData.aggregate_ev_breaker || ''}
-              onChange={(value) => onChange('aggregate_ev_breaker', value)}
+              onChange={(value) => onChange('aggregate_ev_breaker', value, systemNumber)}
               options={[
                 { value: '20', label: '20A' },
                 { value: '40', label: '40A' },
@@ -741,7 +722,7 @@ const StringCombinerPanelSection = ({
             <TableRowButton
               label="+ String Combiner BOS (Type 1)"
               variant="outline"
-              onClick={() => onChange('show_inverter_bos', true)}
+              onClick={() => onChange('show_inverter_bos', true, systemNumber)}
               style={{ width: '100%' }}
             />
           </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import TableRowButton from '../ui/TableRowButton';
 import styles from './Toggle.module.css';
 
 /**
@@ -21,20 +22,18 @@ const Toggle = ({
   return (
     <div className={styles.toggleRow}>
       <div className={styles.toggleContainer}>
-        <button
-          type="button"
+        <TableRowButton
+          label={newLabel}
+          variant="outline"
+          active={isNew}
           onClick={() => onToggle(true)}
-          className={`${styles.toggleButton} ${isNew ? styles.toggleButtonActive : ''}`}
-        >
-          {newLabel}
-        </button>
-        <button
-          type="button"
+        />
+        <TableRowButton
+          label={existingLabel}
+          variant="outline"
+          active={!isNew}
           onClick={() => onToggle(false)}
-          className={`${styles.toggleButton} ${!isNew ? styles.toggleButtonActive : ''}`}
-        >
-          {existingLabel}
-        </button>
+        />
       </div>
 
       {onClear && (

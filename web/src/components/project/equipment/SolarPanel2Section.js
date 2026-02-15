@@ -1,5 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
-import { EquipmentRow, FormFieldRow, TableDropdown, Alert, SectionClearModal, SectionRemoveModal } from '../../ui';
+import { EquipmentRow, FormFieldRow, TableDropdown, SectionClearModal, SectionRemoveModal, PreferredButton } from '../../ui';
+import { PreferredEquipmentModal } from '../../equipment';
 import styles from '../../../styles/ProjectAdd.module.css';
 import logger from '../../../services/devLogger';
 import {
@@ -19,6 +20,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
   const [loadingMakes, setLoadingMakes] = useState(false);
   const [loadingModels, setLoadingModels] = useState(false);
   const [selectedModelData, setSelectedModelData] = useState(null);
+  const [showPreferredModal, setShowPreferredModal] = useState(false);
 
   // Load manufacturers on mount
   // Load manufacturers on mount (once only)
@@ -189,14 +191,26 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
         onEdit={() => {}}
         onCamera={() => {}}
         onDelete={handleTrashClick}
+        headerRightContent={
+          <PreferredButton onClick={() => setShowPreferredModal(true)} />
+        }
+        topRowContent={
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-tight)'
+          }}>
+            <img
+              src={require('../../../assets/images/Skyfire Flame Icon.png')}
+              alt=""
+              style={{ width: '20px', height: '20px', objectFit: 'contain', flexShrink: 0 }}
+            />
+            <div style={{ flex: '1', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+              Solar Panel (Type 1 & Type 2) must be connected to Sys {systemNumber} Inverter or String Combiner Panel.
+            </div>
+          </div>
+        }
       >
-        {/* Flame icon info note */}
-        <div style={{ padding: 'var(--spacing-tight) var(--spacing)' }}>
-          <Alert variant="info" collapsible={false}>
-            Solar Panel (Type 2) must use the same inverter and combiner panel as Type 1.
-          </Alert>
-        </div>
-
         {/* Quantity field */}
         <FormFieldRow label="Quantity">
           <input
@@ -252,6 +266,13 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
         onClose={closeRemoveModal}
         onConfirm={handleRemoveConfirm}
         sectionName={`Solar Panel ${systemNumber} (Type 2)`}
+      />
+
+      {/* Preferred Modal */}
+      <PreferredEquipmentModal
+        isOpen={showPreferredModal}
+        onClose={() => setShowPreferredModal(false)}
+        equipmentType="solar_panel"
       />
     </div>
   );

@@ -787,6 +787,7 @@ const PointOfInterconnectionSection = ({
       isComplete={isComplete}
       expanded={isExpanded}
       onToggle={() => setIsExpanded(!isExpanded)}
+      noWrapTitle={true}
       fields={fields}
       onDelete={handleDelete}
     >
@@ -801,7 +802,7 @@ const PointOfInterconnectionSection = ({
 
       {/* Breaker/Conductor Sizing Mode - Auto/Custom */}
       {showBreakerConductorControls && (
-        <FormFieldRow label="Breaker/Conductor Sizing">
+        <FormFieldRow label="Breaker/Cond. Sizing">
           <TableRowButton
             label="Auto"
             variant="outline"

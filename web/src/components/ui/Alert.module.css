@@ -1,7 +1,7 @@
 .alert {
   display: flex;
   align-items: flex-start;
-  padding: var(--spacing-tight);
+  padding: var(--spacing-tight) var(--spacing);
   margin: 0;
   border-radius: var(--radius-md);
   border: 2px solid transparent;
@@ -28,6 +28,9 @@
 
 .info {
   color: var(--text-primary);
+  background: transparent;
+  border: none;
+  padding: var(--spacing-xs) 0;
 }
 
 .icon {

@@ -63,14 +63,16 @@ const TabbedPanel = ({
     <div className={styles.tabbedPanel}>
       {/* Tabs Wrapper */}
       <div className={styles.tabsWrapper}>
-        {/* Tabs Navigation */}
-        <div className={styles.tabsContainer}>
-          {tabs.map((tab, index) => (
-            <button
-              key={tab.id}
-              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''} ${showArcs ? '' : styles.tabNoArcs}`}
-              onClick={() => handleTabChange(tab.id)}
-            >
+        {/* Tabs Navigation with 25/75 split */}
+        <div className={styles.tabsOuterContainer}>
+          <div className={styles.tabsLeftSpacer}></div>
+          <div className={styles.tabsContainer}>
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.id}
+                className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''} ${showArcs ? '' : styles.tabNoArcs}`}
+                onClick={() => handleTabChange(tab.id)}
+              >
               {/* Icon (if provided) */}
               {tab.icon && (
                 <span className={styles.tabIcon}>
@@ -86,7 +88,8 @@ const TabbedPanel = ({
                 <span className={styles.tabBadge}>{tab.badge}</span>
               )}
             </button>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Content Panel - connects to selected tab with MSN Weather curved borders */}

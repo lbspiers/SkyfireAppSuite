@@ -134,13 +134,13 @@ const StringingSection = ({ formData, onChange }) => {
           <div className={formStyles.toggleGroup}>
             <TableRowButton
               label="Auto"
-              variant="secondary"
+              variant="outline"
               active={stringingType === 'auto'}
               onClick={() => handleStringingTypeChange('auto')}
             />
             <TableRowButton
               label="Custom"
-              variant="secondary"
+              variant="outline"
               active={stringingType === 'custom'}
               onClick={() => handleStringingTypeChange('custom')}
             />

@@ -43,6 +43,7 @@ const EquipmentRow = ({
   children,
   className = '',
   style = {},
+  noWrapTitle = false,
 }) => {
   const [internalExpanded, setInternalExpanded] = useState(initiallyExpanded);
   const isExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
@@ -65,29 +66,29 @@ const EquipmentRow = ({
           onClick={handleToggle}
           aria-expanded={isExpanded}
         >
+          {/* Left side - 25% label area */}
           <div className={styles.headerLeft}>
-            <div className={styles.titleGroup}>
-              <span className={styles.title}>{title}</span>
-              {!isExpanded && (
-                <span className={`${styles.subtitle} ${!subtitle ? styles.empty : ''}`}>
-                  {subtitle || '-'}
-                </span>
-              )}
-            </div>
+            <span className={`${styles.title} ${noWrapTitle ? styles.titleNoWrap : ''}`}>{title}</span>
+            {!isExpanded && subtitle && (
+              <span className={`${styles.subtitle} ${!subtitle ? styles.empty : ''}`}>
+                {subtitle || '-'}
+              </span>
+            )}
           </div>
 
+          {/* Right side - 75% content area */}
           <div className={styles.headerRight}>
+            {/* Inventory button goes here when expanded */}
+            {isExpanded && headerRightContent && (
+              <div className={styles.headerRightContent}>
+                {headerRightContent}
+              </div>
+            )}
             <span className={styles.chevron}>
               <ChevronIcon expanded={isExpanded} />
             </span>
           </div>
         </button>
-        {/* Inventory button aligned with input fields */}
-        {isExpanded && headerRightContent && (
-          <div className={styles.inventoryButton}>
-            {headerRightContent}
-          </div>
-        )}
         {/* Action buttons aligned right */}
         {isExpanded && (
           <div className={styles.actions}>
@@ -138,7 +139,7 @@ const EquipmentRow = ({
                   onClick={() => onExistingChange ? onExistingChange(true) : onNewExistingChange && onNewExistingChange(false)}
                 />
                 {toggleRowRightContent && (
-                  <div style={{ marginLeft: 'var(--spacing-tight)' }}>
+                  <div style={{ marginLeft: 'auto' }}>
                     {toggleRowRightContent}
                   </div>
                 )}

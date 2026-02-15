@@ -1,6 +1,6 @@
 .fieldRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: var(--spacing-tight) var(--spacing);
   border-bottom: var(--border-thin) solid var(--border-subtle);
   gap: var(--spacing);
@@ -15,16 +15,19 @@
   font-size: var(--text-sm);
   color: var(--text-muted);
   text-align: right;
+  word-wrap: break-word;
+  line-height: 1.3;
 }
 
 .content {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--spacing-tight); /* Consistent spacing between buttons */
   pointer-events: auto;
   position: relative;
   z-index: 5;
+  padding-top: 2px; /* Align buttons with first line of wrapped label */
 }
 
 /* Input styling for text inputs inside FormFieldRow */

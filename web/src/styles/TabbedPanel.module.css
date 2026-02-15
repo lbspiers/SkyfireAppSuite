@@ -18,15 +18,29 @@
 }
 
 /* ===== TABS NAVIGATION (Status Tab Style) ===== */
+/* Outer container with 25/75 split to align with form rows */
+.tabsOuterContainer {
+  display: flex;
+  gap: var(--spacing);
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  margin-bottom: 0;
+}
+
+/* Left spacer - 25% to match form label width */
+.tabsLeftSpacer {
+  flex: 0 0 25%;
+}
+
+/* Tabs container - 75% to align with form controls */
 .tabsContainer {
+  flex: 1;
   display: flex;
   gap: var(--spacing);
   padding: 0;
   background: transparent;
   position: relative;
-  z-index: 10;
-  margin-bottom: 0;
-  width: 100%;
 }
 
 .tab {

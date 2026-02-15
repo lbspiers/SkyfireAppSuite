@@ -82,8 +82,8 @@
   grid-template-columns: minmax(80px, auto) minmax(120px, auto) 120px;
   gap: var(--spacing);
   align-items: center;
-  padding-bottom: var(--spacing-tight);
-  margin-bottom: var(--spacing-tight);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -96,8 +96,8 @@
   grid-template-columns: minmax(80px, auto) minmax(120px, auto) 120px 120px;
   gap: var(--spacing);
   align-items: center;
-  padding-bottom: var(--spacing-tight);
-  margin-bottom: var(--spacing-tight);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -114,14 +114,14 @@
   display: flex;
   align-items: center;
   line-height: 1.5;
-  min-height: 40px;
+  min-height: 32px;
 }
 
 .toggleCell {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  min-height: 40px;
+  min-height: 32px;
 }
 
 /* Override Toggle component's bottom margin when used in grid */
@@ -133,14 +133,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 40px;
+  min-height: 32px;
 }
 
 .qtyCell {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 40px;
+  min-height: 32px;
   position: relative;
 }
 

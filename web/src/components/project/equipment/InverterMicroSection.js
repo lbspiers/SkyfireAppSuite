@@ -8,7 +8,6 @@ import {
   FormFieldRow,
   TableRowButton,
   Alert,
-  Button,
   PreferredButton,
   Tooltip,
   AddSectionButton
@@ -1061,14 +1060,13 @@ const InverterMicroSection = ({
 
                 {/* Auto-Calculate Button */}
                 {totalPanelQty > 0 && (
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={handleAutoCalculate}
-                    className={componentStyles.autoCalculateButton}
-                  >
-                    Auto-Calculate Distribution
-                  </Button>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing)' }}>
+                    <TableRowButton
+                      variant="outline"
+                      onClick={handleAutoCalculate}
+                      label="Auto-Calculate Distribution"
+                    />
+                  </div>
                 )}
 
                 {/* String Inverter Input Rows */}

@@ -283,14 +283,13 @@ const InverterStringingSection = ({ formData, onChange }) => {
 
             {/* Auto-Calculate Button */}
             {totalPanels > 0 && (
-              <Button
-                variant="outline"
-                size="md"
-                onClick={handleAutoCalculate}
-                className={componentStyles.autoCalcButton}
-              >
-                Auto-Calculate Distribution
-              </Button>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing)' }}>
+                <TableRowButton
+                  variant="outline"
+                  onClick={handleAutoCalculate}
+                  label="Auto-Calculate Distribution"
+                />
+              </div>
             )}
 
             {/* Header Row */}

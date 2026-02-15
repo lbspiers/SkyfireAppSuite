@@ -115,17 +115,17 @@ const StringingGrid = ({
       <div className={gridStyles.rowsContainer}>
         {rows.map((row, index) => (
           <div key={row.id || index} className={mode === 'dual-qty' ? gridStyles.dataRowDual : gridStyles.dataRow}>
-            {/* Column 1: New/Existing Toggle */}
+            {/* Column 1: Label (Input/Branch) */}
+            <div className={gridStyles.labelCell}>
+              {columnLabels.col1} {row.index}
+            </div>
+
+            {/* Column 2: New/Existing Toggle */}
             <div className={gridStyles.toggleCell}>
               <Toggle
                 isNew={row.isNew}
                 onToggle={(isNew) => onToggle(row.index, isNew)}
               />
-            </div>
-
-            {/* Column 2: Label (Input/Branch) */}
-            <div className={gridStyles.labelCell}>
-              {columnLabels.col1} {row.index}
             </div>
 
             {/* Column 3: Panel Qty (dual-qty mode only) */}
