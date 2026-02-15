@@ -68,7 +68,7 @@
 
 .stringInput {
   flex: 1;
-  max-width: 120px;
+  max-width: 80px;
   padding: var(--spacing-tight);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -103,7 +103,7 @@
 
 .panelsPerStringInput {
   flex: 1;
-  max-width: 140px;
+  max-width: 120px;
   padding: var(--spacing-tight);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -122,6 +122,12 @@
   color: var(--text-disabled);
 }
 
+.panelTypeToggle {
+  display: flex;
+  gap: var(--spacing-tight);
+  margin-left: var(--spacing-tight);
+}
+
 /* ===== POWERWALL 3 SELECT ===== */
 .pw3SelectFilled {
   color: var(--text-primary);
@@ -136,7 +142,11 @@
   margin-top: var(--spacing-xs);
 }
 
+.optimizerType2 {
+  margin-top: var(--spacing-xs);
+}
+
 /* ===== GATEWAY CONFIGURATION SECTION ===== */
 .gatewayConfigSection {
-  margin-top: var(--spacing);
+  margin-top: var(--spacing-xs);
 }

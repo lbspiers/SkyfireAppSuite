@@ -104,6 +104,19 @@
   white-space: nowrap;
 }
 
+.inventoryButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  position: absolute;
+  left: calc(25% + var(--spacing)); /* 25% label width + gap to match content start */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  z-index: 1;
+}
+
 .actions {
   display: flex;
   align-items: center;
@@ -168,6 +181,16 @@
   pointer-events: auto;
 }
 
+.topRow {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+  pointer-events: auto;
+  position: relative;
+  z-index: 5;
+}
+
 .toggleRow {
   display: flex;
   align-items: center;
@@ -180,10 +203,11 @@
 }
 
 .toggleLabel {
-  flex: 0 0 30%;
+  flex: 0 0 25%;
   font-size: var(--text-sm);
   color: var(--text-muted);
   white-space: nowrap;
+  text-align: right;
 }
 
 .toggleButtons {
@@ -248,7 +272,7 @@
 
 /* Text colors need to be white/light on gradient background */
 .row.expanded .title {
-  color: #FFFFFF;
+  color: var(--color-primary);
 }
 
 .row.expanded .subtitle {

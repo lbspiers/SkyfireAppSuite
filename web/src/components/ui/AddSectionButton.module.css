@@ -12,7 +12,7 @@
   gap: var(--spacing-tight);
   padding: var(--spacing-tight) var(--spacing-tight);
   background: transparent;
-  border: var(--border-thin) solid var(--border-default);
+  border: 2px solid var(--color-primary);
   border-radius: var(--radius-md);
   color: var(--color-primary);
   font-size: var(--text-xs);

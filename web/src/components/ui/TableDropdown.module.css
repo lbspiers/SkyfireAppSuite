@@ -12,12 +12,13 @@
 }
 
 .label {
-  flex: 0 0 30%;
+  flex: 0 0 25%;
   font-size: var(--text-sm);
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: right;
 }
 
 .dropdownWrapper {
@@ -149,4 +150,13 @@
   text-align: center;
   color: var(--text-muted);
   font-size: var(--text-sm);
+}
+
+/* Right-aligned variant: content on left, label on right */
+.rightAlign .dropdownWrapper {
+  order: -1;
+}
+
+.rightAlign .label {
+  text-align: right;
 }

@@ -17,6 +17,7 @@ import ActionButton from './ActionButton';
  * @param {React.ReactNode} toggleRowRightContent - Optional content to show on the right side of the toggle row
  * @param {React.ReactNode} titleRowCenterContent - Optional content to show centered in the title row when expanded
  * @param {React.ReactNode} headerRightContent - Optional content to show in header row to the left of action icons
+ * @param {React.ReactNode} topRowContent - Optional content row that appears above the New/Existing toggle
  */
 const EquipmentRow = ({
   title,
@@ -38,6 +39,7 @@ const EquipmentRow = ({
   toggleRowRightContent,
   titleRowCenterContent,
   headerRightContent,
+  topRowContent,
   children,
   className = '',
   style = {},
@@ -80,14 +82,15 @@ const EquipmentRow = ({
             </span>
           </div>
         </button>
-        {/* Action buttons outside of header button to avoid nesting */}
+        {/* Inventory button aligned with input fields */}
+        {isExpanded && headerRightContent && (
+          <div className={styles.inventoryButton}>
+            {headerRightContent}
+          </div>
+        )}
+        {/* Action buttons aligned right */}
         {isExpanded && (
           <div className={styles.actions}>
-            {headerRightContent && (
-              <div>
-                {headerRightContent}
-              </div>
-            )}
             <ActionButton
               icon={pencilIcon}
               label="Edit"
@@ -110,7 +113,14 @@ const EquipmentRow = ({
       {/* Expandable Body */}
       <div className={styles.body}>
         <div className={styles.bodyInner}>
-          {/* New/Existing Toggle Row (optional, appears first) */}
+          {/* Top Row Content (optional, appears first) */}
+          {topRowContent && (
+            <div className={styles.topRow}>
+              {topRowContent}
+            </div>
+          )}
+
+          {/* New/Existing Toggle Row (optional, appears after topRowContent) */}
           {showNewExistingToggle && (
             <div className={styles.toggleRow}>
               <div className={styles.toggleLabel}>Select</div>

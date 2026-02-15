@@ -20,6 +20,13 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
   const backupSwitchLocation = formData.backupSwitchLocation || '';
   const batteryExisting = formData.batteryExisting || false;
 
+  console.log('[PowerWallConfig] Render:', {
+    gateway,
+    backupOption,
+    formData_gateway: formData.gateway,
+    showGatewaySelection: backupOption === 'Whole Home' || backupOption === 'Partial Home'
+  });
+
   // Conditional visibility
   const showGatewaySelection = backupOption === 'Whole Home' || backupOption === 'Partial Home';
   const showBackupSwitchLocation = gateway === 'Backup Switch';
@@ -63,7 +70,7 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
 
       {/* 3. Battery Expansion Packs with New/Existing toggle */}
       <FormFieldRow
-        label="Add Battery Expansion Packs?"
+        label="Tesla Expansion Packs"
         showNewExistingToggle={true}
         isNew={!batteryExisting}
         onNewExistingChange={(isNew) => onChange('batteryExisting', !isNew)}
@@ -86,9 +93,12 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
       {showGatewaySelection && (
         <>
           <TableDropdown
-            label="Gateway Option*"
+            label="Management"
             value={gateway}
-            onChange={(value) => onChange('gateway', value)}
+            onChange={(value) => {
+              console.log('[PowerWallConfig] Gateway onChange:', { value, currentGateway: gateway });
+              onChange('gateway', value);
+            }}
             options={TESLA_POWERWALL_GATEWAYS}
             placeholder="Select gateway..."
           />

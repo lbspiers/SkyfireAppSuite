@@ -11,9 +11,10 @@
 }
 
 .label {
-  flex: 0 0 30%;
+  flex: 0 0 25%;
   font-size: var(--text-sm);
   color: var(--text-muted);
+  text-align: right;
 }
 
 .content {
@@ -21,6 +22,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-tight); /* Consistent spacing between buttons */
+  pointer-events: auto;
+  position: relative;
+  z-index: 5;
 }
 
 /* Input styling for text inputs inside FormFieldRow */
@@ -41,4 +45,14 @@
 
 .content input::placeholder {
   color: var(--text-disabled);
+}
+
+/* Right-aligned variant: content on left, label on right */
+.rightAlign .content {
+  order: -1; /* Move content before label in flex order */
+  justify-content: flex-start; /* Align content to left */
+}
+
+.rightAlign .label {
+  text-align: right; /* Right-align label text */
 }

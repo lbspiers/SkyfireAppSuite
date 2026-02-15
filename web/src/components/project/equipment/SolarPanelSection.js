@@ -40,7 +40,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const solarPanelModelIdField = 'solar_panel_model_id';
   const solarPanelQuantityField = 'solar_panel_quantity';
   const solarPanelWattageField = 'solar_panel_wattage';
-  const solarPanelIsNewField = 'solar_panel_isnew';
+  const solarPanelExistingField = 'solar_panel_existing';
   const solarPanelVocField = 'solar_panel_voc';
   const solarPanelIscField = 'solar_panel_isc';
   const solarPanelVmpField = 'solar_panel_vmp';
@@ -60,8 +60,8 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const sectionTitle = batteryOnlyMode
     ? "Battery Only"
     : (formData.show_solar_panel_2
-        ? `Solar Panel ${systemNumber} (Type 1)`
-        : `Solar Panel ${systemNumber}`);
+        ? "Solar Panel (Type 1)"
+        : "Solar Panel");
 
   // Sync batteryOnlyMode state with formData battery only field when it changes (for persistence)
   useEffect(() => {
@@ -77,10 +77,10 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   useEffect(() => {
     const hasSolarPanel = formData[solarPanelMakeField] || formData[solarPanelModelField];
     // Use == null to catch both undefined AND null
-    if (hasSolarPanel && formData[solarPanelIsNewField] == null) {
-      onChange(solarPanelIsNewField, true); // Default to New
+    if (hasSolarPanel && formData[solarPanelExistingField] == null) {
+      onChange(solarPanelExistingField, true); // Default to New
     }
-  }, [formData[solarPanelMakeField], formData[solarPanelModelField], formData[solarPanelIsNewField], onChange, solarPanelMakeField, solarPanelModelField, solarPanelIsNewField]);
+  }, [formData[solarPanelMakeField], formData[solarPanelModelField], formData[solarPanelExistingField], onChange, solarPanelMakeField, solarPanelModelField, solarPanelExistingField]);
 
   // Load models when manufacturer changes using shared catalog
   useEffect(() => {
@@ -148,8 +148,8 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
     onChange(fieldName, value, systemNumber);
     // Also save New/Existing toggle default if not already set
     // Use == null to catch both undefined AND null
-    if (formData[solarPanelIsNewField] == null) {
-      onChange(solarPanelIsNewField, true, systemNumber);
+    if (formData[solarPanelExistingField] == null) {
+      onChange(solarPanelExistingField, true, systemNumber);
     }
   };
 
@@ -165,7 +165,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         [solarPanelModelField, ''],
         [solarPanelWattageField, ''],
         // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
-        [solarPanelIsNewField, formData[solarPanelIsNewField] ?? true],
+        [solarPanelExistingField, formData[solarPanelExistingField] ?? true],
       ];
       onBatchChange(updates, systemNumber);
     } else {
@@ -205,7 +205,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       }
 
       // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
-      updates.push([solarPanelIsNewField, formData[solarPanelIsNewField] ?? true]);
+      updates.push([solarPanelExistingField, formData[solarPanelExistingField] ?? true]);
 
       onBatchChange(updates, systemNumber);
     } else {
@@ -265,7 +265,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
 
   const clearType2Fields = () => {
     if (onBatchChange) {
-      // BATCH: Clear all Type 2 fields in single operation (11 fields → 1 call)
+      // BATCH: Clear all Type 2 fields in single operation (14 fields → 1 call)
       const updates = [
         ['solar_panel_type2_manufacturer', ''],
         ['solar_panel_type2_model', ''],
@@ -278,6 +278,10 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         ['solar_panel_type2_imp', ''],
         ['solar_panel_type2_temp_coeff_voc', ''],
         ['solar_panel_type2_model_id', ''],
+        // Clear Type 2 optimizer fields
+        ['optimizer_type2_make', ''],
+        ['optimizer_type2_model', ''],
+        ['optimizer_type2_existing', false],
       ];
       onBatchChange(updates, systemNumber);
     } else {
@@ -293,6 +297,10 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       onChange('solar_panel_type2_imp', '', systemNumber);
       onChange('solar_panel_type2_temp_coeff_voc', '', systemNumber);
       onChange('solar_panel_type2_model_id', '', systemNumber);
+      // Clear Type 2 optimizer fields
+      onChange('optimizer_type2_make', '', systemNumber);
+      onChange('optimizer_type2_model', '', systemNumber);
+      onChange('optimizer_type2_existing', false, systemNumber);
     }
   };
 
@@ -329,7 +337,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         [solarPanelModelIdField, null],
         [solarPanelQuantityField, null],
         [solarPanelWattageField, null],
-        [solarPanelIsNewField, null],
+        [solarPanelExistingField, null],
         [solarPanelVocField, null],
         [solarPanelIscField, null],
         [solarPanelVmpField, null],
@@ -358,7 +366,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       onChange(solarPanelModelIdField, null, systemNumber);
       onChange(solarPanelQuantityField, null, systemNumber);
       onChange(solarPanelWattageField, null, systemNumber);
-      onChange(solarPanelIsNewField, null, systemNumber);
+      onChange(solarPanelExistingField, null, systemNumber);
       onChange(solarPanelVocField, null, systemNumber);
       onChange(solarPanelIscField, null, systemNumber);
       onChange(solarPanelVmpField, null, systemNumber);
@@ -388,6 +396,12 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   };
 
   const handleToggleType2 = () => {
+    console.log('[SolarPanelSection] handleToggleType2 clicked', {
+      systemNumber,
+      'formData.show_solar_panel_2': formData.show_solar_panel_2,
+      'will call onChange with': !formData.show_solar_panel_2
+    });
+
     if (formData.show_solar_panel_2) {
       // Hide Type 2 - check if data exists
       const hasType2Data = formData.solar_panel_type2_manufacturer ||
@@ -401,6 +415,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       }
     } else {
       // Show Type 2
+      console.log('[SolarPanelSection] Calling onChange to show Panel Type 2');
       onChange('show_solar_panel_2', true, systemNumber);
     }
   };
@@ -440,7 +455,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
 
     // Quantity with New/Existing indicator
     if (formData[solarPanelQuantityField]) {
-      const statusLetter = formData[solarPanelIsNewField] !== false ? 'N' : 'E';
+      const statusLetter = formData[solarPanelExistingField] === true ? 'E' : 'N';
       parts.push(`${formData[solarPanelQuantityField]} (${statusLetter})`);
     }
 
@@ -459,9 +474,9 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
           title={sectionTitle}
           subtitle={getSubtitle()}
           showNewExistingToggle={!batteryOnlyMode}
-          isNew={formData[solarPanelIsNewField] !== false}
-          onNewExistingChange={(isNew) => {
-            onChange(solarPanelIsNewField, isNew, systemNumber);
+          isExisting={formData[solarPanelExistingField]}
+          onExistingChange={(val) => {
+            onChange(solarPanelExistingField, val, systemNumber);
           }}
           onEdit={!batteryOnlyMode ? () => {} : undefined}
           onCamera={!batteryOnlyMode ? () => {} : undefined}
@@ -629,7 +644,7 @@ const arePropsEqual = (prevProps, nextProps) => {
     `${prefix}solar_panel_model`,
     `${prefix}solar_panel_wattage`,
     `${prefix}solar_panel_quantity`,
-    `${prefix}solar_panel_isnew`,
+    `${prefix}solar_panel_existing`,
     `${prefix}batteryonly`,
     'show_solar_panel_2',
   ];

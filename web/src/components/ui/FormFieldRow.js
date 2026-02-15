@@ -11,19 +11,32 @@ import styles from './FormFieldRow.module.css';
  * @param {string} label - Field label text
  * @param {React.ReactNode} children - Input element or content
  * @param {boolean} noBorder - Remove bottom border (default: false)
+ * @param {boolean} rightAlign - Flip layout: content on left, label on right (default: false)
  * @param {string} className - Additional CSS classes
  */
 const FormFieldRow = ({
   label,
   children,
   noBorder = false,
+  rightAlign = false,
   className = ''
 }) => (
-  <div className={`${styles.fieldRow} ${noBorder ? styles.noBorder : ''} ${className}`}>
-    <span className={styles.label}>{label}</span>
-    <div className={styles.content}>
-      {children}
-    </div>
+  <div className={`${styles.fieldRow} ${noBorder ? styles.noBorder : ''} ${rightAlign ? styles.rightAlign : ''} ${className}`}>
+    {rightAlign ? (
+      <>
+        <div className={styles.content}>
+          {children}
+        </div>
+        <span className={styles.label}>{label}</span>
+      </>
+    ) : (
+      <>
+        <span className={styles.label}>{label}</span>
+        <div className={styles.content}>
+          {children}
+        </div>
+      </>
+    )}
   </div>
 );
 

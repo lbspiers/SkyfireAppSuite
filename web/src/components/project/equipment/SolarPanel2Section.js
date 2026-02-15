@@ -158,11 +158,31 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
   // Check if we have a 2nd solar panel configured
   const hasSolarPanel2 = formData.solar_panel_type2_manufacturer && formData.solar_panel_type2_model;
 
+  // Build comprehensive subtitle with all selections (matching Type 1 format)
+  const getSubtitle = () => {
+    if (!hasSolarPanel2) return '';
+
+    const parts = [];
+
+    // Quantity with New/Existing indicator
+    if (formData.solar_panel_type2_quantity) {
+      const statusLetter = formData.solar_panel_type2_is_new !== false ? 'N' : 'E';
+      parts.push(`${formData.solar_panel_type2_quantity} (${statusLetter})`);
+    }
+
+    // Make and Model
+    if (formData.solar_panel_type2_manufacturer && formData.solar_panel_type2_model) {
+      parts.push(`${formData.solar_panel_type2_manufacturer} ${formData.solar_panel_type2_model}`);
+    }
+
+    return parts.join(' ');
+  };
+
   return (
     <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
-        title={`Solar Panel ${systemNumber} ((Type 2))`}
-        subtitle={hasSolarPanel2 ? `${formData.solar_panel_type2_manufacturer} ${formData.solar_panel_type2_model}` : ''}
+        title="Solar Panel (Type 2)"
+        subtitle={getSubtitle()}
         showNewExistingToggle={true}
         isNew={formData.solar_panel_type2_is_new !== false}
         onNewExistingChange={(isNew) => onChange('solar_panel_type2_is_new', isNew)}
@@ -170,10 +190,12 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
         onCamera={() => {}}
         onDelete={handleTrashClick}
       >
-        {/* Orange-bordered note */}
-        <Alert variant="warning" collapsible={false}>
-          Note: Solar Panel (Type 2) must use the same inverter and combiner panel as Type 1.
-        </Alert>
+        {/* Flame icon info note */}
+        <div style={{ padding: 'var(--spacing-tight) var(--spacing)' }}>
+          <Alert variant="info" collapsible={false}>
+            Solar Panel (Type 2) must use the same inverter and combiner panel as Type 1.
+          </Alert>
+        </div>
 
         {/* Quantity field */}
         <FormFieldRow label="Quantity">
@@ -221,7 +243,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
         isOpen={showClearModal}
         onClose={closeClearModal}
         onConfirm={handleClearConfirm}
-        sectionName={`Solar Panel ${systemNumber} ((Type 2))`}
+        sectionName={`Solar Panel ${systemNumber} (Type 2)`}
       />
 
       {/* Section Remove Modal */}
@@ -229,7 +251,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
         isOpen={showRemoveModal}
         onClose={closeRemoveModal}
         onConfirm={handleRemoveConfirm}
-        sectionName={`Solar Panel ${systemNumber} ((Type 2))`}
+        sectionName={`Solar Panel ${systemNumber} (Type 2)`}
       />
     </div>
   );
