@@ -33,6 +33,8 @@ const EquipmentRow = ({
   showNewExistingToggle = false,
   isNew = true,
   onNewExistingChange,
+  isExisting,
+  onExistingChange,
   toggleRowRightContent,
   titleRowCenterContent,
   headerRightContent,
@@ -82,7 +84,7 @@ const EquipmentRow = ({
         {isExpanded && (
           <div className={styles.actions}>
             {headerRightContent && (
-              <div style={{ marginRight: 'var(--spacing-tight)' }}>
+              <div>
                 {headerRightContent}
               </div>
             )}
@@ -111,25 +113,26 @@ const EquipmentRow = ({
           {/* New/Existing Toggle Row (optional, appears first) */}
           {showNewExistingToggle && (
             <div className={styles.toggleRow}>
-              <div style={{ display: 'flex', gap: 'var(--spacing-tight)' }}>
+              <div className={styles.toggleLabel}>Select</div>
+              <div className={styles.toggleButtons}>
                 <TableRowButton
                   label="New"
                   variant="outline"
-                  active={isNew}
-                  onClick={() => onNewExistingChange && onNewExistingChange(true)}
+                  active={onExistingChange ? isExisting === false : isNew}
+                  onClick={() => onExistingChange ? onExistingChange(false) : onNewExistingChange && onNewExistingChange(true)}
                 />
                 <TableRowButton
                   label="Existing"
                   variant="outline"
-                  active={!isNew}
-                  onClick={() => onNewExistingChange && onNewExistingChange(false)}
+                  active={onExistingChange ? isExisting === true : !isNew}
+                  onClick={() => onExistingChange ? onExistingChange(true) : onNewExistingChange && onNewExistingChange(false)}
                 />
+                {toggleRowRightContent && (
+                  <div style={{ marginLeft: 'var(--spacing-tight)' }}>
+                    {toggleRowRightContent}
+                  </div>
+                )}
               </div>
-              {toggleRowRightContent && (
-                <div style={{ marginLeft: 'auto' }}>
-                  {toggleRowRightContent}
-                </div>
-              )}
             </div>
           )}
 

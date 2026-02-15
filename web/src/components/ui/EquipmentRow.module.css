@@ -110,7 +110,7 @@
   gap: var(--spacing-xs);
   flex-shrink: 0;
   position: absolute;
-  right: var(--spacing-wide); /* Positioned to the left of chevron */
+  right: calc(var(--spacing-wide) + 12px); /* Positioned to the left of chevron with extra spacing */
   top: 50%;
   transform: translateY(-50%);
   pointer-events: auto;
@@ -159,18 +159,38 @@
 
 .bodyInner {
   overflow: hidden;
+  pointer-events: auto;
 }
 
 .row.expanded .bodyInner {
   border-top: var(--border-thin) solid var(--border-subtle);
   overflow: visible;
+  pointer-events: auto;
 }
 
 .toggleRow {
   display: flex;
-  gap: var(--spacing-tight);
+  align-items: center;
   padding: var(--spacing-tight) var(--spacing);
   border-bottom: var(--border-thin) solid var(--border-subtle);
+  pointer-events: auto;
+  position: relative;
+  z-index: 5;
+  gap: var(--spacing);
+}
+
+.toggleLabel {
+  flex: 0 0 30%;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.toggleButtons {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
 }
 
 .fields {
@@ -236,7 +256,7 @@
 }
 
 .row.expanded .chevron {
-  color: #FFFFFF;
+  color: var(--color-primary);
 }
 
 /* Actions container styling when expanded */

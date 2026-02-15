@@ -1,35 +1,49 @@
-/* ActionButton - Square action button with icon */
+/* ActionButton - Icon button with transparent border */
 
 .button {
-  display: flex;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+  transition: var(--transition-base);
   border-radius: var(--radius-sm);
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: var(--transition-colors);
-  padding: 0;
+  color: #3B82F6;
+  min-width: 20px;
+  min-height: 20px;
 }
 
-.button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+.button:hover:not(:disabled) {
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60A5FA;
 }
 
-.button:hover .icon {
-  filter: brightness(0) saturate(100%) invert(100%);
-  opacity: 0.9;
+.button:hover:not(:disabled) .icon {
+  opacity: 1;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .icon {
-  width: 12px;
-  height: 12px;
+  width: 18px;
+  height: 18px;
+  opacity: 0.9;
+  transition: var(--transition-base);
   display: block;
-  filter: brightness(0) saturate(100%) invert(100%);
-  opacity: 0.7;
-  transition: opacity 0.2s, filter 0.2s;
+  filter: brightness(0) saturate(100%) invert(48%) sepia(96%) saturate(2096%) hue-rotate(201deg) brightness(101%) contrast(93%);
+}
+
+.button:hover:not(:disabled) .icon {
+  opacity: 1;
+  filter: brightness(0) saturate(100%) invert(67%) sepia(53%) saturate(2096%) hue-rotate(201deg) brightness(103%) contrast(96%);
+}
+
+.danger:hover:not(:disabled) {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: rgba(239, 68, 68, 0.9);
 }

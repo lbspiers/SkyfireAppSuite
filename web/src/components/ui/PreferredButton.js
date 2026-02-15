@@ -1,23 +1,20 @@
 /**
- * PreferredButton - Small button to open preferred equipment modal
+ * PreferredButton - Button to open preferred equipment modal
  *
  * Placed next to equipment section titles for quick access.
+ * Uses TableRowButton with "Inventory" label.
  */
 
-import React from 'react';
-import styles from './PreferredButton.module.css';
+import TableRowButton from './TableRowButton';
 
-const PreferredButton = ({ onClick, label = 'Preferred', disabled = false }) => {
+const PreferredButton = ({ onClick, disabled = false }) => {
   return (
-    <button
-      type="button"
-      className={styles.preferredButton}
+    <TableRowButton
+      label="Inventory"
+      variant="outline"
       onClick={onClick}
       disabled={disabled}
-      title="Select from preferred equipment"
-    >
-      <span>{label}</span>
-    </button>
+    />
   );
 };
 
