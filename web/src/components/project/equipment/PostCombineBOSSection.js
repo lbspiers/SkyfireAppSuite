@@ -65,7 +65,7 @@ const PostCombineBOSSection = ({ projectUuid, systemDetails, activeSystems, util
   const isPopulated = (n) => !!systemDetails?.[`${getPrefix(n)}_equipment_type`];
 
   return (
-    <div style={{ marginTop: '1rem' }}>
+    <div style={{ marginTop: 'var(--spacing-xs)' }}>
       {/* Slot 1 - Always visible */}
       <PostCombineBOSSlot
         slotNumber={1}

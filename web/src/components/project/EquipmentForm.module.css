@@ -1,6 +1,6 @@
 /* ===== SECTION ===== */
 .section {
-  margin-bottom: 0;
+  margin-bottom: var(--spacing-xs);
   padding: 0 var(--spacing);
 }
 

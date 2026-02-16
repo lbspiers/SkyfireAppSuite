@@ -18,10 +18,13 @@
 
 /* Contained mode - overlays within the parent container only */
 .overlay.overlayContained {
-  position: absolute;
-  z-index: 50; /* Lower than full modal z-index, but above panel content */
-  /* Cover the entire parent container */
-  inset: 0;
+  position: absolute !important;
+  z-index: 10000 !important; /* Above sticky header (z-index: 100) */
+  /* Cover the parent container below the sticky header */
+  top: 250px; /* Offset to start below sticky header (sub-tabs + system selector) */
+  left: 0;
+  right: 0;
+  bottom: 0;
   /* Center modal within the parent container */
   display: flex;
   align-items: center;

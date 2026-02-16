@@ -1,5 +1,6 @@
 /* ===== COMPONENT WRAPPER ===== */
 .sectionWrapper {
+  margin-top: var(--spacing-xs);
   margin-bottom: var(--spacing-xs);
 }
 

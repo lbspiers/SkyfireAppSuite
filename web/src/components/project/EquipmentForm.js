@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useMemo,
   useEffect,
@@ -81,11 +81,11 @@ const useDebouncedValue = (value, delay = 500) => {
 // === TOGGLE GROUP DEFINITIONS ===
 // Maps field prefixes to their _existing toggle field name.
 // Used by piggyback logic to auto-persist toggle defaults when any field
-// in the same equipment group saves — eliminates scattered useEffect auto-init.
+// in the same equipment group saves � eliminates scattered useEffect auto-init.
 // Order: longest prefix first to prevent partial matches.
 const TOGGLE_GROUP_PREFIXES = [
   ["battery_combiner_panel_", "battery_combiner_panel_existing"],
-  ["solar_panel_type2_", null], // Excluded — uses Category B _isnew toggle
+  ["solar_panel_type2_", null], // Excluded � uses Category B _isnew toggle
   ["combiner_panel_", "combiner_panel_existing"],
   ["backup_panel_", "backup_panel_existing"],
   ["solar_panel_", "solar_panel_existing"],
@@ -215,6 +215,9 @@ const EquipmentForm = ({
     solar_panel_model_id: "", // Database ID of the solar panel model
     solar_panel_wattage: "",
     solar_panel_quantity: "",
+
+    // System Type Selection (determines which equipment sections to show)
+    system_type: "", // 'microinverter', 'inverter', or 'optimizer'
 
     // Inverter/Microinverter fields
     inverter_existing: false,
@@ -489,6 +492,9 @@ const EquipmentForm = ({
           show_solar_panel_2: false,
           batteryonly: false,
 
+          // System Type
+          system_type: "",
+
           // Solar Panel 2 defaults
           solar_panel_type2_is_new: true,
           solar_panel_type2_manufacturer: "",
@@ -749,6 +755,9 @@ const EquipmentForm = ({
           systemDetails[`${prefix}_solar_panel_type2_imp`] || "",
         solar_panel_type2_temp_coeff_voc:
           systemDetails[`${prefix}_solar_panel_type2_temp_coeff_voc`] || "",
+
+        // System Type
+        system_type: systemDetails[`${prefix}_system_type`] || "",
 
         // Inverter/Microinverter (handle schema inconsistencies)
         inverter_existing:
@@ -1104,6 +1113,9 @@ const EquipmentForm = ({
         show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
         batteryonly: `${sysPrefix}_batteryonly`,
 
+        // System Type
+        system_type: `${sysPrefix}_system_type`,
+
         // Inverter/Microinverter
         inverter_existing: getSchemaField(sysNum, "micro_inverter_existing"),
         inverter_make: `${sysPrefix}_micro_inverter_make`,
@@ -1240,7 +1252,7 @@ const EquipmentForm = ({
 
         // Tesla PowerWall fields
         expansionPacks: `${sysPrefix}_tesla_extensions`,
-        // gateway removed - redundant, use teslagatewaytype
+        gateway: `${sysPrefix}_teslagatewaytype`, // Maps to same field as teslagatewaytype
         teslagatewaytype: `${sysPrefix}_teslagatewaytype`,
         backupSwitchLocation: `${sysPrefix}_backupswitch_location`,
         batteryExisting: `${sysPrefix}_battery1_existing`,
@@ -1439,7 +1451,7 @@ const EquipmentForm = ({
         const equipment = JSON.parse(pendingEquipment);
         logger.log(
           "EquipmentForm",
-          "Ã¢Å¡Â¡ Auto-populating from assessment:",
+          "âš¡ Auto-populating from assessment:",
           equipment,
         );
 
@@ -1522,7 +1534,7 @@ const EquipmentForm = ({
         if (validationResults.length > 0) {
           logger.log(
             "EquipmentForm",
-            "Ã¢Å¡Â Ã¯Â¸Â Equipment validation warnings:",
+            "âš ï¸ Equipment validation warnings:",
             validationResults,
           );
           setPendingEquipmentToPopulate(equipment);
@@ -1939,15 +1951,26 @@ const EquipmentForm = ({
         }
 
         // Step 2: Match selected model
+        // Special handling for PowerWall 3 - normalize format for matching
+        const isPowerWall3 = inverterModel && inverterModel.toLowerCase().includes('powerwall 3');
+        const normalizedModel = isPowerWall3
+          ? inverterModel.replace(/\s+kw/gi, 'kW').replace(/powerwall/i, 'PowerWall') // Normalize to "PowerWall 3 (11.5kW)"
+          : inverterModel;
+
         const matchedInverter = modelsData.data.find(
           (inv) =>
             inv.model_number === inverterModel ||
             inv.name === inverterModel ||
-            `${inv.manufacturer} ${inv.model_number}` === inverterModel,
+            `${inv.manufacturer} ${inv.model_number}` === inverterModel ||
+            // Try normalized version for PowerWall 3
+            (isPowerWall3 && (
+              inv.model_number === normalizedModel ||
+              inv.name === normalizedModel
+            )),
         );
 
         if (!matchedInverter?.id) {
-          console.warn("No matching inverter found for model:", inverterModel);
+          console.warn("No matching inverter found for model:", inverterModel, "normalized:", normalizedModel);
           setMaxContinuousOutputAmpsPerSystem((prev) => ({
             ...prev,
             [selectedSystem]: null,
@@ -2112,7 +2135,7 @@ const EquipmentForm = ({
           return;
         }
 
-        // Calculate: ISC Ãƒâ€” quantity Ãƒâ€” 1.25
+        // Calculate: ISC Ã— quantity Ã— 1.25
         const totalAmps = iscValue * batteryQty * 1.25;
         setBatteryMaxContinuousOutputAmpsPerSystem((prev) => ({
           ...prev,
@@ -2231,6 +2254,9 @@ const EquipmentForm = ({
         // solar_panel_type2_temp_coeff_voc removed - spec sheet derived, not in DB
         show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
         batteryonly: `${sysPrefix}_batteryonly`,
+
+        // System Type
+        system_type: `${sysPrefix}_system_type`,
 
         // Inverter/Microinverter
         inverter_existing: getSchemaField(sysNum, "micro_inverter_existing"),
@@ -2406,7 +2432,7 @@ const EquipmentForm = ({
 
         // Tesla PowerWall Configuration
         expansionPacks: `${sysPrefix}_tesla_extensions`,
-        // gateway removed - redundant, use teslagatewaytype
+        gateway: `${sysPrefix}_teslagatewaytype`, // Maps to same field as teslagatewaytype
         teslagatewaytype: `${sysPrefix}_teslagatewaytype`,
         backupSwitchLocation: `${sysPrefix}_backupswitch_location`,
         batteryExisting: `battery${sysNum}_existing`,
@@ -2723,7 +2749,7 @@ const EquipmentForm = ({
 
         // Map system-specific inverter fields to component field names
         // IMPORTANT: systemFormData already contains unprefixed component field names
-        // because hydrateFormData() does the databaseÃ¢â€ â€™component mapping
+        // because hydrateFormData() does the databaseâ†’component mapping
         // State stores fields using DATABASE field names (e.g., sys2_micro_inverter_make)
         // Component expects unprefixed names: 'inverter_make', 'inverter_model', etc.
 
@@ -3027,6 +3053,26 @@ const EquipmentForm = ({
             component: "backup_panel_tie_in_breaker",
             state: `bls${systemNumber}_backuploader_upstream_breaker_rating`,
           },
+          // String Combiner Panel existing toggle
+          {
+            component: "combiner_panel_existing",
+            state: `${sysPrefix}_combiner_existing`,
+          },
+          // Optimizer Type 2 existing toggle
+          {
+            component: "optimizer_type2_existing",
+            state: `${sysPrefix}_optimizer_type2_existing`,
+          },
+          // Battery Combiner Panel existing toggle
+          {
+            component: "battery_combiner_panel_existing",
+            state: `bcp${systemNumber}_existing`,
+          },
+          // ESS Combiner existing toggle
+          {
+            component: "ess_existing",
+            state: `${sysPrefix}_ess_existing`,
+          },
           // ESS fields
           { component: "backup_option", state: `${sysPrefix}_backup_option` },
         ];
@@ -3052,7 +3098,7 @@ const EquipmentForm = ({
               }
             }
             // Priority 2: Check if systemFormData already has the unprefixed component field
-            // (hydrateFormData already mapped databaseÃ¢â€ â€™component names)
+            // (hydrateFormData already mapped databaseâ†’component names)
             else if (systemFormData[component] !== undefined) {
               optimisticUpdates[component] = systemFormData[component];
             }
@@ -3110,7 +3156,7 @@ const EquipmentForm = ({
   const handleDeleteSystem = async (systemNumber) => {
     // CRITICAL: Prevent System 1 deletion - multiple safeguards
     if (systemNumber === 1) {
-      console.error("Ã¢ÂÅ’ BLOCKED: Cannot delete System 1");
+      console.error("âŒ BLOCKED: Cannot delete System 1");
       toast.error(
         "System 1 cannot be deleted. You can clear individual sections, but System 1 must always exist.",
         {
@@ -3123,7 +3169,7 @@ const EquipmentForm = ({
 
     if (systemNumber <= 1 || !systemNumber) {
       console.error(
-        "Ã¢ÂÅ’ BLOCKED: Invalid system number for deletion:",
+        "âŒ BLOCKED: Invalid system number for deletion:",
         systemNumber,
       );
       return;
@@ -3245,7 +3291,7 @@ const EquipmentForm = ({
       // Double-check: Never allow System 1 to be removed from visibleSystems
       if (systemNumber === 1) {
         console.error(
-          "Ã¢ÂÅ’ BLOCKED: Attempted to remove System 1 from visibleSystems",
+          "âŒ BLOCKED: Attempted to remove System 1 from visibleSystems",
         );
         return prev;
       }
@@ -3775,17 +3821,17 @@ const EquipmentForm = ({
   // Navigation handlers for footer
   const handlePrev = () => {
     if (selectedView === "bos") {
-      // BOS Ã¢â€ â€™ Combine (if exists) or Equipment
+      // BOS â†’ Combine (if exists) or Equipment
       if (showCombineStep) {
         setSelectedView("combine");
       } else {
         setSelectedView("equipment");
       }
     } else if (selectedView === "combine") {
-      // Combine Ã¢â€ â€™ Equipment
+      // Combine â†’ Equipment
       setSelectedView("equipment");
     } else if (selectedView === "equipment") {
-      // Equipment Ã¢â€ â€™ Previous System's Equipment (if not System 1)
+      // Equipment â†’ Previous System's Equipment (if not System 1)
       if (selectedSystem > 1) {
         setSelectedSystem(selectedSystem - 1);
         // Stay on Equipment view of previous system
@@ -3844,10 +3890,10 @@ const EquipmentForm = ({
     } else {
       // User doesn't want additional system
       if (selectedView === "equipment") {
-        // From Equipment Ã¢â€ â€™ go to Combine
+        // From Equipment â†’ go to Combine
         setSelectedView("combine");
       } else if (selectedView === "bos") {
-        // From BOS Ã¢â€ â€™ go to Electrical tab
+        // From BOS â†’ go to Electrical tab
         if (onNavigateToTab) {
           onNavigateToTab("electrical");
         }
@@ -4085,7 +4131,7 @@ const EquipmentForm = ({
             // === TOGGLE PIGGYBACK (batch path) ===
             // Scan fieldUpdates for group membership. For each group present,
             // inject the toggle's current formData value if not already in the batch.
-            // Zero cost — piggybacks on the existing single API call.
+            // Zero cost � piggybacks on the existing single API call.
             const _batchFields = new Set(fieldUpdates.map(([f]) => f));
             TOGGLE_GROUP_PREFIXES.forEach(([prefix, toggleField]) => {
               if (!toggleField) return; // Skip excluded groups
@@ -4255,9 +4301,10 @@ const EquipmentForm = ({
                 systemNumber={systemNumber}
               />
 
-              {/* 2nd Solar Panel Section */}
+              {/* 2nd Solar Panel Section - Show here for non-optimizer systems */}
               {mergedFormData.show_solar_panel_2 &&
-                !mergedFormData.batteryonly && (
+                !mergedFormData.batteryonly &&
+                mergedFormData.system_type !== 'optimizer' && (
                   <SolarPanel2Section
                     formData={mergedFormData}
                     onChange={handleSystemFieldChange}
@@ -4265,17 +4312,22 @@ const EquipmentForm = ({
                   />
                 )}
 
-              {/* Inverter/Microinverter Section */}
-              <InverterMicroSection
-                formData={mergedFormData}
-                onChange={handleSystemFieldChange}
-                onBatchChange={handleSystemBatchChange}
-                systemNumber={systemNumber}
-                maxContinuousOutputAmps={
-                  maxContinuousOutputAmpsPerSystem[systemNumber]
-                }
-                loadingMaxOutput={loadingMaxOutput}
-              />
+              {/* Inverter/Microinverter Section - Show based on system_type selection */}
+              {(mergedFormData.system_type === 'microinverter' ||
+                mergedFormData.system_type === 'inverter' ||
+                mergedFormData.system_type === 'optimizer') && (
+                <InverterMicroSection
+                  formData={mergedFormData}
+                  onChange={handleSystemFieldChange}
+                  onBatchChange={handleSystemBatchChange}
+                  systemNumber={systemNumber}
+                  maxContinuousOutputAmps={
+                    maxContinuousOutputAmpsPerSystem[systemNumber]
+                  }
+                  loadingMaxOutput={loadingMaxOutput}
+                  showSolarPanel2={mergedFormData.show_solar_panel_2 && !mergedFormData.batteryonly}
+                />
+              )}
 
               {/* Gateway Configuration - MOVED INTO InverterMicroSection */}
               {/* Stringing Section - MOVED INTO InverterMicroSection */}
@@ -4329,7 +4381,7 @@ const EquipmentForm = ({
                 )}
 
               {/* String Combiner Panel - Only shown for Microinverters */}
-              {mergedFormData.inverter_type === "microinverter" && (
+              {mergedFormData.system_type === "microinverter" && (
                 <StringCombinerPanelSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
@@ -4435,19 +4487,6 @@ const EquipmentForm = ({
                   );
                 })()}
 
-              {/* Gateway SMS Info (PowerWall Only) */}
-              {systemIsGatewaySMS && (
-                <div
-                  className={`${formStyles.infoBox} ${equipStyles.infoBoxMarginTight}`}
-                >
-                  <span className={formStyles.infoBoxIcon}>Ã¢â€žÂ¹Ã¯Â¸Â</span>
-                  <span className={formStyles.infoBoxContent}>
-                    {mergedFormData.sms_model} is automatically configured as
-                    the Storage Management System for this PowerWall
-                    installation.
-                  </span>
-                </div>
-              )}
 
               {/* Battery Type/Input 1 - Show when visibility flag is true (NOT PowerWall) */}
               {mergedFormData.show_battery1 && !systemIsPowerWall && (
@@ -4527,7 +4566,21 @@ const EquipmentForm = ({
           />
         )}
 
-        {/* BOS Detection Button - Show for 1 system (below Add System button) */}
+        {/* Post Combine BOS for Single System */}
+        {visibleSystems.length === 1 && (
+          <SystemContainer systemNumber="Post Combine BOS">
+            <PostCombineBOSSection
+              projectUuid={projectUuid}
+              systemDetails={systemDetails}
+              activeSystems={visibleSystems}
+              utility={
+                systemDetails?.utility || systemDetails?.sys1_utility || ""
+              }
+            />
+          </SystemContainer>
+        )}
+
+        {/* BOS Detection Button - Show for 1 system (below Post Combine BOS) */}
         {visibleSystems.length === 1 && (
           <div className={equipStyles.sectionMarginTop}>
             <div
@@ -4614,10 +4667,26 @@ const EquipmentForm = ({
           </SystemContainer>
         )}
 
-        {/* Post Combine BOS Container - Show when systems are combined */}
-        {visibleSystems.length >= 2 &&
-          formData.combine_systems === true &&
-          (() => {
+        {/* Post Combine BOS Container - Show for multi-system scenarios */}
+        {visibleSystems.length >= 2 && (() => {
+          // Case 1: Systems are NOT combined - always show PostCombineBOS
+          if (formData.combine_systems === false) {
+            return (
+              <SystemContainer systemNumber="Post Combine BOS">
+                <PostCombineBOSSection
+                  projectUuid={projectUuid}
+                  systemDetails={systemDetails}
+                  activeSystems={visibleSystems}
+                  utility={
+                    systemDetails?.utility || systemDetails?.sys1_utility || ""
+                  }
+                />
+              </SystemContainer>
+            );
+          }
+
+          // Case 2: Systems ARE combined - only show if configuration is complete
+          if (formData.combine_systems === true) {
             // Check if configuration is complete (all active systems have landing positions)
             const configData = (() => {
               try {
@@ -4631,7 +4700,6 @@ const EquipmentForm = ({
             })();
 
             // Check if all active systems have landing positions
-            // The structure is: configData.system_landings.system1, configData.system_landings.system2, etc.
             const configComplete = configData.active_systems?.every(
               (sysNum) => {
                 const landing = configData.system_landings?.[`system${sysNum}`];
@@ -4651,7 +4719,11 @@ const EquipmentForm = ({
                 />
               </SystemContainer>
             ) : null;
-          })()}
+          }
+
+          // Case 3: combine_systems is undefined/null - don't show yet
+          return null;
+        })()}
 
         {/* BOS Detection Button - Show for 2+ systems (below Combine UI) */}
         {visibleSystems.length >= 2 && (

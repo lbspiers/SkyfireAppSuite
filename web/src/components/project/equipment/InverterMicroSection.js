@@ -43,6 +43,7 @@ import {
 } from '../../../utils/stringingCalculations';
 import PowerWallConfigurationSection from './PowerWallConfigurationSection';
 import GatewayConfigurationSection from './GatewayConfigurationSection';
+import SolarPanel2Section from './SolarPanel2Section';
 
 /**
  * Inverter/Microinverter Section
@@ -58,6 +59,7 @@ const InverterMicroSection = ({
   systemNumber = 1,
   maxContinuousOutputAmps = null,
   loadingMaxOutput = false,
+  showSolarPanel2 = false,
 }) => {
   const [manufacturers, setManufacturers] = useState([]);
   const [models, setModels] = useState([]);
@@ -146,9 +148,9 @@ const InverterMicroSection = ({
     }
   }, [formData.inverter_make, formData.inverter_model, formData.inverter_existing, onChange]);
 
-  // Load models when manufacturer changes
+  // Load models when manufacturer or system_type changes
   useEffect(() => {
-    logger.debug('Equipment', `🔄 Manufacturer changed: ${formData.inverter_make}`);
+    logger.debug('Equipment', `🔄 Manufacturer or system_type changed: ${formData.inverter_make}, ${formData.system_type}`);
     if (formData.inverter_make) {
       logger.debug('Equipment', `📞 Calling loadModels for: ${formData.inverter_make}`);
       loadModels(formData.inverter_make);
@@ -160,20 +162,21 @@ const InverterMicroSection = ({
       hasAutoPopulatedRef.current = false;
       lastProcessedModelRef.current = null;
     }
-  }, [formData.inverter_make]);
+  }, [formData.inverter_make, formData.system_type]);
 
   // Check if optimizers should be shown
   useEffect(() => {
     const supportsOptimizers = manufacturerSupportsOptimizers(formData.inverter_make);
     const hasOptimizerData = formData.optimizer_make || formData.optimizer_model;
+    const isOptimizerSystemType = formData.system_type === 'optimizer';
 
     logger.debug('Equipment', `🔍 Optimizer visibility check - inverter_make: ${formData.inverter_make}`);
-    logger.debug('Equipment', `🔍 supportsOptimizers: ${supportsOptimizers}, hasOptimizerData: ${hasOptimizerData}`);
+    logger.debug('Equipment', `🔍 supportsOptimizers: ${supportsOptimizers}, hasOptimizerData: ${hasOptimizerData}, system_type: ${formData.system_type}`);
 
-    if (supportsOptimizers || hasOptimizerData) {
+    if (supportsOptimizers || hasOptimizerData || isOptimizerSystemType) {
       logger.debug('Equipment', `✅ Showing optimizer section`);
       setShowOptimizers(true);
-      if (supportsOptimizers && !loadingOptimizerMakes && optimizerManufacturers.length === 0) {
+      if ((supportsOptimizers || isOptimizerSystemType) && !loadingOptimizerMakes && optimizerManufacturers.length === 0) {
         logger.debug('Equipment', `📞 Loading optimizer manufacturers...`);
         loadOptimizerManufacturers();
       } else {
@@ -183,7 +186,7 @@ const InverterMicroSection = ({
       logger.debug('Equipment', `❌ Hiding optimizer section`);
       setShowOptimizers(false);
     }
-  }, [formData.inverter_make, formData.optimizer_make, formData.optimizer_model]);
+  }, [formData.inverter_make, formData.optimizer_make, formData.optimizer_model, formData.system_type]);
 
   // Set default New/Existing toggle for optimizer to New on mount if configured but toggle not set
   useEffect(() => {
@@ -328,8 +331,29 @@ const InverterMicroSection = ({
     try {
       logger.debug('Equipment', `📡 About to call getInverterModels for: ${manufacturer}`);
       const response = await getInverterModels(manufacturer);
-      const modelsData = response.data || [];
+      let modelsData = response.data || [];
       logger.debug('Equipment', `✅ Received ${modelsData.length} models from API`);
+
+      // Filter models based on system_type
+      const systemType = formData.system_type;
+      if (systemType === 'microinverter') {
+        // Only show microinverters
+        modelsData = modelsData.filter(m =>
+          m.microinverter === true ||
+          m.equipment_type?.toLowerCase().includes('micro') ||
+          m.equipment_type?.toLowerCase() === 'microinverter'
+        );
+        logger.debug('Equipment', `🔍 Filtered to ${modelsData.length} microinverter models`);
+      } else if (systemType === 'inverter' || systemType === 'optimizer') {
+        // Only show string inverters (not microinverters)
+        modelsData = modelsData.filter(m =>
+          m.microinverter !== true &&
+          !m.equipment_type?.toLowerCase().includes('micro') &&
+          m.equipment_type?.toLowerCase() !== 'microinverter'
+        );
+        logger.debug('Equipment', `🔍 Filtered to ${modelsData.length} string inverter models`);
+      }
+
       setModels(modelsData);
 
       // If current model is selected, find its data
@@ -836,8 +860,16 @@ const InverterMicroSection = ({
     onChange('optimizer_type2_model', '', systemNumber);
   };
 
-  // Dynamic title based on inverter type
+  // Dynamic title based on system_type (preferred) or inverter type (fallback)
   const getSectionTitle = () => {
+    // Use system_type if set
+    if (formData.system_type === 'microinverter') {
+      return 'Microinverter';
+    } else if (formData.system_type === 'inverter' || formData.system_type === 'optimizer') {
+      return 'Inverter';
+    }
+
+    // Fallback to existing logic if system_type not set
     if (!hasInverter) return 'Micro/Inverter';
     return isMicroinverter ? 'Microinverter' : 'Inverter';
   };
@@ -897,8 +929,163 @@ const InverterMicroSection = ({
     return result;
   }, [models]);
 
+  // Determine section rendering order based on system_type
+  const isOptimizerFirst = formData.system_type === 'optimizer';
+
   return (
     <div className={componentStyles.sectionWrapper}>
+      {/* Render Optimizer first when system_type is 'optimizer' */}
+      {isOptimizerFirst && showOptimizers && (
+        <div className={componentStyles.optimizerSection}>
+          <EquipmentRow
+            title={formData.show_solar_panel_2 ? "Optimizer (Type 1)" : "Optimizer"}
+            subtitle={
+              formData.optimizer_make && formData.optimizer_model
+                ? (() => {
+                    const parts = [];
+                    // Quantity with N/E indicator - For optimizers, typically 1:1 with solar panels
+                    const solarPanelQty = parseInt(formData.solar_panel_quantity) || 0;
+                    const quantity = formData.show_solar_panel_2 ? solarPanelQty : (solarPanelQty + (parseInt(formData.solar_panel_type2_quantity) || 0));
+                    if (quantity > 0) {
+                      const statusLetter = formData.optimizer_existing !== true ? 'N' : 'E';
+                      parts.push(`${quantity} (${statusLetter})`);
+                    }
+                    // Make and Model
+                    parts.push(`${formData.optimizer_make} ${formData.optimizer_model}`);
+                    return parts.join(' ');
+                  })()
+                : ''
+            }
+            showNewExistingToggle={true}
+            isExisting={formData.optimizer_existing}
+            onExistingChange={(val) => onChange('optimizer_existing', val, systemNumber)}
+            onDelete={(e) => {
+              // Stop propagation
+              if (e && e.stopPropagation) e.stopPropagation();
+              // Clear optimizer fields inline (optimizer is a sub-section, doesn't need full modal flow)
+              onChange('optimizer_make', '', systemNumber);
+              onChange('optimizer_model', '', systemNumber);
+              onChange('optimizer_existing', false, systemNumber);
+            }}
+            headerRightContent={
+              <PreferredButton onClick={() => setShowOptimizerPreferredModal(true)} />
+            }
+          >
+            {/* Make dropdown */}
+            <TableDropdown
+              label="Make"
+              value={formData.optimizer_make || ''}
+              onChange={(value) => {
+                handleOptimizerFieldChange('optimizer_make', value);
+                onChange('optimizer_model', '', systemNumber); // Clear model when manufacturer changes
+              }}
+              options={optimizerManufacturers.map(m => ({ value: m, label: m }))}
+              placeholder={loadingOptimizerMakes ? 'Loading...' : 'Select make'}
+              disabled={loadingOptimizerMakes}
+            />
+
+            {/* Model dropdown */}
+            <TableDropdown
+              label="Model"
+              value={formData.optimizer_model || ''}
+              onChange={(value) => handleOptimizerFieldChange('optimizer_model', value)}
+              options={optimizerModels
+                .filter(m => m.model || m.model_number) // Optimizers use 'model', inverters use 'model_number'
+                .map(m => ({
+                  value: m.model || m.model_number,
+                  label: m.model || m.model_number
+                }))
+              }
+              placeholder={
+                loadingOptimizerModels ? 'Loading...' :
+                formData.optimizer_make ? 'Select model' :
+                'Select make first'
+              }
+              disabled={!formData.optimizer_make || loadingOptimizerModels}
+            />
+          </EquipmentRow>
+
+          {/* Solar Panel Type 2 - Render here for optimizer systems */}
+          {showSolarPanel2 && formData.system_type === 'optimizer' && (
+            <div style={{ marginTop: 'var(--spacing-xs)' }}>
+              <SolarPanel2Section
+                formData={formData}
+                onChange={onChange}
+                systemNumber={systemNumber}
+              />
+            </div>
+          )}
+
+          {/* Type 2 Optimizer - Only when second panel type is active */}
+          {formData.show_solar_panel_2 && (
+            <div className={componentStyles.optimizerType2}>
+              <EquipmentRow
+                title="Optimizer (Type 2)"
+                subtitle={
+                  formData.optimizer_type2_make && formData.optimizer_type2_model
+                    ? (() => {
+                        const parts = [];
+                        const solarPanelQty2 = parseInt(formData.solar_panel_type2_quantity) || 0;
+                        if (solarPanelQty2 > 0) {
+                          const statusLetter = formData.optimizer_type2_existing !== true ? 'N' : 'E';
+                          parts.push(`${solarPanelQty2} (${statusLetter})`);
+                        }
+                        parts.push(`${formData.optimizer_type2_make} ${formData.optimizer_type2_model}`);
+                        return parts.join(' ');
+                      })()
+                    : ''
+                }
+                showNewExistingToggle={true}
+                isExisting={formData.optimizer_type2_existing}
+                onExistingChange={(val) => onChange('optimizer_type2_existing', val, systemNumber)}
+                onDelete={(e) => {
+                  if (e && e.stopPropagation) e.stopPropagation();
+                  onChange('optimizer_type2_make', '', systemNumber);
+                  onChange('optimizer_type2_model', '', systemNumber);
+                  onChange('optimizer_type2_existing', false, systemNumber);
+                }}
+                headerRightContent={
+                  <PreferredButton onClick={() => setShowOptimizerType2PreferredModal(true)} />
+                }
+              >
+                <TableDropdown
+                  label="Make"
+                  value={formData.optimizer_type2_make || ''}
+                  onChange={(value) => {
+                    handleOptimizerType2FieldChange('optimizer_type2_make', value);
+                    onChange('optimizer_type2_model', '', systemNumber);
+                  }}
+                  options={optimizerType2Manufacturers.map(m => ({ value: m, label: m }))}
+                  placeholder={loadingOptimizerType2Makes ? 'Loading...' : 'Select make'}
+                  disabled={loadingOptimizerType2Makes}
+                />
+
+                <TableDropdown
+                  label="Model"
+                  value={formData.optimizer_type2_model || ''}
+                  onChange={(value) => handleOptimizerType2FieldChange('optimizer_type2_model', value)}
+                  options={optimizerType2Models
+                    .filter(m => m.model || m.model_number)
+                    .map(m => ({
+                      value: m.model || m.model_number,
+                      label: m.model || m.model_number
+                    }))
+                  }
+                  placeholder={
+                    loadingOptimizerType2Models ? 'Loading...' :
+                    formData.optimizer_type2_make ? 'Select model' :
+                    'Select make first'
+                  }
+                  disabled={!formData.optimizer_type2_make || loadingOptimizerType2Models}
+                />
+              </EquipmentRow>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Main Inverter/Microinverter Section */}
+      <div style={isOptimizerFirst ? { marginTop: 'var(--spacing-xs)' } : {}}>
       <EquipmentRow
         title={getSectionTitle()}
         subtitle={getSubtitle()}
@@ -1140,9 +1327,10 @@ const InverterMicroSection = ({
           </div>
         )}
       </EquipmentRow>
+      </div>
 
-      {/* Optimizer Section - Only show for SolarEdge, SOL-ARK, TIGO */}
-      {showOptimizers && (
+      {/* Optimizer Section - Only show for SolarEdge, SOL-ARK, TIGO (when not already rendered first) */}
+      {!isOptimizerFirst && showOptimizers && (
         <div className={componentStyles.optimizerSection}>
           <EquipmentRow
             title={formData.show_solar_panel_2 ? "Optimizer (Type 1)" : "Optimizer"}
@@ -1211,6 +1399,17 @@ const InverterMicroSection = ({
               disabled={!formData.optimizer_make || loadingOptimizerModels}
             />
           </EquipmentRow>
+
+          {/* Solar Panel Type 2 - Render here for optimizer systems */}
+          {showSolarPanel2 && formData.system_type === 'optimizer' && (
+            <div style={{ marginTop: 'var(--spacing-xs)' }}>
+              <SolarPanel2Section
+                formData={formData}
+                onChange={onChange}
+                systemNumber={systemNumber}
+              />
+            </div>
+          )}
 
           {/* Type 2 Optimizer - Only when second panel type is active */}
           {formData.show_solar_panel_2 && (

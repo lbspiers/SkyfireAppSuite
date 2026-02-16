@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import logger from '../../services/devLogger';
 import surveyService from '../../services/surveyService';
 import uploadManager from '../../services/uploadManager';
-import { Button, ConfirmDialog, UploadProgressInline } from '../ui';
+import { Button, ConfirmDialog, UploadProgressInline, TableRowButton } from '../ui';
 import { downloadFileObject, downloadMultipleFiles } from '../../utils/fileDownload';
 import { processFileForUpload, isHeicFile, isImageFile } from '../../utils/imageProcessor';
 import { getThumbUrl } from '../../utils/photoUtils';
@@ -41,6 +41,52 @@ const FilesPanel = ({ projectUuid }) => {
   const [dragActive, setDragActive] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const fileInputRef = useRef(null);
+  const tabsRowRef = useRef(null);
+  const [showLeftChevron, setShowLeftChevron] = useState(false);
+  const [showRightChevron, setShowRightChevron] = useState(false);
+
+  // Check scroll position for chevrons
+  const checkScrollPosition = useCallback(() => {
+    if (!tabsRowRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = tabsRowRef.current;
+    setShowLeftChevron(scrollLeft > 0);
+    setShowRightChevron(scrollLeft < scrollWidth - clientWidth - 1);
+  }, []);
+
+  // Scroll handlers
+  const scrollLeft = () => {
+    if (tabsRowRef.current) {
+      tabsRowRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (tabsRowRef.current) {
+      tabsRowRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
+  // Check scroll position on mount and when tabs change
+  useEffect(() => {
+    // Use a small timeout to ensure DOM is rendered
+    const timer = setTimeout(() => {
+      checkScrollPosition();
+    }, 100);
+
+    const container = tabsRowRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollPosition);
+      window.addEventListener('resize', checkScrollPosition);
+    }
+
+    return () => {
+      clearTimeout(timer);
+      if (container) {
+        container.removeEventListener('scroll', checkScrollPosition);
+        window.removeEventListener('resize', checkScrollPosition);
+      }
+    };
+  }, [checkScrollPosition, files]);
 
   // Fetch all files
   const fetchFiles = useCallback(async () => {
@@ -281,31 +327,47 @@ const FilesPanel = ({ projectUuid }) => {
   return (
     <div className={styles.filesPanel}>
       {/* Tabs */}
-      <div className={styles.tabsRow}>
-        <button
-          className={`${styles.tab} ${activeTab === 'all' ? styles.active : ''}`}
-          onClick={() => setActiveTab('all')}
-        >
-          All ({counts.all})
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'document' ? styles.active : ''}`}
-          onClick={() => setActiveTab('document')}
-        >
-          Documents ({counts.documents})
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'photo' ? styles.active : ''}`}
-          onClick={() => setActiveTab('photo')}
-        >
-          Photos ({counts.photos})
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'video' ? styles.active : ''}`}
-          onClick={() => setActiveTab('video')}
-        >
-          Videos ({counts.videos})
-        </button>
+      <div className={styles.tabsRowContainer}>
+        {showLeftChevron && (
+          <button className={styles.chevronButton} onClick={scrollLeft} aria-label="Scroll left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        )}
+        <div className={styles.tabsRow} ref={tabsRowRef}>
+          <TableRowButton
+            variant="outline"
+            active={activeTab === 'all'}
+            onClick={() => setActiveTab('all')}
+            label={`All (${counts.all})`}
+          />
+          <TableRowButton
+            variant="outline"
+            active={activeTab === 'document'}
+            onClick={() => setActiveTab('document')}
+            label={`Documents (${counts.documents})`}
+          />
+          <TableRowButton
+            variant="outline"
+            active={activeTab === 'photo'}
+            onClick={() => setActiveTab('photo')}
+            label={`Photos (${counts.photos})`}
+          />
+          <TableRowButton
+            variant="outline"
+            active={activeTab === 'video'}
+            onClick={() => setActiveTab('video')}
+            label={`Videos (${counts.videos})`}
+          />
+        </div>
+        {showRightChevron && (
+          <button className={styles.chevronButton} onClick={scrollRight} aria-label="Scroll right">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Toolbar */}

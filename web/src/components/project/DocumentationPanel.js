@@ -3,7 +3,7 @@
  * Consolidates Photos and Notes with shared section type filters and search
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import surveyService from '../../services/surveyService';
 import logger from '../../services/devLogger';
 import { PillButton, SectionHeader, ConfirmDialog, TableRowButton } from '../ui';
@@ -50,6 +50,9 @@ const DocumentationPanel = ({
   const [selectedPhotoIds, setSelectedPhotoIds] = useState(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const filterTabsRef = useRef(null);
+  const [showLeftChevron, setShowLeftChevron] = useState(false);
+  const [showRightChevron, setShowRightChevron] = useState(false);
 
   // Fetch photos and notes on mount
   useEffect(() => {
@@ -294,6 +297,49 @@ const DocumentationPanel = ({
     return allSections.filter(sectionId => sectionId.startsWith(activeFilter));
   }, [activeFilter, allSections]);
 
+  // Check scroll position for chevrons
+  const checkScrollPosition = useCallback(() => {
+    if (!filterTabsRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = filterTabsRef.current;
+    setShowLeftChevron(scrollLeft > 0);
+    setShowRightChevron(scrollLeft < scrollWidth - clientWidth - 1);
+  }, []);
+
+  // Scroll handlers
+  const scrollLeft = () => {
+    if (filterTabsRef.current) {
+      filterTabsRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (filterTabsRef.current) {
+      filterTabsRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
+  // Check scroll position on mount and when tabs change
+  useEffect(() => {
+    // Use a small timeout to ensure DOM is rendered
+    const timer = setTimeout(() => {
+      checkScrollPosition();
+    }, 100);
+
+    const container = filterTabsRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollPosition);
+      window.addEventListener('resize', checkScrollPosition);
+    }
+
+    return () => {
+      clearTimeout(timer);
+      if (container) {
+        container.removeEventListener('scroll', checkScrollPosition);
+        window.removeEventListener('resize', checkScrollPosition);
+      }
+    };
+  }, [checkScrollPosition, sectionTypes]);
+
   // Apply search filter
   const searchFilteredSections = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -383,22 +429,38 @@ const DocumentationPanel = ({
       </div>
 
       {/* Section Filter Tabs */}
-      <div className={styles.filterTabs}>
-        <PillButton
-          active={activeFilter === 'all'}
-          onClick={() => setActiveFilter('all')}
-        >
-          All
-        </PillButton>
-        {sectionTypes.map(sectionType => (
-          <PillButton
-            key={sectionType}
-            active={activeFilter === sectionType}
-            onClick={() => setActiveFilter(sectionType)}
-          >
-            {getSectionTypeLabel(sectionType)}
-          </PillButton>
-        ))}
+      <div className={styles.filterTabsContainer}>
+        {showLeftChevron && (
+          <button className={styles.chevronButton} onClick={scrollLeft} aria-label="Scroll left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        )}
+        <div className={styles.filterTabs} ref={filterTabsRef}>
+          <TableRowButton
+            variant="outline"
+            active={activeFilter === 'all'}
+            onClick={() => setActiveFilter('all')}
+            label="All"
+          />
+          {sectionTypes.map(sectionType => (
+            <TableRowButton
+              key={sectionType}
+              variant="outline"
+              active={activeFilter === sectionType}
+              onClick={() => setActiveFilter(sectionType)}
+              label={getSectionTypeLabel(sectionType)}
+            />
+          ))}
+        </div>
+        {showRightChevron && (
+          <button className={styles.chevronButton} onClick={scrollRight} aria-label="Scroll right">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Bulk Actions Toolbar */}
