@@ -60,7 +60,6 @@ const InverterMicroSection = ({
   systemNumber = 1,
   maxContinuousOutputAmps = null,
   loadingMaxOutput = false,
-  showSolarPanel2 = false,
   siteZipCode = '',
 }) => {
   const [manufacturers, setManufacturers] = useState([]);
@@ -430,43 +429,13 @@ const InverterMicroSection = ({
 
           setSelectedModelData(modelData);
 
-          // Detect if this is a microinverter or string inverter
-          const isMicroinverter = modelData.microinverter === true ||
-                                 modelData.equipment_type?.toLowerCase().includes('micro') ||
-                                 modelData.equipment_type?.toLowerCase() === 'microinverter';
-
-          // Debug logging to help diagnose detection issues
-          logger.debug('Inverter', 'Model detection:', {
-            model: formData.inverter_model,
-            microinverter_field: modelData.microinverter,
-            equipment_type: modelData.equipment_type,
-            detected_as: isMicroinverter ? 'microinverter' : 'inverter'
-          });
+          const updates = buildInverterFieldUpdates(modelData);
+          updates.push(['inverter_existing', formData.inverter_existing ?? false]);
 
           if (onBatchChange) {
-            // Batch all auto-population updates
-            const updates = [
-              ['inverter_type', isMicroinverter ? 'microinverter' : 'inverter'],
-              ['inverter_max_cont_output_amps', modelData.max_cont_output_amps],
-              // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
-              ['inverter_existing', formData.inverter_existing ?? false],
-            ];
-
-            // Store model ID for future reference
-            if (modelData.id) {
-              updates.push(['inverter_model_id', modelData.id]);
-            }
-
             onBatchChange(updates, systemNumber);
           } else {
-            // Fallback to sequential calls
-            onChange('inverter_type', isMicroinverter ? 'microinverter' : 'inverter', systemNumber);
-            onChange('inverter_max_cont_output_amps', modelData.max_cont_output_amps, systemNumber);
-
-            // Store model ID for future reference
-            if (modelData.id) {
-              onChange('inverter_model_id', modelData.id, systemNumber);
-            }
+            updates.forEach(([field, val]) => onChange(field, val, systemNumber));
           }
         }
       }
@@ -655,6 +624,30 @@ const InverterMicroSection = ({
 
   // Legacy handleDelete removed - now using useSectionDelete hook
 
+  // Shared helper: builds the complete field update array from model data.
+  // All three selection paths (auto-populate, PW3, regular) use this to stay in sync.
+  const buildInverterFieldUpdates = (modelData) => {
+    const isMicro = modelData.microinverter === true ||
+      modelData.equipment_type?.toLowerCase().includes('micro') ||
+      modelData.equipment_type?.toLowerCase() === 'microinverter';
+
+    const updates = [
+      ['inverter_type', isMicro ? 'microinverter' : 'inverter'],
+      ['inverter_max_cont_output_amps', modelData.max_cont_output_amps || ''],
+      ['inverter_max_strings_branches', !isMicro && modelData.max_strings_branches ? modelData.max_strings_branches : null],
+      ['inverter_max_vdc', modelData.max_dc_voltage || modelData.max_vdc || modelData.voltage_maximum || ''],
+      ['inverter_mppt_voltage_max', modelData.voltage_maximum || modelData.mppt_voltage_max || ''],
+      ['inverter_min_vdc', modelData.voltage_minimum || modelData.min_vdc || ''],
+      ['inverter_max_input_isc', modelData.max_input_isc || modelData.max_isc_per_input || ''],
+    ];
+
+    if (modelData.id) {
+      updates.push(['inverter_model_id', modelData.id]);
+    }
+
+    return updates;
+  };
+
   const handleModelChange = (value) => {
     // Special handling for PowerWall 3
     if (value === 'Powerwall 3' || isPowerWall3(value)) {
@@ -677,26 +670,12 @@ const InverterMicroSection = ({
 
       if (modelData) {
         setSelectedModelData(modelData);
+        const updates = buildInverterFieldUpdates(modelData);
+        updates.push(['inverter_existing', formData.inverter_existing ?? false]);
         if (onBatchChange) {
-          const maxStringsBranchesValue = modelData.max_strings_branches || 6;
-          console.log('✅ [PowerWall 3] Setting max_strings_branches via batch:', maxStringsBranchesValue);
-
-          const updates = [
-            ['inverter_type', 'inverter'],
-            ['inverter_max_cont_output_amps', modelData.max_cont_output_amps],
-            // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
-            ['inverter_existing', formData.inverter_existing ?? false],
-          ];
-          if (modelData.id) {
-            updates.push(['inverter_model_id', modelData.id]);
-          }
           onBatchChange(updates, systemNumber);
         } else {
-          onChange('inverter_type', 'inverter', systemNumber);
-          onChange('inverter_max_cont_output_amps', modelData.max_cont_output_amps, systemNumber);
-          if (modelData.id) {
-            onChange('inverter_model_id', modelData.id, systemNumber);
-          }
+          updates.forEach(([field, val]) => onChange(field, val, systemNumber));
         }
       }
       return;
@@ -717,36 +696,13 @@ const InverterMicroSection = ({
 
       setSelectedModelData(modelData);
 
-      // Detect if this is a microinverter or string inverter
-      const isMicroinverter = modelData.microinverter === true ||
-                             modelData.equipment_type?.toLowerCase().includes('micro');
-
-      console.log('🔍 [InverterMicroSection] Detection result:', {
-        isMicroinverter,
-        willSaveMaxStrings: !isMicroinverter && modelData.max_strings_branches,
-        max_strings_branches_value: modelData.max_strings_branches
-      });
+      const updates = buildInverterFieldUpdates(modelData);
+      updates.push(['inverter_existing', formData.inverter_existing ?? false]);
 
       if (onBatchChange) {
-        const updates = [
-          ['inverter_type', isMicroinverter ? 'microinverter' : 'inverter'],
-          ['inverter_max_cont_output_amps', modelData.max_cont_output_amps],
-          // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
-          ['inverter_existing', formData.inverter_existing ?? false],
-        ];
-
-        if (modelData.id) {
-          updates.push(['inverter_model_id', modelData.id]);
-        }
         onBatchChange(updates, systemNumber);
       } else {
-        onChange('inverter_type', isMicroinverter ? 'microinverter' : 'inverter', systemNumber);
-        onChange('inverter_max_cont_output_amps', modelData.max_cont_output_amps, systemNumber);
-
-        // Store full model data ID for future reference
-        if (modelData.id) {
-          onChange('inverter_model_id', modelData.id, systemNumber);
-        }
+        updates.forEach(([field, val]) => onChange(field, val, systemNumber));
       }
     }
   };
@@ -783,7 +739,11 @@ const InverterMicroSection = ({
   // Same issue as maxBranches - values get lost on DB round-trip
   const inverterSpecs = useMemo(() => {
     // Try selectedModelData first (set on model selection)
-    const modelData = selectedModelData || models.find(m => m.model_number === formData.inverter_model);
+    let modelData = selectedModelData || models.find(m => m.model_number === formData.inverter_model);
+    // PW3 fuzzy match: formData stores "Powerwall 3 (11.5kW)" but models array has "Powerwall 3"
+    if (!modelData && isPowerWall3(formData.inverter_model)) {
+      modelData = models.find(m => isPowerWall3(m.model_number));
+    }
 
     if (!modelData) {
       return {
@@ -800,14 +760,14 @@ const InverterMicroSection = ({
     }
 
     return {
-      // Legacy voltage specs (startup min, hard max)
-      maxVdc: parseFloat(modelData.voltage_maximum || modelData.max_vdc || 0),
+      // Hard ceiling: absolute max DC voltage (e.g. 600V for PW3)
+      maxVdc: parseFloat(modelData.max_dc_voltage || modelData.max_vdc || modelData.voltage_maximum || 0),
       minVdc: parseFloat(modelData.voltage_minimum || modelData.min_vdc || 0),
       maxIsc: parseFloat(modelData.max_input_isc_1 || modelData.max_input_isc || modelData.max_isc_per_input || 0),
       maxContOutput: parseFloat(modelData.max_cont_output_amps || 0),
-      // New MPPT range specs (optimal operating range)
-      mpptVoltageMax: parseFloat(modelData.mppt_voltage_max || 0),
-      mpptVoltageMin: parseFloat(modelData.mppt_voltage_min || 0),
+      // MPPT optimal operating range (e.g. 480V for PW3 — use voltage_maximum which stores this)
+      mpptVoltageMax: parseFloat(modelData.voltage_maximum || modelData.mppt_voltage_max || 0),
+      mpptVoltageMin: parseFloat(modelData.mppt_voltage_min || modelData.voltage_minimum || 0),
       maxDcVoltage: parseFloat(modelData.max_dc_voltage || 0),
       numMppts: parseInt(modelData.num_mppts || 0, 10),
       stringSizingMethod: modelData.string_sizing_method || '',
@@ -863,27 +823,23 @@ const InverterMicroSection = ({
     return 10;
   }, [selectedModelData, models, formData.inverter_model]);
 
-  // Calculate max panels per string (for string inverters only)
-  // Uses MPPT optimal range when available, falls back to hard max
+  // NEC 690.7 corrected Voc (shared across all panel-count calculations)
+  const vocCorrected = panelVoc > 0 ? panelVoc * (correctionFactor || 1.18) : 0;
+
+  // Hard ceiling: absolute max DC panels per string (e.g. 600V / corrected Voc)
   const maxPanelsPerBranch = useMemo(() => {
-    if (panelVoc <= 0) {
-      return 20; // Default fallback if no panel voltage available
-    }
+    if (vocCorrected <= 0) return 20;
+    const hardMax = inverterMaxVdc > 0 ? inverterMaxVdc : 600;
+    return Math.floor(hardMax / vocCorrected);
+  }, [vocCorrected, inverterMaxVdc]);
 
-    // Apply NEC 690.7 temperature correction factor
-    const vocCorrected = panelVoc * (correctionFactor || 1.18);
-
-    // MPPT optimal max - strings SHOULD stay within this for efficiency
-    // Use mpptVoltageMax if available (e.g., 480V), otherwise fall back to voltage_maximum (e.g., 600V)
-    const optimalVoltageMax = inverterMpptVoltageMax > 0 ? inverterMpptVoltageMax : inverterMaxVdc;
-
-    if (optimalVoltageMax > 0) {
-      // Use MPPT-based limit for sizing (ensures strings stay in efficient operating range)
-      return Math.floor(optimalVoltageMax / vocCorrected);
-    }
-
-    return 20; // Default fallback
-  }, [panelVoc, inverterMaxVdc, inverterMpptVoltageMax, correctionFactor]);
+  // Optimal ceiling: MPPT range max panels per string (e.g. 480V / corrected Voc)
+  // Auto-distribute targets this for best efficiency; manual mode allows up to hard ceiling
+  const optimalPanelsPerBranch = useMemo(() => {
+    if (vocCorrected <= 0) return maxPanelsPerBranch;
+    if (inverterMpptVoltageMax > 0) return Math.floor(inverterMpptVoltageMax / vocCorrected);
+    return maxPanelsPerBranch;
+  }, [vocCorrected, inverterMpptVoltageMax, maxPanelsPerBranch]);
 
   // Calculate total panels assigned across all strings (for string inverters only)
   const totalPanelsAssigned = useMemo(() => {
@@ -898,26 +854,24 @@ const InverterMicroSection = ({
 
   const panelsRemaining = totalPanelQty - totalPanelsAssigned;
 
+  // NEC 690.7 corrected Voc for Type 2 panel
+  const panelVoc2 = parseFloat(formData.solar_panel_type2_voc) || 0;
+  const vocCorrected2 = panelVoc2 > 0 ? panelVoc2 * (correctionFactor || 1.18) : 0;
+
   // Three-tier voltage limits for string validation (NEC 690.7 compliant)
+  // Includes per-type hard limits for Type 1 and Type 2
   const voltageLimits = useMemo(() => {
-    const vocCorrected = panelVoc > 0 ? panelVoc * (correctionFactor || 1.18) : 0;
-    const mpptMax = inverterMpptVoltageMax > 0 ? inverterMpptVoltageMax : inverterMaxVdc;
-    // For now, use inverterMaxVdc as both input max and hard max
-    // (future: add separate input_voltage_max field to inverters table)
-    const inputMax = inverterMaxVdc > 0 ? inverterMaxVdc : 600;
     const hardMax = inverterMaxVdc > 0 ? inverterMaxVdc : 600;
 
     return {
       vocCorrected,
-      mpptMax,
-      inputMax,
       hardMax,
-      // Max panels per string at each tier
-      maxPanelsMppt: vocCorrected > 0 ? Math.floor(mpptMax / vocCorrected) : 20,
-      maxPanelsInput: vocCorrected > 0 ? Math.floor(inputMax / vocCorrected) : 20,
+      // Type 1 hard ceiling
       maxPanelsHard: vocCorrected > 0 ? Math.floor(hardMax / vocCorrected) : 20,
+      // Type 2 hard ceiling (uses Type 2 Voc if available, falls back to Type 1)
+      maxPanelsHard2: vocCorrected2 > 0 ? Math.floor(hardMax / vocCorrected2) : (vocCorrected > 0 ? Math.floor(hardMax / vocCorrected) : 20),
     };
-  }, [panelVoc, correctionFactor, inverterMpptVoltageMax, inverterMaxVdc]);
+  }, [vocCorrected, vocCorrected2, inverterMaxVdc]);
 
   // Stringing event handlers (for string inverters only)
   const handleStringingTypeChange = (type) => {
@@ -938,10 +892,14 @@ const InverterMicroSection = ({
     const parsed = parseInt(numericValue, 10);
 
     // HARD CLAMP: Never allow more panels than NEC 690.7 withstand limit
-    // This is a safety ceiling that cannot be overridden
-    if (!isNaN(parsed) && parsed > voltageLimits.maxPanelsHard) {
-      onChange(`branch_string_${index}`, String(voltageLimits.maxPanelsHard), systemNumber);
-      return;
+    // Use per-type ceiling: Type 2 strings use Type 2 Voc, otherwise Type 1
+    if (!isNaN(parsed)) {
+      const panelType = formData[`branch_string_${index}_panel_type`];
+      const hardCap = panelType === '2' ? voltageLimits.maxPanelsHard2 : voltageLimits.maxPanelsHard;
+      if (parsed > hardCap) {
+        onChange(`branch_string_${index}`, String(hardCap), systemNumber);
+        return;
+      }
     }
 
     onChange(`branch_string_${index}`, numericValue, systemNumber);
@@ -956,22 +914,28 @@ const InverterMicroSection = ({
   const handleAutoCalculate = () => {
     if (totalPanelQty <= 0) return;
 
-    console.log('🌡️ [NEC 690.7] Using temperature correction factor:', correctionFactor || 'fallback (1.18)');
+    console.log('🌡️ [AUTO-CALC DEBUG]', {
+      panelVoc,
+      correctionFactor: correctionFactor || 'fallback (1.18)',
+      vocCorrected,
+      inverterMaxVdc,
+      inverterMpptVoltageMax,
+      maxPanelsPerBranch,
+      optimalPanelsPerBranch,
+    });
 
-    // String inverters auto-distribution
+    // String inverters auto-distribution — targets MPPT range (optimalPanelsPerBranch) for efficiency
     const distribution = calculateInverterInputDistribution({
       totalPanels: totalPanelQty,
       maxInputs: maxBranches,
-      maxPanelsPerString: maxPanelsPerBranch,
+      maxPanelsPerString: optimalPanelsPerBranch,
       panelVoc,
       panelIsc,
-      inverterMaxVdc,
+      inverterMaxVdc: inverterMpptVoltageMax || inverterMaxVdc,
       inverterMinVdc,
       inverterMaxIsc,
-      // MPPT optimal voltage range (for efficiency validation)
       inverterMpptVoltageMax,
       inverterMpptVoltageMin,
-      // NEC 690.7 Temperature Correction Factor
       correctionFactor,
     });
 
@@ -995,42 +959,6 @@ const InverterMicroSection = ({
       console.warn('⚠️ [Auto-Calculate] Validation warnings:', distribution.warnings);
       distribution.warnings.forEach(warning => console.warn(`  - ${warning}`));
     }
-  };
-
-  // Helper function to get string voltage status for validation display
-  const getStringVoltageStatus = (panelsPerString) => {
-    if (!panelsPerString || panelsPerString <= 0 || voltageLimits.vocCorrected <= 0) {
-      return { status: 'none', voltage: 0, message: '' };
-    }
-
-    const voltage = panelsPerString * voltageLimits.vocCorrected;
-
-    if (voltage > voltageLimits.hardMax) {
-      return {
-        status: 'error',
-        voltage,
-        message: `${voltage.toFixed(0)}V exceeds NEC maximum (${voltageLimits.hardMax}V)`
-      };
-    }
-    if (voltage > voltageLimits.inputMax && voltageLimits.inputMax < voltageLimits.hardMax) {
-      return {
-        status: 'warning-severe',
-        voltage,
-        message: `${voltage.toFixed(0)}V exceeds input range (${voltageLimits.inputMax}V)`
-      };
-    }
-    if (voltage > voltageLimits.mpptMax) {
-      return {
-        status: 'warning',
-        voltage,
-        message: `${voltage.toFixed(0)}V above MPPT range — may lose efficiency`
-      };
-    }
-    return {
-      status: 'ok',
-      voltage,
-      message: `${voltage.toFixed(0)}V`
-    };
   };
 
   // Preferred equipment handlers
@@ -1111,6 +1039,55 @@ const InverterMicroSection = ({
     // Make and Model
     parts.push(`${formData.inverter_make} ${formData.inverter_model}`);
 
+    // Gateway type for Tesla PowerWall
+    if (isPowerWall && formData.gateway) {
+      parts.push(`- ${formData.gateway}`);
+    }
+
+    // Custom stringing summary — each string on its own indented row
+    if (!isMicroinverter && stringingType === 'custom') {
+      const type1Rows = [];
+      const type2Rows = [];
+      const ungroupedRows = [];
+
+      for (let i = 1; i <= maxBranches; i++) {
+        const panels = parseInt(formData[`branch_string_${i}`]) || 0;
+        if (panels > 0) {
+          const panelType = formData[`branch_string_${i}_panel_type`];
+          const row = <div key={i} style={{ paddingLeft: '8px' }}>String {i} - {panels} panels</div>;
+          if (panelType === '1') type1Rows.push(row);
+          else if (panelType === '2') type2Rows.push(row);
+          else ungroupedRows.push(row);
+        }
+      }
+
+      const hasGroups = type1Rows.length > 0 || type2Rows.length > 0;
+
+      if (hasGroups || ungroupedRows.length > 0) {
+        return (
+          <>
+            <div>{parts.join(' ')}</div>
+            {hasGroups ? (
+              <>
+                {type1Rows.length > 0 && (
+                  <>
+                    <div style={{ paddingTop: '2px' }}>Type 1</div>
+                    {type1Rows}
+                  </>
+                )}
+                {type2Rows.length > 0 && (
+                  <>
+                    <div style={{ paddingTop: '2px' }}>Type 2</div>
+                    {type2Rows}
+                  </>
+                )}
+              </>
+            ) : ungroupedRows}
+          </>
+        );
+      }
+    }
+
     return parts.join(' ');
   };
 
@@ -1150,7 +1127,8 @@ const InverterMicroSection = ({
       {isOptimizerFirst && showOptimizers && (
         <div className={componentStyles.optimizerSection}>
           <EquipmentRow
-            title={formData.show_solar_panel_2 ? "Optimizer (Type 1)" : "Optimizer"}
+            title="Optimizer"
+            titleSubline={formData.show_solar_panel_2 ? "(Type 1)" : undefined}
             subtitle={
               formData.optimizer_make && formData.optimizer_model
                 ? (() => {
@@ -1217,22 +1195,20 @@ const InverterMicroSection = ({
             />
           </EquipmentRow>
 
-          {/* Solar Panel Type 2 - Render here for optimizer systems */}
-          {showSolarPanel2 && formData.system_type === 'optimizer' && (
-            <div style={{ marginTop: 'var(--spacing-xs)' }}>
-              <SolarPanel2Section
-                formData={formData}
-                onChange={onChange}
-                systemNumber={systemNumber}
-              />
-            </div>
+          {formData.show_solar_panel_2 && (
+            <SolarPanel2Section
+              formData={formData}
+              onChange={onChange}
+              systemNumber={systemNumber}
+            />
           )}
 
           {/* Type 2 Optimizer - Only when second panel type is active */}
           {formData.show_solar_panel_2 && (
             <div className={componentStyles.optimizerType2}>
               <EquipmentRow
-                title="Optimizer (Type 2)"
+                title="Optimizer"
+                titleSubline="(Type 2)"
                 subtitle={
                   formData.optimizer_type2_make && formData.optimizer_type2_model
                     ? (() => {
@@ -1386,6 +1362,18 @@ const InverterMicroSection = ({
           />
         )}
 
+        {/* Add Inverter BOS Button - Tesla PowerWall specific placement (inside Inverter section) */}
+        {isPowerWall && !formData.show_inverter_bos && (
+          <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
+            <TableRowButton
+              label="+ Inverter BOS (Type 1)"
+              variant="outline"
+              onClick={() => onChange('show_inverter_bos', true, systemNumber)}
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
+
         {/* Breaker Size - Only for Hoymiles/Hoymiles Power/APSystems */}
         {(formData.inverter_make === 'Hoymiles' || formData.inverter_make === 'Hoymiles Power' || formData.inverter_make === 'APSystems') && (
           <TableDropdown
@@ -1448,33 +1436,111 @@ const InverterMicroSection = ({
             {/* Custom Stringing Interface */}
             {stringingType === 'custom' && (
               <div className={componentStyles.customStringingSection}>
-                {/* Auto-Distribute + Remaining Panels — stacked right */}
+                {/* Toolbar: remaining counts + min/max per type, Auto-Distribute on right */}
                 <div className={componentStyles.stringingToolbar}>
-                  <span className={`${componentStyles.panelsRemainingValue} ${
-                    panelsRemaining === 0 ? componentStyles.panelsRemainingComplete :
-                    panelsRemaining < 0 ? componentStyles.panelsRemainingError :
-                    componentStyles.panelsRemainingWarning
-                  }`}>
-                    {panelsRemaining} remaining
-                  </span>
+                  {/* Left: info blocks */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-tight)', flex: 1 }}>
+                    {hasSolarPanel2Data ? (
+                      (() => {
+                        const assigned1 = Array.from({ length: maxBranches }, (_, i) => {
+                          const pt = formData[`branch_string_${i + 1}_panel_type`];
+                          return pt === '1' ? (parseInt(formData[`branch_string_${i + 1}`]) || 0) : 0;
+                        }).reduce((a, b) => a + b, 0);
+                        const assigned2 = Array.from({ length: maxBranches }, (_, i) => {
+                          const pt = formData[`branch_string_${i + 1}_panel_type`];
+                          return pt === '2' ? (parseInt(formData[`branch_string_${i + 1}`]) || 0) : 0;
+                        }).reduce((a, b) => a + b, 0);
+                        const rem1 = solarPanelQty - assigned1;
+                        const rem2 = solarPanelQty2 - assigned2;
+                        const make1 = formData.solar_panel_make || '';
+                        const model1 = formData.solar_panel_model || '';
+                        const make2 = formData.solar_panel_type2_manufacturer || '';
+                        const model2 = formData.solar_panel_type2_model || '';
+
+                        const minPanels1 = inverterMinVdc > 0 && vocCorrected > 0 ? Math.ceil(inverterMinVdc / vocCorrected) : null;
+                        const hardMax1 = vocCorrected > 0 ? Math.floor((inverterMaxVdc || 600) / vocCorrected) : maxPanelsPerBranch;
+                        const range1 = minPanels1 !== null ? `${minPanels1}–${hardMax1}` : `Max ${hardMax1}`;
+
+                        const minPanels2 = inverterMinVdc > 0 && vocCorrected2 > 0 ? Math.ceil(inverterMinVdc / vocCorrected2) : null;
+                        const hardMax2 = vocCorrected2 > 0 ? Math.floor((inverterMaxVdc || 600) / vocCorrected2) : maxPanelsPerBranch;
+                        const range2 = minPanels2 !== null ? `${minPanels2}–${hardMax2}` : `Max ${hardMax2}`;
+
+                        return (
+                          <>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+                                Type 1: {rem1} remaining{range1 ? ` | ${range1} panels per string` : ''}
+                              </span>
+                              {(make1 || model1) && (
+                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                                  {[make1, model1].filter(Boolean).join(' ')}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+                                Type 2: {rem2} remaining{range2 ? ` | ${range2} panels per string` : ''}
+                              </span>
+                              {(make2 || model2) && (
+                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                                  {[make2, model2].filter(Boolean).join(' ')}
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+                          {panelsRemaining} remaining
+                          {panelVoc > 0 && (() => {
+                            const min = inverterMinVdc > 0 && vocCorrected > 0 ? Math.ceil(inverterMinVdc / vocCorrected) : null;
+                            const range = min !== null ? `${min}–${maxPanelsPerBranch}` : `Max ${maxPanelsPerBranch}`;
+                            return ` | ${range} panels per string`;
+                          })()}
+                        </span>
+                        {(formData.solar_panel_make || formData.solar_panel_model) && (
+                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                            {[formData.solar_panel_make, formData.solar_panel_model].filter(Boolean).join(' ')}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {/* Right: Auto-Distribute button */}
                   {totalPanelQty > 0 && (
-                    <TableRowButton
-                      variant="outline"
-                      onClick={handleAutoCalculate}
-                      label="Auto-Distribute"
-                    />
+                    hasSolarPanel2Data ? (
+                      <Tooltip
+                        content={
+                          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                            Auto-Distribute is disabled when multiple panel types are in use. Assign strings manually using the Type 1 / Type 2 buttons.
+                          </div>
+                        }
+                        position="bottom"
+                      >
+                        <TableRowButton
+                          variant="outline"
+                          label="Auto-Distribute"
+                          disabled={true}
+                          style={{ opacity: 0.4, cursor: 'not-allowed' }}
+                        />
+                      </Tooltip>
+                    ) : (
+                      <TableRowButton
+                        variant="outline"
+                        onClick={handleAutoCalculate}
+                        label="Auto-Distribute"
+                      />
+                    )
                   )}
                 </div>
 
-                {/* String Inverter Input Rows — FormFieldRow pattern: label right 25%, input left 75% */}
+                {/* String Inverter Input Rows */}
                 {Array.from({ length: maxBranches }, (_, i) => {
                   const index = i + 1;
                   const panelsPerStringValue = formData[`branch_string_${index}`] || '';
                   const panelType = formData[`branch_string_${index}_panel_type`] || '';
-
-                  // Get voltage validation status for this string
-                  const panelsNum = parseInt(panelsPerStringValue, 10) || 0;
-                  const voltageStatus = getStringVoltageStatus(panelsNum);
 
                   return (
                     <FormFieldRow
@@ -1491,17 +1557,6 @@ const InverterMicroSection = ({
                         placeholder="—"
                         className={componentStyles.stringQtyInput}
                       />
-                      {/* Voltage validation indicator */}
-                      {voltageStatus.status !== 'none' && panelsNum > 0 && (
-                        <span className={`${componentStyles.voltageIndicator} ${
-                          voltageStatus.status === 'ok' ? componentStyles.voltageOk :
-                          voltageStatus.status === 'warning' ? componentStyles.voltageWarning :
-                          voltageStatus.status === 'warning-severe' ? componentStyles.voltageWarningSevere :
-                          componentStyles.voltageError
-                        }`}>
-                          {voltageStatus.message}
-                        </span>
-                      )}
                       {/* Panel Type Toggle - Only show when Type 2 is active */}
                       {hasSolarPanel2Data && (
                         <div className={componentStyles.panelTypeToggle}>
@@ -1530,8 +1585,9 @@ const InverterMicroSection = ({
         )}
 
         {/* Add Inverter BOS Button - Show inside Inverter section when inverter configured (regardless of optimizer)
-            Note: For microinverters, this button is inside the String Combiner Panel section */}
-        {formData.inverter_type === 'inverter' && formData.inverter_make && formData.inverter_model && !formData.show_inverter_bos && (
+            Note: For microinverters, this button is inside the String Combiner Panel section
+            Note: For Tesla PowerWall, this button is rendered after PowerWallConfigurationSection below */}
+        {formData.inverter_type === 'inverter' && formData.inverter_make && formData.inverter_model && !isPowerWall && !formData.show_inverter_bos && (
           <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
             <TableRowButton
               label="+ Inverter BOS (Type 1)"
@@ -1548,7 +1604,8 @@ const InverterMicroSection = ({
       {!isOptimizerFirst && showOptimizers && (
         <div className={componentStyles.optimizerSection}>
           <EquipmentRow
-            title={formData.show_solar_panel_2 ? "Optimizer (Type 1)" : "Optimizer"}
+            title="Optimizer"
+            titleSubline={formData.show_solar_panel_2 ? "(Type 1)" : undefined}
             subtitle={
               formData.optimizer_make && formData.optimizer_model
                 ? (() => {
@@ -1615,22 +1672,20 @@ const InverterMicroSection = ({
             />
           </EquipmentRow>
 
-          {/* Solar Panel Type 2 - Render here for optimizer systems */}
-          {showSolarPanel2 && formData.system_type === 'optimizer' && (
-            <div style={{ marginTop: 'var(--spacing-xs)' }}>
-              <SolarPanel2Section
-                formData={formData}
-                onChange={onChange}
-                systemNumber={systemNumber}
-              />
-            </div>
+          {formData.show_solar_panel_2 && (
+            <SolarPanel2Section
+              formData={formData}
+              onChange={onChange}
+              systemNumber={systemNumber}
+            />
           )}
 
           {/* Type 2 Optimizer - Only when second panel type is active */}
           {formData.show_solar_panel_2 && (
             <div className={componentStyles.optimizerType2}>
               <EquipmentRow
-                title="Optimizer (Type 2)"
+                title="Optimizer"
+                titleSubline="(Type 2)"
               subtitle={
                 formData.optimizer_type2_make && formData.optimizer_type2_model
                   ? (() => {
@@ -1801,12 +1856,16 @@ const areInverterPropsEqual = (prevProps, nextProps) => {
     'solar_panel_quantity', 'solar_panel_make', 'solar_panel_model',
     'solar_panel_voc', 'solar_panel_isc', 'solar_panel_existing',
     'solar_panel_type2_manufacturer', 'solar_panel_type2_model',
-    'solar_panel_type2_quantity',
+    'solar_panel_type2_quantity', 'solar_panel_type2_voc', 'solar_panel_type2_isc',
     'show_solar_panel_2',
     // Stringing fields
     'stringing_type',
     'branch_string_1', 'branch_string_2', 'branch_string_3', 'branch_string_4', 'branch_string_5',
     'branch_string_6', 'branch_string_7', 'branch_string_8', 'branch_string_9', 'branch_string_10',
+    'branch_string_1_panel_type', 'branch_string_2_panel_type', 'branch_string_3_panel_type',
+    'branch_string_4_panel_type', 'branch_string_5_panel_type', 'branch_string_6_panel_type',
+    'branch_string_7_panel_type', 'branch_string_8_panel_type', 'branch_string_9_panel_type',
+    'branch_string_10_panel_type',
     // PowerWall / Tesla fields
     'backup_option', 'expansionPacks', 'gateway', 'backupSwitchLocation', 'batteryExisting',
     'teslagatewaytype', 'meter_collar_setting',
@@ -1820,8 +1879,11 @@ const areInverterPropsEqual = (prevProps, nextProps) => {
     // Optimizer fields
     'optimizer_make', 'optimizer_model', 'optimizer_isnew', 'optimizer_existing',
     'optimizer_type2_make', 'optimizer_type2_model', 'optimizer_type2_existing',
+    // Solar Panel Type 2 fields (SP2 renders inside InverterMicroSection for optimizer systems)
+    'solar_panel_type2_is_new', 'solar_panel_type2_manufacturer', 'solar_panel_type2_model',
+    'solar_panel_type2_quantity',
     // System flags
-    'batteryonly', 'system_type',
+    'batteryonly', 'system_type', 'show_inverter_bos',
     // Hoymiles/APSystems breaker
     'sys1_ap_hoy_breaker_size',
   ];

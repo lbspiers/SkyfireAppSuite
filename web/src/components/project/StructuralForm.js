@@ -21,6 +21,11 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     projectUuid,
     autoFetch: true
   });
+  // Log loading / error state changes from the hook
+  useEffect(() => {
+    console.log('[StructuralForm] hook state — loading:', loading, '| saving:', saving, '| data:', systemDetails ? `${Object.keys(systemDetails).length} fields` : 'null');
+  }, [loading, saving, systemDetails]);
+
   // Navigation handlers
   const handlePrev = () => {
     if (onNavigateToTab) {
@@ -97,7 +102,8 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   const hasHydratedRef = React.useRef(false);
 
   useEffect(() => {
-    if (systemDetails && !hasHydratedRef.current) {
+    console.log('[StructuralForm] hydration effect fired — systemDetails:', systemDetails ? `${Object.keys(systemDetails).length} fields` : 'null', '| hasHydrated:', hasHydratedRef.current, '| loading:', loading);
+    if (systemDetails && !loading && !hasHydratedRef.current) {
       // Only hydrate on initial load
       // After that, formData is updated via handleFieldChange which also updates systemDetails
       // So we don't need to sync back from systemDetails to formData
@@ -170,12 +176,18 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
       }
 
       // Always use the hydrated data from backend (it already includes optimistic updates from updateField)
+      console.log('[StructuralForm] hydrating formData — visible_planes:', maxVisiblePlane, '| rta_roofing_material:', hydratedData.rta_roofing_material, '| rta_rail_make:', hydratedData.rta_rail_make, '| mp1_stories:', hydratedData.mp1_stories, '| mp1_pitch:', hydratedData.mp1_pitch, '| mp1_mode:', hydratedData.st_mp1_mode);
       setFormData(hydratedData);
       hasHydratedRef.current = true;
+    } else if (systemDetails && hasHydratedRef.current) {
+      console.log('[StructuralForm] hydration skipped — already hydrated');
+    } else if (!systemDetails) {
+      console.log('[StructuralForm] hydration skipped — systemDetails is null/undefined');
     }
-  }, [systemDetails]);
+  }, [systemDetails, loading]);
 
   const handleFieldChange = async (field, value) => {
+    console.log('[StructuralForm] handleFieldChange:', field, '=', value);
     // Optimistic UI update
     setFormData(prev => ({
       ...prev,
@@ -208,8 +220,9 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     // Save to backend
     try {
       await updateField(field, value);
+      console.log('[StructuralForm] saved OK:', field, '=', value);
     } catch (error) {
-      console.error('Failed to save field:', field, error);
+      console.error('[StructuralForm] save FAILED:', field, error);
       // Error is already logged by useSystemDetails, UI will revert on next fetch
     }
   };

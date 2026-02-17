@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EquipmentRow, FormFieldRow, TableRowButton, TableDropdown, AddButton, ConfirmDialog, SectionClearModal, SectionRemoveModal, PreferredButton, ActionSectionButton, Tooltip } from '../../ui';
+import { EquipmentRow, FormFieldRow, TableRowButton, TableDropdown, AddButton, ConfirmDialog, SectionClearModal, SectionRemoveModal, PreferredButton, Tooltip, GhostSectionRow } from '../../ui';
 import { PreferredEquipmentModal } from '../../equipment';
 import styles from '../../../styles/ProjectAdd.module.css';
 import logger from '../../../services/devLogger';
@@ -12,7 +12,7 @@ import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
  * Handles solar panel configuration with EquipmentRow display
  * Fields are always editable dropdowns (no edit mode)
  */
-const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1 }) => {
+const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1, onShowType2 }) => {
   // Render counter for diagnostics
   const renderCount = useRef(0);
   useEffect(() => {
@@ -29,6 +29,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   } = useEquipmentCatalog();
 
   const [selectedModelData, setSelectedModelData] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   const hasAutoPopulatedRef = useRef(false);
   const lastProcessedModelRef = useRef(null);
 
@@ -61,11 +62,8 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const hasSolarPanel = formData[solarPanelMakeField] && formData[solarPanelModelField];
 
   // Determine title based on Battery Only mode and Type 2 visibility
-  const sectionTitle = batteryOnlyMode
-    ? "Battery Only"
-    : (formData.show_solar_panel_2
-        ? "Solar Panel (Type 1)"
-        : "Solar Panel");
+  const sectionTitle = batteryOnlyMode ? "Battery Only" : "Solar Panel";
+  const sectionTitleSubline = !batteryOnlyMode && formData.show_solar_panel_2 ? "(Type 1)" : undefined;
 
   // Sync batteryOnlyMode state with formData battery only field when it changes (for persistence)
   useEffect(() => {
@@ -132,6 +130,19 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
           updates.push([solarPanelModelIdField, modelData.id]);
         }
 
+        // Auto-populate electrical specs for stringing calculations (same as handleModelChange)
+        // Only fills in specs when currently empty — won't overwrite user edits
+        const voc = modelData.nameplate_voc || modelData.voc || modelData.open_circuit_voltage || '';
+        const isc = modelData.nameplate_isc || modelData.isc || modelData.short_circuit_current || '';
+        const vmp = modelData.nameplate_vpmax || modelData.vmp || modelData.voltage_max_power || '';
+        const imp = modelData.nameplate_ipmax || modelData.imp || modelData.current_max_power || '';
+        const tempCoeff = modelData.temp_coeff_voc || modelData.temperature_coefficient_voc || '';
+        if (voc && !formData[solarPanelVocField]) updates.push([solarPanelVocField, voc]);
+        if (isc && !formData[solarPanelIscField]) updates.push([solarPanelIscField, isc]);
+        if (vmp && !formData[solarPanelVmpField]) updates.push([solarPanelVmpField, vmp]);
+        if (imp && !formData[solarPanelImpField]) updates.push([solarPanelImpField, imp]);
+        if (tempCoeff && !formData[solarPanelTempCoeffField]) updates.push([solarPanelTempCoeffField, tempCoeff]);
+
         // Batch update if we have changes
         if (updates.length > 0) {
           if (onBatchChange) {
@@ -145,7 +156,7 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         setSelectedModelData(null);
       }
     }
-  }, [formData[solarPanelModelField], currentModels, formData[solarPanelWattageField], formData[solarPanelModelIdField], onBatchChange, onChange]);
+  }, [formData[solarPanelModelField], currentModels, formData[solarPanelWattageField], formData[solarPanelModelIdField], formData[solarPanelVocField], formData[solarPanelIscField], formData[solarPanelVmpField], formData[solarPanelImpField], formData[solarPanelTempCoeffField], onBatchChange, onChange]);
 
   // Wrapper to save toggle defaults when any field changes
   const handleFieldChange = (fieldName, value) => {
@@ -620,12 +631,20 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
     return parts.join(' ');
   };
 
+  // Determine if we should show the ghost row for Type 2
+  const showGhostType2 = isExpanded &&
+    !formData.show_solar_panel_2 &&
+    !batteryOnlyMode;
+
   return (
     <div>
-      <div style={{ marginBottom: 'var(--spacing-xs)' }}>
+      <div style={{ marginBottom: showGhostType2 ? 0 : 'var(--spacing-xs)' }}>
         <EquipmentRow
           title={sectionTitle}
+          titleSubline={sectionTitleSubline}
           subtitle={getSubtitle()}
+          expanded={isExpanded}
+          onToggle={() => setIsExpanded(prev => !prev)}
           showNewExistingToggle={!batteryOnlyMode}
           isExisting={formData[solarPanelExistingField]}
           onExistingChange={(val) => {
@@ -741,42 +760,18 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
                 </div>
               </FormFieldRow>
 
-              {/* + 2nd Solar Panel Type Button */}
-              <div style={{
-                paddingLeft: 'var(--spacing)',
-                paddingRight: 'var(--spacing)',
-                paddingTop: 'var(--spacing-tight)',
-                paddingBottom: 'var(--spacing-tight)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--spacing-xs)'
-              }}>
-                <ActionSectionButton
-                  label="+ 2nd Solar Panel Type"
-                  variant="orange"
-                  onClick={handleToggleType2}
-                />
-                <Tooltip
-                  content={
-                    <>
-                      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '0 var(--spacing) 0 0' }}>
-                        <img src={flameIcon} alt="" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
-                      </div>
-                      <div style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--leading-normal)' }}>
-                        Add second Solar Panel Type to system {systemNumber} to inverter or String Combiner Panel
-                      </div>
-                    </>
-                  }
-                  position="bottom"
-                  className="alertTooltip"
-                >
-                  <img src={flameIcon} alt="" style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }} />
-                </Tooltip>
-              </div>
             </>
           )}
         </EquipmentRow>
       </div>
+
+      {/* Ghost row for Type 2 - visible only when Solar Panel is expanded */}
+      {showGhostType2 && (
+        <GhostSectionRow
+          label="Solar Panel (Type 2)"
+          onClick={onShowType2}
+        />
+      )}
 
       {/* Battery Only Confirmation Modal */}
       <ConfirmDialog

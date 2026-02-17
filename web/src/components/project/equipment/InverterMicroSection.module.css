@@ -6,12 +6,12 @@
 
 /* ===== AUTO STRINGING ===== */
 .autoStringingInfo {
-  padding: var(--spacing);
+  padding: var(--spacing-tight) var(--spacing) 0;
 }
 
 /* ===== CUSTOM STRINGING ===== */
 .customStringingSection {
-  padding: var(--spacing);
+  padding: var(--spacing-tight) 0 0;
 }
 
 .panelsRemainingCounter {

@@ -61,7 +61,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
       const modelsData = response.data || [];
       setModels(modelsData);
 
-      // If current model is selected, find its data and auto-populate wattage
+      // If current model is selected, find its data and auto-populate specs
       if (formData.solar_panel_type2_model) {
         const modelData = modelsData.find(m => m.model_number === formData.solar_panel_type2_model);
         if (modelData) {
@@ -76,6 +76,16 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
           if (modelData.id) {
             onChange('solar_panel_type2_model_id', modelData.id);
           }
+
+          // Auto-populate electrical specs for stringing calculations
+          const voc = modelData.voc || modelData.open_circuit_voltage || '';
+          const isc = modelData.isc || modelData.short_circuit_current || '';
+          const vmp = modelData.vmp || modelData.voltage_max_power || '';
+          const imp = modelData.imp || modelData.current_max_power || '';
+          if (voc) onChange('solar_panel_type2_voc', voc);
+          if (isc) onChange('solar_panel_type2_isc', isc);
+          if (vmp) onChange('solar_panel_type2_vmp', vmp);
+          if (imp) onChange('solar_panel_type2_imp', imp);
         }
       }
     } catch (error) {
@@ -85,24 +95,15 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
     }
   };
 
-  // Wrapper to save toggle defaults when any field changes
-  const handleFieldChange = (fieldName, value) => {
-    onChange(fieldName, value);
-    // Also save New/Existing toggle default if not already set
-    if (formData.solar_panel_type2_is_new === undefined) {
-      onChange('solar_panel_type2_is_new', true);
-    }
-  };
-
   const handleManufacturerChange = (value) => {
-    handleFieldChange('solar_panel_type2_manufacturer', value);
+    onChange('solar_panel_type2_manufacturer', value);
     onChange('solar_panel_type2_model', ''); // Clear model when manufacturer changes
     onChange('solar_panel_type2_wattage', ''); // Clear wattage
     setSelectedModelData(null);
   };
 
   const handleModelChange = (value) => {
-    handleFieldChange('solar_panel_type2_model', value);
+    onChange('solar_panel_type2_model', value);
 
     // Find model data and auto-populate wattage and electrical specs
     const modelData = models.find(m => m.model_number === value);
@@ -168,7 +169,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
 
     // Quantity with New/Existing indicator
     if (formData.solar_panel_type2_quantity) {
-      const statusLetter = formData.solar_panel_type2_is_new !== false ? 'N' : 'E';
+      const statusLetter = formData.solar_panel_type2_is_new === false ? 'E' : 'N';
       parts.push(`${formData.solar_panel_type2_quantity} (${statusLetter})`);
     }
 
@@ -183,11 +184,14 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
   return (
     <div style={{ marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
-        title="Solar Panel (Type 2)"
+        title="Solar Panel"
+        titleSubline="(Type 2)"
         subtitle={getSubtitle()}
         showNewExistingToggle={true}
-        isNew={formData.solar_panel_type2_is_new !== false}
-        onNewExistingChange={(isNew) => onChange('solar_panel_type2_is_new', isNew)}
+        isExisting={formData.solar_panel_type2_is_new === false}
+        onExistingChange={(val) => {
+          onChange('solar_panel_type2_is_new', !val, systemNumber);
+        }}
         onEdit={() => {}}
         onCamera={() => {}}
         onDelete={handleTrashClick}
@@ -216,7 +220,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
           <input
             type="text"
             value={formData.solar_panel_type2_quantity || ''}
-            onChange={(e) => handleFieldChange('solar_panel_type2_quantity', e.target.value)}
+            onChange={(e) => onChange('solar_panel_type2_quantity', e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -278,4 +282,5 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
   );
 };
 
-export default memo(SolarPanel2Section);
+export default SolarPanel2Section;
+

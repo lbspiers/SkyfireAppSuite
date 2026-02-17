@@ -1,5 +1,4 @@
-import React from 'react';
-import Button from '../ui/Button';
+import TableRowButton from '../ui/TableRowButton';
 import styles from './FormNavigationFooter.module.css';
 
 /**
@@ -21,33 +20,30 @@ const FormNavigationFooter = ({
     <div className={styles.footer}>
       <div className={styles.buttonContainer}>
         {showPrev && (
-          <Button
-            variant="secondary"
+          <TableRowButton
+            variant="outline"
             onClick={onPrev}
             disabled={prevDisabled}
-            fixedWidth
-          >
-            {prevLabel}
-          </Button>
+            label={prevLabel}
+          />
         )}
         {centerButton && (
-          <Button
-            variant="primary"
+          <TableRowButton
+            variant="outline"
+            active
             onClick={centerButton.onClick}
+            label={centerButton.label}
             className={styles.centerButton}
-          >
-            {centerButton.label}
-          </Button>
+          />
         )}
         {showNext && (
-          <Button
-            variant="primary"
+          <TableRowButton
+            variant="outline"
+            active
             onClick={onNext}
             disabled={nextDisabled}
-            fixedWidth
-          >
-            {nextLabel}
-          </Button>
+            label={nextLabel}
+          />
         )}
       </div>
     </div>

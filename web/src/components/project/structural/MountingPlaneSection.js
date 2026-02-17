@@ -93,8 +93,8 @@ const MountingPlaneSection = ({
 
   // Build subtitle with ALL entered data
   const subtitleParts = [];
-  if (mode) subtitleParts.push(mode);
   if (stories) subtitleParts.push(`${stories} Story`);
+  if (mode) subtitleParts.push(mode);
   if (pitch) subtitleParts.push(`${pitch}° Pitch`);
   if (azimuth) subtitleParts.push(`${azimuth}° Az`);
 

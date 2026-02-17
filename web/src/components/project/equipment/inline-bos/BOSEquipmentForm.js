@@ -90,12 +90,9 @@ const BOSEquipmentForm = ({
     // Filter by minimum required amps if available
     if (minRequiredAmps) {
       const filtered = amps.filter(a => a >= minRequiredAmps);
-      console.log('[BOS Sizing] Min required:', Math.ceil(minRequiredAmps));
-      console.log('[BOS Sizing] Available amps:', filtered);
       return filtered;
     }
 
-    console.log('[BOS Sizing] Available amps:', amps);
     return amps;
   }, [equipmentType, minRequiredAmps, utility]);
 

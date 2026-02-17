@@ -497,7 +497,7 @@ const EquipmentForm = ({
           system_type: "",
 
           // Solar Panel 2 defaults
-          solar_panel_type2_is_new: true,
+          solar_panel_type2_is_new: true, // true = New (default)
           solar_panel_type2_manufacturer: "",
           solar_panel_type2_model: "",
           solar_panel_type2_model_id: "",
@@ -734,6 +734,7 @@ const EquipmentForm = ({
         batteryonly: !!systemDetails[`${prefix}_batteryonly`],
 
         // Solar Panel Type 2 fields
+        // DB stores _is_new (true=new), component uses _is_new directly � no inversion needed
         solar_panel_type2_is_new:
           systemDetails[`${prefix}_solar_panel_type2_is_new`] ?? true,
         solar_panel_type2_manufacturer:
@@ -1104,13 +1105,6 @@ const EquipmentForm = ({
         solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
         solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
         solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
-        // solar_panel_type2_wattage removed - spec sheet derived, not in DB
-        // solar_panel_type2_vmp removed - spec sheet derived, not in DB
-        // solar_panel_type2_imp removed - spec sheet derived, not in DB
-        // solar_panel_type2_voc removed - spec sheet derived, not in DB
-        // solar_panel_type2_isc removed - spec sheet derived, not in DB
-        // solar_panel_type2_model_id removed - spec sheet derived, not in DB
-        // solar_panel_type2_temp_coeff_voc removed - spec sheet derived, not in DB
         show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
         batteryonly: `${sysPrefix}_batteryonly`,
 
@@ -1298,6 +1292,10 @@ const EquipmentForm = ({
         // Invert "isNew" fields to "existing" fields
         if (field.endsWith("_isnew")) {
           dbValue = !value; // isNew=true means existing=false
+        }
+        // Invert _existing fields that map to _is_new DB columns (opposite conventions)
+        if (field.endsWith("_existing") && dbFieldName && dbFieldName.endsWith("_is_new")) {
+          dbValue = !value; // existing=true means is_new=false
         }
 
         // Convert empty strings to null for database
@@ -2188,6 +2186,7 @@ const EquipmentForm = ({
   // Memoized to prevent child component re-renders
   const handleFieldChange = useCallback(
     async (field, value, overrideSystemNumber = null) => {
+      console.log("[handleFieldChange] ENTRY:", field, value, "sys:", overrideSystemNumber);
       // Debug logging for show_solar_panel_2
       if (field === "show_solar_panel_2") {
         console.log(
@@ -2246,13 +2245,6 @@ const EquipmentForm = ({
         solar_panel_type2_manufacturer: `${sysPrefix}_solar_panel_type2_manufacturer`,
         solar_panel_type2_model: `${sysPrefix}_solar_panel_type2_model`,
         solar_panel_type2_quantity: `${sysPrefix}_solar_panel_type2_quantity`,
-        // solar_panel_type2_wattage removed - spec sheet derived, not in DB
-        // solar_panel_type2_vmp removed - spec sheet derived, not in DB
-        // solar_panel_type2_imp removed - spec sheet derived, not in DB
-        // solar_panel_type2_voc removed - spec sheet derived, not in DB
-        // solar_panel_type2_isc removed - spec sheet derived, not in DB
-        // solar_panel_type2_model_id removed - spec sheet derived, not in DB
-        // solar_panel_type2_temp_coeff_voc removed - spec sheet derived, not in DB
         show_solar_panel_2: `${sysPrefix}_show_second_panel_type`,
         batteryonly: `${sysPrefix}_batteryonly`,
 
@@ -2475,7 +2467,7 @@ const EquipmentForm = ({
       // Get database field name from mapping or use field directly for BOS
       const dbFieldName = isBOSField ? field : fieldMapping[field];
 
-      // Debug logging for batteryonly, backup_option, inverter_existing, and show_solar_panel_2 field mapping
+      // Debug logging for batteryonly, backup_option, inverter_existing, show_solar_panel_2
       if (
         field === "batteryonly" ||
         field === "backup_option" ||
@@ -2498,14 +2490,21 @@ const EquipmentForm = ({
       }
 
       // Check if this is a visibility flag (state-only, not saved to DB)
-      const isVisibilityFlag = field.startsWith('show_');
+      // Exception: show_solar_panel_2 maps to sys_show_second_panel_type in DB and MUST be saved
+      const isVisibilityFlag = field.startsWith('show_') && field !== 'show_solar_panel_2';
 
-      if (!dbFieldName && !isVisibilityFlag) {
-        logger.warn("EquipmentForm", `No field mapping found for: ${field}`);
-        console.log(
-          "[EquipmentForm handleFieldChange] EARLY RETURN - no dbFieldName for:",
-          field,
-        );
+      // Spec-derived fields: no DB mapping but still need local state updates for UI calculations
+      // (e.g. solar_panel_type2_voc used for stringing range display in InverterMicroSection)
+      const isSpecDerivedField = !dbFieldName && !isVisibilityFlag;
+
+      if (isSpecDerivedField) {
+        // Update local state only — no DB save
+        // Store under both unprefixed name AND prefixed DB name so mergedFormDataBySystem can pick it up
+        setFormData((prev) => ({
+          ...prev,
+          [field]: value,
+          [`${systemPrefix}_${field}`]: value,
+        }));
         return;
       }
 
@@ -2556,6 +2555,10 @@ const EquipmentForm = ({
         // Invert "isNew" fields to "existing" fields
         if (field.endsWith("_isnew")) {
           dbValue = !value; // isNew=true means existing=false
+        }
+        // Invert _existing fields that map to _is_new DB columns (opposite conventions)
+        if (field.endsWith("_existing") && dbFieldName && dbFieldName.endsWith("_is_new")) {
+          dbValue = !value; // existing=true means is_new=false
         }
 
         // Convert empty strings to null for database
@@ -2845,6 +2848,10 @@ const EquipmentForm = ({
             component: "solar_panel_type2_temp_coeff_voc",
             state: `${sysPrefix}_solar_panel_type2_temp_coeff_voc`,
           },
+          {
+            component: "solar_panel_type2_is_new",
+            state: getSchemaField(systemNumber, "solar_panel_type2_is_new"),
+          },
           // Inverter fields
           {
             component: "inverter_make",
@@ -3090,16 +3097,17 @@ const EquipmentForm = ({
               ) {
                 value = !value; // DB stores "existing", component uses "isNew"
               }
-              optimisticUpdates[component] = value;
-              // Debug SMS fields
-              if (component.startsWith("sms_")) {
-                console.log(
-                  `[mergedFormData] System ${systemNumber}: ${component} = ${value} (from formData.${stateFieldName})`,
-                );
+              // Invert _is_new DB fields to _existing component fields
+              if (
+                component.endsWith("_existing") &&
+                stateFieldName.includes("_is_new")
+              ) {
+                value = !value; // DB stores "is_new", component uses "existing"
               }
+              optimisticUpdates[component] = value;
             }
             // Priority 2: Check if systemFormData already has the unprefixed component field
-            // (hydrateFormData already mapped databaseâ†’component names)
+            // (hydrateFormData already mapped databaseâ†'component names)
             else if (systemFormData[component] !== undefined) {
               optimisticUpdates[component] = systemFormData[component];
             }
@@ -4195,7 +4203,8 @@ const EquipmentForm = ({
               }
 
               // Check if this is a visibility flag (state-only, not saved to DB)
-              const isVisibilityFlag = field.startsWith('show_');
+              // Exception: show_solar_panel_2 maps to sys_show_second_panel_type in DB and MUST be saved
+              const isVisibilityFlag = field.startsWith('show_') && field !== 'show_solar_panel_2';
 
               // Update state
               stateUpdates[stateFieldName] = value;
@@ -4318,9 +4327,10 @@ const EquipmentForm = ({
                 onChange={handleSystemFieldChange}
                 onBatchChange={handleSystemBatchChange}
                 systemNumber={systemNumber}
+                onShowType2={() => handleSystemFieldChange('show_solar_panel_2', true, systemNumber)}
               />
 
-              {/* 2nd Solar Panel Section - Show here for non-optimizer systems */}
+              {/* 2nd Solar Panel Section - optimizer systems render it inside InverterMicroSection */}
               {mergedFormData.show_solar_panel_2 &&
                 !mergedFormData.batteryonly &&
                 mergedFormData.system_type !== 'optimizer' && (
@@ -4344,14 +4354,10 @@ const EquipmentForm = ({
                     maxContinuousOutputAmpsPerSystem[systemNumber]
                   }
                   loadingMaxOutput={loadingMaxOutput}
-                  showSolarPanel2={mergedFormData.show_solar_panel_2 && !mergedFormData.batteryonly}
                   siteZipCode={projectData?.site?.zip_code || ''}
                 />
               )}
 
-              {/* Gateway Configuration - MOVED INTO InverterMicroSection */}
-              {/* Stringing Section - MOVED INTO InverterMicroSection */}
-              {/* PowerWall Configuration - MOVED INTO InverterMicroSection */}
 
               {/* BOS Equipment - Only show when flag is set (button-triggered from InverterMicroSection) */}
               {/* Hide BOS sections when systems are combined - they should appear in Post Combine BOS container instead */}
@@ -5265,3 +5271,6 @@ const EquipmentForm = ({
 };
 
 export default memo(EquipmentForm);
+
+
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
-import { EquipmentRow, TableDropdown, Button } from '../../ui';
+import { EquipmentRow, TableDropdown, TableRowButton } from '../../ui';
 import { BOS_FIELD_PATTERNS } from '../../../constants/bosFieldPatterns';
 import {
   getUtilityEquipmentTypeOptions,
@@ -180,8 +180,6 @@ const BOSEquipmentSection = ({
     // Filter by minimum required amps if available
     if (minRequiredAmps) {
       const filtered = amps.filter(a => a >= minRequiredAmps);
-      console.log(`[BOS Sizing ${section}] Min required:`, Math.ceil(minRequiredAmps));
-      console.log(`[BOS Sizing ${section}] Available amps:`, filtered);
       return filtered.map(amp => ({ label: `${amp}A`, value: amp.toString() }));
     }
 
@@ -356,9 +354,9 @@ const BOSEquipmentSection = ({
         const getSubtitle = () => {
           const parts = [];
 
-          // New/Existing indicator
+          // Qty is always 1 for BOS equipment + New/Existing indicator
           const statusLetter = slot.isNew ? 'N' : 'E';
-          parts.push(`(${statusLetter})`);
+          parts.push(`1 (${statusLetter})`);
 
           if (slot.make && slot.model) {
             parts.push(`${slot.make} ${slot.model}`);
@@ -379,21 +377,7 @@ const BOSEquipmentSection = ({
             <EquipmentRow
               title={slot.equipmentType || getSectionTitle(slot.slotNumber)}
               subtitle={getSubtitle()}
-              showNewExistingToggle={true}
-              isNew={slot.isNew}
-              onNewExistingChange={(isNew) => onChange(`${slot.prefix}_is_new`, isNew)}
-              toggleRowRightContent={
-                maxContinuousOutputAmps > 0 ? (
-                  <span style={{
-                    fontSize: 'var(--font-size-xs)',
-                    color: '#ff6b35',
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                  }}>
-                    Min: {Math.ceil(maxContinuousOutputAmps * 1.25)}A
-                  </span>
-                ) : null
-              }
+              noWrapTitle
               onDelete={() => handleDeleteSlot(slot.slotNumber)}
             >
             <TableDropdown
@@ -456,20 +440,13 @@ const BOSEquipmentSection = ({
 
             {/* Add Next BOS Button - Only in the LAST visible slot */}
             {isLastSlot && canAddMore && (
-              <div style={{
-                marginTop: 'var(--spacing-tight)',
-                paddingTop: 0,
-                paddingLeft: '1rem',
-                borderTop: '1px solid var(--border-color)'
-              }}>
-                <Button
+              <div style={{ display: 'flex', alignItems: 'center', padding: 'var(--spacing-tight) var(--spacing)' }}>
+                <TableRowButton
+                  label={`+ ${getSectionTitle(nextSlot)}`}
                   variant="outline"
-                  size="sm"
                   onClick={handleAddSlot}
-                  style={{ borderRadius: '9999px' }}
-                >
-                  + {getSectionTitle(nextSlot)}
-                </Button>
+                  style={{ width: '100%' }}
+                />
               </div>
             )}
           </EquipmentRow>

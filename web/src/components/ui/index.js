@@ -49,6 +49,7 @@ export { default as TableDropdown } from './TableDropdown';
 export { default as TableTextInput } from './TableTextInput';
 export { default as TableSelect } from './TableSelect';
 export { default as AddSectionButton } from './AddSectionButton';
+export { default as GhostSectionRow } from './GhostSectionRow';
 export { default as AddButton } from './AddButton';
 export { default as ToggleButton } from './ToggleButton';
 export { default as EquipmentRow } from './EquipmentRow';

@@ -44,6 +44,7 @@ const EquipmentRow = ({
   className = '',
   style = {},
   noWrapTitle = false,
+  titleSubline,
 }) => {
   const [internalExpanded, setInternalExpanded] = useState(initiallyExpanded);
   const isExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
@@ -69,6 +70,9 @@ const EquipmentRow = ({
           {/* Left side - 25% label area */}
           <div className={styles.headerLeft}>
             <span className={`${styles.title} ${noWrapTitle ? styles.titleNoWrap : ''}`}>{title}</span>
+            {titleSubline && (
+              <span className={styles.titleSubline}>{titleSubline}</span>
+            )}
             {!isExpanded && subtitle && (
               <span className={`${styles.subtitle} ${!subtitle ? styles.empty : ''}`}>
                 {subtitle || '-'}
