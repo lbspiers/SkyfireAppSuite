@@ -573,6 +573,12 @@ class UploadManager {
     this.projectUuid = projectUuid;
     this.isCancelled = false;
 
+    // Auto-clear previous batch if no active uploads
+    if (!this.hasActiveUploads() && this.files.size > 0) {
+      logger.log('UploadManager', 'Auto-clearing ' + this.files.size + ' files from previous batch');
+      this.reset();
+    }
+
     logger.log('UploadManager', `Enqueuing ${files.length} files for project ${projectUuid}`);
 
     // Categorize files
@@ -745,6 +751,30 @@ class UploadManager {
     logger.log('UploadManager', `Cleared ${completedIds.length} completed uploads`);
 
     this._emit('upload:cleared', { count: completedIds.length });
+  }
+
+  /**
+   * Full reset - clear ALL files from state (completed, failed, everything)
+   * Called when starting a fresh batch or closing the modal after completion
+   * @public
+   */
+  reset() {
+    this.files.clear();
+    this.globalActiveUploads = 0;
+    this.lastUploadTime = null;
+
+    for (const category of Object.keys(this.queue)) {
+      this.queue[category] = [];
+    }
+    for (const category of Object.keys(this.active)) {
+      this.active[category].clear();
+    }
+
+    this.isProcessing = false;
+    this.isCancelled = false;
+
+    logger.log('UploadManager', 'Full reset - all state cleared');
+    this._emit('upload:cleared', { count: 0 });
   }
 
   /**

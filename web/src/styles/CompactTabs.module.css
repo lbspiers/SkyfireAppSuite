@@ -13,10 +13,10 @@
 /* ===== SUB-TAB NAVIGATION (Equipment/BOS Pattern) ===== */
 .viewNavigation {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--spacing);
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   flex-shrink: 0;
   padding-bottom: 0;
   padding-left: 1rem;
@@ -24,8 +24,9 @@
 
 .viewNavigationTabs {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--spacing);
+  padding-top: 1rem;
 }
 
 .viewNavigationControls {
@@ -39,7 +40,7 @@
   text-decoration: none;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  padding: var(--spacing) var(--spacing) var(--spacing-xs) var(--spacing);
+  padding: 0 var(--spacing) var(--spacing-xs) var(--spacing);
   border-radius: var(--radius-md);
   transition: all 0.2s ease;
   position: relative;
@@ -48,7 +49,7 @@
 }
 
 .viewLinkFirst {
-  padding: var(--spacing) var(--spacing) var(--spacing-xs) 0;
+  padding: 0 var(--spacing) var(--spacing-xs) 0;
 }
 
 .viewLink:hover {

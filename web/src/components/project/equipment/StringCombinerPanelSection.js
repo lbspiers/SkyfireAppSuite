@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
-import { EquipmentRow, FormFieldRow, TableDropdown, TableRowButton, Alert, Button, Divider, PreferredButton, AddSectionButton } from '../../ui';
+import { EquipmentRow, FormFieldRow, TableDropdown, TableRowButton, Alert, Button, Divider, PreferredButton, AddSectionButton, ConfirmActionModal } from '../../ui';
 import Tooltip from '../../ui/Tooltip';
 import { PreferredEquipmentModal } from '../../equipment';
 import StringingGrid from './StringingGrid';
+import { HelpCircle } from 'lucide-react';
 import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
 import BOSEquipmentSection from './BOSEquipmentSection';
 import styles from '../../../styles/ProjectAdd.module.css';
 import equipStyles from '../EquipmentForm.module.css';
+import gridStyles from './StringingGrid.module.css';
 import {
   getCombinerPanelManufacturers,
   getCombinerPanelModels,
@@ -58,12 +60,29 @@ const StringCombinerPanelSection = ({
   // Preferred equipment modal state
   const [showPreferredModal, setShowPreferredModal] = useState(false);
 
+  // Confirmation modal state for switching from Custom to Auto
+  const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
+
   // Ref to track if we've auto-set aggregate_pv_breaker to prevent loops
   const hasAutoSetAggregateBreaker = useRef(false);
 
   // Derived stringing values
   const totalPanelQty = solarPanelQty + solarPanelQty2;
   const stringingType = formData.stringing_type || 'auto';
+
+  // Solar panel make/model for display in dropdown
+  const panelType1Make = formData.solar_panel_make || '';
+  const panelType1Model = formData.solar_panel_model || '';
+  const panelType2Make = formData.solar_panel_type2_manufacturer || '';
+  const panelType2Model = formData.solar_panel_type2_model || '';
+
+  // Create panel labels for dropdown
+  const panelType1Label = panelType1Make && panelType1Model
+    ? `${panelType1Make} ${panelType1Model}`
+    : 'Type 1';
+  const panelType2Label = panelType2Make && panelType2Model
+    ? `${panelType2Make} ${panelType2Model}`
+    : 'Type 2';
 
   // Calculate total max continuous output for all microinverters
   // Total panels × max continuous output per microinverter
@@ -339,20 +358,81 @@ const StringCombinerPanelSection = ({
 
   // Handle stringing type change (auto/custom)
   const handleStringingTypeChange = (type) => {
+    // If switching from custom to auto, check if there's data to clear
+    if (type === 'auto' && stringingType === 'custom') {
+      // Check if there's any custom data
+      let hasCustomData = false;
+      for (let i = 1; i <= 10; i++) {
+        if (formData[`branch_string_${i}`] ||
+            formData[`branch_string_${i}_type1`] ||
+            formData[`branch_string_${i}_type2`] ||
+            formData[`branch_string_${i}_panel_type`]) {
+          hasCustomData = true;
+          break;
+        }
+      }
+
+      if (hasCustomData) {
+        // Show confirmation modal
+        setShowResetConfirmModal(true);
+        return;
+      }
+    }
+
+    // Proceed with the change
+    confirmStringingTypeChange(type);
+  };
+
+  // Confirm and execute stringing type change
+  const confirmStringingTypeChange = (type) => {
     onChange('stringing_type', type, systemNumber);
 
     // Clear all branch data when switching to auto
     if (type === 'auto') {
       for (let i = 1; i <= 10; i++) {
         onChange(`branch_string_${i}`, '', systemNumber);
+        onChange(`branch_string_${i}_panel_type`, '', systemNumber);
+        onChange(`branch_string_${i}_type1`, '', systemNumber);
+        onChange(`branch_string_${i}_type2`, '', systemNumber);
       }
     }
+
+    setShowResetConfirmModal(false);
   };
 
   // Handle branch panel qty change
-  const handleBranchStringChange = (index, value) => {
+  const handleBranchStringChange = (index, value, subType = null) => {
     const numericValue = value.replace(/[^0-9]/g, '');
-    onChange(`branch_string_${index}`, numericValue, systemNumber);
+    if (subType) {
+      // For "Both" mode, update the specific type's quantity
+      onChange(`branch_string_${index}_type${subType}`, numericValue, systemNumber);
+    } else {
+      onChange(`branch_string_${index}`, numericValue, systemNumber);
+    }
+  };
+
+  // Handle branch panel type change
+  const handleBranchPanelTypeChange = (index, panelType) => {
+    const oldPanelType = formData[`branch_string_${index}_panel_type`];
+    onChange(`branch_string_${index}_panel_type`, panelType, systemNumber);
+
+    // If switching away from "Both", clear the split fields
+    if (oldPanelType === 'both' && panelType !== 'both') {
+      onChange(`branch_string_${index}_type1`, '', systemNumber);
+      onChange(`branch_string_${index}_type2`, '', systemNumber);
+      onChange(`branch_string_${index}_micro_type1`, '', systemNumber);
+      onChange(`branch_string_${index}_micro_type2`, '', systemNumber);
+    }
+
+    // If switching to "Both", clear the single field
+    if (panelType === 'both' && oldPanelType !== 'both') {
+      onChange(`branch_string_${index}`, '', systemNumber);
+    }
+  };
+
+  // Handle micro type change for "Both" mode sub-rows
+  const handleMicroTypeChange = (branchIndex, microType, subType) => {
+    onChange(`branch_string_${branchIndex}_micro_type${subType}`, microType, systemNumber);
   };
 
   // Auto-calculate distribution
@@ -383,19 +463,63 @@ const StringCombinerPanelSection = ({
 
   // Prepare rows for StringingGrid
   const prepareGridRows = () => {
-    return Array.from({ length: maxBranches }, (_, i) => {
-      const index = i + 1;
-      const value = formData[`branch_string_${index}`] || '';
-      const displayValue = value === '' || value === '0' ? '' : value;
+    const rows = [];
 
-      return {
-        id: index,
-        index,
-        displayValue,
-        panelQtyValue: isDualQtyMode ? displayValue : undefined,
-        isNew: true,
-      };
-    });
+    for (let i = 0; i < maxBranches; i++) {
+      const index = i + 1;
+      const panelType = formData[`branch_string_${index}_panel_type`] || '';
+
+      if (panelType === 'both') {
+        // Create a parent row with two sub-rows for "Both" - one for Type 1 and one for Type 2
+        const type1Value = formData[`branch_string_${index}_type1`] || '';
+        const type2Value = formData[`branch_string_${index}_type2`] || '';
+        const microType1 = formData[`branch_string_${index}_micro_type1`] || '';
+        const microType2 = formData[`branch_string_${index}_micro_type2`] || '';
+
+        rows.push({
+          id: `${index}_both`,
+          index,
+          panelType: 'both',
+          isSplit: true,
+          isParent: true,
+          subRows: [
+            {
+              id: `${index}_type1`,
+              index,
+              subType: 1,
+              displayValue: type1Value === '' || type1Value === '0' ? '' : type1Value,
+              panelQtyValue: isDualQtyMode ? (type1Value === '' || type1Value === '0' ? '' : type1Value) : undefined,
+              actualPanelType: '1',
+              microType: microType1,
+            },
+            {
+              id: `${index}_type2`,
+              index,
+              subType: 2,
+              displayValue: type2Value === '' || type2Value === '0' ? '' : type2Value,
+              panelQtyValue: isDualQtyMode ? (type2Value === '' || type2Value === '0' ? '' : type2Value) : undefined,
+              actualPanelType: '2',
+              microType: microType2,
+            }
+          ],
+        });
+      } else {
+        // Single row for Type 1, Type 2, or no selection
+        const value = formData[`branch_string_${index}`] || '';
+        const displayValue = value === '' || value === '0' ? '' : value;
+
+        rows.push({
+          id: index,
+          index,
+          displayValue,
+          panelQtyValue: isDualQtyMode ? displayValue : undefined,
+          panelType,
+          isSplit: false,
+        });
+      }
+    }
+
+    return rows;
   };
 
   // Column labels
@@ -462,28 +586,23 @@ const StringCombinerPanelSection = ({
           console.log('[StringCombiner] Toggle changed to:', val ? 'Existing' : 'New');
           onChange('combiner_panel_existing', val, systemNumber);
         }}
-        headerRightContent={
-          <PreferredButton onClick={() => setShowPreferredModal(true)} />
-        }
-      >
-        {/* Row 1: No String Combiner Panel Button - Show when no make is selected */}
-        {!formData.combiner_panel_make && (
-          <div style={{
-            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
-          }}>
+        toggleRowRightContent={
+          !isNoCombiner && !formData.combiner_panel_make ? (
             <TableRowButton
-              label="No String Combiner Panel"
+              label="No Combiner Panel"
               variant="outline"
               onClick={() => {
                 onChange('combiner_panel_make', 'No String Combiner Panel', systemNumber);
                 onChange('combiner_panel_model', '', systemNumber);
                 onChange('combiner_panel_main_breaker', 'MLO', systemNumber);
               }}
-              style={{ width: '100%' }}
             />
-          </div>
-        )}
-
+          ) : null
+        }
+        headerRightContent={
+          <PreferredButton onClick={() => setShowPreferredModal(true)} />
+        }
+      >
         {/* Show "No String Combiner Panel Selected" indicator when selected */}
         {isNoCombiner && (
           <div style={{
@@ -541,6 +660,7 @@ const StringCombinerPanelSection = ({
             onChange={(value) => onChange('combiner_panel_main_breaker', value, systemNumber)}
             options={mainBreakerOptions.map(option => ({ value: option, label: option.toString() }))}
             placeholder="Select breaker"
+            wrapLabel={true}
           />
         )}
 
@@ -643,15 +763,35 @@ const StringCombinerPanelSection = ({
                   </Alert>
                 )}
 
-                {/* Auto-Calculate Button */}
+                {/* Panels Remaining & Auto Distribute Row */}
                 {totalPanelQty > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing)' }}>
-                    <TableRowButton
-                      variant="outline"
-                      onClick={handleAutoCalculate}
-                      label="Auto-Calculate Distribution"
-                    />
-                  </div>
+                  <>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingBottom: 'var(--spacing)',
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      borderBottom: 'var(--border-thin) solid var(--border-subtle)',
+                      marginBottom: '1rem'
+                    }}>
+                      <TableRowButton
+                        variant="outline"
+                        onClick={handleAutoCalculate}
+                        label="Auto Distribute Remaining"
+                      />
+                      <div style={{
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-medium)',
+                        color: 'var(--text-secondary)'
+                      }}>
+                        Remaining Panels: <span style={{ color: 'var(--color-primary)', fontWeight: 'var(--font-semibold)' }}>
+                          {panelsRemaining >= 0 ? panelsRemaining : 0}
+                        </span>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 {/* Stringing Grid */}
@@ -661,12 +801,17 @@ const StringCombinerPanelSection = ({
                   columnLabels={columnLabels}
                   mode={isDualQtyMode ? 'dual-qty' : 'standard'}
                   maxPanelsPerBranch={maxPanelsPerBranch}
-                  onToggle={undefined}
                   onChange={handleBranchStringChange}
                   onPanelQtyChange={undefined}
+                  onPanelTypeChange={handleBranchPanelTypeChange}
+                  onMicroTypeChange={handleMicroTypeChange}
+                  showPanelType={solarPanelQty2 > 0}
+                  panelType1Label={panelType1Label}
+                  panelType2Label={panelType2Label}
                   onFocus={setActiveStringInput}
                   onBlur={() => setActiveStringInput(null)}
                   activeInput={activeStringInput}
+                  hideRemainingPanels={true}
                 />
               </div>
             )}
@@ -752,8 +897,42 @@ const StringCombinerPanelSection = ({
         equipmentType="string-combiner"
         title="Select String Combiner Panel"
       />
+
+      {/* Confirm Stringing Type Change Modal */}
+      <ConfirmActionModal
+        isOpen={showResetConfirmModal}
+        onClose={() => setShowResetConfirmModal(false)}
+        onConfirm={() => confirmStringingTypeChange('auto')}
+        title="Reset Stringing Data?"
+        message="Switching to Auto will reset all custom stringing data. This action cannot be undone."
+        confirmText="Reset and Continue"
+        cancelText="Cancel"
+      />
     </div>
   );
 };
 
-export default memo(StringCombinerPanelSection);
+const areCombinerPropsEqual = (prevProps, nextProps) => {
+  if (prevProps.systemNumber !== nextProps.systemNumber) return false;
+
+  const relevantFields = [
+    'combiner_panel_make', 'combiner_panel_model', 'combiner_panel_existing',
+    'combiner_panel_main_breaker', 'combiner_panel_bus_rating',
+    'stringing_type', 'aggregate_pv_breaker',
+    'solar_panel_make', 'solar_panel_model', 'solar_panel_quantity',
+    'solar_panel_type2_manufacturer', 'solar_panel_type2_model', 'solar_panel_type2_quantity',
+    'inverter_make', 'inverter_model', 'inverter_type',
+    // Microinverter stringing (micro1Panels through micro25Panels)
+    ...Array.from({ length: 25 }, (_, i) => `micro${i + 1}Panels`),
+  ];
+
+  for (const field of relevantFields) {
+    if (prevProps.formData?.[field] !== nextProps.formData?.[field]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export default memo(StringCombinerPanelSection, areCombinerPropsEqual);

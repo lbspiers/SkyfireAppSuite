@@ -174,6 +174,7 @@ const MainCircuitBreakersSection = ({ formData, onChange, projectData }) => {
         title="Service Entrance"
         subtitle={getSubtitle()}
         onDelete={handleDelete}
+        noWrapTitle={true}
       >
         {/* Utility Company - Required for SolarAPP+ - MOVED TO TOP */}
         <TableDropdown

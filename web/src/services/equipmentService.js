@@ -11,7 +11,7 @@ const enc = (value) => encodeURIComponent(value);
 // Manufacturers lists are relatively static - cache them for the session
 // ============================================================================
 const manufacturersCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 0; // DISABLED - always fetch fresh from DB
 
 const getCachedData = (key) => {
   const cached = manufacturersCache.get(key);
@@ -148,19 +148,32 @@ export const getSolarPanelModels = async (manufacturer) => {
 /**
  * Get inverter manufacturers
  * Uses dedicated inverter endpoint with fallback to generic endpoint
+ * @param {string} equipmentType - Optional filter: 'microinverter' or 'inverter'
  * @returns {Promise} API response with inverter manufacturers
  */
-export const getInverterManufacturers = async () => {
-  const cacheKey = 'inverter-manufacturers';
+export const getInverterManufacturers = async (equipmentType = null) => {
+  const cacheKey = equipmentType ? `inverter-manufacturers-${equipmentType}` : 'inverter-manufacturers';
 
-  // Check cache first
-  const cached = getCachedData(cacheKey);
-  if (cached) return cached;
+  // Skip cache for filtered requests to ensure fresh data
+  // Check cache first (only for unfiltered requests)
+  const cached = !equipmentType ? getCachedData(cacheKey) : null;
+  if (cached) {
+    logger.log('InverterMfgAPI', '💾 Using cached data (unfiltered)');
+    return cached;
+  }
 
   try {
-    const url = `${API_BASE_URL}/api/inverters/manufacturers`;
-    logger.debug('Equipment', 'Fetching inverter manufacturers from API');
+    let url = `${API_BASE_URL}/api/inverters/manufacturers`;
+    if (equipmentType) {
+      url += `?equipment_type=${enc(equipmentType)}`;
+    }
+    logger.log('InverterMfgAPI', `📡 Fetching from: ${url}`, { equipmentType });
     const response = await axios.get(url);
+    logger.log('InverterMfgAPI', `✅ Response received:`, {
+      count: response.data?.data?.length || 0,
+      equipmentType,
+      manufacturers: response.data?.data?.slice(0, 3) // Show first 3
+    });
     setCachedData(cacheKey, response.data);
     return response.data;
   } catch (error) {

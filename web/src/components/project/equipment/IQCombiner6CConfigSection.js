@@ -214,14 +214,6 @@ const IQCombiner6CConfigSection = ({ formData, onChange }) => {
         </Alert>
       )}
 
-      {/* Legacy PV Detection Notice */}
-      {hasLegacyPV && (
-        <Alert variant="info" style={{ marginBottom: 'var(--spacing)' }}>
-          <strong>Legacy/Third-Party PV Detected:</strong> This system includes existing
-          PV equipment. A software upgrade will be required during commissioning.
-        </Alert>
-      )}
-
       {/* Configuration Summary - Hidden for production */}
       {false && currentConfig && (
         <div className={styles.fieldGroup} style={{

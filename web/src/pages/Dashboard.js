@@ -16,6 +16,7 @@ import Inventory from './Inventory';
 import SupportPanel from '../components/support/SupportPanel';
 import { DevPortal } from '../components/dev';
 import AHJInfoPanel from '../components/Admin/AHJInfoPanel';
+import AnalyticsDashboard from './Admin/AnalyticsDashboard/AnalyticsDashboard';
 import BillingPortal from './Admin/BillingPortal';
 import useDashboardData from '../hooks/useDashboardData';
 import { useDevNotes } from '../hooks/useDevNotes';
@@ -386,6 +387,7 @@ const Dashboard = () => {
                   { id: 'inventory', label: 'Inventory' },
                   ...(isSuperUser ? [{ id: 'billing', label: 'Billing' }] : []),
                   ...(showDevPortalTab ? [{ id: 'ahjinfo', label: 'AHJ Info' }] : []),
+                  ...(showDevPortalTab ? [{ id: 'analytics', label: 'Analytics' }] : []),
                   ...(showDevPortalTab ? [{ id: 'devportal', label: 'Dev Portal' }] : []),
                   { id: 'logout', label: 'Logout' }
                 ]}
@@ -403,6 +405,7 @@ const Dashboard = () => {
                   inventory: <Inventory />,
                   billing: <BillingPortal />,
                   ahjinfo: <AHJInfoPanel />,
+                  analytics: <AnalyticsDashboard />,
                   devportal: <DevPortal />,
                   logout: (
                     <div className={styles.menuTabContent}>

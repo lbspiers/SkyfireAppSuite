@@ -93,8 +93,15 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   });
 
   // Hydrate form from backend data
+  // Use a ref to track if this is the initial hydration
+  const hasHydratedRef = React.useRef(false);
+
   useEffect(() => {
-    if (systemDetails) {
+    if (systemDetails && !hasHydratedRef.current) {
+      // Only hydrate on initial load
+      // After that, formData is updated via handleFieldChange which also updates systemDetails
+      // So we don't need to sync back from systemDetails to formData
+
       // Count visible planes (check which planes have data)
       let maxVisiblePlane = 1;
       for (let i = 1; i <= maxPlanes; i++) {
@@ -162,7 +169,9 @@ const StructuralForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         }
       }
 
+      // Always use the hydrated data from backend (it already includes optimistic updates from updateField)
       setFormData(hydratedData);
+      hasHydratedRef.current = true;
     }
   }, [systemDetails]);
 

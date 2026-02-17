@@ -15,15 +15,16 @@ class RequestCache {
 
     // Default TTLs by endpoint pattern
     this.ttlConfig = {
-      '/equipment/manufacturers': 10 * 60 * 1000, // 10 minutes
-      '/api/solar-panels/manufacturers': 10 * 60 * 1000,
-      '/api/inverters/manufacturers': 10 * 60 * 1000,
-      '/api/batteries/manufacturers': 10 * 60 * 1000,
-      '/api/solar-panels/models': 10 * 60 * 1000,
-      '/api/inverters/models': 10 * 60 * 1000,
-      '/api/batteries/models': 10 * 60 * 1000,
-      '/equipment/models': 10 * 60 * 1000,
-      'default': 60 * 1000 // 1 minute default
+      '/equipment/manufacturers': 0, // No caching - always fetch fresh equipment
+      '/api/solar-panels/manufacturers': 0, // No caching - always fetch fresh
+      '/api/inverters/manufacturers': 0, // No caching - always fetch fresh
+      '/api/batteries/manufacturers': 0, // No caching - always fetch fresh
+      '/api/solar-panels/models': 0, // No caching - always fetch fresh
+      '/api/inverters/models': 0, // No caching - always fetch fresh
+      '/api/batteries/models': 0, // No caching - always fetch fresh
+      '/equipment/models': 0, // No caching - always fetch fresh
+      '/utility-zipcodes/': 0, // No caching - always fetch fresh utilities
+      'default': 60 * 1000 // 1 minute default for other endpoints
     };
   }
 
@@ -58,6 +59,12 @@ class RequestCache {
 
     // Only cache GET requests
     if (method !== 'GET') {
+      return axiosInstance.request({ url, ...options });
+    }
+
+    // Check TTL - if 0, skip caching entirely
+    const ttl = this.getTTL(url);
+    if (ttl === 0) {
       return axiosInstance.request({ url, ...options });
     }
 

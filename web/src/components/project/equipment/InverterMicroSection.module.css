@@ -46,6 +46,43 @@
 }
 
 /* ===== STRING INPUT ROWS ===== */
+
+/* Toolbar: Auto-Distribute left, remaining count top-right */
+.stringingToolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 var(--spacing) var(--spacing-tight) var(--spacing);
+  border-bottom: var(--border-thin) solid var(--border-subtle);
+}
+
+/* Auto-Distribute row content: button on left, count on right (legacy) */
+.autoDistributeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+/* Panels qty input inside FormFieldRow — unstyled text input matching other section fields */
+.stringQtyInput {
+  flex: 0 0 auto;
+  width: 56px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  font-family: inherit;
+  text-align: left;
+  outline: none;
+  padding: 0;
+}
+
+.stringQtyInput::placeholder {
+  color: var(--text-disabled);
+}
+
 .stringInputContainer {
   display: flex;
   flex-direction: column;
@@ -150,4 +187,29 @@
 /* ===== GATEWAY CONFIGURATION SECTION ===== */
 .gatewayConfigSection {
   margin-top: var(--spacing-xs);
+}
+
+/* ===== VOLTAGE VALIDATION INDICATORS (NEC 690.7) ===== */
+.voltageIndicator {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  margin-left: var(--spacing-tight);
+  white-space: nowrap;
+}
+
+.voltageOk {
+  color: var(--color-success);
+}
+
+.voltageWarning {
+  color: #f59e0b; /* amber/yellow */
+}
+
+.voltageWarningSevere {
+  color: #f97316; /* orange */
+}
+
+.voltageError {
+  color: var(--color-error);
+  font-weight: var(--font-bold);
 }

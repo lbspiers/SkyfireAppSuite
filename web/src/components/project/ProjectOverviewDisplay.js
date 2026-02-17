@@ -9,8 +9,9 @@ import styles from './ProjectOverviewDisplay.module.css';
  * @param {object} projectData - Full project data object
  * @param {object} systemDetails - System details from useSystemDetails hook
  * @param {function} onUtilityClick - Optional callback when utility field is clicked (if empty)
+ * @param {function} onHouseSqFtClick - Optional callback when house sq ft field is clicked (if empty)
  */
-const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) => {
+const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick, onHouseSqFtClick }) => {
   // Organize data into sections
   const sections = useMemo(() => {
     const allSections = [];
@@ -50,7 +51,13 @@ const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) 
       addField(customerSiteFields, 'Utility', 'Not Selected', 'utilityMissing');
     }
     if (site.apn) addField(customerSiteFields, 'APN', site.apn);
-    if (site.house_sqft) addField(customerSiteFields, 'Square Footage', site.house_sqft);
+    // Always show House Sq Ft field (even if empty) - mark as special if empty
+    // House Sq Ft is stored in systemDetails, not site
+    if (systemDetails?.house_sqft) {
+      addField(customerSiteFields, 'House Sq Ft', systemDetails.house_sqft);
+    } else {
+      addField(customerSiteFields, 'House Sq Ft', 'Please Add', 'houseSqFtMissing');
+    }
 
     if (customerSiteFields.length > 0) {
       allSections.push({ title: 'Customer & Site', fields: customerSiteFields });
@@ -374,18 +381,19 @@ const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) 
             {/* Section Fields */}
             {section.fields.map((field, fieldIndex) => {
               const isUtilityMissing = field.specialClass === 'utilityMissing';
+              const isHouseSqFtMissing = field.specialClass === 'houseSqFtMissing';
               const isMountingPlaneDivider = field.specialClass === 'mountingPlaneDivider';
-
-              // Utility field specific handling
-              if (field.label === 'Utility') {
-                // Field-specific logic for utility (if needed in future)
-              }
 
               const handleClick = () => {
                 if (isUtilityMissing && onUtilityClick) {
                   onUtilityClick();
+                } else if (isHouseSqFtMissing && onHouseSqFtClick) {
+                  onHouseSqFtClick();
                 }
               };
+
+              const isClickable = (isUtilityMissing && onUtilityClick) || (isHouseSqFtMissing && onHouseSqFtClick);
+              const isMissing = isUtilityMissing || isHouseSqFtMissing;
 
               return (
                 <div
@@ -394,10 +402,10 @@ const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) 
                 >
                   <div className={styles.fieldLabel}>{field.label}</div>
                   <div
-                    className={isUtilityMissing ? `${styles.fieldValue} ${styles.fieldValueMissing}` : styles.fieldValue}
-                    onClick={isUtilityMissing && onUtilityClick ? handleClick : undefined}
-                    style={isUtilityMissing && onUtilityClick ? { cursor: 'pointer' } : undefined}
-                    title={isUtilityMissing && onUtilityClick ? 'Click to select utility' : undefined}
+                    className={isMissing ? `${styles.fieldValue} ${styles.fieldValueMissing}` : styles.fieldValue}
+                    onClick={isClickable ? handleClick : undefined}
+                    style={isClickable ? { cursor: 'pointer' } : undefined}
+                    title={isUtilityMissing && onUtilityClick ? 'Click to select utility' : isHouseSqFtMissing && onHouseSqFtClick ? 'Click to add house square footage' : undefined}
                   >
                     {field.value}
                   </div>

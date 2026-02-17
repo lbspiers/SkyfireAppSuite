@@ -95,6 +95,17 @@
   position: relative;
 }
 
+.viewLinkDisabled {
+  color: var(--text-disabled) !important;
+  cursor: not-allowed !important;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.viewLinkDisabled:hover {
+  color: var(--text-disabled) !important;
+}
+
 .viewLinkIndicator {
   content: '';
   position: absolute;

@@ -93,7 +93,15 @@ export const UploadProvider = ({ children }) => {
     isComplete,
     isModalOpen,
     openModal: useCallback(() => setIsModalOpen(true), []),
-    closeModal: useCallback(() => setIsModalOpen(false), []),
+    closeModal: useCallback(() => {
+      setIsModalOpen(false);
+      // Reset upload state when closing after completion
+      const currentStatus = uploadManager.getStatus();
+      const stillActive = currentStatus.inProgress > 0 || currentStatus.queued > 0;
+      if (!stillActive && currentStatus.total > 0) {
+        uploadManager.reset();
+      }
+    }, []),
     enqueue: useCallback((files, projectUuid, metadata) => uploadManager.enqueue(files, projectUuid, metadata), []),
     cancel: useCallback(() => uploadManager.cancel(), []),
     retryFailed: useCallback(() => uploadManager.retryFailed(), []),

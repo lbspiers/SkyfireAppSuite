@@ -78,17 +78,17 @@ const EquipmentRow = ({
 
           {/* Right side - 75% content area */}
           <div className={styles.headerRight}>
-            {/* Inventory button goes here when expanded */}
-            {isExpanded && headerRightContent && (
-              <div className={styles.headerRightContent}>
-                {headerRightContent}
-              </div>
-            )}
             <span className={styles.chevron}>
               <ChevronIcon expanded={isExpanded} />
             </span>
           </div>
         </button>
+        {/* Header right content (e.g., Inventory/Preferred buttons) - positioned outside button to avoid nesting */}
+        {isExpanded && headerRightContent && (
+          <div className={styles.headerRightContent}>
+            {headerRightContent}
+          </div>
+        )}
         {/* Action buttons aligned right */}
         {isExpanded && (
           <div className={styles.actions}>

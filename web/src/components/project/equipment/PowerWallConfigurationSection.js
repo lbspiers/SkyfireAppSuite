@@ -7,23 +7,25 @@ import {
 import { FormFieldRow, TableRowButton, TableDropdown } from '../../ui';
 import styles from './PowerWallConfigurationSection.module.css';
 import formStyles from '../../../styles/FormSections.module.css';
+import logger from '../../../services/devLogger';
 
 /**
  * PowerWall Configuration Section
  * Handles Tesla PowerWall-specific configuration (expansion packs, gateway, backup options)
  */
-const PowerWallConfigurationSection = ({ formData, onChange }) => {
-  // Extract values with defaults
-  const backupOption = formData.backup_option || '';
-  const expansionPacks = formData.expansionPacks ?? 0;
-  const gateway = formData.gateway || '';
-  const backupSwitchLocation = formData.backupSwitchLocation || '';
-  const batteryExisting = formData.batteryExisting || false;
-
-  console.log('[PowerWallConfig] Render:', {
+const PowerWallConfigurationSection = ({
+  backupOption = '',
+  expansionPacks = 0,
+  gateway = '',
+  backupSwitchLocation = '',
+  batteryExisting = false,
+  onChange
+}) => {
+  logger.log('[PowerWallConfig] Render:', {
     gateway,
     backupOption,
-    formData_gateway: formData.gateway,
+    expansionPacks,
+    batteryExisting,
     showGatewaySelection: backupOption === 'Whole Home' || backupOption === 'Partial Home'
   });
 
@@ -50,7 +52,7 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
             onClick={() => onChange('backup_option', 'Partial Home')}
           />
           <TableRowButton
-            label="None"
+            label="No Backup"
             variant="outline"
             active={backupOption === 'No Backup'}
             onClick={() => onChange('backup_option', 'No Backup')}
@@ -96,7 +98,7 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
             label="Management"
             value={gateway}
             onChange={(value) => {
-              console.log('[PowerWallConfig] Gateway onChange:', { value, currentGateway: gateway });
+              logger.log('[PowerWallConfig] Gateway onChange:', { value, currentGateway: gateway });
               onChange('gateway', value);
             }}
             options={TESLA_POWERWALL_GATEWAYS}
@@ -111,7 +113,7 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
 
       {/* 5. Backup Switch Location (conditional) */}
       {showBackupSwitchLocation && (
-        <FormFieldRow label="Backup Switch Location*">
+        <FormFieldRow label="Backup Switch Location">
           <div style={{ display: 'flex', gap: 'var(--spacing-xs)', flexWrap: 'wrap' }}>
             {BACKUP_SWITCH_LOCATIONS.map((option) => (
               <TableRowButton
@@ -125,6 +127,7 @@ const PowerWallConfigurationSection = ({ formData, onChange }) => {
           </div>
         </FormFieldRow>
       )}
+
     </div>
   );
 };

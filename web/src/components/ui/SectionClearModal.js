@@ -16,6 +16,7 @@ const SectionClearModal = ({
   sectionName = 'this section',
   fieldCount = 0,
   scopedToPanel = true, // Default to true for left panel modals
+  contained = true, // Default to true - renders within parent container
   cascadeSections = [], // Array of section names that will also be cleared
   willRemove = false, // Whether the section will also be removed after clearing
 }) => {
@@ -28,6 +29,7 @@ const SectionClearModal = ({
       title={willRemove ? "Clear and Remove Section?" : "Clear Section Data?"}
       size="sm"
       scopedToPanel={scopedToPanel}
+      contained={contained}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>

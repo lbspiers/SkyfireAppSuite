@@ -3,6 +3,7 @@ import { MAIN_CIRCUIT_BREAKER_RATINGS, PCS_AMPS_OPTIONS } from '../../../utils/c
 import { TableDropdown, TableRowButton, Alert, FormFieldRow, Tooltip } from '../../ui';
 import formStyles from '../../../styles/FormSections.module.css';
 import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
+import logger from '../../../services/devLogger';
 
 /**
  * Gateway Configuration Section
@@ -12,30 +13,53 @@ import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
  * - Auto: System calculates optimal breaker rating (shows tooltip)
  * - Custom: User manually selects breaker rating from dropdown
  */
-const GatewayConfigurationSection = ({ formData, onChange }) => {
+const GatewayConfigurationSection = ({
+  gatewayConfigMainBreakerMode = 'auto',
+  gatewayConfigMainBreaker = '',
+  gatewayConfigBackupSubPanelMode = 'auto',
+  gatewayConfigBackupSubPanel = '',
+  gatewayConfigPVBreakerMode = 'auto',
+  gatewayConfigPVBreaker = '',
+  gatewayConfigESSBreakerMode = 'auto',
+  gatewayConfigESSBreaker = '',
+  gatewayConfigTieInBreakerMode = 'auto',
+  gatewayConfigTieInBreaker = '',
+  gatewayConfigActivatePCS = false,
+  gatewayConfigPCSAmps = '',
+  onChange,
+}) => {
   // Main Breaker
-  const mainBreakerMode = formData.gatewayConfigMainBreakerMode || 'auto';
-  const mainBreaker = formData.gatewayConfigMainBreaker || '';
+  const mainBreakerMode = gatewayConfigMainBreakerMode;
+  const mainBreaker = gatewayConfigMainBreaker;
 
   // Backup Sub Panel
-  const backupSubPanelMode = formData.gatewayConfigBackupSubPanelMode || 'auto';
-  const backupSubPanel = formData.gatewayConfigBackupSubPanel || '';
+  const backupSubPanelMode = gatewayConfigBackupSubPanelMode;
+  const backupSubPanel = gatewayConfigBackupSubPanel;
 
   // PV Breaker Rating
-  const pvBreakerMode = formData.gatewayConfigPVBreakerMode || 'auto';
-  const pvBreaker = formData.gatewayConfigPVBreaker || '';
+  const pvBreakerMode = gatewayConfigPVBreakerMode;
+  const pvBreaker = gatewayConfigPVBreaker;
 
   // ESS Breaker Rating
-  const essBreakerMode = formData.gatewayConfigESSBreakerMode || 'auto';
-  const essBreaker = formData.gatewayConfigESSBreaker || '';
+  const essBreakerMode = gatewayConfigESSBreakerMode;
+  const essBreaker = gatewayConfigESSBreaker;
 
   // Tie-in Breaker
-  const tieInBreakerMode = formData.gatewayConfigTieInBreakerMode || 'auto';
-  const tieInBreaker = formData.gatewayConfigTieInBreaker || '';
+  const tieInBreakerMode = gatewayConfigTieInBreakerMode;
+  const tieInBreaker = gatewayConfigTieInBreaker;
 
   // Activate PCS
-  const activatePCS = formData.gatewayConfigActivatePCS || false;
-  const pcsAmps = formData.gatewayConfigPCSAmps || '';
+  const activatePCS = gatewayConfigActivatePCS;
+  const pcsAmps = gatewayConfigPCSAmps;
+
+  logger.log('[GatewayConfig] Render:', {
+    mainBreakerMode,
+    backupSubPanelMode,
+    pvBreakerMode,
+    essBreakerMode,
+    tieInBreakerMode,
+    activatePCS
+  });
 
   // Main Breaker options (100, 125, 150, 175, 200)
   const mainBreakerOptions = [100, 125, 150, 175, 200].map((n) => ({

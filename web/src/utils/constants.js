@@ -175,7 +175,7 @@ export const PCS_AMPS_OPTIONS = Array.from({ length: 38 }, (_, i) => {
 
 export const SPB_TIE_IN_LOCATIONS = [
   { label: "Main Panel (A) Bus", value: "Main Panel (A) Bus" },
-  { label: "Sub Panel (B) MCB Spot (M2/M3)", value: "Sub Panel (B) MCB Spot (M2/M3)" },
+  { label: "Sub Panel (B) MCB Spot (M2)", value: "Sub Panel (B) MCB Spot (M2)" },
 ];
 
 // Structural Section Constants
@@ -299,7 +299,7 @@ export const POWERWALL_3_KILOWATT_OPTIONS = [
 
 export const BACKUP_SWITCH_LOCATIONS = [
   { label: "Behind Utility Meter", value: "behind_utility_meter" },
-  { label: "Stand Alone Meter Panel", value: "stand_alone_meter_panel" },
+  { label: "Standalone Meter Panel", value: "stand_alone_meter_panel" },
 ];
 
 export const BATTERY_MOUNT_TYPES = [

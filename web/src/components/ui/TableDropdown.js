@@ -12,6 +12,8 @@ import styles from './TableDropdown.module.css';
  * @param {string} placeholder - Placeholder text
  * @param {boolean} disabled - Disable the dropdown
  * @param {boolean} showSearch - Show search input (default: true, set false for short lists)
+ * @param {boolean} rightAlign - Flip layout: content on left, label on right (default: false)
+ * @param {boolean} wrapLabel - Allow label to wrap to multiple lines (default: false)
  */
 const TableDropdown = ({
   label,
@@ -21,13 +23,19 @@ const TableDropdown = ({
   placeholder = 'Select...',
   disabled = false,
   showSearch = true,
+  rightAlign = false,
+  wrapLabel = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
-  const selectedOption = options.find(opt => opt.value === value);
+  // Find the selected option in the options array
+  // If value exists but option not found (e.g., during hydration before options load),
+  // create a temporary option to display the value
+  const selectedOption = options.find(opt => opt.value === value) ||
+    (value ? { value, label: value } : null);
 
   const filteredOptions = useMemo(() => {
     if (!search) return options;
@@ -58,61 +66,78 @@ const TableDropdown = ({
   }, [isOpen]);
 
   const handleSelect = (optValue) => {
+    console.log('[TableDropdown] handleSelect called:', { label, optValue, currentValue: value });
     onChange(optValue);
     setIsOpen(false);
     setSearch('');
   };
 
-  return (
-    <div className={styles.row} ref={containerRef}>
-      <span className={styles.label}>{label}</span>
-      <div className={styles.dropdownWrapper}>
-        <button
-          type="button"
-          className={`${styles.dropdown} ${disabled ? styles.disabled : ''}`}
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
-        >
-          <span className={!selectedOption ? styles.placeholderText : ''}>
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
-        </button>
-        <ChevronDownIcon isOpen={isOpen} />
+  const dropdownContent = (
+    <div className={styles.dropdownWrapper}>
+      <button
+        type="button"
+        className={`${styles.dropdown} ${disabled ? styles.disabled : ''}`}
+        onClick={() => {
+          console.log('[TableDropdown] Dropdown clicked:', { label, disabled, isOpen });
+          !disabled && setIsOpen(!isOpen);
+        }}
+        disabled={disabled}
+      >
+        <span className={!selectedOption ? styles.placeholderText : ''}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+      </button>
+      <ChevronDownIcon isOpen={isOpen} />
 
-        {isOpen && (
-          <div className={styles.dropdownMenu}>
-            {showSearch && (
-              <div className={styles.searchWrapper}>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className={styles.searchInput}
-                  placeholder="Search..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-            )}
-            <div className={styles.optionsList}>
-              {filteredOptions.length === 0 ? (
-                <div className={styles.noResults}>No results found</div>
-              ) : (
-                filteredOptions.map((option, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className={`${styles.option} ${option.value === value ? styles.selected : ''}`}
-                    onClick={() => handleSelect(option.value)}
-                  >
-                    {option.label}
-                  </button>
-                ))
-              )}
+      {isOpen && (
+        <div className={styles.dropdownMenu}>
+          {showSearch && (
+            <div className={styles.searchWrapper}>
+              <input
+                ref={inputRef}
+                type="text"
+                className={styles.searchInput}
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
             </div>
+          )}
+          <div className={styles.optionsList}>
+            {filteredOptions.length === 0 ? (
+              <div className={styles.noResults}>No results found</div>
+            ) : (
+              filteredOptions.map((option, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`${styles.option} ${option.value === value ? styles.selected : ''}`}
+                  onClick={() => handleSelect(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className={`${styles.row} ${rightAlign ? styles.rightAlign : ''}`} ref={containerRef}>
+      {rightAlign ? (
+        <>
+          {dropdownContent}
+          <span className={`${styles.label} ${wrapLabel ? styles.wrapLabel : ''}`}>{label}</span>
+        </>
+      ) : (
+        <>
+          <span className={`${styles.label} ${wrapLabel ? styles.wrapLabel : ''}`}>{label}</span>
+          {dropdownContent}
+        </>
+      )}
     </div>
   );
 };

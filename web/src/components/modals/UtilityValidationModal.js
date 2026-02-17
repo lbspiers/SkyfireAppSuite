@@ -3,6 +3,7 @@ import Modal from '../ui/Modal';
 import { FormSelect, FormInput, Button } from '../ui';
 import axios from '../../config/axios';
 import logger from '../../services/devLogger';
+import requestCache from '../../services/requestCache';
 import styles from './UtilityValidationModal.module.css';
 
 /**
@@ -16,7 +17,7 @@ import styles from './UtilityValidationModal.module.css';
  * @param {string} projectUuid - Project UUID for saving (optional for create page)
  * @param {boolean} autoSelectMultiple - Auto-select if multiple options (default: false)
  */
-const UtilityValidationModal = ({ isOpen, onClose, onSave, zipCode, projectUuid, autoSelectMultiple = false }) => {
+const UtilityValidationModal = ({ isOpen, onClose, onSave, zipCode, projectUuid, autoSelectMultiple = false, scopedToPanel = false, contained = false }) => {
   const [selectedUtility, setSelectedUtility] = useState('');
   const [utilities, setUtilities] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,12 +47,20 @@ const UtilityValidationModal = ({ isOpen, onClose, onSave, zipCode, projectUuid,
         throw new Error('Company ID not found');
       }
 
+      // Clear any cached utility data before fetching
+      const cacheKey = `/utility-zipcodes/zips/${zipCode}/utilities`;
+      requestCache.invalidate(cacheKey);
+      console.log('[UtilityValidationModal] 🗑️ Cleared cache for:', cacheKey);
+
       const response = await axios.get(`/utility-zipcodes/zips/${zipCode}/utilities`, {
         params: {
           companyId,
-          _: Date.now() // Cache-busting timestamp
+          _: Date.now(), // Cache-busting timestamp
+          bust: Math.random() // Additional cache buster
         }
       });
+
+      console.log('[UtilityValidationModal] 📦 Fetched utilities:', response.data);
 
       const utilityData = response.data?.data || response.data || [];
       logger.log('UtilityValidationModal', 'Fetched utilities:', utilityData);
@@ -143,6 +152,8 @@ const UtilityValidationModal = ({ isOpen, onClose, onSave, zipCode, projectUuid,
       onClose={onClose}
       title="Utility Required"
       size="sm"
+      scopedToPanel={scopedToPanel}
+      contained={contained}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>

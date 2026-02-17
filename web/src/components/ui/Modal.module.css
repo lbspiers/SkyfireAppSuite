@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent; /* No dark overlay for contained modals */
 }
 
 @keyframes fadeIn {

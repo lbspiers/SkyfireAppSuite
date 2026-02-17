@@ -51,7 +51,7 @@
 }
 
 .fieldValueMissing {
-  color: var(--color-warning);
+  color: #ef4444;
   font-style: italic;
   transition: var(--transition-colors);
 }
@@ -59,6 +59,16 @@
 .fieldValueMissing:hover {
   color: var(--color-primary);
   text-decoration: underline;
+}
+
+.fieldRow:has(.fieldValueMissing) {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+}
+
+.fieldRowMountingPlaneDivider:has(.fieldValueMissing) {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
 }
 
 .emptyState {

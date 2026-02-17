@@ -390,35 +390,29 @@ const BatteryTypeSection = ({
   };
 
   const handleDelete = () => {
-    // Check if there's any data to clear
-    const hasData = !!(
-      formData[makeField] ||
-      formData[modelField] ||
-      formData[quantityField] ||
-      formData[tieInLocationField] ||
-      formData[configurationField] ||
-      formData[mountTypeField]
-    );
+    // Clear all battery data fields
+    onChange(makeField, '');
+    onChange(modelField, '');
+    onChange(quantityField, '');
+    onChange(tieInLocationField, '');
+    onChange(configurationField, '');
+    onChange(combinationMethodField, '');
+    onChange(mountTypeField, '');
+    onChange(`${prefix}_isnew`, true); // Reset to default
+    // Also hide BOS if it was showing
+    onChange(`show_battery${batteryNumber}_bos`, false);
+    // Mark as manually cleared to prevent auto-select from re-triggering
+    setManuallyCleared(true);
 
-    if (hasData) {
-      // First click: Clear all data
-      onChange(makeField, '');
-      onChange(modelField, '');
-      onChange(quantityField, '');
-      onChange(tieInLocationField, '');
-      onChange(configurationField, '');
-      onChange(combinationMethodField, '');
-      onChange(mountTypeField, '');
-      onChange(`${prefix}_isnew`, true); // Reset to default
-      // Also hide BOS if it was showing
-      onChange(`show_battery${batteryNumber}_bos`, false);
-      // Mark as manually cleared to prevent auto-select from re-triggering
-      setManuallyCleared(true);
-    } else {
-      // Second click: Hide the entire section (only for Battery Type 2)
-      if (batteryNumber === 2) {
-        onChange('show_battery_type_2', false);
-      }
+    // Hide the entire section by setting BOTH visibility flags to false
+    // show_battery1 controls the main visibility (computed from backup_option OR battery_make)
+    // show_battery_type_1 is an additional override to force hide even if battery data exists
+    if (batteryNumber === 1) {
+      onChange('show_battery1', false);
+      onChange('show_battery_type_1', false);
+    } else if (batteryNumber === 2) {
+      onChange('show_battery2', false);
+      onChange('show_battery_type_2', false);
     }
   };
 

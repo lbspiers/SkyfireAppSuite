@@ -27,11 +27,11 @@ export const calculatePanelsRemaining = (formData, isMicroinverter) => {
       totalAssigned += panelQty;
     }
   } else {
-    // String inverters: use branch_string_X * branch_panels_per_string_X
+    // String inverters: branch_string_X stores panels per string directly
+    // (1 string per MPPT input)
     for (let i = 1; i <= 10; i++) {
-      const stringsQty = parseInt(formData[`branch_string_${i}`]) || 0;
-      const panelsPerString = parseInt(formData[`branch_panels_per_string_${i}`]) || 0;
-      totalAssigned += stringsQty * panelsPerString;
+      const panelsPerString = parseInt(formData[`branch_string_${i}`]) || 0;
+      totalAssigned += panelsPerString;
     }
   }
 

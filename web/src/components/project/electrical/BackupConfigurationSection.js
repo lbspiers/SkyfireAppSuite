@@ -38,7 +38,7 @@ const BackupConfigurationSection = ({
       // Clear panel selections
       onChange('backuploads_panel_selection', '');
       // Mark backup panel as new
-      onChange('backup_panel_isnew', true);
+      onChange('backup_panel_existing', false);
     } else if (value === 'Backup Existing Panel') {
       // Clear panel selection, they'll choose in step 2
       onChange('backuploads_panel_selection', '');
@@ -95,6 +95,7 @@ const BackupConfigurationSection = ({
         <EquipmentRow
           title={getTitle()}
           subtitle={getSubtitle()}
+          noWrapTitle={true}
         >
           {/* Step 1: Backup Option Dropdown */}
           <TableDropdown
@@ -109,24 +110,26 @@ const BackupConfigurationSection = ({
           {/* Step 2: Panel Selection Buttons (only show if "Backup Existing Panel" selected) */}
           {showPanelButtons && (
             <FormFieldRow label="Select Panel">
-              <TableRowButton
-                label="Main Panel (A)"
-                variant="outline"
-                active={backupPanelSelection === 'Main Panel (A)'}
-                onClick={() => handlePanelSelection('Main Panel (A)')}
-              />
-              <TableRowButton
-                label="Sub Panel (B)"
-                variant="outline"
-                active={backupPanelSelection === 'Sub Panel (B)'}
-                onClick={() => handlePanelSelection('Sub Panel (B)')}
-              />
-              <TableRowButton
-                label="Sub Panel (C)"
-                variant="outline"
-                active={backupPanelSelection === 'Sub Panel (C)'}
-                onClick={() => handlePanelSelection('Sub Panel (C)')}
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-tight)', alignItems: 'flex-start' }}>
+                <TableRowButton
+                  label="Main Panel (A)"
+                  variant="outline"
+                  active={backupPanelSelection === 'Main Panel (A)'}
+                  onClick={() => handlePanelSelection('Main Panel (A)')}
+                />
+                <TableRowButton
+                  label="Sub Panel (B)"
+                  variant="outline"
+                  active={backupPanelSelection === 'Sub Panel (B)'}
+                  onClick={() => handlePanelSelection('Sub Panel (B)')}
+                />
+                <TableRowButton
+                  label="Sub Panel (C)"
+                  variant="outline"
+                  active={backupPanelSelection === 'Sub Panel (C)'}
+                  onClick={() => handlePanelSelection('Sub Panel (C)')}
+                />
+              </div>
             </FormFieldRow>
           )}
         </EquipmentRow>

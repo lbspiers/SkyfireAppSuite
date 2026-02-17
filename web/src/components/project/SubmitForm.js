@@ -5,6 +5,7 @@ import FormNavigationFooter from './FormNavigationFooter';
 import AttestationModal from '../modals/AttestationModal';
 import GenerateStatusModal from '../modals/GenerateStatusModal';
 import UtilityValidationModal from '../modals/UtilityValidationModal';
+import HouseSqFtModal from '../modals/HouseSqFtModal';
 import ProjectOverview from './ProjectOverview';
 import ProjectHeader from '../common/ProjectHeader';
 import ProjectOverviewDisplay from './ProjectOverviewDisplay';
@@ -30,9 +31,9 @@ import { extractAllEquipment } from '../../utils/equipmentExtractor';
  * SubmitForm - Submission workflow component with sub-tabs
  * Replaces the Print tab with Overview, QC, and Print sub-tabs
  */
-const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
+const SubmitForm = ({ projectUuid, projectData, onNavigateToTab, onSwitchToPlanSetTab }) => {
   // Get system details for Overview tab
-  const { data: systemDetails } = useSystemDetails({ projectUuid });
+  const { data: systemDetails, refresh: refreshSystemDetails } = useSystemDetails({ projectUuid });
   // Navigation handlers
   const handlePrev = () => {
     if (onNavigateToTab) {
@@ -58,6 +59,9 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   const [showGenerateConfirm, setShowGenerateConfirm] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showUtilityModal, setShowUtilityModal] = useState(false);
+  const [showHouseSqFtModal, setShowHouseSqFtModal] = useState(false);
+  const [showRequiredFieldsModal, setShowRequiredFieldsModal] = useState(false);
+  const [missingRequiredFields, setMissingRequiredFields] = useState([]);
 
   // Local state for utility to force UI update
   const [localProjectData, setLocalProjectData] = useState(projectData);
@@ -70,14 +74,55 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   const handlePrintDraft = () => {
     logger.log('Project', 'Generate Plan Set clicked');
 
-    // Check if utility is missing
-    if (!localProjectData?.site?.utility) {
-      logger.warn('SubmitForm', 'Utility is missing, showing modal');
-      toast.warning('Please select a utility before generating the plan set', {
+    // Validate required fields
+    const missing = [];
+    const site = localProjectData?.site || {};
+    const state = site.state;
+
+    // Jurisdiction is always required
+    if (!site.ahj || site.ahj.trim() === '') {
+      missing.push('Jurisdiction');
+    }
+
+    // Utility is always required
+    if (!site.utility || site.utility.trim() === '') {
+      missing.push('Utility');
+    }
+
+    // House Sq Ft is required for CA projects (stored in systemDetails, not site)
+    if (state === 'CA' && (!systemDetails?.house_sqft || String(systemDetails.house_sqft).trim() === '')) {
+      missing.push('House Sq Ft');
+    }
+
+    if (missing.length > 0) {
+      logger.warn('SubmitForm', 'Missing required fields:', missing);
+      setMissingRequiredFields(missing);
+
+      // Show specific modal for single missing field
+      if (missing.length === 1) {
+        if (missing[0] === 'Utility') {
+          toast.warning('Please select a utility before generating the plan set', {
+            position: 'top-center',
+            autoClose: 3000
+          });
+          setShowUtilityModal(true);
+          return;
+        } else if (missing[0] === 'House Sq Ft') {
+          toast.warning('House Sq Ft is required for California projects', {
+            position: 'top-center',
+            autoClose: 3000
+          });
+          setShowHouseSqFtModal(true);
+          return;
+        }
+      }
+
+      // Show general modal for multiple missing fields
+      toast.error(`Please fill in the following required field(s): ${missing.join(', ')}`, {
         position: 'top-center',
-        autoClose: 3000
+        autoClose: 5000
       });
-      setShowUtilityModal(true);
+      setShowRequiredFieldsModal(true);
       return;
     }
 
@@ -89,48 +134,62 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     setIsGenerating(true);
 
     try {
-      logger.log('Project', '🚀 Triggering GenerateProjects_Mobile automation for project:', projectUuid);
+      logger.log('Project', '🚀 Generating plan set for project:', projectUuid);
 
-      toast.info('Triggering plan set generation...', {
+      toast.info('Submitting plan set generation...', {
         position: 'top-center',
         autoClose: 2000,
       });
 
-      // Fetch the secret token
-      const secretToken = await fetchTriggerSecret();
+      // Import the new DA function
+      const { generatePlanSet, fetchTriggerSecret } = await import('../../utils/triggerPlanAutomation');
 
-      // Get user data from session
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
-      const userUuid = userData.uuid || userData.id;
-      const companyUuid = userData?.company?.uuid || projectData?.company_id;
-
-      if (!companyUuid) {
-        throw new Error('Company ID not found');
+      // Get fallback credentials (in case DA API is down)
+      let secretToken = null;
+      let automationOptions = null;
+      try {
+        secretToken = await fetchTriggerSecret();
+        const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+        automationOptions = {
+          companyUuid: userData?.company?.uuid || projectData?.company_id,
+          userUuid: userData.uuid || userData.id,
+          computerName: 'ServerComputer2',
+        };
+      } catch {
+        logger.warn('Project', 'Could not fetch legacy trigger credentials (non-blocking)');
       }
 
-      const automationOptions = {
-        companyUuid,
-        userUuid,
-        computerName: 'ServerComputer2',
-      };
-
-      // Trigger the plan set generation automation
-      await triggerPlanAutomation(
-        projectUuid,
+      // Use the new cloud pipeline with automatic fallback
+      const result = await generatePlanSet(projectUuid, {
         secretToken,
-        'GenerateProjects_Mobile',
-        automationOptions
-      );
-
-      logger.success('Project', '✅ Plan set generation triggered successfully');
-      toast.success('Plan set generation triggered successfully', {
-        position: 'top-center',
-        autoClose: 3000,
+        automationOptions,
+        onProgress: (progress) => {
+          logger.debug('Project', 'Generation progress:', progress);
+          // Optional: update a progress indicator in the UI
+        },
       });
 
+      if (result.source === 'da_api') {
+        logger.success('Project', `✅ Plan set generated in ${result.total_seconds}s (cloud)`);
+        toast.success(`Plan set generated in ${result.total_seconds}s!`, {
+          position: 'top-center',
+          autoClose: 5000,
+        });
+        // Auto-switch to Plan Set tab to show the new version
+        if (typeof onSwitchToPlanSetTab === 'function') {
+          setTimeout(() => onSwitchToPlanSetTab(), 2000);
+        }
+      } else {
+        logger.success('Project', '✅ Plan set generation triggered (legacy)');
+        toast.success('Plan set generation triggered successfully', {
+          position: 'top-center',
+          autoClose: 3000,
+        });
+      }
+
     } catch (error) {
-      logger.error('Project', '❌ Failed to trigger plan set generation:', error);
-      toast.error(error.response?.data?.message || error.message || 'Failed to trigger plan set generation. Please try again.', {
+      logger.error('Project', '❌ Failed to generate plan set:', error);
+      toast.error(error.message || 'Failed to generate plan set. Please try again.', {
         position: 'top-center',
         autoClose: 5000,
       });
@@ -142,11 +201,37 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
   // Calculate total QC progress (average of both)
   const totalQcProgress = Math.round((siteQcProgress + designQcProgress) / 2);
 
+  // Check if required fields are filled
+  const checkRequiredFields = () => {
+    const missing = [];
+    const site = localProjectData?.site || {};
+    const state = site.state;
+
+    // Jurisdiction is always required
+    if (!site.ahj || site.ahj.trim() === '') {
+      missing.push('Jurisdiction');
+    }
+
+    // Utility is always required
+    if (!site.utility || site.utility.trim() === '') {
+      missing.push('Utility');
+    }
+
+    // House Sq Ft is required for CA projects (stored in systemDetails, not site)
+    if (state === 'CA' && (!systemDetails?.house_sqft || String(systemDetails.house_sqft).trim() === '')) {
+      missing.push('House Sq Ft');
+    }
+
+    return missing;
+  };
+
+  const hasRequiredFields = checkRequiredFields().length === 0;
+
   // View configuration
   const viewSteps = [
     { key: 'overview', label: 'Overview' },
     { key: 'qc', label: 'QC' },
-    { key: 'print', label: 'Submit' },
+    { key: 'print', label: 'Submit', requiresValidation: true },
     { key: 'activity', label: 'Activity', alignRight: true },
   ];
 
@@ -203,6 +288,13 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     setShowUtilityModal(true);
   };
 
+  const handleHouseSqFtClick = () => {
+    logger.log('SubmitForm', 'House Sq Ft field clicked, opening modal');
+    const state = localProjectData?.site?.state;
+    const isRequired = state === 'CA';
+    setShowHouseSqFtModal(true);
+  };
+
   // Handle utility save from modal
   const handleUtilitySave = async (selectedUtility) => {
     logger.log('SubmitForm', 'Utility save requested:', selectedUtility);
@@ -255,25 +347,70 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
     }
   };
 
+  const handleHouseSqFtSave = async (houseSqFt) => {
+    logger.log('SubmitForm', 'House Sq Ft save requested:', houseSqFt);
+    try {
+      // Save house_sqft to system-details endpoint
+      const systemDetailsPayload = {
+        house_sqft: parseFloat(houseSqFt)
+      };
+
+      logger.log('SubmitForm', 'Saving house_sqft to system-details:', systemDetailsPayload);
+      await axios.patch(`/project/${projectUuid}/system-details`, systemDetailsPayload);
+
+      // Refresh system details to get the updated value
+      await refreshSystemDetails();
+
+      toast.success('House Sq Ft saved successfully', {
+        position: 'top-center',
+        autoClose: 2000
+      });
+
+      setShowHouseSqFtModal(false);
+    } catch (error) {
+      logger.error('SubmitForm', 'HouseSqFtSave Error:', error);
+      toast.error(`Failed to save house sq ft: ${error.response?.data?.message || error.message}`, {
+        position: 'top-center',
+        autoClose: 3000
+      });
+    }
+  };
+
   return (
     <form onSubmit={(e) => e.preventDefault()} className={styles.formContainer}>
       {/* Sticky Header Section - Sub-tab Navigation */}
       <div className={equipStyles.stickyHeader}>
         {/* View Navigation - Overview, QC, Submit + Activity on right */}
         <div className={`${styles.viewNavigation} ${selectedView === 'qc' ? styles.viewNavigationWithQC : ''}`}>
-          {viewSteps.filter(v => !v.alignRight).map((view, index) => (
-            <button
-              key={view.key}
-              type="button"
-              onClick={() => setSelectedView(view.key)}
-              className={`${styles.viewLink} ${index === 0 ? styles.viewLinkFirst : ''} ${selectedView === view.key ? styles.viewLinkActive : ''}`}
-            >
-              {view.label}
-              {selectedView === view.key && (
-                <span className={`${styles.viewLinkIndicator} ${index === 0 ? styles.viewLinkIndicatorFirst : styles.viewLinkIndicatorCenter}`} />
-              )}
-            </button>
-          ))}
+          {viewSteps.filter(v => !v.alignRight).map((view, index) => {
+            const isDisabled = view.requiresValidation && !hasRequiredFields;
+
+            return (
+              <button
+                key={view.key}
+                type="button"
+                onClick={() => {
+                  if (isDisabled) {
+                    const missing = checkRequiredFields();
+                    toast.error(`Please fill in the following required field(s): ${missing.join(', ')}`, {
+                      position: 'top-center',
+                      autoClose: 5000
+                    });
+                    setMissingRequiredFields(missing);
+                    return;
+                  }
+                  setSelectedView(view.key);
+                }}
+                className={`${styles.viewLink} ${index === 0 ? styles.viewLinkFirst : ''} ${selectedView === view.key ? styles.viewLinkActive : ''} ${isDisabled ? styles.viewLinkDisabled : ''}`}
+                disabled={isDisabled}
+              >
+                {view.label}
+                {selectedView === view.key && (
+                  <span className={`${styles.viewLinkIndicator} ${index === 0 ? styles.viewLinkIndicatorFirst : styles.viewLinkIndicatorCenter}`} />
+                )}
+              </button>
+            );
+          })}
 
           {/* Spacer to push right-aligned tabs */}
           <div style={{ flex: 1 }} />
@@ -333,6 +470,7 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
                 projectData={localProjectData}
                 systemDetails={systemDetails}
                 onUtilityClick={handleUtilityClick}
+                onHouseSqFtClick={handleHouseSqFtClick}
               />
             )}
           </div>
@@ -356,7 +494,11 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
 
         {/* Print View */}
         {selectedView === 'print' && (
-          <PrintSubTab projectUuid={projectUuid} projectData={projectData} />
+          <PrintSubTab
+            projectUuid={projectUuid}
+            projectData={projectData}
+            onSwitchToPlanSetTab={onSwitchToPlanSetTab}
+          />
         )}
 
         {/* Activity View */}
@@ -419,6 +561,18 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab }) => {
         onSave={handleUtilitySave}
         zipCode={localProjectData?.site?.zip_code}
         projectUuid={projectUuid}
+        scopedToPanel={true}
+        contained={true}
+      />
+
+      {/* House Sq Ft Modal */}
+      <HouseSqFtModal
+        isOpen={showHouseSqFtModal}
+        onClose={() => setShowHouseSqFtModal(false)}
+        onSave={handleHouseSqFtSave}
+        required={localProjectData?.site?.state === 'CA'}
+        scopedToPanel={true}
+        contained={true}
       />
     </form>
   );
@@ -442,7 +596,7 @@ const DisplayRow = ({ label, value }) => {
 /**
  * Print Sub-Tab - Draft printing, PE stamps, and permit ordering
  */
-const PrintSubTab = ({ projectUuid, projectData }) => {
+const PrintSubTab = ({ projectUuid, projectData, onSwitchToPlanSetTab }) => {
   // Draft version state
   const [draftVersion, setDraftVersion] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -591,31 +745,59 @@ const PrintSubTab = ({ projectUuid, projectData }) => {
     try {
       logger.log('Project', '🖨️ Printing draft version:', draftVersion);
 
-      // TODO: Trigger actual print automation
-      const secretToken = await fetchTriggerSecret();
-      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
-      const companyData = JSON.parse(sessionStorage.getItem('companyData') || '{}');
-
-      const options = {
-        companyUuid: companyData.uuid,
-        userUuid: userData.uuid,
-        computerName: 'ServerComputer2',
-      };
-
-      await triggerPlanAutomation(projectUuid, secretToken, 'GenerateProjects_Mobile', options);
-
-      // Increment draft version
-      setDraftVersion(prev => prev + 1);
-
-      toast.success(`Draft ${draftVersion} printed successfully!`, {
+      toast.info('Submitting plan set generation...', {
         position: 'top-center',
-        autoClose: 3000,
+        autoClose: 2000,
       });
 
-      logger.success('Project', '✅ Draft printed successfully');
+      const { generatePlanSet, fetchTriggerSecret } = await import('../../utils/triggerPlanAutomation');
+
+      // Get fallback credentials (in case DA API is down)
+      let secretToken = null;
+      let automationOptions = null;
+      try {
+        secretToken = await fetchTriggerSecret();
+        const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+        const companyData = JSON.parse(sessionStorage.getItem('companyData') || '{}');
+        automationOptions = {
+          companyUuid: companyData.uuid,
+          userUuid: userData.uuid,
+          computerName: 'ServerComputer2',
+        };
+      } catch {
+        logger.warn('Project', 'Could not fetch legacy trigger credentials (non-blocking)');
+      }
+
+      const result = await generatePlanSet(projectUuid, {
+        secretToken,
+        automationOptions,
+        onProgress: (progress) => {
+          logger.debug('Project', 'Generation progress:', progress);
+        },
+      });
+
+      setDraftVersion(prev => prev + 1);
+
+      if (result.source === 'da_api') {
+        logger.success('Project', `✅ Draft printed in ${result.total_seconds}s (cloud)`);
+        toast.success(`Draft ${draftVersion} generated in ${result.total_seconds}s!`, {
+          position: 'top-center',
+          autoClose: 5000,
+        });
+        // Auto-switch to Plan Set tab to show the new version
+        if (typeof onSwitchToPlanSetTab === 'function') {
+          setTimeout(() => onSwitchToPlanSetTab(), 2000);
+        }
+      } else {
+        logger.success('Project', '✅ Draft print triggered (legacy)');
+        toast.success(`Draft ${draftVersion} generation triggered!`, {
+          position: 'top-center',
+          autoClose: 3000,
+        });
+      }
     } catch (error) {
       logger.error('Project', '❌ Failed to print draft:', error);
-      toast.error('Failed to print draft. Please try again.', {
+      toast.error(error.message || 'Failed to print draft. Please try again.', {
         position: 'top-center',
         autoClose: 5000,
       });
@@ -1053,6 +1235,8 @@ const PrintSubTab = ({ projectUuid, projectData }) => {
         onSave={handleUtilitySave}
         zipCode={projectData?.site?.zip_code}
         projectUuid={projectUuid}
+        scopedToPanel={true}
+        contained={true}
       />
     </div>
   );

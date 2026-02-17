@@ -125,12 +125,14 @@ const RailsSection = ({ formData, onChange, railType = 'A', onClear }) => {
               setIsRailless(false);
             }}
           />
-          <TableRowButton
-            label="Rail-less"
-            variant="outline"
-            active={isRailless}
-            onClick={() => setIsRailless(!isRailless)}
-          />
+          <div style={{ marginLeft: 'auto' }}>
+            <TableRowButton
+              label="Rail-less"
+              variant="outline"
+              active={isRailless}
+              onClick={() => setIsRailless(!isRailless)}
+            />
+          </div>
         </div>
 
         {/* Rail Make and Model - Hidden when Rail-less is active */}

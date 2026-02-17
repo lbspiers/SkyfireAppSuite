@@ -36,6 +36,7 @@ import {
   AddSectionButton,
   AddButton,
   Alert,
+  TableRowButton,
 } from "../ui";
 import { detectProjectConfiguration } from "../../utils/bosConfigurationSwitchboard";
 import {
@@ -3951,20 +3952,24 @@ const EquipmentForm = ({
 
           // Create system-specific batch handler
           const handleSystemBatchChange = async (fieldUpdates) => {
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] handleSystemBatchChange ENTRY:`,
               { fieldUpdates, length: fieldUpdates?.length },
             );
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 1: Checking if empty...`,
             );
             if (!fieldUpdates || fieldUpdates.length === 0) {
-              console.log(
+              logger.debug(
+                'EquipmentForm',
                 `[System ${systemNumber}] Batch change SKIPPED - empty or null updates`,
               );
               return;
             }
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 2: Not empty, proceeding...`,
             );
 
@@ -3973,10 +3978,11 @@ const EquipmentForm = ({
               `[System ${systemNumber}] Batch change called with ${fieldUpdates.length} updates:`,
               fieldUpdates,
             );
-            console.log(`[System ${systemNumber}] Step 3: After logger.log`);
+            logger.debug('EquipmentForm', `[System ${systemNumber}] Step 3: After logger.log`);
 
             const systemPrefix = SYSTEM_PREFIXES[systemNumber];
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 4: systemPrefix = ${systemPrefix}`,
             );
 
@@ -4152,11 +4158,13 @@ const EquipmentForm = ({
             });
 
             // Process each field update
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 5: Starting forEach loop, ${fieldUpdates.length} items`,
             );
             fieldUpdates.forEach(([field, value], index) => {
-              console.log(
+              logger.debug(
+                'EquipmentForm',
                 `[System ${systemNumber}] Processing field ${index}:`,
                 { field, value },
               );
@@ -4213,17 +4221,20 @@ const EquipmentForm = ({
               }
             });
 
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 6: forEach complete. stateUpdates:`,
               stateUpdates,
             );
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 7: dbUpdates:`,
               dbUpdates,
             );
 
             // Update local state immediately in ONE call (optimistic update)
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 8: Calling setFormData...`,
             );
             setFormData((prev) => {
@@ -4231,7 +4242,8 @@ const EquipmentForm = ({
                 ...prev,
                 ...stateUpdates,
               };
-              console.log(
+              logger.debug(
+                'EquipmentForm',
                 `[System ${systemNumber}] Step 9: setFormData merging:`,
                 {
                   prev: Object.keys(prev).length,
@@ -4241,22 +4253,26 @@ const EquipmentForm = ({
               );
               return newFormData;
             });
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 10: setFormData complete`,
             );
 
             // Save to database in ONE call
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 11: About to save to DB, dbUpdates count:`,
               Object.keys(dbUpdates).length,
             );
             try {
               if (Object.keys(dbUpdates).length > 0) {
-                console.log(
+                logger.debug(
+                  'EquipmentForm',
                   `[System ${systemNumber}] Step 12: Calling updateFields...`,
                 );
                 await updateFields(dbUpdates);
-                console.log(
+                logger.debug(
+                  'EquipmentForm',
                   `[System ${systemNumber}] Step 13: updateFields completed`,
                 );
                 logger.log(
@@ -4265,12 +4281,14 @@ const EquipmentForm = ({
                   dbUpdates,
                 );
               } else {
-                console.log(
+                logger.debug(
+                  'EquipmentForm',
                   `[System ${systemNumber}] Step 12: No DB updates to save (dbUpdates empty)`,
                 );
               }
             } catch (error) {
-              console.error(
+              logger.error(
+                'EquipmentForm',
                 `[System ${systemNumber}] Step ERROR: Database save failed:`,
                 error,
               );
@@ -4280,7 +4298,8 @@ const EquipmentForm = ({
                 error,
               );
             }
-            console.log(
+            logger.debug(
+              'EquipmentForm',
               `[System ${systemNumber}] Step 14: handleSystemBatchChange COMPLETE`,
             );
           };
@@ -4326,6 +4345,7 @@ const EquipmentForm = ({
                   }
                   loadingMaxOutput={loadingMaxOutput}
                   showSolarPanel2={mergedFormData.show_solar_panel_2 && !mergedFormData.batteryonly}
+                  siteZipCode={projectData?.site?.zip_code || ''}
                 />
               )}
 
@@ -4435,10 +4455,11 @@ const EquipmentForm = ({
                 />
               )}
 
-              {/* IQ Meter Collar - Show ONLY for Enphase Combiner 6C + Whole/Partial Home backup */}
+              {/* IQ Meter Collar - Show ONLY for Enphase Combiner 6C + Whole/Partial Home backup + Backup Switch (not Gateway 3) */}
               {systemIsEnphaseCombiner6C &&
                 (mergedFormData.backup_option === "Whole Home" ||
-                  mergedFormData.backup_option === "Partial Home") && (
+                  mergedFormData.backup_option === "Partial Home") &&
+                mergedFormData.gateway === "backup_switch" && (
                   <IQMeterCollarSection
                     formData={mergedFormData}
                     onChange={handleSystemFieldChange}
@@ -4489,7 +4510,7 @@ const EquipmentForm = ({
 
 
               {/* Battery Type/Input 1 - Show when visibility flag is true (NOT PowerWall) */}
-              {mergedFormData.show_battery1 && !systemIsPowerWall && (
+              {mergedFormData.show_battery1 && (mergedFormData.show_battery_type_1 === undefined || mergedFormData.show_battery_type_1 === true) && !systemIsPowerWall && (
                 <BatteryTypeSection
                   formData={mergedFormData}
                   onChange={handleSystemFieldChange}
@@ -4566,8 +4587,8 @@ const EquipmentForm = ({
           />
         )}
 
-        {/* Post Combine BOS for Single System */}
-        {visibleSystems.length === 1 && (
+        {/* Post Combine BOS for Single System - Hidden unless combine decision is made */}
+        {visibleSystems.length === 1 && formData.combine_systems === false && (
           <SystemContainer systemNumber="Post Combine BOS">
             <PostCombineBOSSection
               projectUuid={projectUuid}
@@ -4585,6 +4606,13 @@ const EquipmentForm = ({
           <div className={equipStyles.sectionMarginTop}>
             <div
               className={`${formStyles.infoBox} ${equipStyles.infoBoxMarginBase}`}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "12px",
+                textAlign: "center",
+              }}
             >
               <img
                 src={flameIcon}
@@ -4598,14 +4626,14 @@ const EquipmentForm = ({
                 }}
               />
               <span className={formStyles.infoBoxContent}>
-                Please select all equipment and combination method before
-                detecting utility required BOS.
+                Select all equipment and combination method before clicking to add Utility Required BOS.
               </span>
+              <TableRowButton
+                label="+ Utility Required BOS"
+                onClick={handleDetectUtilityBOS}
+                variant="outline"
+              />
             </div>
-            <AddSectionButton
-              label="Utility Required Equipment"
-              onClick={handleDetectUtilityBOS}
-            />
           </div>
         )}
 
@@ -4730,6 +4758,13 @@ const EquipmentForm = ({
           <div className={equipStyles.sectionMarginTop}>
             <div
               className={`${formStyles.infoBox} ${equipStyles.infoBoxMarginBase}`}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "12px",
+                textAlign: "center",
+              }}
             >
               <img
                 src={flameIcon}
@@ -4743,14 +4778,14 @@ const EquipmentForm = ({
                 }}
               />
               <span className={formStyles.infoBoxContent}>
-                Please select all equipment and combination method before
-                detecting utility required BOS.
+                Select all equipment and combination method before clicking to add Utility Required BOS.
               </span>
+              <TableRowButton
+                label="+ Utility Required BOS"
+                onClick={handleDetectUtilityBOS}
+                variant="outline"
+              />
             </div>
-            <AddSectionButton
-              label="Utility Required Equipment"
-              onClick={handleDetectUtilityBOS}
-            />
           </div>
         )}
 

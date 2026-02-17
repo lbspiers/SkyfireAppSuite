@@ -20,7 +20,7 @@ const ProjectHeader = ({ projectData }) => {
 
   // Build address
   const address = site.address
-    ? `${site.address}, ${site.city || ''} ${site.state || ''} ${site.zip_code || ''}`.trim()
+    ? `${site.address}, ${site.city || ''}, ${site.state || ''} ${site.zip_code || site.zip || ''}`.trim()
     : null;
 
   // Project ID - use installer_project_id (same as dashboard table)

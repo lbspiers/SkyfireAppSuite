@@ -256,3 +256,213 @@ export async function triggerPlanAutomation(
     throw error;
   }
 }
+
+// ============================================================
+// Design Automation API (Cloud Pipeline) — NEW PRIMARY PATH
+// ============================================================
+
+const DA_API_BASE = 'https://api.skyfireapp.io/api/da';
+
+/**
+ * Fetch the DA API token from the backend.
+ * Falls back to env variable if endpoint unavailable.
+ */
+async function getDAToken() {
+  try {
+    const response = await axios.get('/server-endpoints/da-token');
+    return response.data.data.token;
+  } catch {
+    // Fallback: use env variable (for dev/demo)
+    const envToken = process.env.REACT_APP_DA_API_TOKEN;
+    if (envToken) return envToken;
+    throw new Error('DA API token not available');
+  }
+}
+
+/**
+ * Trigger plan generation via the Design Automation cloud pipeline.
+ * Only needs project_uuid — the server fetches everything else from DB.
+ *
+ * @param {string} projectUuid - Project UUID
+ * @returns {Promise<{status: string, project_uuid: string, mode: string}>}
+ */
+export async function triggerDAProcess(projectUuid) {
+  if (!projectUuid) throw new Error('projectUuid is required');
+
+  logger.log('DA', `Triggering cloud pipeline for project: ${projectUuid}`);
+
+  const token = await getDAToken();
+
+  const response = await axiosExternal.post(
+    `${DA_API_BASE}/process`,
+    { project_uuid: projectUuid },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    }
+  );
+
+  logger.success('DA', 'Pipeline submitted:', response.data);
+  return response.data;
+}
+
+/**
+ * Poll DA API for run completion.
+ * Resolves when status is 'completed' or 'failed'.
+ *
+ * @param {string} projectUuid - Project UUID to check
+ * @param {Object} options
+ * @param {number} options.intervalMs - Poll interval (default 3000ms)
+ * @param {number} options.timeoutMs - Max wait time (default 120000ms = 2 min)
+ * @param {function} options.onProgress - Callback with status updates
+ * @returns {Promise<Object>} The completed run record
+ */
+export async function pollDAStatus(projectUuid, options = {}) {
+  const {
+    intervalMs = 3000,
+    timeoutMs = 180000,
+    onProgress = null,
+    lastRunId = 0,
+  } = options;
+
+  const token = await getDAToken();
+  const startTime = Date.now();
+
+  logger.log('DA', `Polling status for ${projectUuid}...`);
+
+  while (Date.now() - startTime < timeoutMs) {
+    try {
+      const response = await axiosExternal.get(
+        `${DA_API_BASE}/runs`,
+        {
+          params: { project_uuid: projectUuid },
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 10000,
+        }
+      );
+
+      const runs = response.data.runs || [];
+      const validRuns = lastRunId
+        ? runs.filter(r => r.id > lastRunId)
+        : runs;
+
+      if (validRuns.length > 0) {
+        const latest = validRuns[0]; // Most recent run (sorted desc)
+
+        if (onProgress) {
+          onProgress({
+            status: latest.status,
+            elapsed: Date.now() - startTime,
+            totalSeconds: latest.total_seconds,
+          });
+        }
+
+        if (latest.status === 'completed') {
+          logger.success('DA', `Completed in ${latest.total_seconds}s`);
+          return latest;
+        }
+
+        if (latest.status === 'failed') {
+          throw new Error(latest.error_message || 'Pipeline failed');
+        }
+      }
+    } catch (pollError) {
+      // If it's our own thrown error (failed status), re-throw
+      if (pollError.message === 'Pipeline failed' || pollError.message?.includes('Pipeline failed')) {
+        throw pollError;
+      }
+      // Otherwise log and continue polling
+      logger.warn('DA', 'Poll request failed, retrying...', pollError.message);
+    }
+
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+
+  throw new Error(`Pipeline timed out after ${timeoutMs / 1000}s`);
+}
+
+/**
+ * Full flow: trigger DA process and poll until completion.
+ * This is the main function SubmitForm should call.
+ *
+ * Falls back to ngrok/laptop trigger if DA API is unavailable.
+ *
+ * @param {string} projectUuid
+ * @param {Object} options
+ * @param {function} options.onProgress - Status callback
+ * @param {string} options.secretToken - Ngrok secret (for fallback)
+ * @param {Object} options.automationOptions - Ngrok options (for fallback)
+ * @returns {Promise<Object>} The completed run record
+ */
+export async function generatePlanSet(projectUuid, options = {}) {
+  const { onProgress, secretToken, automationOptions } = options;
+
+  try {
+    // PRIMARY: Try DA API (cloud pipeline)
+    logger.log('DA', 'Using cloud pipeline (primary)');
+
+    if (onProgress) onProgress({ status: 'submitting', message: 'Submitting to cloud pipeline...' });
+
+    // Get current latest run ID before triggering
+    let lastRunId = 0;
+    try {
+      const token = await getDAToken();
+      const pre = await axiosExternal.get(`${DA_API_BASE}/runs`, {
+        params: { project_uuid: projectUuid },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 5000,
+      });
+      const existingRuns = pre.data.runs || [];
+      if (existingRuns.length > 0) {
+        lastRunId = existingRuns[0].id;
+      }
+    } catch (e) {
+      logger.warn('DA', 'Could not fetch pre-trigger runs, using timestamp fallback');
+    }
+
+    await triggerDAProcess(projectUuid);
+
+    if (onProgress) onProgress({ status: 'processing', message: 'Processing in cloud...' });
+
+    const result = await pollDAStatus(projectUuid, {
+      lastRunId,
+      onProgress: (p) => {
+        if (onProgress) {
+          onProgress({
+            status: 'processing',
+            message: `Processing... ${p.totalSeconds ? `(${p.totalSeconds}s)` : ''}`,
+            ...p,
+          });
+        }
+      },
+      timeoutMs: 180000,
+    });
+
+    if (onProgress) onProgress({ status: 'completed', message: `Done in ${result.total_seconds}s` });
+
+    return { source: 'da_api', ...result };
+
+  } catch (daError) {
+    logger.warn('DA', 'Cloud pipeline failed, falling back to legacy trigger:', daError.message);
+
+    // FALLBACK: Use ngrok/laptop trigger
+    if (secretToken) {
+      if (onProgress) onProgress({ status: 'fallback', message: 'Falling back to local processing...' });
+
+      await triggerPlanAutomation(
+        projectUuid,
+        secretToken,
+        'GenerateProjects_Mobile',
+        automationOptions || {}
+      );
+
+      return { source: 'legacy_ngrok', status: 'triggered' };
+    }
+
+    // No fallback available
+    throw daError;
+  }
+}

@@ -245,6 +245,9 @@ const ProjectOverview = ({ projectData, systemDetails, readOnly = false }) => {
   }, [projectData]);
 
   // Fetch utilities by zip code
+  // Add refresh counter to force re-fetch (increments on mount to bypass stale React state)
+  const [utilityRefreshKey] = useState(() => Date.now());
+
   useEffect(() => {
     if (readOnly) {
       return; // Skip API calls in read-only mode
@@ -260,6 +263,9 @@ const ProjectOverview = ({ projectData, systemDetails, readOnly = false }) => {
     let isCancelled = false;
 
     const fetchUtilities = async () => {
+      console.log('[Utility Fetch] 🚀 Starting fetch for ZIP:', zipCode);
+      console.log('[Utility Fetch] 🔑 Refresh key:', utilityRefreshKey);
+
       setUtilityLoading(true);
       setUtilityError(null);
 
@@ -267,16 +273,30 @@ const ProjectOverview = ({ projectData, systemDetails, readOnly = false }) => {
         const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
         const companyId = userData?.company?.uuid;
 
+        console.log('[Utility Fetch] 🏢 Company ID:', companyId);
+        console.log('[Utility Fetch] 📡 Request URL:', `/utility-zipcodes/zips/${zipCode}/utilities`);
+        const requestParams = {
+          _: Date.now(),
+          refresh: utilityRefreshKey
+        };
+        console.log('[Utility Fetch] 📋 Request params:', requestParams);
+
         const response = await axios.get(`/utility-zipcodes/zips/${zipCode}/utilities`, {
-          params: {
-            _: Date.now() // Cache-busting timestamp
-          },
+          params: requestParams,
           headers: companyId ? { 'X-Company-ID': companyId } : {},
         });
+
+        console.log('[Utility Fetch] ✅ Response received');
+        console.log('[Utility Fetch] 📊 Response status:', response.status);
+        console.log('[Utility Fetch] 📦 Response data:', response.data);
 
         if (isCancelled) return;
 
         const utilityData = response.data?.data || response.data || [];
+        console.log('[Utility Fetch] 🔍 Raw utility data:', utilityData);
+        console.log('[Utility Fetch] 🔍 Data type:', typeof utilityData);
+        console.log('[Utility Fetch] 🔍 Is array:', Array.isArray(utilityData));
+        console.log('[Utility Fetch] 🔍 Length:', utilityData.length);
 
         // Remove duplicates, normalize names, and sort
         const uniqueUtilities = [...new Set(utilityData.map(u => {
@@ -284,7 +304,9 @@ const ProjectOverview = ({ projectData, systemDetails, readOnly = false }) => {
           return u === 'PSCo (Xcel Energy)' ? 'Xcel Energy' : u;
         }))].sort();
 
+        console.log('[Utility Fetch] ✨ Unique utilities after processing:', uniqueUtilities);
         setUtilities(uniqueUtilities);
+        console.log('[Utility Fetch] 💾 State updated with', uniqueUtilities.length, 'utilities');
 
         // Auto-select if only one utility and no current value (only in edit mode)
         if (!readOnly) {
@@ -306,16 +328,28 @@ const ProjectOverview = ({ projectData, systemDetails, readOnly = false }) => {
         }
 
         if (uniqueUtilities.length === 0) {
+          console.log('[Utility Fetch] ⚠️ No utilities found for ZIP:', zipCode);
           setUtilityError(`No utilities for ${zipCode}`);
+        } else {
+          console.log('[Utility Fetch] ✅ SUCCESS - Loaded', uniqueUtilities.length, 'utilities');
         }
       } catch (error) {
-        if (isCancelled) return;
+        if (isCancelled) {
+          console.log('[Utility Fetch] ❌ Request cancelled');
+          return;
+        }
 
-        console.error('[Site] Error fetching utilities:', error);
+        console.error('[Utility Fetch] ❌ ERROR fetching utilities:', error);
+        console.error('[Utility Fetch] ❌ Error details:', {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data
+        });
         setUtilityError('Failed to load utilities');
         setUtilities([]);
       } finally {
         if (!isCancelled) {
+          console.log('[Utility Fetch] 🏁 Fetch complete, loading=false');
           setUtilityLoading(false);
         }
       }
@@ -326,7 +360,7 @@ const ProjectOverview = ({ projectData, systemDetails, readOnly = false }) => {
     return () => {
       isCancelled = true;
     };
-  }, [site.zip_code, readOnly]);
+  }, [site.zip_code, readOnly, utilityRefreshKey]);
 
   // Fetch jurisdictions by zip code
   useEffect(() => {

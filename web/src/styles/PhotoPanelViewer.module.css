@@ -2,7 +2,7 @@
 
 .viewerContainer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   background-color: var(--color-surface);
@@ -10,7 +10,16 @@
   position: relative;
 }
 
-/* Left sidebar - Metadata panel (10%) */
+/* Top section - Image viewer and metadata panel side by side */
+.topSection {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Left sidebar - Metadata panel (matches image height) */
 .metadataPanel {
   width: 15%;
   min-width: 220px;
@@ -81,7 +90,7 @@
   user-select: none;
 }
 
-/* Footer with thumbnail carousel */
+/* Footer with thumbnail carousel - now full width below image and metadata */
 .footer {
   display: flex;
   align-items: center;
@@ -95,6 +104,7 @@
   height: 135px;
   min-height: 135px;
   max-height: 135px;
+  width: 100%;
 }
 
 .carouselNavButton {
@@ -128,6 +138,7 @@
   flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-xs);
   overflow-x: auto;
   overflow-y: hidden;

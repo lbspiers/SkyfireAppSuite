@@ -1,7 +1,7 @@
 // Skyfire Service Worker
 // Version format: YYYY.MM.DD.increment (e.g., 2024.12.25.1)
 // IMPORTANT: Increment version when changing caching behavior to force browser updates
-const CACHE_VERSION = '2026.02.06.4';
+const CACHE_VERSION = '2026.02.14.2341';
 const CACHE_NAME = `skyfire-cache-v${CACHE_VERSION}`;
 
 // Assets to cache immediately on install
@@ -70,6 +70,7 @@ self.addEventListener('fetch', (event) => {
   // always fetch fresh data from the backend
   if (url.pathname.startsWith('/api/') ||
       url.pathname.startsWith('/equipment/') ||
+      url.pathname.startsWith('/utility-zipcodes/') ||
       url.pathname.startsWith('/socket.io/') ||
       url.hostname !== self.location.hostname) {
     // Return early without calling event.respondWith()

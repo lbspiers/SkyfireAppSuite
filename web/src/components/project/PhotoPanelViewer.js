@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import logger from '../../services/devLogger';
 import surveyService from '../../services/surveyService';
+import axiosInstance from '../../api/axiosInstance';
 import { getPreviewUrl, getThumbUrl } from '../../utils/photoUtils';
 import styles from '../../styles/PhotoPanelViewer.module.css';
 
@@ -26,11 +27,13 @@ const PhotoPanelViewer = ({
 }) => {
   const currentItem = media[currentIndex];
   const [editData, setEditData] = useState({
-    section: currentItem?.section || 'general',
+    fileName: currentItem?.fileName || currentItem?.filename || '',
+    section: currentItem?.section || '',
     tag: currentItem?.tag || '',
     note: currentItem?.originalNotes || ''
   });
   const [saving, setSaving] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   // Pan state
   const [isPanning, setIsPanning] = useState(false);
@@ -48,26 +51,91 @@ const PhotoPanelViewer = ({
   const carouselRef = useRef(null);
   const carouselScrollStartRef = useRef({ scrollLeft: 0, clientX: 0 });
 
-  // Reset edit data when photo changes
+  // Fetch categories on mount
   useEffect(() => {
+    console.log('🎨 PhotoPanelViewer MOUNTED');
+    const fetchCategories = async () => {
+      try {
+        console.log('🎨 Fetching categories from /api/media-categories');
+        const res = await axiosInstance.get('/api/media-categories');
+        console.log('🎨 Categories response:', res.data);
+        if (res.data?.status === 'SUCCESS') {
+          console.log('🎨 Setting categories:', res.data.data);
+          setCategories(res.data.data);
+        }
+      } catch (error) {
+        console.error('🎨 Failed to fetch categories:', error);
+        logger.error('PhotoPanelViewer', 'Failed to fetch categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Reset edit data when photo changes or categories load
+  useEffect(() => {
+    console.log('🎨 Photo change effect triggered', { hasCurrentItem: !!currentItem, categoriesCount: categories.length });
     if (currentItem) {
-      logger.log('PhotoPanelViewer', 'Photo changed:', {
+      console.log('🎨 Photo changed - FULL DATA:', currentItem);
+      console.log('🎨 Photo metadata:', {
         id: currentItem.id,
         filename: currentItem.fileName || currentItem.filename,
-        hasUrl: !!currentItem.url
+        section: currentItem.section,
+        tag: currentItem.tag,
+        note: currentItem.originalNotes,
+        hasUrl: !!currentItem.url,
+        categoriesLoaded: categories.length > 0,
+        availableCategories: categories.map(c => c.label)
       });
+      logger.log('PhotoPanelViewer', 'Photo changed - FULL DATA:', currentItem);
+      logger.log('PhotoPanelViewer', 'Photo metadata:', {
+        id: currentItem.id,
+        filename: currentItem.fileName || currentItem.filename,
+        section: currentItem.section,
+        tag: currentItem.tag,
+        note: currentItem.originalNotes,
+        hasUrl: !!currentItem.url,
+        categoriesLoaded: categories.length > 0,
+        availableCategories: categories.map(c => c.label)
+      });
+
+      // Find matching category value, handling singular/plural mismatch
+      let sectionValue = currentItem.section || '';
+      if (sectionValue && categories.length > 0) {
+        // Try exact match first
+        let matchingCategory = categories.find(cat => cat.value === sectionValue);
+
+        // If no exact match, try singular/plural variants
+        if (!matchingCategory) {
+          // Try adding 's' for plural
+          matchingCategory = categories.find(cat => cat.value === sectionValue + 's');
+          if (matchingCategory) {
+            sectionValue = matchingCategory.value;
+            console.log('🎨 Matched plural variant:', sectionValue);
+          } else {
+            // Try removing 's' for singular
+            matchingCategory = categories.find(cat => cat.value === sectionValue.replace(/s$/, ''));
+            if (matchingCategory) {
+              sectionValue = matchingCategory.value;
+              console.log('🎨 Matched singular variant:', sectionValue);
+            }
+          }
+        }
+      }
+
       setEditData({
-        section: currentItem.section || 'general',
+        fileName: currentItem.fileName || currentItem.filename || '',
+        section: sectionValue,
         tag: currentItem.tag || '',
         note: currentItem.originalNotes || ''
       });
     }
-  }, [currentItem?.id]);
+  }, [currentItem?.id, categories]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
       await surveyService.photos.updateMetadata(projectUuid, currentItem.id, {
+        fileName: editData.fileName,
         section: editData.section,
         tag: editData.tag,
         note: editData.note
@@ -257,142 +325,146 @@ const PhotoPanelViewer = ({
 
   return (
     <div className={styles.viewerContainer}>
-      {/* Left sidebar - Metadata panel (10%) */}
-      <div className={styles.metadataPanel}>
-        <div className={styles.metadataBody}>
-          <div className={styles.formGroup}>
-            <input
-              type="text"
-              className={styles.input}
-              value={currentItem.fileName || currentItem.filename || 'Untitled'}
-              disabled
-              placeholder="Filename"
-            />
+      {/* Top section - Image viewer and metadata panel side by side */}
+      <div className={styles.topSection}>
+        {/* Left sidebar - Metadata panel */}
+        <div className={styles.metadataPanel}>
+          <div className={styles.metadataBody}>
+            <div className={styles.formGroup}>
+              <input
+                type="text"
+                className={styles.input}
+                value={editData.fileName}
+                onChange={(e) => setEditData({ ...editData, fileName: e.target.value })}
+                placeholder="Filename"
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <select
+                className={styles.input}
+                value={editData.section}
+                onChange={(e) => setEditData({ ...editData, section: e.target.value })}
+              >
+                <option value="">Select category...</option>
+                {categories.map((cat) => (
+                  <option key={cat.uuid} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <input
+                type="text"
+                className={styles.input}
+                value={editData.tag}
+                onChange={(e) => setEditData({ ...editData, tag: e.target.value })}
+                placeholder="Tag"
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <textarea
+                className={styles.textarea}
+                value={editData.note}
+                onChange={(e) => setEditData({ ...editData, note: e.target.value })}
+                placeholder="Notes..."
+                rows={4}
+              />
+            </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <select
-              className={styles.input}
-              value={editData.section}
-              onChange={(e) => setEditData({ ...editData, section: e.target.value })}
+          <div className={styles.metadataFooter}>
+            <button
+              className={styles.saveButton}
+              onClick={handleSave}
+              disabled={saving}
             >
-              <option value="general">General</option>
-              <option value="solar_panel">Solar Panel</option>
-              <option value="inverter">Inverter</option>
-              <option value="msp">MSP</option>
-              <option value="battery">Battery</option>
-            </select>
-          </div>
-
-          <div className={styles.formGroup}>
-            <input
-              type="text"
-              className={styles.input}
-              value={editData.tag}
-              onChange={(e) => setEditData({ ...editData, tag: e.target.value })}
-              placeholder="Tag"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <textarea
-              className={styles.textarea}
-              value={editData.note}
-              onChange={(e) => setEditData({ ...editData, note: e.target.value })}
-              placeholder="Notes..."
-              rows={4}
-            />
+              {saving ? 'Saving...' : 'Save'}
+            </button>
           </div>
         </div>
 
-        <div className={styles.metadataFooter}>
-          <button
-            className={styles.saveButton}
-            onClick={handleSave}
-            disabled={saving}
+        {/* Right side - Image viewer */}
+        <div className={styles.imageViewerSection}>
+          {/* Image container with zoom/pan */}
+          <div
+            ref={imageContainerRef}
+            className={styles.imageContainer}
+            onWheel={handleWheel}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
           >
-            {saving ? 'Saving...' : 'Save'}
-          </button>
+            <div
+              className={styles.imageWrapper}
+              style={{
+                transform: `rotate(${rotation}deg) scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                transition: (isPanning || isRotaryScrolling) ? 'none' : 'transform 0.3s ease-out',
+                cursor: zoom > 1
+                  ? (isPanning ? 'grabbing' : 'grab')
+                  : (isRotaryScrolling ? 'grabbing' : 'grab')
+              }}
+            >
+              <img
+                ref={imageRef}
+                src={photoUrl}
+                alt={currentItem.fileName || currentItem.filename || 'Photo'}
+                className={styles.image}
+                draggable={false}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right side - Image viewer (90%) */}
-      <div className={styles.imageViewerSection}>
-        {/* Image container with zoom/pan */}
+      {/* Footer with thumbnail carousel - full width */}
+      <div className={styles.footer}>
         <div
-          ref={imageContainerRef}
-          className={styles.imageContainer}
-          onWheel={handleWheel}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          ref={carouselRef}
+          className={styles.thumbnailCarousel}
+          onMouseDown={handleCarouselMouseDown}
+          onMouseMove={handleCarouselMouseMove}
+          onMouseUp={handleCarouselMouseUp}
+          onMouseLeave={handleCarouselMouseUp}
         >
-          <div
-            className={styles.imageWrapper}
-            style={{
-              transform: `rotate(${rotation}deg) scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-              transition: (isPanning || isRotaryScrolling) ? 'none' : 'transform 0.3s ease-out',
-              cursor: zoom > 1
-                ? (isPanning ? 'grabbing' : 'grab')
-                : (isRotaryScrolling ? 'grabbing' : 'grab')
-            }}
-          >
-            <img
-              ref={imageRef}
-              src={photoUrl}
-              alt={currentItem.fileName || currentItem.filename || 'Photo'}
-              className={styles.image}
-              draggable={false}
-            />
-          </div>
-        </div>
+          {media.map((item, index) => {
+            // Use optimized thumbnail for carousel (~40KB vs 4MB)
+            const thumbnailUrl = getThumbUrl(item);
+            const isActive = index === currentIndex;
 
-        {/* Footer with thumbnail carousel */}
-        <div className={styles.footer}>
-          <div
-            ref={carouselRef}
-            className={styles.thumbnailCarousel}
-            onMouseDown={handleCarouselMouseDown}
-            onMouseMove={handleCarouselMouseMove}
-            onMouseUp={handleCarouselMouseUp}
-            onMouseLeave={handleCarouselMouseUp}
-          >
-            {media.map((item, index) => {
-              // Use optimized thumbnail for carousel (~40KB vs 4MB)
-              const thumbnailUrl = getThumbUrl(item);
-              const isActive = index === currentIndex;
+            // Calculate size tier based on hover (if hovering) or selection (if not)
+            const targetIndex = hoveredIndex !== null ? hoveredIndex : currentIndex;
+            const distance = Math.abs(index - targetIndex);
 
-              // Calculate size tier based on hover (if hovering) or selection (if not)
-              const targetIndex = hoveredIndex !== null ? hoveredIndex : currentIndex;
-              const distance = Math.abs(index - targetIndex);
+            // Apply size classes based on distance from target (hover or selection)
+            // When hovering, ONLY the hovered thumbnail gets sizing, not the selected one
+            const shouldApplyActiveSize = hoveredIndex !== null
+              ? index === hoveredIndex
+              : isActive;
+            const isAdjacent = distance === 1;
+            const isSecondary = distance === 2;
 
-              // Apply size classes based on distance from target (hover or selection)
-              // When hovering, ONLY the hovered thumbnail gets sizing, not the selected one
-              const shouldApplyActiveSize = hoveredIndex !== null
-                ? index === hoveredIndex
-                : isActive;
-              const isAdjacent = distance === 1;
-              const isSecondary = distance === 2;
-
-              return (
-                <button
-                  key={item.id || index}
-                  className={`${styles.thumbnail} ${shouldApplyActiveSize ? styles.thumbnailActive : ''} ${isAdjacent ? styles.thumbnailAdjacent : ''} ${isSecondary ? styles.thumbnailSecondary : ''}`}
-                  onClick={() => onNavigate(index - currentIndex)}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  title={item.fileName || item.filename || `Photo ${index + 1}`}
-                >
-                  <img
-                    src={thumbnailUrl}
-                    alt={item.fileName || item.filename || `Thumbnail ${index + 1}`}
-                    className={styles.thumbnailImage}
-                  />
-                </button>
-              );
-            })}
-          </div>
+            return (
+              <button
+                key={item.id || index}
+                className={`${styles.thumbnail} ${shouldApplyActiveSize ? styles.thumbnailActive : ''} ${isAdjacent ? styles.thumbnailAdjacent : ''} ${isSecondary ? styles.thumbnailSecondary : ''}`}
+                onClick={() => onNavigate(index - currentIndex)}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                title={item.fileName || item.filename || `Photo ${index + 1}`}
+              >
+                <img
+                  src={thumbnailUrl}
+                  alt={item.fileName || item.filename || `Thumbnail ${index + 1}`}
+                  className={styles.thumbnailImage}
+                />
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

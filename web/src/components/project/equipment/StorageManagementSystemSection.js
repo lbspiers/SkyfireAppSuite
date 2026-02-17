@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Alert, EquipmentRow, FormFieldRow, TableDropdown, TableRowButton, AddSectionButton, PreferredButton, Tooltip, Divider } from '../../ui';
 import { PreferredEquipmentModal } from '../../equipment';
 import BOSEquipmentSection from './BOSEquipmentSection';
@@ -48,7 +48,7 @@ const StorageManagementSystemSection = ({
   // Load models when manufacturer changes
   useEffect(() => {
     if (formData.sms_make && formData.sms_make !== 'No SMS') {
-      loadModels();
+      loadModels(formData.sms_make);
     } else {
       setModels([]);
     }
@@ -58,10 +58,11 @@ const StorageManagementSystemSection = ({
   useEffect(() => {
     const hasSMS = formData.sms_make && formData.sms_model && formData.sms_make !== 'No SMS';
     // Use == null to catch both undefined AND null
-    if (hasSMS && formData.sms_isnew == null) {
-      onChange('sms_isnew', true); // Default to New
+    if (hasSMS && formData.sms_existing == null) {
+      onChange('sms_existing', false, systemNumber); // Default to New
     }
-  }, [formData.sms_make, formData.sms_model, formData.sms_isnew, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.sms_make, formData.sms_model]); // Removed onChange and formData.sms_existing to prevent re-render loop
 
   const loadManufacturers = async () => {
     setLoadingManufacturers(true);
@@ -84,10 +85,10 @@ const StorageManagementSystemSection = ({
     }
   };
 
-  const loadModels = async () => {
+  const loadModels = async (manufacturer) => {
     setLoadingModels(true);
     try {
-      const response = await getSMSModels(formData.sms_make);
+      const response = await getSMSModels(manufacturer);
       const modelList = response?.data || [];
       // Normalize data to { label, value } format
       const normalized = modelList.map(item => {
@@ -106,13 +107,19 @@ const StorageManagementSystemSection = ({
   };
 
   const handleToggle = (isNew) => {
-    onChange('sms_isnew', isNew);
+    onChange('sms_existing', !isNew, systemNumber);
     console.log('[SMS] New/Existing toggle changed to:', isNew ? 'New' : 'Existing');
   };
 
-  const handleMakeChange = (e) => {
-    const makeValue = e.target.value;
+  const handleMakeChange = useCallback((e) => {
+    const makeValue = typeof e === 'string' ? e : e.target?.value;
     console.log('[SMS] Make changed to:', makeValue);
+
+    // Prevent duplicate calls - check if value actually changed
+    if (makeValue === formData.sms_make) {
+      console.log('[SMS] Value unchanged, skipping update');
+      return;
+    }
 
     if (onBatchChange) {
       // BATCH: Update make, model, and related fields in single operation (up to 6 fields → 1 call)
@@ -131,54 +138,61 @@ const StorageManagementSystemSection = ({
       }
 
       // ALWAYS include toggle - use existing value or default to true (nullish coalescing)
-      updates.push(['sms_isnew', formData.sms_isnew ?? true]);
+      updates.push(['sms_existing', formData.sms_existing ?? false]);
 
-      // If "No SMS" selected, clear all other fields
+      // If "No SMS" selected, clear all other fields (but keep section visible)
       if (makeValue === 'No SMS') {
         updates.push(['sms_main_breaker', 'MLO']);
         updates.push(['sms_has_rsd', false]);
         console.log('[SMS] No SMS selected - clearing fields');
       }
 
-      onBatchChange(updates);
+      console.log('[SMS] Calling onBatchChange with updates:', updates);
+      console.log('[SMS] onBatchChange function exists?', typeof onBatchChange);
+      try {
+        onBatchChange(updates, systemNumber);
+        console.log('[SMS] onBatchChange call completed');
+      } catch (error) {
+        console.error('[SMS] ERROR calling onBatchChange:', error);
+      }
     } else {
       // Fallback: Sequential onChange (backwards compatibility)
-      onChange('sms_make', makeValue);
-      onChange('sms_model', '');
+      onChange('sms_make', makeValue, systemNumber);
+      onChange('sms_model', '', systemNumber);
 
       if (makeValue && makeValue !== 'No SMS') {
-        onChange('sys1_sms_equipment_type', 'SMS');
+        onChange('sys1_sms_equipment_type', 'SMS', systemNumber);
         console.log('[SMS] Setting sys1_sms_equipment_type: SMS');
       } else {
-        onChange('sys1_sms_equipment_type', '');
+        onChange('sys1_sms_equipment_type', '', systemNumber);
         console.log('[SMS] Clearing sys1_sms_equipment_type');
       }
 
       // Save default if not already set - use == null to catch both undefined AND null
-      if (formData.sms_isnew == null) {
-        onChange('sms_isnew', true);
+      if (formData.sms_existing == null) {
+        onChange('sms_existing', false, systemNumber);
       }
 
       if (makeValue === 'No SMS') {
-        onChange('sms_main_breaker', 'MLO');
-        onChange('sms_has_rsd', false);
+        onChange('sms_main_breaker', 'MLO', systemNumber);
+        onChange('sms_has_rsd', false, systemNumber);
         console.log('[SMS] No SMS selected - clearing fields');
       }
     }
-  };
+  }, [formData.sms_make, formData.sms_existing, onBatchChange, onChange]);
 
   const handleClearPVBreaker = () => {
-    onChange('sms_pv_breaker', '');
+    onChange('sms_pv_breaker', '', systemNumber);
     setEditPVBreaker(false);
   };
 
   const handleClearESSBreaker = () => {
-    onChange('sms_ess_breaker', '');
+    onChange('sms_ess_breaker', '', systemNumber);
     setEditESSBreaker(false);
   };
 
   const handleClearTieInBreaker = () => {
-    onChange('sms_tie_in_breaker', '');
+    onChange('sms_tie_in_breaker', '', systemNumber);
     setEditTieInBreaker(false);
   };
 
@@ -203,7 +217,7 @@ const StorageManagementSystemSection = ({
   const getSubtitle = () => {
     if (isNoSMS) return 'No SMS';
     if (formData.sms_make && formData.sms_model) {
-      const statusLetter = formData.sms_isnew !== false ? 'N' : 'E';
+      const statusLetter = formData.sms_existing !== true ? 'N' : 'E';
       return `(${statusLetter}) ${formData.sms_make} ${formData.sms_model}`;
     }
     return '';
@@ -211,8 +225,9 @@ const StorageManagementSystemSection = ({
 
   const handleDelete = () => {
     if (onBatchChange) {
-      // BATCH: Clear all SMS fields in single operation (7 fields → 1 call)
+      // BATCH: Clear all SMS fields and hide section in single operation
       const updates = [
+        ['show_sms', false],
         ['sms_make', ''],
         ['sms_model', ''],
         ['sms_main_breaker', 'MLO'],
@@ -220,17 +235,20 @@ const StorageManagementSystemSection = ({
         ['sms_ess_breaker', ''],
         ['sms_tie_in_breaker', ''],
         ['sms_has_rsd', false],
+        ['show_postsms_bos', false],
       ];
-      onBatchChange(updates);
+      onBatchChange(updates, systemNumber);
     } else {
       // Fallback: Sequential onChange (backwards compatibility)
-      onChange('sms_make', '');
-      onChange('sms_model', '');
-      onChange('sms_main_breaker', 'MLO');
-      onChange('sms_pv_breaker', '');
-      onChange('sms_ess_breaker', '');
-      onChange('sms_tie_in_breaker', '');
-      onChange('sms_has_rsd', false);
+      onChange('show_sms', false, systemNumber);
+      onChange('sms_make', '', systemNumber);
+      onChange('sms_model', '', systemNumber);
+      onChange('sms_main_breaker', 'MLO', systemNumber);
+      onChange('sms_pv_breaker', '', systemNumber);
+      onChange('sms_ess_breaker', '', systemNumber);
+      onChange('sms_tie_in_breaker', '', systemNumber);
+      onChange('sms_has_rsd', false, systemNumber);
+      onChange('show_postsms_bos', false, systemNumber);
     }
 
     // Reset local state
@@ -241,13 +259,13 @@ const StorageManagementSystemSection = ({
 
   // Preferred equipment handlers
   const handlePreferredSelect = (selected) => {
-    onChange('sms_make', selected.make);
-    onChange('sms_model', selected.model);
+    onChange('sms_make', selected.make, systemNumber);
+    onChange('sms_model', selected.model, systemNumber);
   };
 
   const handleSelectOther = () => {
-    onChange('sms_make', '');
-    onChange('sms_model', '');
+    onChange('sms_make', '', systemNumber);
+    onChange('sms_model', '', systemNumber);
   };
 
   return (
@@ -256,46 +274,28 @@ const StorageManagementSystemSection = ({
         title="Storage Management System"
         subtitle={getSubtitle()}
         onDelete={handleDelete}
+        showNewExistingToggle={!isNoSMS}
+        isExisting={formData.sms_existing}
+        onExistingChange={(val) => {
+          console.log('[SMS] Toggle changed to:', val ? 'Existing' : 'New');
+          onChange('sms_existing', val, systemNumber);
+        }}
+        toggleRowRightContent={
+          !isNoSMS && !formData.sms_make ? (
+            <TableRowButton
+              label="No SMS"
+              variant="outline"
+              onClick={() => {
+                console.log('[SMS] No SMS button clicked');
+                handleMakeChange({ target: { value: 'No SMS' } });
+              }}
+            />
+          ) : null
+        }
         headerRightContent={
           <PreferredButton onClick={() => setShowPreferredModal(true)} />
         }
       >
-        {/* Row 1: No SMS Button - Show when no make is selected */}
-        {!formData.sms_make && (
-          <div style={{
-            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
-          }}>
-            <TableRowButton
-              label="No SMS"
-              variant="outline"
-              onClick={() => handleMakeChange({ target: { value: 'No SMS' } })}
-              style={{ width: '100%' }}
-            />
-          </div>
-        )}
-
-        {/* Row 2: New/Existing Toggle - Always visible (except when "No SMS") */}
-        {!isNoSMS && (
-          <div style={{
-            display: 'flex',
-            gap: 'var(--spacing-tight)',
-            padding: 'var(--spacing-tight) var(--spacing)',
-            borderBottom: 'var(--border-thin) solid var(--border-subtle)',
-          }}>
-            <TableRowButton
-              label="New"
-              variant="outline"
-              active={formData.sms_isnew !== false}
-              onClick={() => handleToggle(true)}
-            />
-            <TableRowButton
-              label="Existing"
-              variant="outline"
-              active={formData.sms_isnew === false}
-              onClick={() => handleToggle(false)}
-            />
-          </div>
-        )}
 
         {/* Show "No SMS Selected" indicator when No SMS is chosen */}
         {isNoSMS && (
@@ -325,7 +325,18 @@ const StorageManagementSystemSection = ({
             <TableDropdown
               label="Model"
               value={formData.sms_model || ''}
-              onChange={(value) => onChange('sms_model', value)}
+              onChange={(value) => {
+                console.log('[SMS] Model changed to:', value);
+                if (onBatchChange) {
+                  const updates = [
+                    ['sms_model', value],
+                  ];
+                  console.log('[SMS] Calling onBatchChange for model:', updates);
+                  onBatchChange(updates, systemNumber);
+                } else {
+                  onChange('sms_model', value, systemNumber);
+                }
+              }}
               options={models}
               placeholder={!formData.sms_make ? 'Select make' : loadingModels ? 'Loading...' : 'Select model'}
               disabled={!formData.sms_make || loadingModels}
@@ -334,7 +345,13 @@ const StorageManagementSystemSection = ({
             <TableDropdown
               label="Main Breaker"
               value={formData.sms_main_breaker || ''}
-              onChange={(value) => onChange('sms_main_breaker', value)}
+              onChange={(value) => {
+                if (onBatchChange) {
+                  onBatchChange([['sms_main_breaker', value]], systemNumber);
+                } else {
+                  onChange('sms_main_breaker', value, systemNumber);
+                }
+              }}
               options={SMS_MAIN_BREAKER_OPTIONS}
               placeholder="Select breaker..."
             />
@@ -375,7 +392,7 @@ const StorageManagementSystemSection = ({
               <TableDropdown
                 label="Breaker Rating"
                 value={formData.sms_pv_breaker || ''}
-                onChange={(value) => onChange('sms_pv_breaker', value)}
+                onChange={(value) => onChange('sms_pv_breaker', value, systemNumber)}
                 options={breakerOptions.map(rating => ({ label: `${rating}`, value: `${rating}` }))}
                 placeholder="Select rating..."
               />
@@ -417,7 +434,7 @@ const StorageManagementSystemSection = ({
               <TableDropdown
                 label="Breaker Rating"
                 value={formData.sms_ess_breaker || ''}
-                onChange={(value) => onChange('sms_ess_breaker', value)}
+                onChange={(value) => onChange('sms_ess_breaker', value, systemNumber)}
                 options={breakerOptions.map(rating => ({ label: `${rating}`, value: `${rating}` }))}
                 placeholder="Select rating..."
               />
@@ -459,7 +476,7 @@ const StorageManagementSystemSection = ({
               <TableDropdown
                 label="Breaker Rating"
                 value={formData.sms_tie_in_breaker || ''}
-                onChange={(value) => onChange('sms_tie_in_breaker', value)}
+                onChange={(value) => onChange('sms_tie_in_breaker', value, systemNumber)}
                 options={breakerOptions.map(rating => ({ label: `${rating}`, value: `${rating}` }))}
                 placeholder="Select rating..."
               />
@@ -470,20 +487,37 @@ const StorageManagementSystemSection = ({
               display: 'flex',
               alignItems: 'center',
               padding: 'var(--spacing-tight) var(--spacing)',
+              borderBottom: 'var(--border-thin) solid var(--border-subtle)',
             }}>
               <TableRowButton
                 label={formData.sms_has_rsd ? 'Rapid Shutdown Switch' : '+ Rapid Shutdown Switch'}
                 variant={formData.sms_has_rsd ? 'primary' : 'outline'}
-                onClick={() => onChange('sms_has_rsd', !formData.sms_has_rsd)}
+                onClick={() => onChange('sms_has_rsd', !formData.sms_has_rsd, systemNumber)}
                 style={{ width: '50%' }}
               />
             </div>
+
+            {/* Add Post-SMS BOS Button */}
+            {!formData.show_postsms_bos && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: 'var(--spacing-tight) var(--spacing)',
+              }}>
+                <TableRowButton
+                  label="+ Post-SMS BOS (Type 1)"
+                  variant="outline"
+                  onClick={() => onChange('show_postsms_bos', true, systemNumber)}
+                  style={{ width: '50%' }}
+                />
+              </div>
+            )}
           </>
         )}
       </EquipmentRow>
 
-      {/* BOS Equipment */}
-      {hasSMS && (
+      {/* BOS Equipment - Only show when explicitly enabled */}
+      {hasSMS && formData.show_postsms_bos && (
         <BOSEquipmentSection
           formData={formData}
           onChange={onChange}
@@ -507,4 +541,26 @@ const StorageManagementSystemSection = ({
   );
 };
 
-export default memo(StorageManagementSystemSection);
+// Custom comparison - only re-render when SMS-relevant fields change
+const areSMSPropsEqual = (prevProps, nextProps) => {
+  if (prevProps.systemNumber !== nextProps.systemNumber) return false;
+
+  const relevantFields = [
+    'sms_make', 'sms_model', 'sms_existing', 'sms_equipment_type',
+    'sms_breaker_rating', 'sms_backup_load_sub_panel_breaker_rating',
+    'sms_pv_breaker_rating_override', 'sms_ess_breaker_rating_override',
+    'sms_tie_in_breaker_rating_override', 'sms_rsd_enabled',
+    'backup_panel_make', 'backup_panel_model',
+    'show_sms',
+  ];
+
+  for (const field of relevantFields) {
+    if (prevProps.formData?.[field] !== nextProps.formData?.[field]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export default React.memo(StorageManagementSystemSection, areSMSPropsEqual);

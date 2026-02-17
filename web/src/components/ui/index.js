@@ -65,6 +65,7 @@ export { default as ErrorState } from './ErrorState';
 export { default as ProjectHeader } from './ProjectHeader';
 export { default as PreferredButton } from './PreferredButton';
 export { default as PillButton } from './PillButton';
+export { default as ActionSectionButton } from './ActionSectionButton';
 export { default as Accordion } from './Accordion';
 export { default as SolarAPPStatusBadge } from './SolarAPPStatusBadge';
 export { default as TabStatusBadge } from './TabStatusBadge';

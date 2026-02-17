@@ -27,7 +27,7 @@ import { Button } from '../ui';
 const PdfToolbar = ({
   currentTool = 'select',
   onToolChange,
-  currentColor = 'var(--color-danger)',
+  currentColor = '#dc2626',
   onColorChange,
   canSave = false,
   onSave,
@@ -38,8 +38,8 @@ const PdfToolbar = ({
       id: 'cloud',
       label: 'Rev Cloud',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 8 Q2 6 3 5 Q4 4 5 5 Q5 3 7 3 Q9 3 9 5 Q10 4 11 5 Q12 6 11 8 Q13 9 11 11 Q10 12 9 11 Q9 13 7 13 Q5 13 5 11 Q4 12 3 11 Q2 10 3 8 Z"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M6 18 C4 18 3 16 3 14 C3 12 4 11 6 11 C6 9 7 7 10 7 C11 5 13 5 14 7 C17 7 18 9 18 11 C20 11 21 12 21 14 C21 16 20 18 18 18 Z"/>
         </svg>
       )
     },
@@ -47,7 +47,7 @@ const PdfToolbar = ({
       id: 'delta',
       label: 'Delta',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M8 3 L13 13 L3 13 Z" />
         </svg>
       )
@@ -61,7 +61,7 @@ const PdfToolbar = ({
       id: 'whiteout',
       label: 'Whiteout',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16">
+        <svg width="24" height="24" viewBox="0 0 16 16">
           <rect x="2" y="2" width="12" height="12" fill="white" stroke='var(--gray-400)' strokeWidth="1" />
         </svg>
       )
@@ -70,17 +70,16 @@ const PdfToolbar = ({
       id: 'leader',
       label: 'Leader Line',
       icon: (
-        <svg width="28" height="16" viewBox="0 0 28 16" fill="currentColor">
-          <path d="M0 8 L8 8 M5 5 L8 8 L5 11" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-          <text x="10" y="12" fontSize="10" fontWeight="bold" fill="currentColor">ABC</text>
-        </svg>
+        <span style={{ fontSize: '16px', fontWeight: 'bold', whiteSpace: 'nowrap', display: 'block', marginBottom: '2px' }}>
+          Text →
+        </span>
       )
     },
     {
       id: 'line',
       label: 'Line',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="2">
+        <svg width="24" height="24" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="2">
           <line x1="2" y1="14" x2="14" y2="2" />
         </svg>
       )
@@ -89,7 +88,7 @@ const PdfToolbar = ({
       id: 'square',
       label: 'Square',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="2" y="2" width="12" height="12" />
         </svg>
       )
@@ -98,7 +97,7 @@ const PdfToolbar = ({
       id: 'circle',
       label: 'Circle',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="8" cy="8" r="6" />
         </svg>
       )
@@ -132,24 +131,38 @@ const PdfToolbar = ({
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>Color</h4>
           <div className={styles.colorOptions}>
-            {/* Dynamic color for swatch */}
+            {/* Red */}
             <button
-              className={`${styles.colorSwatch} ${currentColor === 'var(--color-danger)' ? styles.selected : ''}`}
-              style={{ backgroundColor: 'var(--color-danger)' }}
-              onClick={() => onColorChange('var(--color-danger)')}
+              className={`${styles.colorSwatch} ${currentColor === '#dc2626' ? styles.selected : ''}`}
+              style={{ backgroundColor: '#dc2626' }}
+              onClick={() => onColorChange('#dc2626')}
               title="Red"
             />
-            {/* Dynamic color for swatch */}
+            {/* Orange */}
             <button
-              className={`${styles.colorSwatch} ${currentColor === 'var(--gray-900)' ? styles.selected : ''}`}
-              style={{ backgroundColor: 'var(--gray-900)' }}
-              onClick={() => onColorChange('var(--gray-900)')}
+              className={`${styles.colorSwatch} ${currentColor === '#fd7332' ? styles.selected : ''}`}
+              style={{ backgroundColor: '#fd7332' }}
+              onClick={() => onColorChange('#fd7332')}
+              title="Orange"
+            />
+            {/* Black */}
+            <button
+              className={`${styles.colorSwatch} ${currentColor === '#000000' ? styles.selected : ''}`}
+              style={{ backgroundColor: '#000000' }}
+              onClick={() => onColorChange('#000000')}
               title="Black"
+            />
+            {/* Blue */}
+            <button
+              className={`${styles.colorSwatch} ${currentColor === '#2563eb' ? styles.selected : ''}`}
+              style={{ backgroundColor: '#2563eb' }}
+              onClick={() => onColorChange('#2563eb')}
+              title="Blue"
             />
           </div>
         </div>
 
-        {/* Publish Button - Only show on Draft tab */}
+        {/* Save Button - Only show on Draft tab */}
         {statusTab === 'draft' && (
           <div className={styles.section}>
             <Button
@@ -158,7 +171,7 @@ const PdfToolbar = ({
               disabled={!canSave}
               fullWidth
             >
-              Publish
+              Save
             </Button>
           </div>
         )}

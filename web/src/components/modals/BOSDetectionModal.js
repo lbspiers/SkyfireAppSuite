@@ -33,7 +33,7 @@ const BOSDetectionModal = ({
         </>
       }
     >
-      <div>
+      <div >
           {isLoading ? (
             <div className={styles.loadingState}>
               <p>Detecting BOS configurations...</p>

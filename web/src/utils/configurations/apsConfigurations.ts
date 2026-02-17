@@ -136,24 +136,6 @@ export function detectFranklinAPSWholeHome(equipment: EquipmentState): Configura
     });
   }
 
-  // 2. Utility Line Side Disconnect
-  const utilitySlot2 = getNextAvailableSlot(
-    [...equipment.existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
-    'utility'
-  );
-  if (utilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber: equipment.systemNumber,
-      minAmpRating: 100,
-      sizingCalculation: '100A (standard APS solar production)',
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // ========== BATTERY BOS (Between Battery and SMS) ==========
   // 3. Battery DER Side Disconnect
   const battery1Slot1 = getNextAvailableSlot(equipment.existingBOS.battery1, 'battery1');
@@ -329,25 +311,7 @@ export function detectFranklinAPSPartialHome(equipment: EquipmentState): Configu
     });
   }
 
-  // 2. Utility Line Side Disconnect
-  const utilitySlot2 = getNextAvailableSlot(
-    [...equipment.existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
-    'utility'
-  );
-  if (utilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber: equipment.systemNumber,
-      minAmpRating: 100,
-      sizingCalculation: '100A (standard APS solar production)',
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // 3. Battery DER Side Disconnect
+  // 2. Battery DER Side Disconnect
   const battery1Slot1 = getNextAvailableSlot(equipment.existingBOS.battery1, 'battery1');
   if (battery1Slot1) {
     bosEquipment.push({
@@ -570,28 +534,10 @@ export function detectEnphaseAPSWholeHome(equipment: EquipmentState): Configurat
     });
   }
 
-  // 2. Pre-Combine Line Side Disconnect
-  const utilitySlot2 = getNextAvailableSlot(
-    [...equipment.existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
-    'utility'
-  );
-  if (utilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber: equipment.systemNumber,
-      minAmpRating: 100,
-      sizingCalculation: '100A (fixed for APS solar production)',
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // ========== POST-SMS BOS (After Enphase IQ System Controller) ==========
   // AC-coupled: Sized to total system output
 
-  // 3. Post-SMS Utility Disconnect
+  // 2. Post-SMS Utility Disconnect
   const postSMSSlot1 = getNextAvailableSlot(equipment.existingBOS.postSMS, 'postSMS');
   if (postSMSSlot1) {
     bosEquipment.push({
@@ -706,28 +652,10 @@ export function detectEnphaseAPSPartialHome(equipment: EquipmentState): Configur
     });
   }
 
-  // 2. Pre-Combine Line Side Disconnect
-  const utilitySlot2 = getNextAvailableSlot(
-    [...equipment.existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
-    'utility'
-  );
-  if (utilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber: equipment.systemNumber,
-      minAmpRating: 100,
-      sizingCalculation: '100A (fixed for APS solar production)',
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // ========== POST-SMS BOS (After Enphase IQ System Controller) ==========
   // AC-coupled: Sized to total system output
 
-  // 3. Post-SMS Utility Disconnect
+  // 2. Post-SMS Utility Disconnect
   const postSMSSlot1 = getNextAvailableSlot(equipment.existingBOS.postSMS, 'postSMS');
   if (postSMSSlot1) {
     bosEquipment.push({
@@ -801,7 +729,7 @@ export function detectAPSPVOnlyStringInverter(equipment: EquipmentState): Config
   const minAmpRating = Math.ceil(inverterMaxContOutput * 1.25);
   const sizingCalculation = `${inverterMaxContOutput}A × 1.25 = ${minAmpRating}A`;
 
-  // Utility Section BOS (Pre-Combine) - PV-Only uses 2 slots
+  // Utility Section BOS (Pre-Combine) - PV-Only uses 1 slot
   // Slot 1: Uni-Directional Meter (PV Meter - production meter, inverter-based sizing)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
@@ -811,24 +739,6 @@ export function detectAPSPVOnlyStringInverter(equipment: EquipmentState): Config
       section: 'utility',
       systemNumber,
       minAmpRating,  // Same as inverter sizing (NEC 1.25×)
-      sizingCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Slot 2: Uni-Directional Meter Line Side Disconnect (AC Disconnect - DER-side)
-  const utilitySlot2 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
-    'utility'
-  );
-  if (utilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',  // Maps to AC Disconnect in catalog
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating,
       sizingCalculation,
       blockName: 'PRE COMBINE',
       isNew: true,
@@ -894,7 +804,7 @@ export function detectAPSPVOnlyMicroinverter(equipment: EquipmentState): Configu
   const minAmpRating = Math.ceil(inverterMaxContOutput * 1.25);
   const sizingCalculation = `${inverterMaxContOutput}A × 1.25 = ${minAmpRating}A`;
 
-  // Utility Section BOS (Pre-Combine) - PV-Only uses 2 slots
+  // Utility Section BOS (Pre-Combine) - PV-Only uses 1 slot
   // Slot 1: Uni-Directional Meter (PV Meter - production meter, inverter-based sizing)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
@@ -904,24 +814,6 @@ export function detectAPSPVOnlyMicroinverter(equipment: EquipmentState): Configu
       section: 'utility',
       systemNumber,
       minAmpRating,  // Same as inverter sizing (NEC 1.25×)
-      sizingCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Slot 2: Uni-Directional Meter Line Side Disconnect (AC Disconnect - DER-side)
-  const utilitySlot2 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
-    'utility'
-  );
-  if (utilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',  // Maps to AC Disconnect in catalog
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating,
       sizingCalculation,
       blockName: 'PRE COMBINE',
       isNew: true,
@@ -1007,11 +899,11 @@ export function detectAPSPVOnlyStringSMS(equipment: EquipmentState): Configurati
   const preCombineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const preCombineCalculation = `${inverterMaxContOutput}A × 1.25 = ${preCombineAmps}A`;
 
-  // Pre-Combine Slot 1: Uni-Directional Meter Line Side Disconnect
+  // Pre-Combine Slot 1: Uni-Directional Meter
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Uni-Directional Meter',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -1022,33 +914,15 @@ export function detectAPSPVOnlyStringSMS(equipment: EquipmentState): Configurati
     });
   }
 
-  // Pre-Combine Slot 2: Uni-Directional Meter
+  // Pre-Combine Slot 2: Utility Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: preCombineAmps,
-      sizingCalculation: preCombineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Pre-Combine Slot 3: Utility Disconnect
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
       equipmentType: 'Utility Disconnect',
-      position: utilitySlot3,
+      position: utilitySlot2,
       section: 'utility',
       systemNumber,
       minAmpRating: preCombineAmps,
@@ -1245,11 +1119,11 @@ export function detectAPSPVOnlyMicroSMS(equipment: EquipmentState): Configuratio
   const preCombineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const preCombineCalculation = `${inverterMaxContOutput}A × 1.25 = ${preCombineAmps}A`;
 
-  // Pre-Combine Slot 1: Uni-Directional Meter Line Side Disconnect
+  // Pre-Combine Slot 1: Uni-Directional Meter
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Uni-Directional Meter',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -1260,33 +1134,15 @@ export function detectAPSPVOnlyMicroSMS(equipment: EquipmentState): Configuratio
     });
   }
 
-  // Pre-Combine Slot 2: Uni-Directional Meter
+  // Pre-Combine Slot 2: Utility Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: preCombineAmps,
-      sizingCalculation: preCombineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Pre-Combine Slot 3: Utility Disconnect
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
       equipmentType: 'Utility Disconnect',
-      position: utilitySlot3,
+      position: utilitySlot2,
       section: 'utility',
       systemNumber,
       minAmpRating: preCombineAmps,
@@ -1373,11 +1229,11 @@ export function detectAPSPVOnlyMicroNoSMS(equipment: EquipmentState): Configurat
   const combineAmps = Math.ceil(inverterMaxContOutput * 1.25);
   const combineCalculation = `${inverterMaxContOutput}A × 1.25 = ${combineAmps}A`;
 
-  // Combine Slot 1: Uni-Directional Meter Line Side Disconnect
+  // Combine Slot 1: Uni-Directional Meter
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Uni-Directional Meter',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -1388,33 +1244,15 @@ export function detectAPSPVOnlyMicroNoSMS(equipment: EquipmentState): Configurat
     });
   }
 
-  // Combine Slot 2: Uni-Directional Meter
+  // Combine Slot 2: Utility Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter',
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Combine Slot 3: Utility Disconnect
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
       equipmentType: 'Utility Disconnect',
-      position: utilitySlot3,
+      position: utilitySlot2,
       section: 'utility',
       systemNumber,
       minAmpRating: combineAmps,
@@ -1503,33 +1341,15 @@ export function detectAPSACCoupled(equipment: EquipmentState): ConfigurationMatc
     });
   }
 
-  // Type 2: Uni-Directional Meter Line Side Disconnect (AC Disconnect - DER-side)
+  // Type 2: Uni-Directional Meter (PV Meter - production meter, inverter-based sizing)
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',  // Maps to AC Disconnect in catalog
-      position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating,
-      sizingCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  // Type 3: Uni-Directional Meter (PV Meter - production meter, inverter-based sizing)
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
       equipmentType: 'Uni-Directional Meter',  // Maps to PV Meter in catalog
-      position: utilitySlot3,
+      position: utilitySlot2,
       section: 'utility',
       systemNumber,
       minAmpRating,  // Same as inverter sizing (NEC 1.25×)
@@ -1684,24 +1504,6 @@ export function detectAPSDCCoupledWithSMSAndBackup(equipment: EquipmentState): C
     bosEquipment.push({
       equipmentType: 'Uni-Directional Meter',
       position: backupSlot1,
-      section: 'backup',
-      systemNumber,
-      minAmpRating: backupPanelAmps,
-      sizingCalculation: backupSizingCalc,
-      blockName: 'BACKUP LOAD SUB PANEL',
-      isNew: true,
-    });
-  }
-
-  // Backup Slot 2: Uni-Directional Meter Line Side Disconnect (sized to backup panel)
-  const backupSlot2 = getNextAvailableSlot(
-    [...existingBOS.backup, ...(backupSlot1 ? [backupSlot1] : [])],
-    'backup'
-  );
-  if (backupSlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: backupSlot2,
       section: 'backup',
       systemNumber,
       minAmpRating: backupPanelAmps,
@@ -1998,24 +1800,6 @@ export function detectAPSDCCoupledNoSMSBackup(equipment: EquipmentState): Config
     bosEquipment.push({
       equipmentType: 'Uni-Directional Meter',
       position: backupSlot1,
-      section: 'backup',
-      systemNumber,
-      minAmpRating: backupPanelAmps,
-      sizingCalculation: backupSizingCalc,
-      blockName: 'BACKUP LOAD SUB PANEL',
-      isNew: true,
-    });
-  }
-
-  // Backup Slot 2: Uni-Directional Meter Line Side Disconnect (sized to backup panel)
-  const backupSlot2 = getNextAvailableSlot(
-    [...existingBOS.backup, ...(backupSlot1 ? [backupSlot1] : [])],
-    'backup'
-  );
-  if (backupSlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: backupSlot2,
       section: 'backup',
       systemNumber,
       minAmpRating: backupPanelAmps,
@@ -2328,24 +2112,6 @@ export function detectAPSACCoupledStringSMSBackup(equipment: EquipmentState): Co
     });
   }
 
-  // Utility Slot 3: Uni-Directional Meter Line Side Disconnect
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot3,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: preCombineAmps,
-      sizingCalculation: preCombineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // ============================================
   // POST SMS (After Storage Management System)
   // Sized to BOTH inverter + battery × 1.25 (both can discharge)
@@ -2530,23 +2296,6 @@ export function detectAPSACCoupledStringSMSNoBackup(equipment: EquipmentState): 
     });
   }
 
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot3,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: preCombineAmps,
-      sizingCalculation: preCombineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // POST SMS (inverter + battery)
   const postSMSAmps = Math.ceil(totalOutput * 1.25);
   const postSMSCalculation = `(${inverterOutput}A inverter + ${batteryOutput}A battery) × 1.25 = ${postSMSAmps}A`;
@@ -2603,7 +2352,7 @@ export function detectAPSACCoupledStringSMSNoBackup(equipment: EquipmentState): 
 /**
  * AC-Coupled Detector 3: String Inverter + No SMS + Backup
  * Triggers: AC-coupled + String inverter + Battery + No SMS + Backup panel
- * BOS Equipment: 2 Backup + 5 Pre-Combine = 7 items
+ * BOS Equipment: 4 Pre-Combine = 4 items (APS B-1: Uni-Directional Meter + Line Side Disconnect + Utility Disconnect + DER Combiner Panel)
  */
 export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): ConfigurationMatch | null {
   const {
@@ -2621,7 +2370,6 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
     hasSMS,
     hasBackupPanel,
     backupOption,
-    backupPanelBusRating,
     existingBOS,
     systemNumber,
     hasInverter,
@@ -2673,45 +2421,14 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
   const batteryOutput = batteryMaxContOutput || 0;
   const totalOutput = inverterOutput + batteryOutput;
 
-  // BACKUP BOS (exact panel rating)
-  const backupAmps = backupPanelBusRating || 200;
-  const backupCalculation = `Backup Panel Bus Rating: ${backupAmps}A`;
-
-  const backupSlot1 = getNextAvailableSlot(existingBOS.backup, 'backup');
-  if (backupSlot1) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter',
-      position: backupSlot1,
-      section: 'backup',
-      systemNumber,
-      minAmpRating: backupAmps,
-      sizingCalculation: backupCalculation,
-      blockName: 'ESS',
-      isNew: true,
-    });
-  }
-
-  const backupSlot2 = getNextAvailableSlot(
-    [...existingBOS.backup, ...(backupSlot1 ? [backupSlot1] : [])],
-    'backup'
-  );
-  if (backupSlot2) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter Line Side Disconnect',
-      position: backupSlot2,
-      section: 'backup',
-      systemNumber,
-      minAmpRating: backupAmps,
-      sizingCalculation: backupCalculation,
-      blockName: 'ESS',
-      isNew: true,
-    });
-  }
-
-  // PRE COMBINE (inverter + battery - no SMS)
+  // APS B-1: With Backup - 4 utility items
+  // Per APS ESS Metering & Isolation Concept Drawings Rev F
+  // NO backup section metering - ADS is integral to battery inverter
+  // NO bi-directional battery metering (APS prohibits battery grid export in AC-coupled)
   const combineAmps = Math.ceil(totalOutput * 1.25);
   const combineCalculation = `(${inverterOutput}A inverter + ${batteryOutput}A battery) × 1.25 = ${combineAmps}A`;
 
+  // 1. Uni-Directional Meter (PV production metering)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
@@ -2726,13 +2443,14 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
     });
   }
 
+  // 2. Uni-Directional Meter Line Side Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Utility Disconnect',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -2743,13 +2461,14 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
     });
   }
 
+  // 3. Utility Disconnect (non-fused visible-open, lockable per APS Req #7)
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
       section: 'utility',
       systemNumber,
@@ -2760,31 +2479,15 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
     });
   }
 
+  // 4. Dedicated DER Combiner Panel
   const utilitySlot4 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : [])],
     'utility'
   );
   if (utilitySlot4) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter DER Side Disconnect',
+      equipmentType: 'Dedicated DER Combiner Panel',
       position: utilitySlot4,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  const utilitySlot5 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : []), ...(utilitySlot4 ? [utilitySlot4] : [])],
-    'utility'
-  );
-  if (utilitySlot5) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter',
-      position: utilitySlot5,
       section: 'utility',
       systemNumber,
       minAmpRating: combineAmps,
@@ -2799,13 +2502,11 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
   }
 
   console.log('[APS AC-Coupled String + No SMS + Backup] ✅ MATCHED - returning', bosEquipment.length, 'BOS items');
-  console.log('[APS AC-Coupled String + No SMS + Backup] Calculations:');
-  console.log(`  - Combine: ${combineCalculation}`);
-  console.log(`  - Backup: ${backupCalculation}`);
+  console.log('[APS AC-Coupled String + No SMS + Backup] Calculation: ${combineCalculation}');
 
   return {
     configId: 'aps-ac-coupled-string-no-sms-backup',
-    configName: 'APS AC-Coupled String Inverter + Backup (No SMS)',
+    configName: 'APS B-1 AC-Coupled String Inverter + Backup (No SMS)',
     description: 'AC-coupled battery system with string inverter and backup, no SMS',
     confidence: 'high',
     bosEquipment,
@@ -2815,7 +2516,7 @@ export function detectAPSACCoupledStringNoSMSBackup(equipment: EquipmentState): 
 /**
  * AC-Coupled Detector 4: String Inverter + No SMS + No Backup
  * Triggers: AC-coupled + String inverter + Battery + No SMS + No backup panel
- * BOS Equipment: 4 Pre-Combine = 4 items
+ * BOS Equipment: 3 Pre-Combine = 3 items (APS B-2: Uni-Directional Meter + Line Side Disconnect + Utility Disconnect)
  */
 export function detectAPSACCoupledStringNoSMSNoBackup(equipment: EquipmentState): ConfigurationMatch | null {
   const {
@@ -2884,10 +2585,13 @@ export function detectAPSACCoupledStringNoSMSNoBackup(equipment: EquipmentState)
   const batteryOutput = batteryMaxContOutput || 0;
   const totalOutput = inverterOutput + batteryOutput;
 
-  // COMBINE (inverter + battery - no SMS, no backup)
+  // APS B-2: No Backup - 3 utility items
+  // Per APS ESS Metering & Isolation Concept Drawings Rev F
+  // NO bi-directional battery metering (APS prohibits battery grid export in AC-coupled)
   const combineAmps = Math.ceil(totalOutput * 1.25);
   const combineCalculation = `(${inverterOutput}A inverter + ${batteryOutput}A battery) × 1.25 = ${combineAmps}A`;
 
+  // 1. Uni-Directional Meter (PV production metering)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
@@ -2902,13 +2606,14 @@ export function detectAPSACCoupledStringNoSMSNoBackup(equipment: EquipmentState)
     });
   }
 
+  // 2. Uni-Directional Meter Line Side Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter DER Side Disconnect',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -2919,31 +2624,15 @@ export function detectAPSACCoupledStringNoSMSNoBackup(equipment: EquipmentState)
     });
   }
 
+  // 3. Utility Disconnect (non-fused visible-open, lockable per APS Req #7)
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  const utilitySlot4 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : [])],
-    'utility'
-  );
-  if (utilitySlot4) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter Line Side Disconnect',
-      position: utilitySlot4,
       section: 'utility',
       systemNumber,
       minAmpRating: combineAmps,
@@ -2962,7 +2651,7 @@ export function detectAPSACCoupledStringNoSMSNoBackup(equipment: EquipmentState)
 
   return {
     configId: 'aps-ac-coupled-string-no-sms-no-backup',
-    configName: 'APS AC-Coupled String Inverter (No SMS, No Backup)',
+    configName: 'APS B-2 AC-Coupled String Inverter (No SMS, No Backup)',
     description: 'AC-coupled battery system with string inverter, no SMS, no backup',
     confidence: 'high',
     bosEquipment,
@@ -3112,23 +2801,6 @@ export function detectAPSACCoupledMicroSMSBackup(equipment: EquipmentState): Con
     bosEquipment.push({
       equipmentType: 'Utility Disconnect',
       position: utilitySlot2,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: preCombineAmps,
-      sizingCalculation: preCombineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot3,
       section: 'utility',
       systemNumber,
       minAmpRating: preCombineAmps,
@@ -3316,23 +2988,6 @@ export function detectAPSACCoupledMicroSMSNoBackup(equipment: EquipmentState): C
     });
   }
 
-  const utilitySlot3 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
-    'utility'
-  );
-  if (utilitySlot3) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot3,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: preCombineAmps,
-      sizingCalculation: preCombineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // POST SMS (microinverter + battery)
   const postSMSAmps = Math.ceil(totalOutput * 1.25);
   const postSMSCalculation = `(${inverterOutput}A microinverter + ${batteryOutput}A battery) × 1.25 = ${postSMSAmps}A`;
@@ -3389,7 +3044,7 @@ export function detectAPSACCoupledMicroSMSNoBackup(equipment: EquipmentState): C
 /**
  * AC-Coupled Detector 7: Microinverter + No SMS + Backup
  * Triggers: AC-coupled + Microinverter + Battery + No SMS + Backup panel
- * BOS Equipment: 2 Backup + 5 Pre-Combine = 7 items
+ * BOS Equipment: 4 Pre-Combine = 4 items (APS B-1: Uni-Directional Meter + Line Side Disconnect + Utility Disconnect + DER Combiner Panel)
  */
 export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): ConfigurationMatch | null {
   const {
@@ -3407,7 +3062,6 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
     hasSMS,
     hasBackupPanel,
     backupOption,
-    backupPanelBusRating,
     existingBOS,
     systemNumber,
     hasInverter,
@@ -3459,45 +3113,14 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
   const batteryOutput = batteryMaxContOutput || 0;
   const totalOutput = inverterOutput + batteryOutput;
 
-  // BACKUP BOS
-  const backupAmps = backupPanelBusRating || 200;
-  const backupCalculation = `Backup Panel Bus Rating: ${backupAmps}A`;
-
-  const backupSlot1 = getNextAvailableSlot(existingBOS.backup, 'backup');
-  if (backupSlot1) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter',
-      position: backupSlot1,
-      section: 'backup',
-      systemNumber,
-      minAmpRating: backupAmps,
-      sizingCalculation: backupCalculation,
-      blockName: 'ESS',
-      isNew: true,
-    });
-  }
-
-  const backupSlot2 = getNextAvailableSlot(
-    [...existingBOS.backup, ...(backupSlot1 ? [backupSlot1] : [])],
-    'backup'
-  );
-  if (backupSlot2) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter Line Side Disconnect',
-      position: backupSlot2,
-      section: 'backup',
-      systemNumber,
-      minAmpRating: backupAmps,
-      sizingCalculation: backupCalculation,
-      blockName: 'ESS',
-      isNew: true,
-    });
-  }
-
-  // COMBINE (microinverter + battery - no SMS)
+  // APS B-1: With Backup - 4 utility items
+  // Per APS ESS Metering & Isolation Concept Drawings Rev F
+  // NO backup section metering - ADS is integral to battery inverter
+  // NO bi-directional battery metering (APS prohibits battery grid export in AC-coupled)
   const combineAmps = Math.ceil(totalOutput * 1.25);
   const combineCalculation = `(${inverterOutput}A microinverter + ${batteryOutput}A battery) × 1.25 = ${combineAmps}A`;
 
+  // 1. Uni-Directional Meter (PV production metering)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
@@ -3512,13 +3135,14 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
     });
   }
 
+  // 2. Uni-Directional Meter Line Side Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Utility Disconnect',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -3529,13 +3153,14 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
     });
   }
 
+  // 3. Utility Disconnect (non-fused visible-open, lockable per APS Req #7)
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
       section: 'utility',
       systemNumber,
@@ -3546,31 +3171,15 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
     });
   }
 
+  // 4. Dedicated DER Combiner Panel
   const utilitySlot4 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : [])],
     'utility'
   );
   if (utilitySlot4) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter DER Side Disconnect',
+      equipmentType: 'Dedicated DER Combiner Panel',
       position: utilitySlot4,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  const utilitySlot5 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : []), ...(utilitySlot4 ? [utilitySlot4] : [])],
-    'utility'
-  );
-  if (utilitySlot5) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter',
-      position: utilitySlot5,
       section: 'utility',
       systemNumber,
       minAmpRating: combineAmps,
@@ -3585,13 +3194,11 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
   }
 
   console.log('[APS AC-Coupled Micro + No SMS + Backup] ✅ MATCHED - returning', bosEquipment.length, 'BOS items');
-  console.log('[APS AC-Coupled Micro + No SMS + Backup] Calculations:');
-  console.log(`  - Combine: ${combineCalculation}`);
-  console.log(`  - Backup: ${backupCalculation}`);
+  console.log('[APS AC-Coupled Micro + No SMS + Backup] Calculation: ${combineCalculation}');
 
   return {
     configId: 'aps-ac-coupled-micro-no-sms-backup',
-    configName: 'APS AC-Coupled Microinverter + Backup (No SMS)',
+    configName: 'APS B-1 AC-Coupled Microinverter + Backup (No SMS)',
     description: 'AC-coupled battery system with microinverter and backup, no SMS',
     confidence: 'high',
     bosEquipment,
@@ -3601,7 +3208,7 @@ export function detectAPSACCoupledMicroNoSMSBackup(equipment: EquipmentState): C
 /**
  * AC-Coupled Detector 8: Microinverter + No SMS + No Backup
  * Triggers: AC-coupled + Microinverter + Battery + No SMS + No backup panel
- * BOS Equipment: 4 Pre-Combine = 4 items
+ * BOS Equipment: 3 Pre-Combine = 3 items (APS B-2: Uni-Directional Meter + Line Side Disconnect + Utility Disconnect)
  */
 export function detectAPSACCoupledMicroNoSMSNoBackup(equipment: EquipmentState): ConfigurationMatch | null {
   const {
@@ -3670,10 +3277,13 @@ export function detectAPSACCoupledMicroNoSMSNoBackup(equipment: EquipmentState):
   const batteryOutput = batteryMaxContOutput || 0;
   const totalOutput = inverterOutput + batteryOutput;
 
-  // COMBINE (microinverter + battery - no SMS, no backup)
+  // APS B-2: No Backup - 3 utility items
+  // Per APS ESS Metering & Isolation Concept Drawings Rev F
+  // NO bi-directional battery metering (APS prohibits battery grid export in AC-coupled)
   const combineAmps = Math.ceil(totalOutput * 1.25);
   const combineCalculation = `(${inverterOutput}A microinverter + ${batteryOutput}A battery) × 1.25 = ${combineAmps}A`;
 
+  // 1. Uni-Directional Meter (PV production metering)
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
@@ -3688,13 +3298,14 @@ export function detectAPSACCoupledMicroNoSMSNoBackup(equipment: EquipmentState):
     });
   }
 
+  // 2. Uni-Directional Meter Line Side Disconnect
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter DER Side Disconnect',
+      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,
@@ -3705,31 +3316,15 @@ export function detectAPSACCoupledMicroNoSMSNoBackup(equipment: EquipmentState):
     });
   }
 
+  // 3. Utility Disconnect (non-fused visible-open, lockable per APS Req #7)
   const utilitySlot3 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : [])],
     'utility'
   );
   if (utilitySlot3) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter',
+      equipmentType: 'Utility Disconnect',
       position: utilitySlot3,
-      section: 'utility',
-      systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  const utilitySlot4 = getNextAvailableSlot(
-    [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : [])],
-    'utility'
-  );
-  if (utilitySlot4) {
-    bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter Line Side Disconnect',
-      position: utilitySlot4,
       section: 'utility',
       systemNumber,
       minAmpRating: combineAmps,
@@ -3748,7 +3343,7 @@ export function detectAPSACCoupledMicroNoSMSNoBackup(equipment: EquipmentState):
 
   return {
     configId: 'aps-ac-coupled-micro-no-sms-no-backup',
-    configName: 'APS AC-Coupled Microinverter (No SMS, No Backup)',
+    configName: 'APS B-2 AC-Coupled Microinverter (No SMS, No Backup)',
     description: 'AC-coupled battery system with microinverter, no SMS, no backup',
     confidence: 'high',
     bosEquipment,
@@ -3886,24 +3481,6 @@ export async function detectTeslaPW3MultiSystemWholeHome(
     });
   }
 
-  // 2. System 1 Line Side Disconnect
-  const sys1UtilitySlot2 = getNextAvailableSlot(
-    [...sys1Equipment.existingBOS.utility, ...(sys1UtilitySlot1 ? [sys1UtilitySlot1] : [])],
-    'utility'
-  );
-  if (sys1UtilitySlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: sys1UtilitySlot2,
-      section: 'utility',
-      systemNumber: 1,
-      minAmpRating: 100,
-      sizingCalculation: '100A (standard microinverter)',
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
   // ========== SYSTEM 2 BACKUP BOS ==========
   // 3. System 2 Backup Uni-Directional Meter
   const sys2BackupSlot1 = getNextAvailableSlot(equipment.existingBOS.backup, 'backup');
@@ -3911,24 +3488,6 @@ export async function detectTeslaPW3MultiSystemWholeHome(
     bosEquipment.push({
       equipmentType: 'Uni-Directional Meter',
       position: sys2BackupSlot1,
-      section: 'backup',
-      systemNumber: 2,
-      minAmpRating: backupPanelAmps,
-      sizingCalculation: `${backupPanelAmps}A (backup panel bus rating)`,
-      blockName: 'ESS',
-      isNew: true,
-    });
-  }
-
-  // 4. System 2 Backup Line Side Disconnect
-  const sys2BackupSlot2 = getNextAvailableSlot(
-    [...equipment.existingBOS.backup, ...(sys2BackupSlot1 ? [sys2BackupSlot1] : [])],
-    'backup'
-  );
-  if (sys2BackupSlot2) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: sys2BackupSlot2,
       section: 'backup',
       systemNumber: 2,
       minAmpRating: backupPanelAmps,
@@ -4075,22 +3634,6 @@ export function detectTeslaPW3SingleSystem(equipment: EquipmentState): Configura
       });
     }
 
-    const backupSlot2 = getNextAvailableSlot(
-      [...equipment.existingBOS.backup, ...(backupSlot1 ? [backupSlot1] : [])],
-      'backup'
-    );
-    if (backupSlot2) {
-      bosEquipment.push({
-        equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-        position: backupSlot2,
-        section: 'backup',
-        systemNumber: equipment.systemNumber,
-        minAmpRating: backupPanelAmps,
-        sizingCalculation: `${backupPanelAmps}A (backup panel bus rating)`,
-        blockName: 'ESS',
-        isNew: true,
-      });
-    }
   }
 
   // Utility BOS (always present)
@@ -4114,13 +3657,13 @@ export function detectTeslaPW3SingleSystem(equipment: EquipmentState): Configura
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'Bi-Directional Meter DER Side Disconnect',
+      equipmentType: 'AC Disconnect',
       position: utilitySlot2,
       section: 'utility',
       systemNumber: equipment.systemNumber,
       minAmpRating: combineAmps,
       sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
+      blockName: 'ESS',
       isNew: true,
     });
   }
@@ -4150,23 +3693,6 @@ export function detectTeslaPW3SingleSystem(equipment: EquipmentState): Configura
     bosEquipment.push({
       equipmentType: 'Utility Disconnect',
       position: utilitySlot4,
-      section: 'utility',
-      systemNumber: equipment.systemNumber,
-      minAmpRating: combineAmps,
-      sizingCalculation: combineCalculation,
-      blockName: 'PRE COMBINE',
-      isNew: true,
-    });
-  }
-
-  const utilitySlot5 = getNextAvailableSlot(
-    [...equipment.existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : []), ...(utilitySlot2 ? [utilitySlot2] : []), ...(utilitySlot3 ? [utilitySlot3] : []), ...(utilitySlot4 ? [utilitySlot4] : [])],
-    'utility'
-  );
-  if (utilitySlot5) {
-    bosEquipment.push({
-      equipmentType: 'Uni-Directional Meter Line Side Disconnect',
-      position: utilitySlot5,
       section: 'utility',
       systemNumber: equipment.systemNumber,
       minAmpRating: combineAmps,

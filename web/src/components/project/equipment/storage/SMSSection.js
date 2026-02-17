@@ -96,7 +96,7 @@ const SMSSection = ({ formData, onChange }) => {
   };
 
   const handleToggle = (isNew) => {
-    onChange('sms_isnew', isNew);
+    onChange('sms_existing', !isNew);
   };
 
   const handleManufacturerChange = (e) => {
@@ -136,7 +136,7 @@ const SMSSection = ({ formData, onChange }) => {
   return (
     <>
       <Toggle
-        isNew={formData.sms_isnew !== false}
+        isNew={formData.sms_existing !== true}
         onToggle={handleToggle}
       />
 

@@ -228,6 +228,8 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
 
   const handleBackupOptionChange = (option) => {
     console.log('[ESS] Backup option changed to:', option);
+    console.log('[ESS] handleBackupOptionChange called with option:', option);
+    console.log('[ESS] Current formData.backup_option:', formData.backup_option);
 
     // Skip all other logic if just expanding the section
     if (option === 'expand') {
@@ -325,18 +327,19 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
         title="Energy Storage System"
         subtitle={subtitle}
         onDelete={handleTrashClick}
+        noWrapTitle={true}
       >
         {/* Row 1: Grid Forming Options */}
         <FormFieldRow label="Grid Forming">
           <TableRowButton
             label="Whole Home"
-            variant="secondary"
+            variant="outline"
             active={backupOption === 'Whole Home'}
             onClick={() => handleBackupOptionChange('Whole Home')}
           />
           <TableRowButton
             label="Partial Home"
-            variant="secondary"
+            variant="outline"
             active={backupOption === 'Partial Home'}
             onClick={() => handleBackupOptionChange('Partial Home')}
           />
@@ -346,7 +349,7 @@ const EnergyStorageSection = ({ formData, onChange, onBatchChange }) => {
         <FormFieldRow label="Grid Tied" style={{ marginTop: 'var(--spacing-tight)' }}>
           <TableRowButton
             label="No Backup"
-            variant="secondary"
+            variant="outline"
             active={backupOption === 'No Backup'}
             onClick={() => handleBackupOptionChange('No Backup')}
           />

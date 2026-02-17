@@ -24,7 +24,7 @@ import styles from './PdfAnnotationLayer.module.css';
 const PdfAnnotationLayer = forwardRef(({
   isActive = false,
   currentTool = 'select',
-  currentColor = 'var(--color-danger)', // Red default
+  currentColor = '#dc2626', // Red default
   annotations = [],
   onAnnotationsChange,
   onToolChange,
@@ -1386,17 +1386,25 @@ const PdfAnnotationLayer = forwardRef(({
 
   // Save annotations to parent component
   const saveAnnotations = (canvas) => {
+    logger.log('PDF', '========== saveAnnotations called ==========');
+    logger.log('PDF', 'onAnnotationsChange callback:', onAnnotationsChange ? 'EXISTS' : 'MISSING');
+
     if (!onAnnotationsChange) {
+      logger.error('PDF', 'onAnnotationsChange callback is missing!');
       return;
     }
 
     const objects = canvas.getObjects();
+    logger.log('PDF', 'Canvas objects count:', objects.length);
+
     const annotationsData = objects.map((obj) => ({
       page: currentPage,
       object: obj.toJSON(['deltaLetter', 'cloudPath', 'customType']) // Include custom properties
     }));
 
+    logger.log('PDF', 'Calling onAnnotationsChange with annotationsData:', annotationsData);
     onAnnotationsChange(annotationsData);
+    logger.log('PDF', 'onAnnotationsChange callback completed');
   };
 
   // Handle object modifications
@@ -1515,7 +1523,99 @@ const PdfAnnotationLayer = forwardRef(({
     }
   };
 
-  // Expose undo/redo/delete functions to parent
+  // Export all annotated pages as base64 PNG data
+  const exportAllPages = async () => {
+    console.log('!!! RAW exportAllPages called !!!');
+    console.log('!!! fabricCanvas:', !!fabricCanvasRef.current, 'canvasRef:', !!canvasRef.current);
+    console.log('!!! OBJECTS COUNT:', fabricCanvasRef.current.getObjects().length);
+
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) {
+      console.log('!!! Canvas not initialized - returning empty array');
+      return [];
+    }
+
+    // Check if there are any annotations on the canvas
+    const objects = canvas.getObjects();
+    console.log('!!! Canvas objects count:', objects.length);
+
+    if (objects.length === 0) {
+      console.log('!!! No annotations to export - returning empty array');
+      return [];
+    }
+
+    try {
+      // Use closest() to find imageContainer regardless of Fabric.js wrapper structure
+      const imageContainer = canvasRef.current?.closest('[class*="imageContainer"]');
+      console.log('!!! imageContainer:', !!imageContainer, imageContainer?.tagName, imageContainer?.className);
+      const pdfImage = imageContainer?.querySelector('img');
+      console.log('!!! pdfImage found:', !!pdfImage, pdfImage?.naturalWidth, 'x', pdfImage?.naturalHeight);
+
+      if (!pdfImage) {
+        logger.error('PDF', 'Cannot find PDF image element');
+        logger.error('PDF', 'Container HTML:', imageContainer.innerHTML.substring(0, 500));
+        return [];
+      }
+
+      logger.log('PDF', 'Image details:', {
+        naturalWidth: pdfImage.naturalWidth,
+        naturalHeight: pdfImage.naturalHeight,
+        src: pdfImage.src?.substring(0, 100)
+      });
+
+      // Create a temporary canvas to composite the image + annotations
+      const tempCanvas = document.createElement('canvas');
+      const ctx = tempCanvas.getContext('2d');
+
+      // Set canvas size to match the PDF image
+      tempCanvas.width = pdfImage.naturalWidth;
+      tempCanvas.height = pdfImage.naturalHeight;
+
+      // Draw the original PDF image
+      console.log('!!! About to drawImage, crossOrigin:', pdfImage.crossOrigin);
+      ctx.drawImage(pdfImage, 0, 0);
+
+      // Calculate scale factor between display canvas and original image
+      const scaleX = pdfImage.naturalWidth / canvas.width;
+      const scaleY = pdfImage.naturalHeight / canvas.height;
+
+      // Draw the Fabric.js canvas annotations on top, scaled to match
+      const fabricDataUrl = canvas.toDataURL({
+        format: 'png',
+        multiplier: Math.max(scaleX, scaleY) // Scale up to match image resolution
+      });
+
+      const fabricImage = new Image();
+      await new Promise((resolve, reject) => {
+        fabricImage.onload = resolve;
+        fabricImage.onerror = reject;
+        fabricImage.src = fabricDataUrl;
+      });
+
+      // Draw the scaled annotations
+      ctx.drawImage(fabricImage, 0, 0, tempCanvas.width, tempCanvas.height);
+
+      // Convert to base64 PNG
+      const compositeDataUrl = tempCanvas.toDataURL('image/png');
+      // Keep full data URI - backend expects it and strips prefix itself
+      const imageData = compositeDataUrl;
+
+      logger.log('PDF', `Exported annotated page ${currentPage} (${tempCanvas.width}x${tempCanvas.height})`);
+
+      // Return array with single page (current page)
+      // The imageKey should come from the parent component's page data
+      return [{
+        pageNumber: currentPage,
+        imageData: imageData,
+        // imageKey will be added by parent component since we don't have access to it here
+      }];
+    } catch (error) {
+      console.log('!!! EXPORT ERROR:', error.name, error.message);
+      return [];
+    }
+  };
+
+  // Expose undo/redo/delete/export functions to parent
   useImperativeHandle(ref, () => ({
     undo: () => {
       const canvas = fabricCanvasRef.current;
@@ -1534,7 +1634,8 @@ const PdfAnnotationLayer = forwardRef(({
       if (canvas) {
         deleteSelected(canvas);
       }
-    }
+    },
+    exportAllPages: exportAllPages
   }));
 
   if (!isActive) {

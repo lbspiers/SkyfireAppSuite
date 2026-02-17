@@ -2,16 +2,16 @@
  * PreferredButton - Button to open preferred equipment modal
  *
  * Placed next to equipment section titles for quick access.
- * Uses TableRowButton with "Inventory" label.
+ * Uses ActionSectionButton (rectangular) with "Inventory" label.
  */
 
-import TableRowButton from './TableRowButton';
+import ActionSectionButton from './ActionSectionButton';
 
 const PreferredButton = ({ onClick, disabled = false }) => {
   return (
-    <TableRowButton
+    <ActionSectionButton
       label="Inventory"
-      variant="outline"
+      variant="primary"
       onClick={onClick}
       disabled={disabled}
     />

@@ -64,7 +64,7 @@ const GridIcon4x4 = () => (
  */
 const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem('surveyPanelTab') || 'documentation';
+    return localStorage.getItem('surveyPanelTab') || 'view';
   });
   const [gridSize, setGridSize] = useState(() => {
     return localStorage.getItem('surveyGalleryGridSize') || 'medium';
@@ -73,6 +73,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
     return localStorage.getItem('surveyViewMode') || 'grid';
   });
   const [photoCount, setPhotoCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Photo viewer state
   const [viewerState, setViewerState] = useState({
@@ -154,11 +155,39 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   };
 
   const renderControls = (activeTab) => {
-    if (activeTab === 'documentation') {
+    if (activeTab === 'view') {
       const count = photoCount;
 
       return (
         <React.Fragment>
+          {/* Search Bar - only show when photo viewer is not open */}
+          {!viewerState.isOpen && (
+            <div className={styles.searchBar}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="7" cy="7" r="4" />
+                <path d="M14 14l-3.5-3.5" strokeLinecap="round" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search photos and notes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className={styles.clearButton}
+                  aria-label="Clear search"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 4L4 12M4 4l8 8" strokeLinecap="round" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Zoom controls with close button - only show when photo viewer is open */}
           {viewerState.isOpen && (
             <div className={styles.zoomControls}>
@@ -289,7 +318,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
   };
 
   const tabContent = {
-    documentation: viewerState.isOpen ? (
+    view: viewerState.isOpen ? (
       <PhotoPanelViewer
         media={viewerState.media}
         currentIndex={viewerState.currentIndex}
@@ -311,6 +340,7 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
         viewMode={viewMode}
         onCountChange={setPhotoCount}
         onPhotoClick={handleOpenPhoto}
+        searchQuery={searchQuery}
       />
     ),
     map: projectData ? (
@@ -336,11 +366,11 @@ const SurveyPanel = ({ projectUuid, projectData, onSwitchToFilesTab }) => {
     <div className={styles.surveyPanel}>
       <CompactTabs
         tabs={[
-          { id: 'documentation', label: 'Documentation' },
+          { id: 'view', label: 'View' },
           { id: 'map', label: 'Map' },
           { id: 'report', label: 'SS Report' },
         ]}
-        defaultTab="documentation"
+        defaultTab="view"
         storageKey="surveyPanelTab"
         renderControls={renderControls}
         tabContent={tabContent}

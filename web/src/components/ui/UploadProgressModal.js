@@ -107,7 +107,7 @@ const UploadProgressModal = ({
   const { total, completed, failed, inProgress, queued, files } = status;
 
   const isProcessing = inProgress > 0 || queued > 0;
-  const allDone = !isProcessing && total > 0;
+  const allDone = !isProcessing;
 
   // Calculate overall progress
   const overallPercent = total > 0
@@ -157,7 +157,7 @@ const UploadProgressModal = ({
             ) : failed > 0 ? (
               <>{completed} uploaded, {failed} failed</>
             ) : (
-              <>All {total} file{total !== 1 ? 's' : ''} uploaded successfully!</>
+              <>{total > 0 ? <>All {total} file{total !== 1 ? 's' : ''} uploaded successfully!</> : 'Upload complete'}</>
             )}
           </div>
           <Progress

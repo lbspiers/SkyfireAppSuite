@@ -1,0 +1,71 @@
+/* ActionSectionButton - Rectangular button for modal triggers and section actions */
+.button {
+  padding: calc(var(--spacing-tight) * 0.6) var(--spacing);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  font-family: inherit;
+  transition: var(--transition-base);
+  white-space: nowrap;
+  line-height: 1;
+  border: var(--border-thin) solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  background: transparent;
+}
+
+.button:hover:not(.disabled) {
+  transform: translateY(-1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+.button:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variant: Primary (electric blue outline) */
+.variant-primary {
+  border-color: rgba(59, 130, 246, 0.5);
+  color: var(--color-accent-blue);
+}
+
+.variant-primary:hover:not(.disabled) {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+
+/* Variant: Orange (Skyfire orange outline) */
+.variant-orange {
+  border-color: rgba(253, 115, 50, 0.5);
+  color: var(--color-primary);
+}
+
+.variant-orange:hover:not(.disabled) {
+  background: rgba(253, 115, 50, 0.1);
+  border-color: rgba(253, 115, 50, 0.8);
+  box-shadow: 0 0 12px rgba(253, 115, 50, 0.4);
+}
+
+/* Variant: Secondary (subtle gray) */
+.variant-secondary {
+  border-color: var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.variant-secondary:hover:not(.disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-elevated);
+}

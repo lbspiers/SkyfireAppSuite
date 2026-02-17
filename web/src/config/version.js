@@ -5,11 +5,11 @@
  * DEPLOYMENT_NUMBER increments with each deployment
  * DEPLOYMENT_VERSION format: yyyy.MM.dd.HHmm (unique per deployment)
  */
-export const DEPLOYMENT_NUMBER = 46; // Auto-incremented by deploy script
-export const DEPLOYMENT_VERSION = '2026.02.05.1823'; // Auto-updated by deploy script
-export const BUILD_DATE = '2026-02-05'; // Auto-updated by deploy script
-export const BUILD_TIME = '18:23'; // Auto-updated by deploy script
-export const BUILD_SIZE = '8.3 MB'; // Auto-calculated by deploy script
+export const DEPLOYMENT_NUMBER = 72; // Auto-incremented by deploy script
+export const DEPLOYMENT_VERSION = '2026.02.14.2341'; // Auto-updated by deploy script
+export const BUILD_DATE = '2026-02-14'; // Auto-updated by deploy script
+export const BUILD_TIME = '23:41'; // Auto-updated by deploy script
+export const BUILD_SIZE = '8.4 MB'; // Auto-calculated by deploy script
 
 // Legacy version for compatibility
 export const APP_VERSION = '1.0.0';

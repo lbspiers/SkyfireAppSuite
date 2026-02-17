@@ -380,6 +380,7 @@ project_system_details:
   sys2_ap_hoy_breaker_size: text
   bsp_backup_feeder_location: text
   spb_subpanel_b_feeder_location: text
+  spb_tie_in_location: text
   mpa_bus_bar_existing: boolean
   mpa_main_circuit_breaker_existing: boolean
   mpa_mainpanela_acunit_amps: text

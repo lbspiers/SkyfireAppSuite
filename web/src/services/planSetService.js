@@ -40,6 +40,28 @@ const planSetService = {
       logger.error('PlanSetService', 'Failed to retry conversion:', error);
       throw error;
     }
+  },
+
+  /**
+   * Save annotated plan set images back to S3
+   * @param {string} projectUuid - Project UUID
+   * @param {number} versionId - Version ID
+   * @param {Array} pages - Array of { pageNumber, imageData, imageKey }
+   * @returns {Promise} Response with status and updated pages count
+   */
+  async saveAnnotations(projectUuid, versionId, pages) {
+    try {
+      const endpoint = `/project/${projectUuid}/versions/${versionId}/save-annotations`;
+      logger.log('PlanSetService', `Saving ${pages.length} annotated pages for version ${versionId}`);
+
+      const response = await axios.post(endpoint, { pages });
+
+      logger.log('PlanSetService', 'Annotations saved successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      logger.error('PlanSetService', `Failed to save annotations for version ${versionId}:`, error.response?.status, error.message);
+      throw error;
+    }
   }
 };
 

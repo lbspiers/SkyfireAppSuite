@@ -43,6 +43,17 @@ function isTRICOUtility(utilityName: string | null): boolean {
 }
 
 /**
+ * Check if utility is UNISOURCE (UniSource Energy Services)
+ */
+function isUNISOURCEUtility(utilityName: string | null): boolean {
+  if (!utilityName) return false;
+  const name = utilityName.toLowerCase();
+  return name.includes('unisource') ||
+         name.includes('uns electric') ||
+         name.includes('uns energy');
+}
+
+/**
  * Check if utility is Xcel Energy (Colorado)
  */
 function isXcelUtility(utilityName: string | null): boolean {
@@ -79,6 +90,7 @@ export function detectGenericPVOnly(equipment: EquipmentState): ConfigurationMat
     batteryQuantity,
     existingBOS,
     systemNumber,
+    utilityName,
   } = equipment;
 
   // Check for PV-Only pattern (no battery)
@@ -97,12 +109,16 @@ export function detectGenericPVOnly(equipment: EquipmentState): ConfigurationMat
   const minAmpRating = Math.ceil(inverterMaxContOutput * 1.25);
   const sizingCalculation = `${inverterMaxContOutput}A × 1.25 = ${minAmpRating}A`;
 
+  // Determine utility-specific equipment names
+  const isUNISOURCE = isUNISOURCEUtility(utilityName);
+
   // Utility Section BOS (Pre-Combine)
-  // Type 1: PV Meter (generic name - will be translated by catalog lookup)
+  // For UNISOURCE: Slot 1 = Utility DG Disconnect, Slot 2 = Utility DG Meter
+  // For others: Slot 1 = PV Meter, Slot 2 = AC Disconnect
   const utilitySlot1 = getNextAvailableSlot(existingBOS.utility, 'utility');
   if (utilitySlot1) {
     bosEquipment.push({
-      equipmentType: 'PV Meter',
+      equipmentType: isUNISOURCE ? 'Utility DG Disconnect' : 'PV Meter',
       position: utilitySlot1,
       section: 'utility',
       systemNumber,
@@ -113,14 +129,14 @@ export function detectGenericPVOnly(equipment: EquipmentState): ConfigurationMat
     });
   }
 
-  // Type 2: AC Disconnect
+  // Type 2
   const utilitySlot2 = getNextAvailableSlot(
     [...existingBOS.utility, ...(utilitySlot1 ? [utilitySlot1] : [])],
     'utility'
   );
   if (utilitySlot2) {
     bosEquipment.push({
-      equipmentType: 'AC Disconnect',
+      equipmentType: isUNISOURCE ? 'Utility DG Meter' : 'AC Disconnect',
       position: utilitySlot2,
       section: 'utility',
       systemNumber,

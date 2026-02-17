@@ -20,28 +20,6 @@ const JURISDICTIONS = [
   'Fresno County',
 ];
 
-// Common utilities
-const UTILITIES = [
-  // Arizona
-  'Arizona Public Service (APS)',
-  'Salt River Project (SRP)',
-  'Tucson Electric Power (TEP)',
-  'Trico Electric Cooperative (TRICO)',
-  'UniSource Energy Services (UniSource)',
-  'Sulphur Springs Valley Electric Cooperative',
-  // California
-  'Pacific Gas & Electric (PG&E)',
-  'Southern California Edison (SCE)',
-  'San Diego Gas & Electric (SDG&E)',
-  'Los Angeles Department of Water and Power (LADWP)',
-  'Sacramento Municipal Utility District (SMUD)',
-  'Imperial Irrigation District (IID)',
-  'Anaheim Public Utilities',
-  'Riverside Public Utilities',
-  'Pasadena Water and Power',
-  'Glendale Water & Power',
-];
-
 /**
  * SiteForm - Form for site information with auto-save
  * Saves automatically after 800ms of inactivity or on blur
@@ -66,6 +44,8 @@ const SiteForm = ({ projectUuid, projectData }) => {
   const [isHydrating, setIsHydrating] = useState(true);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [planSetVersion, setPlanSetVersion] = useState(1); // Next version to be generated
+  const [utilities, setUtilities] = useState([]); // Dynamic utilities from database
+  const [loadingUtilities, setLoadingUtilities] = useState(false);
 
   const saveTimeoutRef = useRef(null);
   const lastSavedDataRef = useRef(null);
@@ -230,6 +210,61 @@ const SiteForm = ({ projectUuid, projectData }) => {
       });
     }
   }, [projectData]);
+
+  // Fetch utilities based on zip code
+  useEffect(() => {
+    const fetchUtilities = async () => {
+      const zipCode = addressFormData.zip;
+
+      if (!zipCode || zipCode.length < 5) {
+        setUtilities([]);
+        return;
+      }
+
+      try {
+        setLoadingUtilities(true);
+        console.log('[SiteForm Utility Fetch] 🚀 Fetching utilities for ZIP:', zipCode);
+
+        const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+        const companyId = userData?.company?.uuid;
+
+        if (!companyId) {
+          console.error('[SiteForm Utility Fetch] ❌ Company ID not found');
+          setUtilities([]);
+          return;
+        }
+
+        const response = await axios.get(`/utility-zipcodes/zips/${zipCode}/utilities`, {
+          params: {
+            companyId,
+            _: Date.now() // Cache-busting timestamp
+          }
+        });
+
+        console.log('[SiteForm Utility Fetch] 📦 Raw response:', response.data);
+
+        const utilityData = response.data?.data || response.data || [];
+        console.log('[SiteForm Utility Fetch] 📋 Utility data:', utilityData);
+
+        // Remove duplicates, normalize names, and sort
+        const uniqueUtilities = [...new Set(utilityData.map(u => {
+          // Normalize "PSCo (Xcel Energy)" to "Xcel Energy"
+          return u === 'PSCo (Xcel Energy)' ? 'Xcel Energy' : u;
+        }))].sort();
+
+        console.log('[SiteForm Utility Fetch] ✅ Final utilities:', uniqueUtilities);
+        setUtilities(uniqueUtilities);
+      } catch (err) {
+        console.error('[SiteForm Utility Fetch] ❌ Error fetching utilities:', err);
+        logger.error('SiteForm', 'Failed to fetch utilities:', err);
+        setUtilities([]);
+      } finally {
+        setLoadingUtilities(false);
+      }
+    };
+
+    fetchUtilities();
+  }, [addressFormData.zip]);
 
   // Fetch current version number to determine next version
   useEffect(() => {
@@ -453,11 +488,14 @@ const SiteForm = ({ projectUuid, projectData }) => {
           value={formData.utility}
           onChange={handleChange}
           onBlur={handleBlur}
+          disabled={loadingUtilities || utilities.length === 0}
           className={`${styles.select} ${formData.utility !== '' ? styles.selectFilled : ''}`}
           style={{ color: formData.utility === '' ? 'var(--gray-500)' : 'var(--gray-50)' }}
         >
-          <option value="">Select Utility...</option>
-          {UTILITIES.map(utility => (
+          <option value="">
+            {loadingUtilities ? 'Loading utilities...' : utilities.length === 0 ? 'Enter ZIP code first' : 'Select Utility...'}
+          </option>
+          {utilities.map(utility => (
             <option key={utility} value={utility}>
               {utility}
             </option>

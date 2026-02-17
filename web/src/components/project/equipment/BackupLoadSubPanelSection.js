@@ -49,7 +49,7 @@ const BackupLoadSubPanelSection = ({
   // Load models when manufacturer changes
   useEffect(() => {
     if (formData.backup_panel_make) {
-      loadModels();
+      loadModels(formData.backup_panel_make);
     } else {
       setModels([]);
     }
@@ -83,16 +83,16 @@ const BackupLoadSubPanelSection = ({
     }
 
     // Sync new/existing status
-    const backupPanelIsNew = formData.backup_panel_isnew !== false;
-    const smsIsNew = formData.sms_isnew !== false;
+    const backupPanelIsNew = formData.backup_panel_existing !== true;
+    const smsIsNew = formData.sms_existing !== true;
     if (backupPanelIsNew !== smsIsNew) {
-      updates.push(['sms_isnew', backupPanelIsNew]);
+      updates.push(['sms_existing', !backupPanelIsNew]);
     }
 
     // Apply updates if needed
     if (updates.length > 0) {
       updates.forEach(([field, value]) => {
-        onChange(field, value);
+        onChange(field, value, systemNumber);
       });
       logger.log('BackupLoadSubPanel', `Synced ${updates.length} fields to SMS for Combiner 6C`);
     }
@@ -102,7 +102,7 @@ const BackupLoadSubPanelSection = ({
     isEnphaseCombiner6C,
     formData.backup_panel_make,
     formData.backup_panel_model,
-    formData.backup_panel_isnew,
+    formData.backup_panel_existing,
   ]);
 
   const loadManufacturers = async () => {
@@ -130,10 +130,10 @@ const BackupLoadSubPanelSection = ({
     }
   };
 
-  const loadModels = async () => {
+  const loadModels = async (manufacturer) => {
     setLoadingModels(true);
     try {
-      const response = await getCombinerPanelModels(formData.backup_panel_make);
+      const response = await getCombinerPanelModels(manufacturer);
       const modelList = response?.data || [];
       // Normalize data to { label, value } format
       const normalized = modelList.map(item => {
@@ -153,36 +153,36 @@ const BackupLoadSubPanelSection = ({
 
   const handleMakeChange = (value) => {
     // Always save isnew state when make is selected (defaults to true if not set)
-    const isNewValue = formData.backup_panel_isnew !== false; // true unless explicitly set to false
-    onChange('backup_panel_isnew', isNewValue);
-    console.log('[BackupLoadSubPanel] Setting backup_panel_isnew:', isNewValue);
+    const isNewValue = formData.backup_panel_existing !== true; // true unless explicitly set to false
+    onChange('backup_panel_existing', !isNewValue, systemNumber);
+    console.log('[BackupLoadSubPanel] Setting backup_panel_existing:', isNewValue);
 
-    onChange('backup_panel_make', value);
-    onChange('backup_panel_model', '');
+    onChange('backup_panel_make', value, systemNumber);
+    onChange('backup_panel_model', '', systemNumber);
 
     // Ensure main breaker default is saved to bls1_backuploader_main_breaker_rating
     if (formData.backup_panel_main_breaker === undefined || formData.backup_panel_main_breaker === null) {
-      onChange('backup_panel_main_breaker', 'MLO');
-      onChange('bls1_backuploader_main_breaker_rating', 'MLO');
+      onChange('backup_panel_main_breaker', 'MLO', systemNumber);
+      onChange('bls1_backuploader_main_breaker_rating', 'MLO', systemNumber);
       console.log('[BackupLoadSubPanel] Setting default backup_panel_main_breaker: MLO');
       console.log('[BackupLoadSubPanel] Setting bls1_backuploader_main_breaker_rating: MLO');
     } else {
       // Sync current value to bls1 field
-      onChange('bls1_backuploader_main_breaker_rating', formData.backup_panel_main_breaker);
+      onChange('bls1_backuploader_main_breaker_rating', formData.backup_panel_main_breaker, systemNumber);
       console.log('[BackupLoadSubPanel] Syncing bls1_backuploader_main_breaker_rating:', formData.backup_panel_main_breaker);
     }
   };
 
   const handleModelChange = (value) => {
     // Always save isnew state when model is selected (defaults to true if not set)
-    const isNewValue = formData.backup_panel_isnew !== false; // true unless explicitly set to false
-    onChange('backup_panel_isnew', isNewValue);
+    const isNewValue = formData.backup_panel_existing !== true; // true unless explicitly set to false
+    onChange('backup_panel_existing', !isNewValue, systemNumber);
 
-    onChange('backup_panel_model', value);
+    onChange('backup_panel_model', value, systemNumber);
   };
 
   const handleClearTieInBreaker = () => {
-    onChange('backup_panel_tie_in_breaker', '');
+    onChange('backup_panel_tie_in_breaker', '', systemNumber);
     setEditTieInBreaker(false);
   };
 
@@ -221,7 +221,7 @@ const BackupLoadSubPanelSection = ({
 
   const getSubtitle = () => {
     if (formData.backup_panel_make && formData.backup_panel_model) {
-      const statusLetter = formData.backup_panel_isnew !== false ? 'N' : 'E';
+      const statusLetter = formData.backup_panel_existing !== true ? 'N' : 'E';
       return `(${statusLetter}) ${formData.backup_panel_make} ${formData.backup_panel_model}`;
     }
     return '';
@@ -229,22 +229,22 @@ const BackupLoadSubPanelSection = ({
 
   const handleDelete = () => {
     // Clear all backup panel fields
-    onChange('backup_panel_make', '');
-    onChange('backup_panel_model', '');
-    onChange('backup_panel_bus_amps', '');
-    onChange('backup_panel_main_breaker', 'MLO');
-    onChange('backup_panel_tie_in_breaker', '');
-    onChange('backup_panel_isnew', true);
-    onChange(tieInLocationField, '');
+    onChange('backup_panel_make', '', systemNumber);
+    onChange('backup_panel_model', '', systemNumber);
+    onChange('backup_panel_bus_amps', '', systemNumber);
+    onChange('backup_panel_main_breaker', 'MLO', systemNumber);
+    onChange('backup_panel_tie_in_breaker', '', systemNumber);
+    onChange('backup_panel_existing', false, systemNumber);
+    onChange(tieInLocationField, '', systemNumber);
     setEditTieInBreaker(false);
 
     // If IQ Combiner 6C is active, also clear the SMS fields that were synced
     // This ensures the equipment_type and other SMS data doesn't get left behind
     if (isEnphaseCombiner6C) {
-      onChange('sms_equipment_type', '');
-      onChange('sms_make', '');
-      onChange('sms_model', '');
-      onChange('sms_isnew', true);
+      onChange('sms_equipment_type', '', systemNumber);
+      onChange('sms_make', '', systemNumber);
+      onChange('sms_model', '', systemNumber);
+      onChange('sms_existing', false, systemNumber);
       logger.log('BackupLoadSubPanel', 'Cleared SMS fields for Combiner 6C on delete');
     }
   };
@@ -298,7 +298,7 @@ const BackupLoadSubPanelSection = ({
   // Auto-select if only one option
   useEffect(() => {
     if (tieInLocationOptions.length === 1 && !formData[tieInLocationField]) {
-      onChange(tieInLocationField, tieInLocationOptions[0].value);
+      onChange(tieInLocationField, tieInLocationOptions[0].value, systemNumber);
     }
   }, [tieInLocationOptions, formData[tieInLocationField]]);
 
@@ -308,8 +308,8 @@ const BackupLoadSubPanelSection = ({
         title="Backup Load Sub Panel"
         subtitle={getSubtitle()}
         showNewExistingToggle={true}
-        isNew={formData.backup_panel_isnew !== false}
-        onNewExistingChange={(isNew) => onChange('backup_panel_isnew', isNew)}
+        isExisting={formData.backup_panel_existing}
+        onExistingChange={(val) => onChange('backup_panel_existing', val, systemNumber)}
         onDelete={handleDelete}
       >
         <TableDropdown
@@ -333,7 +333,7 @@ const BackupLoadSubPanelSection = ({
         <TableDropdown
           label="Bus (Amps)"
           value={formData.backup_panel_bus_amps || ''}
-          onChange={(value) => onChange('backup_panel_bus_amps', value)}
+          onChange={(value) => onChange('backup_panel_bus_amps', value, systemNumber)}
           options={busAmpOptions}
           placeholder="Select amps..."
         />
@@ -342,8 +342,8 @@ const BackupLoadSubPanelSection = ({
           label="Main Circuit Breaker"
           value={formData.backup_panel_main_breaker || 'MLO'}
           onChange={(value) => {
-            onChange('backup_panel_main_breaker', value);
-            onChange('bls1_backuploader_main_breaker_rating', value);
+            onChange('backup_panel_main_breaker', value, systemNumber);
+            onChange('bls1_backuploader_main_breaker_rating', value, systemNumber);
             console.log('[BackupLoadSubPanel] Main breaker changed to:', value);
             console.log('[BackupLoadSubPanel] Setting bls1_backuploader_main_breaker_rating:', value);
           }}
@@ -356,7 +356,7 @@ const BackupLoadSubPanelSection = ({
           <TableDropdown
             label="Tie-In Location"
             value={formData[tieInLocationField] || ''}
-            onChange={(value) => onChange(tieInLocationField, value)}
+            onChange={(value) => onChange(tieInLocationField, value, systemNumber)}
             options={tieInLocationOptions}
             placeholder="Select tie-in location..."
             disabled={tieInLocationOptions.length === 1}
@@ -399,7 +399,7 @@ const BackupLoadSubPanelSection = ({
           <TableDropdown
             label="Breaker Rating"
             value={formData.backup_panel_tie_in_breaker || ''}
-            onChange={(value) => onChange('backup_panel_tie_in_breaker', value)}
+            onChange={(value) => onChange('backup_panel_tie_in_breaker', value, systemNumber)}
             options={breakerOptions.map(rating => ({ label: rating, value: rating }))}
             placeholder="Select rating..."
           />
@@ -421,4 +421,28 @@ const BackupLoadSubPanelSection = ({
   );
 };
 
-export default memo(BackupLoadSubPanelSection);
+const areBackupPanelPropsEqual = (prevProps, nextProps) => {
+  if (prevProps.systemNumber !== nextProps.systemNumber) return false;
+
+  const relevantFields = [
+    'backup_panel_make', 'backup_panel_model', 'backup_panel_existing',
+    'backup_panel_bus_bar_rating', 'backup_panel_main_breaker',
+    'backup_panel_upstream_breaker',
+    'combiner_panel_make', 'combiner_panel_model',
+    'sms_make', 'sms_model', 'sms_existing', 'sms_equipment_type',
+    'show_backup_panel',
+    // Backup load types (1-20)
+    ...Array.from({ length: 20 }, (_, i) => `backup_load_type_${i + 1}`),
+    ...Array.from({ length: 20 }, (_, i) => `backup_load_rating_${i + 1}`),
+  ];
+
+  for (const field of relevantFields) {
+    if (prevProps.formData?.[field] !== nextProps.formData?.[field]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export default memo(BackupLoadSubPanelSection, areBackupPanelPropsEqual);

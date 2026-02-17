@@ -3,6 +3,7 @@ import axios from '../../config/axios';
 import { toast } from 'react-toastify';
 import logger from '../../services/devLogger';
 import planSetService from '../../services/planSetService';
+import sitePlanService from '../../services/sitePlanService';
 import { useSocket } from '../../hooks/useSocket';
 import styles from '../../styles/Dashboard.module.css';
 import PdfFullScreenModal from '../pdf/PdfFullScreenModal';
@@ -16,7 +17,7 @@ import SpecSheetGrid from './SpecSheetGrid';
  * Now displays converted PNG images instead of raw PDFs.
  * Listens for 'planset:converted' WebSocket events after upload.
  */
-const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
+const PlanSetVersions = ({ projectUuid, onQCPanelChange, refreshTrigger }) => {
   logger.log('PlanSet', `[Component] PlanSetVersions mounted/rendered with projectUuid=${projectUuid}`);
 
   const [versions, setVersions] = useState([]);
@@ -35,6 +36,9 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [activePage, setActivePage] = useState(1);   // Currently selected page number
   const [pageCount, setPageCount] = useState(1);
 
+  // Site plan integration state
+  const [sitePlanPages, setSitePlanPages] = useState([]);  // Published site plan pages to merge
+
   // Status tab state: 'draft' or 'published'
   const [statusTab, setStatusTab] = useState('draft');
 
@@ -44,7 +48,7 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   // Annotation state
   const [isAnnotationMode, setIsAnnotationMode] = useState(true); // Start with tools open
   const [currentTool, setCurrentTool] = useState('select');
-  const [currentColor, setCurrentColor] = useState('var(--color-danger)'); // Red default
+  const [currentColor, setCurrentColor] = useState('#dc2626'); // Red default
   const [annotations, setAnnotations] = useState([]);
   const [hasChanges, setHasChanges] = useState(false);
   const annotationLayerRef = useRef(null);
@@ -56,6 +60,12 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef(null);
 
+  // Stable refs for socket listener (prevents register/unregister thrashing)
+  const selectedVersionRef = useRef(null);
+  const fetchImageUrlRef = useRef(null);
+  const fetchVersionsRef = useRef(null);
+  const fetchPublishedSitePlanPagesRef = useRef(null);
+
   // QC Checklist panel state - now supports 'site' and 'design' types
   const [activeQCType, setActiveQCType] = useState(null); // null, 'site', or 'design'
 
@@ -65,7 +75,62 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   const [viewingSpecSheet, setViewingSpecSheet] = useState(null);
 
   // Socket.io hooks
-  const { joinProject, leaveProject, onPlanSetConverted } = useSocket();
+  const { joinProject, leaveProject, onPlanSetConverted, onSitePlanConverted } = useSocket();
+
+  // Ref to hold polling interval ID so we can clear it early when socket event fires
+  const pollingIntervalRef = useRef(null);
+
+  // Fetch published site plan pages to merge into plan set
+  const fetchPublishedSitePlanPages = useCallback(async () => {
+    if (!projectUuid) return;
+
+    try {
+      logger.log('PlanSet', '[fetchPublishedSitePlanPages] Fetching published site plan');
+
+      // Get published site plan
+      const response = await sitePlanService.getPublished(projectUuid);
+
+      if (response.status === 'SUCCESS' && response.data) {
+        const publishedSitePlan = response.data;
+        logger.log('PlanSet', '[fetchPublishedSitePlanPages] Found published site plan:', publishedSitePlan);
+
+        // Get the image URLs for the published site plan
+        const imgResponse = await sitePlanService.getImageUrl(projectUuid, publishedSitePlan.id);
+        const imgData = imgResponse?.data || imgResponse;
+
+        // Normalize snake_case to camelCase
+        if (imgData) {
+          if (imgData.image_url && !imgData.imageUrl) imgData.imageUrl = imgData.image_url;
+          if (imgData.image_key && !imgData.imageKey) imgData.imageKey = imgData.image_key;
+          if (imgData.conversion_status && !imgData.conversionStatus) imgData.conversionStatus = imgData.conversion_status;
+          if (imgData.page_count && !imgData.pageCount) imgData.pageCount = imgData.page_count;
+          if (imgData.pages) {
+            imgData.pages = imgData.pages.map(p => ({
+              ...p,
+              imageUrl: p.imageUrl || p.image_url,
+              imageKey: p.imageKey || p.image_key,
+            }));
+          }
+        }
+
+        // Check if we have pages
+        if (imgData?.pages && imgData.pages.length > 0) {
+          logger.log('PlanSet', `[fetchPublishedSitePlanPages] Got ${imgData.pages.length} site plan pages`);
+          setSitePlanPages(imgData.pages);
+        } else {
+          logger.log('PlanSet', '[fetchPublishedSitePlanPages] No site plan pages available yet');
+          setSitePlanPages([]);
+        }
+      } else {
+        logger.log('PlanSet', '[fetchPublishedSitePlanPages] No published site plan found');
+        setSitePlanPages([]);
+      }
+    } catch (error) {
+      // It's okay if there's no published site plan yet
+      logger.debug('PlanSet', '[fetchPublishedSitePlanPages] Error fetching published site plan:', error.message);
+      setSitePlanPages([]);
+    }
+  }, [projectUuid]);
 
   // Fetch all versions (extracted to useCallback so it can be called from socket listener)
   const fetchVersions = useCallback(async () => {
@@ -122,6 +187,15 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
   useEffect(() => {
     fetchVersions();
   }, [fetchVersions]);
+
+  // Fetch published site plan pages when viewing published plan set
+  useEffect(() => {
+    if (statusTab === 'published') {
+      fetchPublishedSitePlanPages();
+    } else {
+      setSitePlanPages([]);
+    }
+  }, [statusTab, fetchPublishedSitePlanPages]);
 
   // Fetch spec sheets
   const fetchSpecSheets = useCallback(async () => {
@@ -247,13 +321,61 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
         // Check if we have image URLs (conversion complete)
         if (imgData?.pages && imgData.pages.length > 0) {
           // Multi-page response
-          setPages(imgData.pages);
-          setPageCount(imgData.pageCount || imgData.pages.length);
-          setPresignedUrl(imgData.pages[0]?.imageUrl || null);
+          let mergedPages = [...imgData.pages];
+
+          // If we're viewing published plan set and have site plan pages, merge them in
+          if (statusTab === 'published' && sitePlanPages.length > 0) {
+            logger.log('PlanSet', `Merging ${sitePlanPages.length} site plan pages into plan set`);
+
+            // Site plan pages should be inserted at positions 2, 3, and 9
+            // Site plan page 1 (PV 2) -> plan set position 2
+            // Site plan page 2 (PV 3) -> plan set position 3
+            // Site plan page 3 (PV 7) -> plan set position 9
+
+            const sitePlanInsertions = [
+              { sitePlanPageIndex: 0, planSetPosition: 2, label: 'PV 2' },  // First site plan page
+              { sitePlanPageIndex: 1, planSetPosition: 3, label: 'PV 3' },  // Second site plan page
+              { sitePlanPageIndex: 2, planSetPosition: 9, label: 'PV 7' },  // Third site plan page
+            ];
+
+            // Build the final merged array
+            const finalPages = [];
+            let planSetIndex = 0;
+
+            for (let i = 1; i <= 10; i++) {  // We'll have 10 pages total in the merged plan set
+              const insertion = sitePlanInsertions.find(ins => ins.planSetPosition === i);
+
+              if (insertion && sitePlanPages[insertion.sitePlanPageIndex]) {
+                // Insert site plan page
+                finalPages.push({
+                  page: i,
+                  label: insertion.label,
+                  imageUrl: sitePlanPages[insertion.sitePlanPageIndex].imageUrl,
+                  imageKey: sitePlanPages[insertion.sitePlanPageIndex].imageKey,
+                  isSitePlan: true
+                });
+              } else if (planSetIndex < mergedPages.length) {
+                // Insert plan set page
+                finalPages.push({
+                  ...mergedPages[planSetIndex],
+                  page: i,
+                  isSitePlan: false
+                });
+                planSetIndex++;
+              }
+            }
+
+            mergedPages = finalPages;
+            logger.log('PlanSet', `Merged plan set now has ${mergedPages.length} pages`);
+          }
+
+          setPages(mergedPages);
+          setPageCount(mergedPages.length);
+          setPresignedUrl(mergedPages[0]?.imageUrl || null);
           setActivePage(1);
           setConversionPending(false);
           imagesLoaded = true;
-          logger.log('PlanSet', `Loaded ${imgData.pages.length} pages for version ${versionNumber}`);
+          logger.log('PlanSet', `Loaded ${mergedPages.length} pages for version ${versionNumber}`);
           return;
         }
 
@@ -298,7 +420,13 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     } finally {
       setLoadingPdf(false);
     }
-  }, [projectUuid]);
+  }, [projectUuid, statusTab, sitePlanPages]);
+
+  // Keep refs current so socket listeners don't need to re-register
+  selectedVersionRef.current = selectedVersion;
+  fetchImageUrlRef.current = fetchImageUrl;
+  fetchVersionsRef.current = fetchVersions;
+  fetchPublishedSitePlanPagesRef.current = fetchPublishedSitePlanPages;
 
   // Listen for conversion completion
   useEffect(() => {
@@ -308,6 +436,13 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
       if (data.conversionStatus === 'complete') {
         setConversionPending(false);
         toast.success('Plan set image ready!');
+
+        // Stop polling immediately when socket event fires
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+          logger.log('PlanSet', 'Stopped polling - version ready via socket event');
+        }
 
         // If this is the currently selected version, fetch the PNG URLs (all pages)
         if (selectedVersion && data.versionId === selectedVersion) {
@@ -329,7 +464,52 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     });
 
     return cleanup;
-  }, [onPlanSetConverted, selectedVersion, projectUuid, fetchVersions, fetchImageUrl]);
+  }, [onPlanSetConverted]);
+
+  // Poll for new versions after mount (catches versions created after tab switch)
+  useEffect(() => {
+    if (!projectUuid) return;
+
+    let pollCount = 0;
+    const maxPolls = 6; // 6 polls × 5s = 30s
+
+    pollingIntervalRef.current = setInterval(() => {
+      pollCount++;
+      fetchVersions();
+
+      // Stop if we've reached max polls
+      if (pollCount >= maxPolls) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    }, 5000);
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [projectUuid, refreshTrigger]); // Triggers on mount, project change, OR refresh trigger
+
+  // Listen for site plan conversion completion to refresh merged pages
+  useEffect(() => {
+    const cleanup = onSitePlanConverted(async (data) => {
+      logger.log('PlanSet', '[WebSocket] siteplan:converted received:', data);
+
+      if (data.conversionStatus === 'complete' && statusTab === 'published') {
+        logger.log('PlanSet', 'Site plan converted, refreshing published site plan pages');
+        await fetchPublishedSitePlanPages();
+
+        // Refresh the current plan set view to show merged pages
+        if (selectedVersion) {
+          await fetchImageUrl(selectedVersion);
+        }
+      }
+    });
+
+    return cleanup;
+  }, [onSitePlanConverted]);
 
   // Fetch image URL when version changes
   useEffect(() => {
@@ -421,47 +601,164 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
     }
   };
 
+  const handlePublish = async () => {
+    if (!projectUuid || !selectedVersion) return;
+
+    try {
+      // For now, just show a placeholder message since we don't have the publish endpoint yet
+      toast.info('Publish functionality coming soon', {
+        position: 'top-right',
+        autoClose: 3000
+      });
+
+      // TODO: Implement publish endpoint
+      // const response = await planSetService.publish(projectUuid, selectedVersion);
+      // if (response.status === 'SUCCESS') {
+      //   toast.success(`Version ${selectedVersion} published successfully!`, {
+      //     position: 'top-right',
+      //     autoClose: 3000
+      //   });
+      //   await fetchVersions();
+      // }
+    } catch (error) {
+      logger.error('PlanSet', 'Error publishing version:', error);
+      toast.error('Failed to publish version', {
+        position: 'top-right',
+        autoClose: 5000
+      });
+    }
+  };
+
   const handleToggleAnnotationMode = () => {
     setIsAnnotationMode(!isAnnotationMode);
   };
 
   const handleAnnotationsChange = (newAnnotations) => {
+    logger.log('PlanSet', 'handleAnnotationsChange called:', {
+      annotationCount: newAnnotations?.length,
+      annotations: newAnnotations
+    });
     setAnnotations(newAnnotations);
     setHasChanges(true);
+    logger.log('PlanSet', 'hasChanges set to TRUE - Save button should be enabled');
   };
 
   const handleSaveMarkup = async () => {
-    // If we're in draft mode with changes, publish the version
+    logger.log('PlanSet', '========== SAVE MARKUP CLICKED ==========');
+    logger.log('PlanSet', 'Current state:', { statusTab, hasChanges, selectedVersion, projectUuid });
+
+    // Save annotated images back to S3
     if (statusTab === 'draft' && hasChanges) {
-      await handlePublish();
-    } else {
-      logger.debug('Dashboard', 'Save markup clicked - no changes to publish');
-    }
-  };
+      logger.log('PlanSet', 'Save conditions met - proceeding with save');
 
-  // Publish current draft version
-  const handlePublish = async () => {
-    if (!projectUuid || !selectedVersion) {
-      return;
-    }
-
-    try {
-      const response = await axios.post(`/project/${projectUuid}/versions/${selectedVersion}/publish`);
-
-      if (response.data.success) {
-        toast.success(`Version ${selectedVersion} published successfully!`, {
-          position: 'top-right',
-          autoClose: 3000
+      try {
+        // Get the annotation layer canvas and export all pages as images
+        logger.log('PlanSet', 'Checking annotationLayerRef:', {
+          exists: !!annotationLayerRef.current,
+          current: annotationLayerRef.current
         });
 
-        // Refetch versions to update UI
-        await fetchVersions();
+        if (!annotationLayerRef.current) {
+          logger.error('PlanSet', 'annotationLayerRef.current is null - aborting save');
+          toast.error('No annotations to save', {
+            position: 'top-right',
+            autoClose: 3000
+          });
+          return;
+        }
+
+        toast.info('Saving annotations...', {
+          position: 'top-right',
+          autoClose: 2000
+        });
+
+        // Get canvas data for all pages with annotations
+        logger.log('PlanSet', 'Calling exportAllPages()...');
+        const annotatedPages = await annotationLayerRef.current.exportAllPages();
+        logger.log('PlanSet', 'exportAllPages() returned:', {
+          count: annotatedPages?.length,
+          pages: annotatedPages
+        });
+
+        if (!annotatedPages || annotatedPages.length === 0) {
+          logger.warn('PlanSet', 'No annotated pages returned from exportAllPages()');
+          toast.error('No annotated pages to save', {
+            position: 'top-right',
+            autoClose: 3000
+          });
+          return;
+        }
+
+        // Add imageKey from pages state to each annotated page
+        logger.log('PlanSet', 'Adding imageKeys to pages. Current pages state:', pages);
+        const pagesWithKeys = annotatedPages.map(annotatedPage => {
+          const pageData = pages.find(p => p.page === annotatedPage.pageNumber);
+          logger.log('PlanSet', `Mapping page ${annotatedPage.pageNumber}:`, {
+            pageData,
+            imageKey: pageData?.imageKey
+          });
+          return {
+            ...annotatedPage,
+            imageKey: pageData?.imageKey || null
+          };
+        });
+        logger.log('PlanSet', 'Pages with keys:', pagesWithKeys);
+
+        // Validate that all pages have imageKeys
+        const missingKeys = pagesWithKeys.filter(p => !p.imageKey);
+        if (missingKeys.length > 0) {
+          logger.error('PlanSet', 'Cannot save - missing imageKeys for pages:', missingKeys.map(p => p.pageNumber));
+          toast.error('Failed to save - missing image keys', {
+            position: 'top-right',
+            autoClose: 3000
+          });
+          return;
+        }
+
+        // Save to backend
+        logger.log('PlanSet', 'Calling planSetService.saveAnnotations with:', {
+          projectUuid,
+          selectedVersion,
+          pageCount: pagesWithKeys.length
+        });
+
+        const response = await planSetService.saveAnnotations(
+          projectUuid,
+          selectedVersion,
+          pagesWithKeys
+        );
+
+        logger.log('PlanSet', 'Backend response:', response);
+
+        if (response.status === 'SUCCESS') {
+          logger.log('PlanSet', 'Save successful!');
+          toast.success(`Saved ${response.data.pagesUpdated} annotated pages!`, {
+            position: 'top-right',
+            autoClose: 3000
+          });
+
+          // Reset changes flag
+          setHasChanges(false);
+
+          // Refresh the images to show the saved annotations
+          logger.log('PlanSet', 'Refreshing images...');
+          await fetchImageUrl(selectedVersion);
+          logger.log('PlanSet', '========== SAVE COMPLETE ==========');
+        }
+      } catch (error) {
+        logger.error('PlanSet', 'Error saving annotations:', error);
+        logger.error('PlanSet', 'Error stack:', error.stack);
+        toast.error('Failed to save annotations', {
+          position: 'top-right',
+          autoClose: 5000
+        });
       }
-    } catch (error) {
-      logger.error('Dashboard', 'Error publishing version:', error);
-      toast.error('Failed to publish version', {
-        position: 'top-right',
-        autoClose: 5000
+    } else {
+      logger.warn('PlanSet', 'Save conditions NOT met:', {
+        statusTab,
+        expectedStatusTab: 'draft',
+        hasChanges,
+        reason: statusTab !== 'draft' ? 'Not on draft tab' : 'No changes to save'
       });
     }
   };
@@ -695,6 +992,7 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
                 }}
               >
                 <img
+                  crossOrigin="anonymous"
                   src={presignedUrl}
                   alt={`Plan Set Version ${selectedVersion}`}
                   style={{
@@ -738,6 +1036,18 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
                     ⟲
                   </button>
                 </div>
+
+                {/* Annotation Layer Overlay - MUST be inside imageContainer */}
+                <PdfAnnotationLayer
+                  ref={annotationLayerRef}
+                  isActive={isAnnotationMode}
+                  currentTool={currentTool}
+                  currentColor={currentColor}
+                  annotations={annotations}
+                  onAnnotationsChange={handleAnnotationsChange}
+                  onToolChange={setCurrentTool}
+                  currentPage={activePage}
+                />
               </div>
             ) : (
               <iframe
@@ -746,18 +1056,6 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
                 title={`Plan Set Version ${selectedVersion}`}
               />
             )}
-
-            {/* Annotation Layer Overlay */}
-            <PdfAnnotationLayer
-              ref={annotationLayerRef}
-              isActive={isAnnotationMode}
-              currentTool={currentTool}
-              currentColor={currentColor}
-              annotations={annotations}
-              onAnnotationsChange={handleAnnotationsChange}
-              onToolChange={setCurrentTool}
-              currentPage={activePage}
-            />
 
             {/* Annotation Toolbar */}
             {isAnnotationMode && (
@@ -814,3 +1112,12 @@ const PlanSetVersions = ({ projectUuid, onQCPanelChange }) => {
 };
 
 export default PlanSetVersions;
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PITCH_OPTIONS, STORIES_OPTIONS } from '../../../utils/constants';
-import { AddSectionButton, EquipmentRow, FormFieldRow, TableSelect, TableRowButton } from '../../ui';
+import { AddSectionButton, EquipmentRow, FormFieldRow, TableDropdown, TableRowButton } from '../../ui';
 import styles from './MountingPlaneSection.module.css';
 
 /**
@@ -134,7 +134,7 @@ const MountingPlaneSection = ({
         onToggle={() => setIsExpanded(!isExpanded)}
         onDelete={onClear}
       >
-      {/* Mode Selection - No label */}
+      {/* Mode Selection + Keep Same (Plane 1 only) */}
       <div className={styles.modeSelectionRow}>
         {['Flush', 'Tilt'].map((modeOption) => (
           <TableRowButton
@@ -145,6 +145,16 @@ const MountingPlaneSection = ({
             onClick={() => handleFieldChange(`st_${prefix}_mode`, modeOption)}
           />
         ))}
+        {planeNumber === 1 && (
+          <div style={{ marginLeft: 'auto' }}>
+            <TableRowButton
+              label="Keep Same"
+              variant="outline"
+              active={keepSameActive}
+              onClick={onKeepSameToggle}
+            />
+          </div>
+        )}
       </div>
 
       {/* Roof Type (if B exists) */}
@@ -165,49 +175,28 @@ const MountingPlaneSection = ({
         </FormFieldRow>
       )}
 
-      {/* Stories and Pitch Row - with Keep Same button for Plane 1 */}
-      <div className={`${styles.storiesPitchGrid} ${planeNumber === 1 ? styles.storiesPitchGridWithButton : styles.storiesPitchGridNoButton}`}>
-        {/* Stories - suppress internal border, narrower dropdown */}
-        <div className={styles.gridCellNoBorder}>
-          <div className={`${styles.gridCellInner} ${styles.storiesWrapper}`}>
-            <TableSelect
-              label="Stories"
-              value={stories}
-              onChange={(value) => handleFieldChange(`${prefix}_stories`, value)}
-              options={STORIES_OPTIONS}
-              placeholder="Select..."
-            />
-          </div>
-        </div>
+      {/* Stories */}
+      <TableDropdown
+        label="Stories"
+        value={stories}
+        onChange={(value) => handleFieldChange(`${prefix}_stories`, value)}
+        options={STORIES_OPTIONS}
+        placeholder="Select..."
+        showSearch={false}
+      />
 
-        {/* Pitch - suppress internal border */}
-        <div className={styles.gridCellNoBorder}>
-          <div className={styles.gridCellInner}>
-            <TableSelect
-              label="Pitch"
-              value={pitch}
-              onChange={(value) => handleFieldChange(`${prefix}_pitch`, value)}
-              options={PITCH_OPTIONS}
-              placeholder="Select..."
-            />
-          </div>
-        </div>
+      {/* Pitch */}
+      <TableDropdown
+        label="Pitch"
+        value={pitch}
+        onChange={(value) => handleFieldChange(`${prefix}_pitch`, value)}
+        options={PITCH_OPTIONS}
+        placeholder="Select..."
+        showSearch={false}
+      />
 
-        {/* Keep Same Button - Only for Plane 1 */}
-        {planeNumber === 1 && (
-          <div className={styles.keepSameWrapper}>
-            <TableRowButton
-              label="Keep Same"
-              variant="outline"
-              active={keepSameActive}
-              onClick={onKeepSameToggle}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Azimuth - Custom spacing to bring field closer */}
-      <FormFieldRow label="Azimuth" className={styles.azimuthRow}>
+      {/* Azimuth */}
+      <FormFieldRow label="Azimuth">
         <input
           type="text"
           inputMode="numeric"
@@ -243,7 +232,6 @@ const MountingPlaneSection = ({
             }
           }}
           placeholder="0-359"
-          className={styles.azimuthInput}
         />
       </FormFieldRow>
 
@@ -254,24 +242,16 @@ const MountingPlaneSection = ({
         const orientationValue = formData[`st_${prefix}_array${arrayNum}_orientation`] || '';
 
         return (
-          <div key={arrayNum} className={styles.arrayRow}>
-            {/* Array label and quantity input */}
-            <div className={styles.arrayLabelInputWrapper}>
-              <label className={styles.arrayLabel}>
-                Array {arrayNum}
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={qtyValue}
-                onChange={(e) => handleFieldChange(`st_${prefix}_arrayqty_${arrayNum}`, e.target.value)}
-                placeholder="0"
-                className={styles.arrayQuantityInput}
-              />
-            </div>
-
-            {/* Landscape/Portrait buttons - right-justified */}
-            <div className={styles.arrayOrientationButtons}>
+          <FormFieldRow key={arrayNum} label={`Array ${arrayNum}`}>
+            <input
+              type="number"
+              min="0"
+              value={qtyValue}
+              onChange={(e) => handleFieldChange(`st_${prefix}_arrayqty_${arrayNum}`, e.target.value)}
+              placeholder="0"
+              style={{ width: '3rem', flex: 'none' }}
+            />
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--spacing-xs)' }}>
               <TableRowButton
                 label="Landscape"
                 variant="outline"
@@ -285,7 +265,7 @@ const MountingPlaneSection = ({
                 onClick={() => handleFieldChange(`st_${prefix}_array${arrayNum}_orientation`, 'portrait')}
               />
             </div>
-          </div>
+          </FormFieldRow>
         );
       })}
 

@@ -1,85 +1,48 @@
-/**
- * Pricing Constants for Project Credits
- * Defines all pricing tiers and credit usage
- */
+// src/constants/pricing.js
+// Project pricing tiers and billing constants
 
 export const PROJECT_PRICING = {
   SINGLE: {
-    id: 'single',
-    name: 'Single Project',
-    projects: 1,
-    price: 150,
+    label: 'Single Project',
     pricePerProject: 150,
-    savings: 0,
-    savingsPercent: 0,
-    badge: null,
-    description: 'No commitment required',
+    minProjects: 1,
+    maxProjects: 1,
   },
-  STARTER: {
-    id: 'starter',
-    name: 'Starter Pack',
-    projects: 10,
-    price: 1250,
-    pricePerProject: 125,
-    savings: 0,
-    savingsPercent: 0,
-    badge: 'Standard Rate',
-    description: 'Great for getting started',
-  },
-  PROFESSIONAL: {
-    id: 'professional',
-    name: 'Professional',
-    projects: 25,
-    price: 2875,
-    pricePerProject: 115,
-    savings: 375,
-    savingsPercent: 8,
-    badge: 'Most Popular',
-    featured: true,
-    description: 'Best for growing teams',
-  },
-  BUSINESS: {
-    id: 'business',
-    name: 'Business',
-    projects: 50,
-    price: 5250,
-    pricePerProject: 105,
-    savings: 1250,
-    savingsPercent: 16,
-    badge: 'Best Value',
-    description: 'Scale your operations',
-  },
-  ENTERPRISE: {
-    id: 'enterprise',
-    name: 'Enterprise',
-    projects: 100,
-    price: 9500,
-    pricePerProject: 95,
-    savings: 3000,
-    savingsPercent: 24,
-    badge: 'Maximum Savings',
-    description: 'For high-volume installers',
-  },
+  TIERS: [
+    { id: 'tier_1', label: '1-10 Projects', pricePerProject: 150, minProjects: 1, maxProjects: 10 },
+    { id: 'tier_2', label: '11-25 Projects', pricePerProject: 135, minProjects: 11, maxProjects: 25 },
+    { id: 'tier_3', label: '26-50 Projects', pricePerProject: 120, minProjects: 26, maxProjects: 50 },
+    { id: 'tier_4', label: '51-100 Projects', pricePerProject: 110, minProjects: 51, maxProjects: 100 },
+    { id: 'tier_5', label: '100+ Projects', pricePerProject: 95, minProjects: 101, maxProjects: Infinity },
+  ],
 };
 
-export const PROJECT_CREDITS = {
-  STANDARD_RESIDENTIAL: { credits: 1, label: 'Standard Residential Design' },
-  STORAGE_ADDON: { credits: 1, label: 'Storage System Add-on' },
-  MULTI_INVERTER: { credits: 1, label: 'Multi-Inverter System' },
-  COMMERCIAL: { credits: 3, label: 'Commercial Design' },
-  PERMIT_PACKAGE: { credits: 0.5, label: 'Permit Package Add-on' },
-  REVISION_PACKAGE: { credits: 0.5, label: 'Major Revision Package' },
+export const DEFAULT_PRICE = PROJECT_PRICING.SINGLE.pricePerProject;
+
+export const getTierPrice = (projectCount) => {
+  const tier = PROJECT_PRICING.TIERS.find(
+    (t) => projectCount >= t.minProjects && projectCount <= t.maxProjects
+  );
+  return tier ? tier.pricePerProject : DEFAULT_PRICE;
 };
 
-// Helper to get all tiers as array
-export const getAllTiers = () => Object.values(PROJECT_PRICING);
-
-// Helper to format price
-export const formatPrice = (price) => {
+export const formatPrice = (amount) => {
+  if (amount === null || amount === undefined) return '$0.00';
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
+export const formatPriceCompact = (amount) => {
+  if (amount === null || amount === undefined) return '$0';
+  if (Number.isInteger(amount)) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  }
+  return formatPrice(amount);
 };

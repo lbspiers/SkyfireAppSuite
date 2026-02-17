@@ -2,12 +2,12 @@
 // Admin Billing Portal - Bill.com Integration v3
 // Compact layout: inline stats, max table space
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  DollarSign, FileText, Send, CheckCircle, Clock, AlertCircle,
+  DollarSign, FileText, Send, CheckCircle, Clock,
   Building2, Search, RefreshCw, Eye, XCircle, Ban,
   ToggleLeft, ToggleRight, ChevronDown, ChevronUp,
-  Zap, Activity, Hash, MapPin, Package,
+  Zap, Activity,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
@@ -346,40 +346,49 @@ const BillingPortal = () => {
     return (
       <div className={styles.statsBar}>
         <div className={styles.statPill}>
-          <Package size={13} />
-          <span className={styles.statNum}>{Number(s.total_projects) || 0}</span>
-          <span className={styles.statLbl}>Billable</span>
+          <div className={styles.statContent}>
+            <span className={styles.statNum}>{Number(s.total_projects) || 0}</span>
+            <span className={styles.statLbl}>Total Projects</span>
+          </div>
         </div>
         <div className={`${styles.statPill} ${styles.statWarn}`}>
-          <Clock size={13} />
-          <span className={styles.statNum}>{Number(s.uninvoiced_count) || 0}</span>
-          <span className={styles.statLbl}>Uninvoiced</span>
+          <div className={styles.statContent}>
+            <span className={styles.statNum}>{Number(s.uninvoiced_count) || 0}</span>
+            <span className={styles.statLbl}>Awaiting Invoice</span>
+          </div>
         </div>
         <div className={`${styles.statPill} ${styles.statInfo}`}>
-          <FileText size={13} />
-          <span className={styles.statNum}>{formatPrice(Number(s.outstanding_amount) || 0)}</span>
-          <span className={styles.statLbl}>{Number(s.invoiced_count) || 0} invoices</span>
+          <div className={styles.statContent}>
+            <span className={styles.statNum}>{Number(s.invoiced_count) || 0}</span>
+            <span className={styles.statLbl}>Invoiced</span>
+            <span className={styles.statSub}>{formatPrice(Number(s.outstanding_amount) || 0)} outstanding</span>
+          </div>
         </div>
         <div className={`${styles.statPill} ${styles.statOk}`}>
-          <CheckCircle size={13} />
-          <span className={styles.statNum}>{formatPrice(Number(s.paid_amount) || 0)}</span>
-          <span className={styles.statLbl}>{Number(s.paid_count) || 0} projects</span>
+          <div className={styles.statContent}>
+            <span className={styles.statNum}>{Number(s.paid_count) || 0}</span>
+            <span className={styles.statLbl}>Paid</span>
+            <span className={styles.statSub}>{formatPrice(Number(s.paid_amount) || 0)}</span>
+          </div>
         </div>
         <div className={`${styles.statPill} ${styles.statAccent}`}>
-          <Activity size={13} />
-          <span className={styles.statNum}>{formatPrice(Number(s.total_revenue) || 0)}</span>
-          <span className={styles.statLbl}>Total</span>
+          <div className={styles.statContent}>
+            <span className={styles.statNum}>{formatPrice(Number(s.total_revenue) || 0)}</span>
+            <span className={styles.statLbl}>Total Revenue</span>
+          </div>
         </div>
         <div className={styles.statPill}>
-          <DollarSign size={13} />
-          <span className={styles.statNum}>{formatPrice(Number(s.avg_project_value) || 150)}</span>
-          <span className={styles.statLbl}>per project</span>
+          <div className={styles.statContent}>
+            <span className={styles.statNum}>{formatPrice(Number(s.avg_project_value) || 150)}</span>
+            <span className={styles.statLbl}>Avg per Project</span>
+          </div>
         </div>
         {Number(s.held_canceled_count) > 0 && (
           <div className={`${styles.statPill} ${styles.statMuted}`}>
-            <Ban size={13} />
-            <span className={styles.statNum}>{Number(s.held_canceled_count)}</span>
-            <span className={styles.statLbl}>Held</span>
+            <div className={styles.statContent}>
+              <span className={styles.statNum}>{Number(s.held_canceled_count)}</span>
+              <span className={styles.statLbl}>On Hold / Canceled</span>
+            </div>
           </div>
         )}
       </div>

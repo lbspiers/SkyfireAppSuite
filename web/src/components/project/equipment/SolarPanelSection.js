@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EquipmentRow, FormFieldRow, TableRowButton, TableDropdown, AddButton, ConfirmDialog, SectionClearModal, SectionRemoveModal, PreferredButton } from '../../ui';
+import { EquipmentRow, FormFieldRow, TableRowButton, TableDropdown, AddButton, ConfirmDialog, SectionClearModal, SectionRemoveModal, PreferredButton, ActionSectionButton, Tooltip } from '../../ui';
 import { PreferredEquipmentModal } from '../../equipment';
 import styles from '../../../styles/ProjectAdd.module.css';
 import logger from '../../../services/devLogger';
 import { useEquipmentCatalog } from '../../../hooks/useEquipmentCatalog';
 import { useSectionDelete, DELETE_BEHAVIOR } from '../../../hooks/useSectionDelete';
+import flameIcon from '../../../assets/images/Skyfire Flame Icon.png';
 
 /**
  * Solar Panel Section
@@ -46,12 +47,15 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
   const solarPanelVmpField = 'solar_panel_vmp';
   const solarPanelImpField = 'solar_panel_imp';
   const solarPanelTempCoeffField = 'solar_panel_temp_coeff_voc';
+  const systemTypeField = 'system_type';
 
   const [batteryOnlyMode, setBatteryOnlyMode] = useState(formData[batteryOnlyField] === true);
   const [showBatteryOnlyConfirm, setShowBatteryOnlyConfirm] = useState(false);
   const [showType2Confirm, setShowType2Confirm] = useState(false);
   const [showPreferredModal, setShowPreferredModal] = useState(false);
   const [useFullCatalog, setUseFullCatalog] = useState(false);
+  const [showSystemTypeChangeConfirm, setShowSystemTypeChangeConfirm] = useState(false);
+  const [pendingSystemType, setPendingSystemType] = useState(null);
 
   // Check if we have a solar panel configured
   const hasSolarPanel = formData[solarPanelMakeField] && formData[solarPanelModelField];
@@ -184,10 +188,10 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
       // BATCH all updates into a single call to parent
       setSelectedModelData(modelData);
 
-      const voc = modelData.voc || modelData.open_circuit_voltage || '';
-      const isc = modelData.isc || modelData.short_circuit_current || '';
-      const vmp = modelData.vmp || modelData.voltage_max_power || '';
-      const imp = modelData.imp || modelData.current_max_power || '';
+      const voc = modelData.nameplate_voc || modelData.voc || modelData.open_circuit_voltage || '';
+      const isc = modelData.nameplate_isc || modelData.isc || modelData.short_circuit_current || '';
+      const vmp = modelData.nameplate_vpmax || modelData.vmp || modelData.voltage_max_power || '';
+      const imp = modelData.nameplate_ipmax || modelData.imp || modelData.current_max_power || '';
       const tempCoeff = modelData.temp_coeff_voc || modelData.temperature_coefficient_voc || '';
 
       const updates = [
@@ -226,10 +230,10 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         }
 
         // Store electrical specs for stringing calculations
-        const voc = modelData.voc || modelData.open_circuit_voltage || '';
-        const isc = modelData.isc || modelData.short_circuit_current || '';
-        const vmp = modelData.vmp || modelData.voltage_max_power || '';
-        const imp = modelData.imp || modelData.current_max_power || '';
+        const voc = modelData.nameplate_voc || modelData.voc || modelData.open_circuit_voltage || '';
+        const isc = modelData.nameplate_isc || modelData.isc || modelData.short_circuit_current || '';
+        const vmp = modelData.nameplate_vpmax || modelData.vmp || modelData.voltage_max_power || '';
+        const imp = modelData.nameplate_ipmax || modelData.imp || modelData.current_max_power || '';
         const tempCoeff = modelData.temp_coeff_voc || modelData.temperature_coefficient_voc || '';
 
         onChange(solarPanelVocField, voc, systemNumber);
@@ -426,6 +430,155 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
     setShowType2Confirm(false);
   };
 
+  // System Type Change Handlers
+  const hasInverterData = () => {
+    // Check for inverter/microinverter data
+    return formData.inverter_make ||
+           formData.inverter_model ||
+           formData.inverter_quantity;
+  };
+
+  const hasStringCombinerData = () => {
+    // Check for string combiner panel data (branch strings)
+    for (let i = 1; i <= 20; i++) {
+      if (formData[`branch_string_${i}`] ||
+          formData[`branch_string_${i}_panel_type`] ||
+          formData[`branch_string_${i}_type1`] ||
+          formData[`branch_string_${i}_type2`]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const hasOptimizerData = () => {
+    // Check for optimizer data
+    return formData.optimizer_make ||
+           formData.optimizer_model ||
+           formData.optimizer_quantity;
+  };
+
+  const clearInverterMicroData = () => {
+    // Clear all inverter/microinverter fields
+    const updates = [
+      ['inverter_make', null],
+      ['inverter_model', null],
+      ['inverter_model_id', null],
+      ['inverter_quantity', null],
+      ['inverter_type', null],
+      ['inverter_max_ac_output_current', null],
+      ['show_inverter_bos', false],
+    ];
+
+    if (onBatchChange) {
+      onBatchChange(updates, systemNumber);
+    } else {
+      updates.forEach(([field, value]) => onChange(field, value, systemNumber));
+    }
+  };
+
+  const clearStringCombinerData = () => {
+    // Clear all string combiner panel fields
+    const updates = [];
+    for (let i = 1; i <= 20; i++) {
+      updates.push([`branch_string_${i}`, '']);
+      updates.push([`branch_string_${i}_panel_type`, '']);
+      updates.push([`branch_string_${i}_type1`, '']);
+      updates.push([`branch_string_${i}_type2`, '']);
+      updates.push([`branch_string_${i}_micro_type1`, '']);
+      updates.push([`branch_string_${i}_micro_type2`, '']);
+    }
+
+    if (onBatchChange) {
+      onBatchChange(updates, systemNumber);
+    } else {
+      updates.forEach(([field, value]) => onChange(field, value, systemNumber));
+    }
+  };
+
+  const clearOptimizerData = () => {
+    // Clear all optimizer fields
+    const updates = [
+      ['optimizer_make', null],
+      ['optimizer_model', null],
+      ['optimizer_existing', null],
+      ['optimizer_type2_make', null],
+      ['optimizer_type2_model', null],
+      ['optimizer_type2_existing', null],
+    ];
+
+    if (onBatchChange) {
+      onBatchChange(updates, systemNumber);
+    } else {
+      updates.forEach(([field, value]) => onChange(field, value, systemNumber));
+    }
+  };
+
+  const handleSystemTypeChange = (newSystemType) => {
+    const currentSystemType = formData[systemTypeField];
+
+    // If clicking the same type, do nothing
+    if (currentSystemType === newSystemType) {
+      return;
+    }
+
+    // Check if there's data to clear based on current system type
+    let hasData = false;
+
+    if (currentSystemType === 'microinverter') {
+      hasData = hasInverterData() || hasStringCombinerData();
+    } else if (currentSystemType === 'inverter') {
+      hasData = hasInverterData();
+    } else if (currentSystemType === 'optimizer') {
+      hasData = hasOptimizerData() || hasInverterData();
+    }
+
+    if (hasData) {
+      // Show confirmation modal
+      setPendingSystemType(newSystemType);
+      setShowSystemTypeChangeConfirm(true);
+    } else {
+      // No data, just change the system type
+      onChange(systemTypeField, newSystemType, systemNumber);
+    }
+  };
+
+  const handleConfirmSystemTypeChange = () => {
+    const currentSystemType = formData[systemTypeField];
+
+    // Clear data based on current system type
+    if (currentSystemType === 'microinverter') {
+      clearInverterMicroData();
+      clearStringCombinerData();
+    } else if (currentSystemType === 'inverter') {
+      clearInverterMicroData();
+    } else if (currentSystemType === 'optimizer') {
+      clearOptimizerData();
+      clearInverterMicroData();
+    }
+
+    // Set the new system type
+    onChange(systemTypeField, pendingSystemType, systemNumber);
+
+    // Close modal and reset pending state
+    setShowSystemTypeChangeConfirm(false);
+    setPendingSystemType(null);
+  };
+
+  const getSystemTypeChangeMessage = () => {
+    const currentSystemType = formData[systemTypeField];
+
+    if (currentSystemType === 'microinverter') {
+      return 'Switching from Microinverter will clear all Microinverter and String Combiner Panel data. This action cannot be undone.';
+    } else if (currentSystemType === 'inverter') {
+      return 'Switching from Inverter will clear all Inverter data. This action cannot be undone.';
+    } else if (currentSystemType === 'optimizer') {
+      return 'Switching from Optimizer will clear all Optimizer and Inverter data. This action cannot be undone.';
+    }
+
+    return 'Switching system type will clear existing equipment data. This action cannot be undone.';
+  };
+
   // Use the section delete hook with CLEAR_ONLY behavior (System 1 Solar Panel can never be removed)
   const {
     showClearModal,
@@ -561,19 +714,64 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
                 disabled={!formData[solarPanelMakeField] || (currentModels.length === 0 && formData[solarPanelMakeField])}
               />
 
-              {/* + Solar Panel (Type 2) Button */}
+              {/* System Type Selection */}
+              <FormFieldRow label="System Type">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)', alignItems: 'flex-start' }}>
+                  <TableRowButton
+                    label="Microinverter"
+                    variant="outline"
+                    active={formData[systemTypeField] === 'microinverter'}
+                    onClick={() => handleSystemTypeChange('microinverter')}
+                    style={{ width: 'auto' }}
+                  />
+                  <TableRowButton
+                    label="Inverter With Optimizer"
+                    variant="outline"
+                    active={formData[systemTypeField] === 'optimizer'}
+                    onClick={() => handleSystemTypeChange('optimizer')}
+                    style={{ width: 'auto' }}
+                  />
+                  <TableRowButton
+                    label="Inverter No Optimizer"
+                    variant="outline"
+                    active={formData[systemTypeField] === 'inverter'}
+                    onClick={() => handleSystemTypeChange('inverter')}
+                    style={{ width: 'auto' }}
+                  />
+                </div>
+              </FormFieldRow>
+
+              {/* + 2nd Solar Panel Type Button */}
               <div style={{
                 paddingLeft: 'var(--spacing)',
                 paddingRight: 'var(--spacing)',
                 paddingTop: 'var(--spacing-tight)',
                 paddingBottom: 'var(--spacing-tight)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-xs)'
               }}>
-                <TableRowButton
-                  label="+ Solar Panel (Type 2)"
-                  variant="outline"
-                  active={formData.show_solar_panel_2}
+                <ActionSectionButton
+                  label="+ 2nd Solar Panel Type"
+                  variant="orange"
                   onClick={handleToggleType2}
                 />
+                <Tooltip
+                  content={
+                    <>
+                      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '0 var(--spacing) 0 0' }}>
+                        <img src={flameIcon} alt="" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                      </div>
+                      <div style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--leading-normal)' }}>
+                        Add second Solar Panel Type to system {systemNumber} to inverter or String Combiner Panel
+                      </div>
+                    </>
+                  }
+                  position="bottom"
+                  className="alertTooltip"
+                >
+                  <img src={flameIcon} alt="" style={{ width: '20px', height: '20px', objectFit: 'contain', cursor: 'help' }} />
+                </Tooltip>
               </div>
             </>
           )}
@@ -630,6 +828,21 @@ const SolarPanelSection = ({ formData, onChange, onBatchChange, systemNumber = 1
         equipmentType="solar-panels"
         title="Select Solar Panel"
       />
+
+      {/* System Type Change Confirmation Modal */}
+      <ConfirmDialog
+        isOpen={showSystemTypeChangeConfirm}
+        onClose={() => {
+          setShowSystemTypeChangeConfirm(false);
+          setPendingSystemType(null);
+        }}
+        onConfirm={handleConfirmSystemTypeChange}
+        title="Confirm System Type Change"
+        message={getSystemTypeChangeMessage()}
+        confirmText="Clear and Continue"
+        cancelText="Cancel"
+        contained={true}
+      />
     </div>
   );
 };
@@ -646,6 +859,7 @@ const arePropsEqual = (prevProps, nextProps) => {
     `${prefix}solar_panel_quantity`,
     `${prefix}solar_panel_existing`,
     `${prefix}batteryonly`,
+    `${prefix}system_type`,
     'show_solar_panel_2',
   ];
 

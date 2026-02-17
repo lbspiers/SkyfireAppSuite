@@ -38,13 +38,13 @@ const DocumentationPanel = ({
   gridSize,
   viewMode = 'grid',
   onCountChange,
-  onPhotoClick
+  onPhotoClick,
+  searchQuery = ''
 }) => {
   const [photos, setPhotos] = useState([]);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editingNoteText, setEditingNoteText] = useState('');
   const [selectedPhotoIds, setSelectedPhotoIds] = useState(new Set());
@@ -388,46 +388,6 @@ const DocumentationPanel = ({
 
   return (
     <div className={styles.container}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarLeft}>
-          <span className={styles.itemCount}>
-            {photos.length} photo{photos.length !== 1 ? 's' : ''}, {notes.length} note{notes.length !== 1 ? 's' : ''}
-          </span>
-          {photos.length > 0 && (
-            <button
-              className={styles.selectAllButton}
-              onClick={handleSelectAll}
-            >
-              {selectedPhotoIds.size === photos.length ? 'Deselect All' : 'Select All'}
-            </button>
-          )}
-        </div>
-
-        <div className={styles.toolbarRight}>
-          {/* Search Bar */}
-          <div className={styles.searchBar}>
-            <SearchIcon />
-            <input
-              type="text"
-              placeholder="Search photos and notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.searchInput}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className={styles.clearButton}
-                aria-label="Clear search"
-              >
-                <CloseIcon />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Section Filter Tabs */}
       <div className={styles.filterTabsContainer}>
         {showLeftChevron && (
@@ -564,10 +524,14 @@ const DocumentationPanel = ({
             }
           }}
           onLightboxOpen={(index) => {
+            // Pass ALL photos, not just filtered ones
+            // But we need to find the global index of the clicked photo
             const filteredPhotos = photos.filter(photo =>
               activeFilter === 'all' || photo.section?.startsWith(activeFilter)
             );
-            onPhotoClick(filteredPhotos, index);
+            const clickedPhoto = filteredPhotos[index];
+            const globalIndex = photos.findIndex(p => p.id === clickedPhoto.id);
+            onPhotoClick(photos, globalIndex);
           }}
         />
       ) : (
@@ -577,22 +541,33 @@ const DocumentationPanel = ({
             const sectionPhotos = photosBySection[sectionId] || [];
             const sectionNotes = notesBySection[sectionId] || [];
 
+            // Build title with counts
+            const titleParts = [];
+            if (sectionPhotos.length > 0) {
+              titleParts.push(`Photos (${sectionPhotos.length})`);
+            }
+            if (sectionNotes.length > 0) {
+              titleParts.push(`Notes (${sectionNotes.length})`);
+            }
+            const fullTitle = `${getSectionLabel(sectionId)} - ${titleParts.join(', ')}`;
+
             return (
               <div key={sectionId} className={styles.section}>
-                <SectionHeader title={getSectionLabel(sectionId)} />
+                <SectionHeader title={fullTitle} />
 
                 {/* Photos for this section */}
                 {sectionPhotos.length > 0 && (
                   <div className={styles.photosSection}>
-                    <h4 className={styles.subsectionTitle}>Photos ({sectionPhotos.length})</h4>
                     <div className={`${styles.photoGrid} ${styles[`grid-${gridSize}`]}`}>
                       {sectionPhotos.map((photo, index) => {
                         const isSelected = selectedPhotoIds.has(photo.id);
+                        // Find the global index of this photo in ALL photos
+                        const globalIndex = photos.findIndex(p => p.id === photo.id);
                         return (
                           <div
                             key={photo.id}
                             className={`${styles.photoItem} ${isSelected ? styles.selected : ''}`}
-                            onClick={() => onPhotoClick(sectionPhotos, index)}
+                            onClick={() => onPhotoClick(photos, globalIndex)}
                           >
                             {/* Selection Checkbox */}
                             <div
@@ -707,13 +682,6 @@ const DocumentationPanel = ({
 };
 
 // Icon Components
-const SearchIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="7" cy="7" r="4" />
-    <path d="M14 14l-3.5-3.5" strokeLinecap="round" />
-  </svg>
-);
-
 const CloseIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M12 4L4 12M4 4l8 8" strokeLinecap="round" />

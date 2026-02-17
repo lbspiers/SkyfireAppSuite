@@ -153,10 +153,19 @@ export const calculateDualQtyDistribution = (totalPanels, specs, maxBranches) =>
  * Calculate string distribution for standard inverters
  * Distributes panels across inputs (formerly MPPTs)
  *
- * @param {number} totalPanels - Total solar panels
+ * DUAL CALLING CONVENTION SUPPORT:
+ * 1. Object-based (with voltage/current validation):
+ *    calculateInverterInputDistribution({ totalPanels, maxInputs, maxPanelsPerString, panelVoc, panelIsc, inverterMaxVdc, inverterMinVdc, inverterMaxIsc })
+ *    Returns: { strings: [...], warnings: [...], totalPanelsAssigned, remainingPanels }
+ *
+ * 2. Positional args (legacy, no validation):
+ *    calculateInverterInputDistribution(totalPanels, maxInputs, stringsPerInput, maxPanelsPerString)
+ *    Returns: { inputs: [...], totalPanelsAssigned, remainingPanels, isComplete }
+ *
+ * @param {number|object} totalPanels - Total solar panels OR spec object
  * @param {number} maxInputs - Max inputs on the inverter (from max_strings_branches)
- * @param {number} stringsPerInput - Strings per input (1 or 2)
- * @param {number} maxPanelsPerString - Max panels per string (voltage limited)
+ * @param {number} stringsPerInput - Strings per input (1 or 2) - positional only
+ * @param {number} maxPanelsPerString - Max panels per string (voltage limited) - positional only
  * @returns {object} - Distribution across inputs
  */
 export const calculateInverterInputDistribution = (
@@ -165,6 +174,20 @@ export const calculateInverterInputDistribution = (
   stringsPerInput = 1,
   maxPanelsPerString = 15
 ) => {
+  // ============================================
+  // DETECT CALLING CONVENTION
+  // ============================================
+
+  // Object-based call (spec-based with validation)
+  if (typeof totalPanels === 'object' && totalPanels !== null) {
+    const spec = totalPanels;
+    return calculateSpecBasedDistribution(spec);
+  }
+
+  // ============================================
+  // POSITIONAL ARGS (Legacy - InverterStringingSection)
+  // ============================================
+
   const maxPanelsPerInput = stringsPerInput * maxPanelsPerString;
   const inputs = [];
   let remainingPanels = totalPanels;
@@ -187,6 +210,165 @@ export const calculateInverterInputDistribution = (
     totalPanelsAssigned: totalPanels - remainingPanels,
     remainingPanels,
     isComplete: remainingPanels === 0,
+  };
+};
+
+/**
+ * Spec-based distribution with voltage/current validation
+ * Used by InverterMicroSection handleAutoCalculate
+ *
+ * @param {object} spec - Configuration object
+ * @param {number} spec.totalPanels - Total panels to distribute
+ * @param {number} spec.maxInputs - Max inputs on inverter
+ * @param {number} spec.maxPanelsPerString - Voltage-limited max panels per string
+ * @param {number} spec.panelVoc - Panel open circuit voltage
+ * @param {number} spec.panelIsc - Panel short circuit current
+ * @param {number} spec.inverterMaxVdc - Inverter max DC voltage (hard safety ceiling)
+ * @param {number} spec.inverterMinVdc - Inverter min DC voltage (startup minimum)
+ * @param {number} spec.inverterMaxIsc - Inverter max input short circuit current
+ * @param {number} spec.inverterMpptVoltageMax - MPPT optimal voltage max (e.g., 480V)
+ * @param {number} spec.inverterMpptVoltageMin - MPPT optimal voltage min (e.g., 60V)
+ * @param {number|null} spec.correctionFactor - NEC 690.7 temperature correction factor (from API)
+ * @returns {object} - { strings: [...], warnings: [...], totalPanelsAssigned, remainingPanels }
+ */
+const calculateSpecBasedDistribution = (spec) => {
+  const {
+    totalPanels,
+    maxInputs,
+    maxPanelsPerString = 15,
+    panelVoc = 0,
+    panelIsc = 0,
+    inverterMaxVdc = 600,
+    inverterMinVdc = 0,
+    inverterMaxIsc = 15,
+    inverterMpptVoltageMax = 0,
+    inverterMpptVoltageMin = 0,
+    correctionFactor = null,
+  } = spec;
+
+  const strings = [];
+  const warnings = [];
+
+  // ============================================
+  // CALCULATE VOLTAGE-LIMITED MAX/MIN PANELS PER STRING
+  // Uses MPPT optimal range when available (NEC 690.7 compliance)
+  // ============================================
+
+  let calculatedMaxPanels = maxPanelsPerString;
+  let calculatedMinPanels = 1;
+  let hardMaxPanels = maxPanelsPerString; // Safety ceiling
+
+  if (panelVoc > 0) {
+    // Calculate corrected Voc for NEC 690.7 compliance
+    const vocCorrected = correctionFactor !== null && correctionFactor > 0
+      ? panelVoc * correctionFactor
+      : panelVoc * 1.18; // Fallback to 1.18 if correction factor not available
+
+    // Hard safety ceiling - strings must NEVER exceed this
+    hardMaxPanels = Math.floor(inverterMaxVdc / vocCorrected);
+
+    // MPPT optimal max - strings SHOULD stay within this for efficiency
+    // Use mpptVoltageMax if available (e.g., 480V), otherwise fall back to voltage_maximum (e.g., 600V)
+    const optimalVoltageMax = inverterMpptVoltageMax > 0 ? inverterMpptVoltageMax : inverterMaxVdc;
+    const optimalMaxPerString = Math.floor(optimalVoltageMax / vocCorrected);
+
+    // Use the MPPT-based limit for sizing (it's always <= hard max)
+    calculatedMaxPanels = optimalMaxPerString;
+
+    // Min panels per string (for MPPT tracking minimum)
+    // Use mpptVoltageMin if available, otherwise fall back to voltage_minimum
+    const optimalVoltageMin = inverterMpptVoltageMin > 0 ? inverterMpptVoltageMin : inverterMinVdc;
+    if (optimalVoltageMin > 0) {
+      calculatedMinPanels = Math.ceil(optimalVoltageMin / vocCorrected);
+    }
+  }
+
+  // ============================================
+  // CALCULATE MINIMUM INPUTS NEEDED (Industry Best Practice)
+  // ============================================
+
+  // Use minimum number of inputs needed rather than all available inputs
+  // This maximizes string length which improves efficiency
+  const minInputsNeeded = Math.ceil(totalPanels / calculatedMaxPanels);
+  const inputsToUse = Math.min(minInputsNeeded, maxInputs);
+
+  // If no panels can fit, return empty
+  if (inputsToUse === 0 || totalPanels === 0) {
+    return {
+      strings: [],
+      warnings: ['No panels to distribute'],
+      totalPanelsAssigned: 0,
+      remainingPanels: totalPanels,
+      isComplete: false,
+    };
+  }
+
+  // ============================================
+  // DISTRIBUTE PANELS EVENLY ACROSS MINIMUM INPUTS
+  // ============================================
+
+  const basePanelsPerString = Math.floor(totalPanels / inputsToUse);
+  const extraPanels = totalPanels % inputsToUse;
+
+  for (let i = 0; i < inputsToUse; i++) {
+    // Distribute extra panels to first inputs (e.g., 28 panels / 3 inputs = 10/9/9)
+    const panelsThisString = basePanelsPerString + (i < extraPanels ? 1 : 0);
+
+    // Voltage validation
+    let stringVoltage = 0;
+    let voltageValid = true;
+    let minVoltageWarning = false;
+
+    if (panelVoc > 0) {
+      stringVoltage = calculateStringVoltage(panelsThisString, panelVoc, correctionFactor);
+      const voltageCheck = validateStringVoltage(stringVoltage, inverterMaxVdc);
+      voltageValid = voltageCheck.isValid;
+
+      if (!voltageValid) {
+        warnings.push(`Input ${i + 1}: ${voltageCheck.message}`);
+      }
+
+      // Check minimum voltage
+      if (panelsThisString < calculatedMinPanels) {
+        minVoltageWarning = true;
+        warnings.push(`Input ${i + 1}: ${panelsThisString} panels (${Math.round(panelsThisString * panelVoc)}V) below minimum ${calculatedMinPanels} panels (${Math.round(calculatedMinPanels * panelVoc)}V)`);
+      }
+    }
+
+    // Current validation
+    let stringCurrent = 0;
+    let currentValid = true;
+
+    if (panelIsc > 0) {
+      stringCurrent = calculateStringCurrent(panelIsc, 1); // 1 string per input
+      const currentCheck = validateStringCurrent(stringCurrent, inverterMaxIsc);
+      currentValid = currentCheck.isValid;
+
+      if (!currentValid) {
+        warnings.push(`Input ${i + 1}: ${currentCheck.message}`);
+      }
+    }
+
+    strings.push({
+      inputIndex: i + 1,
+      numStrings: 1, // Fixed to 1 string per input
+      panelsPerString: panelsThisString,
+      stringVoltage: Math.round(stringVoltage * 10) / 10,
+      stringCurrent: Math.round(stringCurrent * 100) / 100,
+      voltageValid: voltageValid && !minVoltageWarning,
+      currentValid,
+      isNew: true,
+    });
+  }
+
+  return {
+    strings,
+    warnings,
+    totalPanelsAssigned: totalPanels,
+    remainingPanels: 0,
+    isComplete: true,
+    inputsUsed: inputsToUse,
+    inputsAvailable: maxInputs,
   };
 };
 
@@ -241,17 +423,26 @@ export const getStringingMode = (inverterType, manufacturer) => {
 // ============================================
 
 /**
- * Calculate string voltage at coldest temperature
+ * Calculate string voltage at coldest temperature (NEC 690.7 compliant)
  * @param {number} panelsPerString - Number of panels in string
  * @param {number} panelVoc - Panel open circuit voltage (STC)
- * @param {number} tempCoeffVoc - Temperature coefficient of Voc (%/°C), typically negative
- * @param {number} minTemp - Minimum expected temperature (°C), default -10
+ * @param {number|null} correctionFactor - NEC 690.7 temperature correction factor (from API), or null to use fallback
+ * @param {number} tempCoeffVoc - Temperature coefficient of Voc (%/°C), fallback only
+ * @param {number} minTemp - Minimum expected temperature (°C), fallback only
  * @returns {number} - String Voc at coldest temp
  */
-export const calculateStringVoltage = (panelsPerString, panelVoc, tempCoeffVoc = -0.3, minTemp = -10) => {
-  // Voc increases as temperature decreases (tempCoeff is negative)
-  const tempDelta = minTemp - 25; // STC is 25°C
-  const vocCold = panelVoc * (1 + (tempCoeffVoc / 100) * tempDelta);
+export const calculateStringVoltage = (panelsPerString, panelVoc, correctionFactor = null, tempCoeffVoc = -0.3, minTemp = -10) => {
+  let vocCold;
+
+  if (correctionFactor !== null && correctionFactor > 0) {
+    // NEC 690.7 method: use correction factor from API
+    vocCold = panelVoc * correctionFactor;
+  } else {
+    // Fallback method: calculate from temperature coefficient
+    const tempDelta = minTemp - 25; // STC is 25°C
+    vocCold = panelVoc * (1 + (tempCoeffVoc / 100) * tempDelta);
+  }
+
   return panelsPerString * vocCold;
 };
 
