@@ -182,7 +182,7 @@ const SolarPanel2Section = ({ formData, onChange, systemNumber = 1 }) => {
   };
 
   return (
-    <div style={{ marginBottom: 'var(--spacing-xs)' }}>
+    <div style={{ marginTop: 'var(--spacing-xs)', marginBottom: 'var(--spacing-xs)' }}>
       <EquipmentRow
         title="Solar Panel"
         titleSubline="(Type 2)"
