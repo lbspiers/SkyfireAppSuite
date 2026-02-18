@@ -293,9 +293,12 @@
 }
 
 .layerName {
-  flex: 1;
   font-weight: 500;
+  font-size: var(--text-xs);
   color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .layerItemActive .layerName {
@@ -1143,3 +1146,60 @@
 }
 .modalBtnPrimary:hover { background: #2563EB; }
 .modalBtnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* =============================================
+   PHASE 6.5A — LAYER SYSTEM & LINE TYPES
+   ============================================= */
+
+/* Layer list: wrap name + lineType badge */
+.layerInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.layerLineTypeBadge {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Left tool rail — site group label */
+.railGroupLabel {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  padding: 2px 0;
+  line-height: 1;
+}
+
+/* Text badge inside a rail button (PL, FN, DW) */
+.railBadge {
+  font-size: 9px;
+  font-weight: 800;
+  color: currentColor;
+  letter-spacing: 0.04em;
+}
+
+/* Properties panel — layer picker row (swatch + select) */
+.propsLayerPicker {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+
+.propsLayerSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.15);
+}

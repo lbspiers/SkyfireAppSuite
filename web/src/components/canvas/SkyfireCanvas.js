@@ -5,36 +5,41 @@ import { fetchCanvasState, saveCanvasState } from '../../services/canvasAPI';
 import { useSystemDetails } from '../../hooks/useSystemDetails';
 import { getSolarPanelSpecs } from '../../services/equipmentService';
 import { generatePanelArray, countPanelsFit } from '../../utils/panelArrayAlgorithm';
+import {
+  DEFAULT_LAYERS, ACI_COLORS, LINE_TYPES,
+  getLayerColor, getLayerLineType,
+  scaledLineDash, drawFenceNotches,
+} from '../../utils/canvasLayers';
 import styles from './SkyfireCanvas.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const LAYERS = [
-  { id: 'roof',       name: 'Roof Outline',   color: '#F59E0B', locked: false },
-  { id: 'panels',     name: 'Solar Panels',   color: '#3B82F6', locked: false },
-  { id: 'conduit',    name: 'Conduit Runs',   color: '#10B981', locked: false },
-  { id: 'equipment',  name: 'Equipment',      color: '#8B5CF6', locked: false },
-  { id: 'dimensions', name: 'Dimensions',     color: '#EC4899', locked: false },
-  { id: 'labels',     name: 'Labels & Notes', color: '#06B6D4', locked: false },
-  { id: 'property',   name: 'Property Line',  color: '#6B7280', locked: false },
-  { id: 'aerial',     name: 'Aerial Image',   color: '#374151', locked: true  },
-];
+// Use canvasLayers DEFAULT_LAYERS as the authoritative layer list.
+// LAYERS is an alias kept for compatibility with DXF export and existing refs.
+const LAYERS = DEFAULT_LAYERS;
 
-const LAYER_COLORS = LAYERS.reduce((acc, l) => { acc[l.id] = l.color; return acc; }, {});
+// LAYER_COLORS: id → hex color (derived from ACI palette)
+const LAYER_COLORS = DEFAULT_LAYERS.reduce((acc, l) => {
+  acc[l.id] = ACI_COLORS[l.aciColor] || '#FFFFFF';
+  return acc;
+}, {});
 
 const TOOL_HINTS = {
-  select:     'Click to select objects. <kbd>Delete</kbd> to remove. Hover for info.',
-  line:       '<strong>Line</strong> — Click start, click end. <kbd>Esc</kbd> cancel.',
-  polyline:   '<strong>Polyline</strong> — Click points. Snap to first point to close. <kbd>Double-click</kbd> or <kbd>Right-click</kbd> to finish.',
-  rect:       '<strong>Rectangle</strong> — Click corner, click opposite corner.',
-  circle:     '<strong>Circle</strong> — Click center, click radius point.',
-  dimension:  '<strong>Dimension</strong> — Click start, click end to measure.',
-  pan:        '<strong>Pan</strong> — Drag to pan. Also <kbd>Space</kbd>+drag.',
-  text:       '<strong>Text</strong> — Click to place text (coming soon).',
-  measure:    '<strong>Measure</strong> — Click two points to measure distance.',
-  panelArray: '<strong>Panel Array (A)</strong> — Click a closed polygon to fill with solar panels.',
+  select:       'Click to select objects. <kbd>Delete</kbd> to remove. Hover for info.',
+  line:         '<strong>Line</strong> — Click start, click end. <kbd>Esc</kbd> cancel.',
+  polyline:     '<strong>Polyline</strong> — Click points. Snap to first point to close. <kbd>Double-click</kbd> or <kbd>Right-click</kbd> to finish.',
+  rect:         '<strong>Rectangle</strong> — Click corner, click opposite corner.',
+  circle:       '<strong>Circle</strong> — Click center, click radius point.',
+  dimension:    '<strong>Dimension</strong> — Click start, click end to measure.',
+  pan:          '<strong>Pan</strong> — Drag to pan. Also <kbd>Space</kbd>+drag.',
+  text:         '<strong>Text</strong> — Click to place text (coming soon).',
+  measure:      '<strong>Measure</strong> — Click two points to measure distance.',
+  panelArray:   '<strong>Panel Array (A)</strong> — Click a closed polygon to fill with solar panels.',
+  propertyLine: '<strong>Property Line</strong> — Draw phantom (dash-dot) property boundary. Right-click to finish.',
+  fence:        '<strong>Fence</strong> — Draw fence line with perpendicular notches. Right-click to finish.',
+  driveway:     '<strong>Driveway</strong> — Draw closed driveway/drive-line polygon.',
 };
 
 const EQUIPMENT_ABBREVIATIONS = {
@@ -307,26 +312,26 @@ function buildDemoObjects(originLat, originLng) {
     { type: 'rect',
       nw: o(-8.5,  6.5), ne: o( 8.5,  6.5),
       se: o( 8.5, -6.5), sw: o(-8.5, -6.5),
-      layer: 'roof', lineStyle: 'solid' },
+      layer: 'HOUSE' },
     { type: 'rect',
       nw: o( 8.5,  4.5), ne: o(14,    4.5),
       se: o(14,   -4.5), sw: o( 8.5, -4.5),
-      layer: 'roof', lineStyle: 'solid' },
+      layer: 'HOUSE' },
     { type: 'rect',
       nw: o(-8,    6),   ne: o(-1,    6),
       se: o(-1,    1),   sw: o(-8,    1),
-      layer: 'panels', lineStyle: 'solid' },
+      layer: 'MODULE' },
     { type: 'rect',
       nw: o(-8,   -1),  ne: o(-1,   -1),
       se: o(-1,  -5),   sw: o(-8,  -5),
-      layer: 'panels', lineStyle: 'solid' },
+      layer: 'MODULE' },
     { type: 'polyline',
       points: [o(-4.5, 0), o(-4.5, -7), o(9, -7), o(9, -10)],
-      layer: 'conduit', lineStyle: 'dashed' },
-    { type: 'equipment', pos: o(10, -10), label: 'MSP', layer: 'equipment' },
-    { type: 'equipment', pos: o(12, -10), label: 'DIS', layer: 'equipment' },
-    { type: 'equipment', pos: o(14, -10), label: 'MTR', layer: 'equipment' },
-    { type: 'dimension', p1: o(-8.5, 7.5), p2: o(8.5, 7.5), layer: 'dimensions', lineStyle: 'solid' },
+      layer: 'CONDUIT', lineType: 'continuous' },
+    { type: 'equipment', pos: o(10, -10), label: 'MSP', layer: 'EQUIPMENT', symbolType: 'msp', widthFt: 1.5, heightFt: 2.5 },
+    { type: 'equipment', pos: o(12, -10), label: 'DIS', layer: 'EQUIPMENT', symbolType: 'disconnect', widthFt: 1.0, heightFt: 1.3 },
+    { type: 'equipment', pos: o(14, -10), label: 'MTR', layer: 'EQUIPMENT', symbolType: 'meter', widthFt: 0.7, heightFt: 0.9 },
+    { type: 'dimension', p1: o(-8.5, 7.5), p2: o(8.5, 7.5), layer: 'DIMENSIONS' },
   ];
 }
 
@@ -365,7 +370,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     mousePx: null,
     selectedIdx: null,
     objects: [],
-    activeLayer: 'roof',
+    activeLayer: 'HOUSE',
     snapEnabled: true,
     orthoEnabled: true,
     gridEnabled: true,
@@ -377,11 +382,12 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     closeSnap: false,       // boolean — polyline close-path snap active
     hoverIdx: null,         // object index under cursor (select tool)
     hoverPx: null,          // { x, y } position of hover cursor for tooltip
+    mapZoom: 20,            // current Google Maps zoom (for line type scaling)
   });
 
   // ── React UI state ────────────────────────────────────────────────────
   const [activeTool,      setActiveTool]      = useState('line');
-  const [activeLayer,     setActiveLayer]      = useState('roof');
+  const [activeLayer,     setActiveLayer]      = useState('HOUSE');
   const [leftTab,         setLeftTab]          = useState('layers');
   const [snapEnabled,     setSnapEnabled]      = useState(true);
   const [orthoEnabled,    setOrthoEnabled]     = useState(true);
@@ -547,6 +553,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     const centerLat = (map.getCenter()?.lat() ?? (geocodedCoords.lat || 33.4));
     const mPerPx = 156543.03392 * Math.cos(centerLat * Math.PI / 180) / Math.pow(2, zoom);
     drawRef.current.metersPerPx = mPerPx;
+    drawRef.current.mapZoom = zoom;
     const ftPerPx = mPerPx * FT_PER_M;
     setScaleLabel(`1 px ≈ ${ftPerPx.toFixed(2)} ft`);
     setMapZoom(zoom);
@@ -689,12 +696,20 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   function drawObject(ctx, obj, selected, proj, d) {
     if (!proj) return;
     ctx.save();
-    const color = selected ? '#FD7332' : (LAYER_COLORS[obj.layer] || '#9CA3AF');
+
+    // Resolve color: explicit obj.color > BYLAYER from layer > fallback
+    const layerColor = LAYER_COLORS[obj.layer] || '#9CA3AF';
+    const color = selected ? '#FD7332' : (obj.color && obj.color !== 'BYLAYER' ? obj.color : layerColor);
     ctx.strokeStyle = color;
     ctx.lineWidth = selected ? 2 : 1.5;
-    if (obj.lineStyle === 'dashed') ctx.setLineDash([8, 4]);
-    else if (obj.lineStyle === 'dashdot') ctx.setLineDash([8, 3, 2, 3]);
-    else ctx.setLineDash([]);
+
+    // Resolve line type: obj.lineType > layer default > continuous
+    const resolvedLineType = !selected
+      ? (obj.lineType || getLayerLineType(obj.layer) || 'continuous')
+      : 'continuous';
+    const zoom = d.mapZoom || 18;
+    const dash = scaledLineDash(resolvedLineType, zoom);
+    ctx.setLineDash(dash || []);
 
     const pts = getObjPoints(obj, proj);
 
@@ -703,22 +718,23 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         const { p1, p2 } = pts;
         if (!p1 || !p2) break;
         ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+        ctx.setLineDash([]);
+        // Fence decoration on single lines
+        if (resolvedLineType === 'fence') {
+          drawFenceNotches(ctx, [p1, p2], color, zoom);
+        }
         if (selected) { drawHandle(ctx, p1.x, p1.y); drawHandle(ctx, p2.x, p2.y); }
         break;
       }
       case 'rect': {
         const { nw, ne, se, sw } = pts;
         if (!nw || !ne || !se || !sw) break;
-        // Fill for rect (layer color at 10% opacity)
         ctx.setLineDash([]);
-        ctx.fillStyle = hexToRgba(LAYER_COLORS[obj.layer] || '#9CA3AF', 0.10);
+        ctx.fillStyle = hexToRgba(layerColor, 0.10);
         ctx.beginPath();
         ctx.moveTo(nw.x, nw.y); ctx.lineTo(ne.x, ne.y); ctx.lineTo(se.x, se.y); ctx.lineTo(sw.x, sw.y);
         ctx.closePath(); ctx.fill();
-        // Restore dash for stroke
-        if (obj.lineStyle === 'dashed') ctx.setLineDash([8, 4]);
-        else if (obj.lineStyle === 'dashdot') ctx.setLineDash([8, 3, 2, 3]);
-        else ctx.setLineDash([]);
+        ctx.setLineDash(dash || []);
         ctx.beginPath();
         ctx.moveTo(nw.x, nw.y); ctx.lineTo(ne.x, ne.y); ctx.lineTo(se.x, se.y); ctx.lineTo(sw.x, sw.y);
         ctx.closePath(); ctx.stroke();
@@ -738,38 +754,49 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         if (!points || points.length < 2) break;
 
         if (obj.closed && points.length >= 3) {
-          // Semi-transparent fill for closed polygon
-          ctx.setLineDash([]);
-          ctx.fillStyle = hexToRgba(LAYER_COLORS[obj.layer] || '#9CA3AF', 0.15);
-          ctx.beginPath();
-          ctx.moveTo(points[0].x, points[0].y);
-          for (let i = 1; i < points.length; i++) {
-            if (points[i]) ctx.lineTo(points[i].x, points[i].y);
+          // Semi-transparent fill for closed polygon (suppress for fence/property)
+          const suppressFill = resolvedLineType === 'fence';
+          if (!suppressFill) {
+            ctx.setLineDash([]);
+            ctx.fillStyle = hexToRgba(layerColor, 0.10);
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              if (points[i]) ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath(); ctx.fill();
           }
-          ctx.closePath(); ctx.fill();
-          // Restore dash
-          if (obj.lineStyle === 'dashed') ctx.setLineDash([8, 4]);
-          else if (obj.lineStyle === 'dashdot') ctx.setLineDash([8, 3, 2, 3]);
-          else ctx.setLineDash([]);
+
+          ctx.setLineDash(dash || []);
           ctx.beginPath();
           ctx.moveTo(points[0].x, points[0].y);
           for (let i = 1; i < points.length; i++) {
             if (points[i]) ctx.lineTo(points[i].x, points[i].y);
           }
           ctx.closePath(); ctx.stroke();
+          ctx.setLineDash([]);
 
-          // Area label at centroid
-          const centroid = polygonCentroid(obj.points);
-          if (centroid) {
-            const cp = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(centroid.lat, centroid.lng));
-            if (cp) {
-              const areaSqFt = polygonAreaSqFt(obj.points);
-              ctx.setLineDash([]);
-              ctx.fillStyle = color;
-              ctx.font = 'bold 11px sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText(`${areaSqFt.toFixed(0)} sq ft`, cp.x, cp.y);
+          // Fence decoration
+          if (resolvedLineType === 'fence') {
+            const closedPts = [...points, points[0]];
+            drawFenceNotches(ctx, closedPts, color, zoom);
+          }
+
+          // Area label at centroid (suppress for non-building layers)
+          const areaLayers = new Set(['HOUSE', 'MODULE', 'SOLAR PANELS', 'DRIVE LINE']);
+          if (areaLayers.has(obj.layer)) {
+            const centroid = polygonCentroid(obj.points);
+            if (centroid) {
+              const cp = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(centroid.lat, centroid.lng));
+              if (cp) {
+                const areaSqFt = polygonAreaSqFt(obj.points);
+                ctx.setLineDash([]);
+                ctx.fillStyle = color;
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${areaSqFt.toFixed(0)} sq ft`, cp.x, cp.y);
+              }
             }
           }
         } else {
@@ -777,6 +804,11 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
           ctx.moveTo(points[0].x, points[0].y);
           for (let i = 1; i < points.length; i++) { ctx.lineTo(points[i].x, points[i].y); }
           ctx.stroke();
+          ctx.setLineDash([]);
+          // Fence decoration on open polylines
+          if (resolvedLineType === 'fence') {
+            drawFenceNotches(ctx, points, color, zoom);
+          }
         }
 
         if (selected) { points.forEach(p => { if (p) drawHandle(ctx, p.x, p.y); }); }
@@ -1429,21 +1461,33 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         return;
       }
 
-      if (d.tool === 'polyline') {
+      // Site tools (propertyLine, fence, driveway) share polyline drawing logic
+      const SITE_TOOL_CONFIG = {
+        propertyLine: { layer: 'PROPERTY LINE', lineType: 'phantom', closed: false },
+        fence:        { layer: 'FENCE',          lineType: 'fence',   closed: false },
+        driveway:     { layer: 'DRIVE LINE',      lineType: 'continuous', closed: true  },
+      };
+
+      if (d.tool === 'polyline' || d.tool in SITE_TOOL_CONFIG) {
         if (!d.drawing) {
           d.drawing = true;
           d.currentPolyline = [snapped];
           d.startPt = snapped;
         } else {
-          // Check close-path
+          // Determine if we should force-close (driveway always closes)
+          const siteCfg = SITE_TOOL_CONFIG[d.tool];
+          const shouldClose = (d.closeSnap && d.currentPolyline.length >= 3) ||
+            (siteCfg?.closed && d.currentPolyline.length >= 3 && d.closeSnap);
+
           if (d.closeSnap && d.currentPolyline.length >= 3) {
-            // Close the polygon
+            const layer = siteCfg ? siteCfg.layer : d.activeLayer;
+            const lineType = siteCfg ? siteCfg.lineType : getLayerLineType(d.activeLayer);
             d.objects.push({
               type: 'polyline',
               points: [...d.currentPolyline],
               closed: true,
-              layer: d.activeLayer,
-              lineStyle: 'solid',
+              layer,
+              lineType,
             });
             d.currentPolyline = null;
             d.drawing = false;
@@ -1502,10 +1546,24 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       }
     };
 
+    const SITE_TOOLS_SET = new Set(['polyline', 'propertyLine', 'fence', 'driveway']);
+    const SITE_TOOL_CFG = {
+      propertyLine: { layer: 'PROPERTY LINE', lineType: 'phantom' },
+      fence:        { layer: 'FENCE',          lineType: 'fence'   },
+      driveway:     { layer: 'DRIVE LINE',      lineType: 'continuous' },
+    };
+
     const onDblClick = (e) => {
       const d = drawRef.current;
-      if (d.tool === 'polyline' && d.drawing && d.currentPolyline && d.currentPolyline.length >= 2) {
-        d.objects.push({ type: 'polyline', points: [...d.currentPolyline], closed: false, layer: d.activeLayer, lineStyle: 'solid' });
+      if (SITE_TOOLS_SET.has(d.tool) && d.drawing && d.currentPolyline && d.currentPolyline.length >= 2) {
+        const cfg = SITE_TOOL_CFG[d.tool];
+        d.objects.push({
+          type: 'polyline',
+          points: [...d.currentPolyline],
+          closed: false,
+          layer:    cfg ? cfg.layer    : d.activeLayer,
+          lineType: cfg ? cfg.lineType : getLayerLineType(d.activeLayer),
+        });
         d.currentPolyline = null; d.drawing = false;
         syncObjects(); render();
       }
@@ -1515,8 +1573,15 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       e.preventDefault();
       const d = drawRef.current;
       if (d.drawing) {
-        if (d.tool === 'polyline' && d.currentPolyline && d.currentPolyline.length >= 2) {
-          d.objects.push({ type: 'polyline', points: [...d.currentPolyline], closed: false, layer: d.activeLayer, lineStyle: 'solid' });
+        if (SITE_TOOLS_SET.has(d.tool) && d.currentPolyline && d.currentPolyline.length >= 2) {
+          const cfg = SITE_TOOL_CFG[d.tool];
+          d.objects.push({
+            type: 'polyline',
+            points: [...d.currentPolyline],
+            closed: false,
+            layer:    cfg ? cfg.layer    : d.activeLayer,
+            lineType: cfg ? cfg.lineType : getLayerLineType(d.activeLayer),
+          });
           syncObjects();
         }
         d.drawing = false; d.currentPolyline = null; d.closeSnap = false;
@@ -1608,6 +1673,8 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         case 'd': case 'D': setTool('dimension'); break;
         case 't': case 'T': setTool('text'); break;
         case 'a': case 'A': setTool('panelArray'); break;
+        case 'p': case 'P': setTool('propertyLine'); break;
+        case 'f': case 'F': setTool('fence'); break;
         case 'Delete': case 'Backspace':
           if (d.selectedIdx !== null) {
             d.objects.splice(d.selectedIdx, 1);
@@ -1762,7 +1829,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         model: arrayConfig.panelModel,
         rotation: (arrayConfig.azimuthDeg - 180), // relative to North
         arrayId, arrayIndex: idx,
-        layer: 'panels', lineStyle: 'solid',
+        layer: 'SOLAR PANELS',
       }));
       d.objects.push(...newPanels);
       setArrayModal(null);
@@ -1976,6 +2043,17 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
             <rect x="5" y="14" width="7" height="3"/>
           </svg>
         </button>
+        <div className={styles.railDivider}/>
+        <span className={styles.railGroupLabel}>Site</span>
+        <button title="Property Line (P)" className={`${styles.railBtn} ${activeTool==='propertyLine' ? styles.railBtnActive : ''}`} onClick={() => setTool('propertyLine')}>
+          <span className={styles.railBadge}>PL</span>
+        </button>
+        <button title="Fence (F)" className={`${styles.railBtn} ${activeTool==='fence' ? styles.railBtnActive : ''}`} onClick={() => setTool('fence')}>
+          <span className={styles.railBadge}>FN</span>
+        </button>
+        <button title="Driveway" className={`${styles.railBtn} ${activeTool==='driveway' ? styles.railBtnActive : ''}`} onClick={() => setTool('driveway')}>
+          <span className={styles.railBadge}>DW</span>
+        </button>
       </div>
 
       {/* ===== LEFT PANEL ===== */}
@@ -1992,27 +2070,37 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
         {leftTab === 'layers' && (
           <div className={styles.panelContent}>
-            {LAYERS.map(layer => (
-              <div key={layer.id}
-                className={`${styles.layerItem} ${activeLayer === layer.id ? styles.layerItemActive : ''}`}
-                onClick={() => handleLayerClick(layer.id)}>
-                <div className={styles.layerColor} style={{ background: layer.color }}/>
-                <span className={styles.layerName}>{layer.name}</span>
-                <button className={`${styles.layerVis} ${!layerVisibility[layer.id] ? styles.layerVisHidden : ''}`}
-                  onClick={(e) => handleToggleVisibility(layer.id, e)} title="Toggle visibility">
-                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2">
-                    <path d="M1 6s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z"/>
-                    <circle cx="6" cy="6" r="1.5"/>
-                  </svg>
-                </button>
-                <button className={`${styles.layerLock} ${layerLocked[layer.id] ? styles.layerLockLocked : ''}`}
-                  onClick={(e) => handleToggleLock(layer.id, e)} title="Toggle lock">
-                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2">
-                    <rect x="2" y="5" width="8" height="6" rx="1"/><path d="M4 5V3a2 2 0 014 0v2"/>
-                  </svg>
-                </button>
-              </div>
-            ))}
+            {LAYERS.map(layer => {
+              const layerHex = ACI_COLORS[layer.aciColor] || '#FFFFFF';
+              const lineTypeDef = LINE_TYPES[layer.lineType];
+              return (
+                <div key={layer.id}
+                  className={`${styles.layerItem} ${activeLayer === layer.id ? styles.layerItemActive : ''}`}
+                  onClick={() => handleLayerClick(layer.id)}
+                  title={`${layer.name} — ${layer.lineType}`}>
+                  <div className={styles.layerColor} style={{ background: layerHex }}/>
+                  <div className={styles.layerInfo}>
+                    <span className={styles.layerName}>{layer.name}</span>
+                    {layer.lineType !== 'continuous' && (
+                      <span className={styles.layerLineTypeBadge}>{layer.lineType}</span>
+                    )}
+                  </div>
+                  <button className={`${styles.layerVis} ${!layerVisibility[layer.id] ? styles.layerVisHidden : ''}`}
+                    onClick={(e) => handleToggleVisibility(layer.id, e)} title="Toggle visibility">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2">
+                      <path d="M1 6s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z"/>
+                      <circle cx="6" cy="6" r="1.5"/>
+                    </svg>
+                  </button>
+                  <button className={`${styles.layerLock} ${layerLocked[layer.id] ? styles.layerLockLocked : ''}`}
+                    onClick={(e) => handleToggleLock(layer.id, e)} title="Toggle lock">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2">
+                      <rect x="2" y="5" width="8" height="6" rx="1"/><path d="M4 5V3a2 2 0 014 0v2"/>
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -2281,23 +2369,61 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
           <div className={styles.selectionInfo}>{getSelectedDetail()}</div>
         </div>
 
-        <div className={styles.propsSection}>
-          <div className={styles.propsSectionTitle}>Appearance</div>
-          <div className={styles.propsRow}>
-            <span className={styles.propsLabel}>Layer</span>
-            <select className={styles.propsSelect} value={activeLayer} onChange={e => handleLayerClick(e.target.value)}>
-              {LAYERS.filter(l => l.id !== 'aerial').map(l => (
-                <option key={l.id} value={l.id}>{l.name}</option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.propsRow}>
-            <span className={styles.propsLabel}>Style</span>
-            <select className={styles.propsSelect}>
-              <option>Continuous</option><option>Dashed</option><option>Dashdot</option>
-            </select>
-          </div>
-        </div>
+        {/* Appearance section — wired to selected object when one is selected */}
+        {(() => {
+          const selObj = selectedIdx !== null ? objects[selectedIdx] : null;
+          const selLayer = selObj?.layer || activeLayer;
+          const selLineType = selObj?.lineType || getLayerLineType(selLayer) || 'continuous';
+          const selColor = LAYER_COLORS[selLayer] || '#9CA3AF';
+
+          const setSelLayer = (layerId) => {
+            if (selObj) {
+              const d = drawRef.current;
+              d.objects[selectedIdx] = { ...selObj, layer: layerId };
+              syncObjects(); render();
+            } else {
+              handleLayerClick(layerId);
+            }
+          };
+          const setSelLineType = (lt) => {
+            if (selObj) {
+              const d = drawRef.current;
+              d.objects[selectedIdx] = { ...selObj, lineType: lt };
+              syncObjects(); render();
+            }
+          };
+
+          return (
+            <div className={styles.propsSection}>
+              <div className={styles.propsSectionTitle}>Appearance</div>
+              <div className={styles.propsRow}>
+                <span className={styles.propsLabel}>Layer</span>
+                <div className={styles.propsLayerPicker}>
+                  <div className={styles.propsLayerSwatch} style={{ background: selColor }}/>
+                  <select className={styles.propsSelect} value={selLayer} onChange={e => setSelLayer(e.target.value)}>
+                    {LAYERS.map(l => (
+                      <option key={l.id} value={l.id}>{l.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className={styles.propsRow}>
+                <span className={styles.propsLabel}>Line Type</span>
+                <select className={styles.propsSelect} value={selLineType} onChange={e => setSelLineType(e.target.value)}>
+                  {Object.keys(LINE_TYPES).map(lt => (
+                    <option key={lt} value={lt}>{lt.charAt(0).toUpperCase() + lt.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+              {selObj && (
+                <div className={styles.propsRow} style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                  <span>Color</span>
+                  <span style={{ color: selColor, fontWeight: 600 }}>{selColor} (By Layer)</span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <div className={styles.propsHeader}>
           Objects <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({objects.length})</span>

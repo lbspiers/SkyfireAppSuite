@@ -6,23 +6,15 @@
  *   x = (lng - originLng) * 111320 * cos(originLat) * FT_PER_M  (East, in feet)
  *   y = (lat - originLat) * 111320 * FT_PER_M                    (North, in feet)
  *
- * AutoCAD Color Index (ACI) for layers:
- *   roof=30 (orange), panels=5 (blue), conduit=3 (green),
- *   equipment=6 (magenta), dimensions=1 (red), labels=4 (cyan), property=8 (gray)
+ * Layers use AutoCAD Color Index (ACI) and proper line type names
+ * sourced from canvasLayers.js DEFAULT_LAYERS.
  */
 
-const FT_PER_M = 3.28084;
+import {
+  DEFAULT_LAYERS, getLayerACI, lineTypeToDxf, buildDxfLtypeTable,
+} from './canvasLayers';
 
-const LAYER_ACI = {
-  roof:       30,
-  panels:      5,
-  conduit:     3,
-  equipment:   6,
-  dimensions:  1,
-  labels:      4,
-  property:    8,
-  aerial:      8,
-};
+const FT_PER_M = 3.28084;
 
 /** Convert a { lat, lng } point to DXF feet relative to origin */
 function toDxfXY(pt, origin) {
@@ -64,52 +56,62 @@ function buildHeader() {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// TABLES section (just layer definitions)
+// TABLES section — LTYPE table + LAYER table
 // ─────────────────────────────────────────────────────────────────
 function buildTables(layers) {
-  let table =
-    gc(0, 'SECTION') +
-    gc(2, 'TABLES') +
+  // LTYPE table (CONTINUOUS + DASHED + PHANTOM)
+  const ltypeSection = buildDxfLtypeTable();
+
+  // LAYER table
+  let layerTable =
     gc(0, 'TABLE') +
     gc(2, 'LAYER') +
     gc(70, layers.length);
 
   for (const layer of layers) {
-    table +=
+    const aci      = getLayerACI(layer.id);
+    const ltypeDxf = lineTypeToDxf(layer.lineType || 'continuous');
+    layerTable +=
       gc(0, 'LAYER') +
       gc(2, layer.name) +
-      gc(70, 0) +                                 // layer flags (0 = normal)
-      gc(62, LAYER_ACI[layer.id] ?? 7) +           // ACI color
-      gc(6, 'CONTINUOUS');                         // linetype
+      gc(70, 0) +          // layer flags (0 = normal/on)
+      gc(62, aci) +         // ACI color
+      gc(6, ltypeDxf);      // linetype name
   }
+  layerTable += gc(0, 'ENDTAB');
 
-  table +=
-    gc(0, 'ENDTAB') +
-    gc(0, 'ENDSEC');
-
-  return table;
+  return (
+    gc(0, 'SECTION') +
+    gc(2, 'TABLES') +
+    ltypeSection +
+    layerTable +
+    gc(0, 'ENDSEC')
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────
 // ENTITIES helpers
 // ─────────────────────────────────────────────────────────────────
 
-function entityLine(p1, p2, layerName, aci) {
+// 256 = BYLAYER in AutoCAD (entity inherits layer color)
+const BYLAYER = 256;
+
+function entityLine(p1, p2, layerName) {
   return (
     gc(0, 'LINE') +
     gc(8, layerName) +
-    gc(62, aci) +
+    gc(62, BYLAYER) +
     gc(10, p1.x.toFixed(4)) + gc(20, p1.y.toFixed(4)) + gc(30, '0') +
     gc(11, p2.x.toFixed(4)) + gc(21, p2.y.toFixed(4)) + gc(31, '0')
   );
 }
 
-function entityLwPolyline(pts, closed, layerName, aci) {
+function entityLwPolyline(pts, closed, layerName) {
   const flags = closed ? 1 : 0;
   let e =
     gc(0, 'LWPOLYLINE') +
     gc(8, layerName) +
-    gc(62, aci) +
+    gc(62, BYLAYER) +
     gc(90, pts.length) +   // vertex count
     gc(70, flags);         // 1 = closed
   for (const pt of pts) {
@@ -118,35 +120,35 @@ function entityLwPolyline(pts, closed, layerName, aci) {
   return e;
 }
 
-function entityCircle(center, radiusFt, layerName, aci) {
+function entityCircle(center, radiusFt, layerName) {
   return (
     gc(0, 'CIRCLE') +
     gc(8, layerName) +
-    gc(62, aci) +
+    gc(62, BYLAYER) +
     gc(10, center.x.toFixed(4)) + gc(20, center.y.toFixed(4)) + gc(30, '0') +
     gc(40, radiusFt.toFixed(4))
   );
 }
 
-function entityText(pos, text, height, layerName, aci) {
+function entityText(pos, text, height, layerName) {
   return (
     gc(0, 'TEXT') +
     gc(8, layerName) +
-    gc(62, aci) +
+    gc(62, BYLAYER) +
     gc(10, pos.x.toFixed(4)) + gc(20, pos.y.toFixed(4)) + gc(30, '0') +
     gc(40, height.toFixed(4)) +
     gc(1, text)
   );
 }
 
-function entityMtext(pos, text, height, layerName, aci) {
+function entityMtext(pos, text, height, layerName) {
   return (
     gc(0, 'MTEXT') +
     gc(8, layerName) +
-    gc(62, aci) +
+    gc(62, BYLAYER) +
     gc(10, pos.x.toFixed(4)) + gc(20, pos.y.toFixed(4)) + gc(30, '0') +
-    gc(40, height.toFixed(4)) +  // text height
-    gc(41, '24') +               // reference rectangle width (24ft)
+    gc(40, height.toFixed(4)) +
+    gc(41, '24') +
     gc(1, text)
   );
 }
@@ -170,14 +172,15 @@ export function exportToDXF(objects, layers, origin) {
   let entities = gc(0, 'SECTION') + gc(2, 'ENTITIES');
 
   for (const obj of objects) {
-    const layerName = obj.layer || 'labels';
-    const aci = LAYER_ACI[layerName] ?? 7;
+    // Use the object's layer id as the DXF layer name.
+    // Fall back to 'ANNOTATIONS' if layer is unrecognized.
+    const layerName = obj.layer || 'ANNOTATIONS';
 
     switch (obj.type) {
       case 'line': {
         const p1 = toDxfXY(obj.p1, origin);
         const p2 = toDxfXY(obj.p2, origin);
-        entities += entityLine(p1, p2, layerName, aci);
+        entities += entityLine(p1, p2, layerName);
         break;
       }
 
@@ -186,61 +189,54 @@ export function exportToDXF(objects, layers, origin) {
         const ne = toDxfXY(obj.ne, origin);
         const se = toDxfXY(obj.se, origin);
         const sw = toDxfXY(obj.sw, origin);
-        entities += entityLwPolyline([nw, ne, se, sw], true, layerName, aci);
+        entities += entityLwPolyline([nw, ne, se, sw], true, layerName);
         break;
       }
 
       case 'circle': {
         const center = toDxfXY(obj.center, origin);
         const radiusFt = haverineFt(obj.center, obj.edge);
-        entities += entityCircle(center, radiusFt, layerName, aci);
+        entities += entityCircle(center, radiusFt, layerName);
         break;
       }
 
       case 'polyline': {
         if (!obj.points || obj.points.length < 2) break;
         const pts = obj.points.map(pt => toDxfXY(pt, origin));
-        entities += entityLwPolyline(pts, !!obj.closed, layerName, aci);
+        entities += entityLwPolyline(pts, !!obj.closed, layerName);
         break;
       }
 
       case 'dimension': {
-        // Draw line + tick marks + text
         const p1 = toDxfXY(obj.p1, origin);
         const p2 = toDxfXY(obj.p2, origin);
-        entities += entityLine(p1, p2, 'dimensions', LAYER_ACI.dimensions);
-        // Tick marks (perpendicular to line, ±0.5ft)
+        entities += entityLine(p1, p2, 'DIMENSIONS');
         const dx = p2.x - p1.x, dy = p2.y - p1.y;
         const len = Math.sqrt(dx * dx + dy * dy) || 1;
         const nx = -dy / len * 0.5, ny = dx / len * 0.5;
         entities += entityLine(
-          { x: p1.x - nx, y: p1.y - ny },
-          { x: p1.x + nx, y: p1.y + ny },
-          'dimensions', LAYER_ACI.dimensions
+          { x: p1.x - nx, y: p1.y - ny }, { x: p1.x + nx, y: p1.y + ny }, 'DIMENSIONS'
         );
         entities += entityLine(
-          { x: p2.x - nx, y: p2.y - ny },
-          { x: p2.x + nx, y: p2.y + ny },
-          'dimensions', LAYER_ACI.dimensions
+          { x: p2.x - nx, y: p2.y - ny }, { x: p2.x + nx, y: p2.y + ny }, 'DIMENSIONS'
         );
-        // Label at midpoint, slightly offset
         const distFt = haverineFt(obj.p1, obj.p2);
         const mid = { x: (p1.x + p2.x) / 2 + nx * 2, y: (p1.y + p2.y) / 2 + ny * 2 };
-        entities += entityText(mid, `${distFt.toFixed(1)}'`, 0.75, 'dimensions', LAYER_ACI.dimensions);
+        entities += entityText(mid, `${distFt.toFixed(1)}'`, 0.75, 'DIMENSIONS');
         break;
       }
 
       case 'equipment': {
         const pos = toDxfXY(obj.pos, origin);
-        // Equipment as a small square (2ft × 2ft) + label
-        const hs = 1.0; // half-size in feet
+        const hs = (obj.widthFt  ?? 2) / 2;
+        const hh = (obj.heightFt ?? 2) / 2;
         entities += entityLwPolyline(
-          [{ x: pos.x - hs, y: pos.y - hs }, { x: pos.x + hs, y: pos.y - hs },
-           { x: pos.x + hs, y: pos.y + hs }, { x: pos.x - hs, y: pos.y + hs }],
-          true, 'equipment', LAYER_ACI.equipment
+          [{ x: pos.x - hs, y: pos.y - hh }, { x: pos.x + hs, y: pos.y - hh },
+           { x: pos.x + hs, y: pos.y + hh }, { x: pos.x - hs, y: pos.y + hh }],
+          true, 'EQUIPMENT'
         );
         if (obj.label) {
-          entities += entityText({ x: pos.x, y: pos.y }, obj.label, 0.6, 'equipment', LAYER_ACI.equipment);
+          entities += entityText({ x: pos.x, y: pos.y }, obj.label, 0.6, 'EQUIPMENT');
         }
         break;
       }
