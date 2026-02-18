@@ -8,6 +8,8 @@ import ProjectDetailsTabs from '../components/dashboard/ProjectDetailsTabs';
 import ProjectOverviewTabs from '../components/dashboard/ProjectOverviewTabs';
 import PlanSetVersions from '../components/dashboard/PlanSetVersions';
 import SitePlanVersions from '../components/dashboard/SitePlanVersions';
+import { isFeatureEnabled, FEATURE_FLAGS } from '../constants/featureFlags';
+import { SkyfireCanvas } from '../components/canvas';
 import SurveyPanel from '../components/project/SurveyPanel';
 import FilesTab from '../components/project/FilesTab';
 import FilesPanel from '../components/project/FilesPanel';
@@ -480,9 +482,18 @@ const DesignPortal = () => {
             tabs={['survey', 'overview', 'planset', 'revisions', 'files']}
           >
             {selectedOverviewTab === 'overview' && projectUuid && (
-              <SitePlanVersions
-                projectUuid={projectUuid}
-              />
+              isFeatureEnabled(FEATURE_FLAGS.CANVAS_SITE_PLAN) ? (
+                <SkyfireCanvas
+                  projectUuid={projectUuid}
+                  projectData={projectData}
+                  lat={projectData?.site?.lat}
+                  lng={projectData?.site?.lng}
+                />
+              ) : (
+                <SitePlanVersions
+                  projectUuid={projectUuid}
+                />
+              )
             )}
             {selectedOverviewTab === 'survey' && projectUuid && (
               <SurveyPanel

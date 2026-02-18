@@ -32,6 +32,8 @@ import AnalyticsTab from './AnalyticsTab';
 import EquipmentReviewPanel from './EquipmentReviewPanel';
 import CSVUploadModal from './CSVUploadModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
+import { FEATURE_FLAGS, getAllFlags, toggleFeature } from '../../constants/featureFlags';
+import Toggle from '../ui/Toggle';
 import styles from './DevPortal.module.css';
 
 const DevPortal = () => {
@@ -49,7 +51,8 @@ const DevPortal = () => {
   const [currentUser, setCurrentUser] = useState(DEV_USERS[0]);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('tasks'); // tasks, analytics, equipment-review
+  const [activeTab, setActiveTab] = useState('tasks'); // tasks, analytics, equipment-review, flags
+  const [flagState, setFlagState] = useState(() => getAllFlags());
   const [view, setView] = useState('list'); // list, kanban, history
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -2079,6 +2082,13 @@ const DevPortal = () => {
                 Equipment Review
               </button>
               <button
+                className={`${styles.viewButton} ${activeTab === 'flags' ? styles.viewButtonActive : ''}`}
+                onClick={() => setActiveTab('flags')}
+                title="Feature Flags"
+              >
+                Flags
+              </button>
+              <button
                 className={styles.viewButton}
                 onClick={() => setShowNotesPanel(true)}
                 title="Dev Notes - Convert ideas to tasks"
@@ -2539,6 +2549,36 @@ const DevPortal = () => {
 
       {activeTab === 'equipment-review' && (
         <EquipmentReviewPanel />
+      )}
+
+      {activeTab === 'flags' && (
+        <div style={{ padding: 'var(--spacing)', maxWidth: 600 }}>
+          <h2 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 'var(--spacing)' }}>
+            Feature Flags
+          </h2>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 'var(--spacing)' }}>
+            Refresh the page after toggling a flag to apply changes.
+          </p>
+          {Object.entries(FEATURE_FLAGS).map(([name, key]) => {
+            const humanName = name.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+            return (
+              <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--spacing-tight) 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                <div>
+                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)' }}>{humanName}</div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{key}</div>
+                </div>
+                <Toggle
+                  checked={!!flagState[key]}
+                  onChange={() => {
+                    const next = toggleFeature(key);
+                    setFlagState(prev => ({ ...prev, [key]: next }));
+                    toast.info(`Feature flag "${humanName}" ${next ? 'enabled' : 'disabled'}. Refresh to apply.`);
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {showCommandPalette && (
