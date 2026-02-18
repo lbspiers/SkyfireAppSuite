@@ -403,7 +403,7 @@
 }
 
 /* =============================================
-   CANVAS AREA
+   CANVAS AREA — Google Map + transparent canvas overlay
    ============================================= */
 .canvasArea {
   grid-row: 2;
@@ -413,12 +413,51 @@
   background: #1a1a2e;
 }
 
-.drawingCanvas {
+/* Google Maps satellite layer — fills the entire canvas area */
+.mapLayer {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Drawing canvas — transparent, sits on top of the map */
+.canvasOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
   cursor: crosshair;
   display: block;
+  /* Pointer events pass through to canvas for drawing;
+     map pan/zoom is handled by the map div underneath */
+  pointer-events: all;
+}
+
+/* No-coords / error overlay */
+.noCoordsOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(10, 22, 40, 0.85);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+/* zoom badge in toolbar */
+.zoomBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 0 4px;
 }
 
 .canvasZoomDisplay {
