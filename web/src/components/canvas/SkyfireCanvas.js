@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useGoogleMaps from '../../hooks/useGoogleMaps';
+import { exportToDXF, downloadDXF } from '../../utils/dxfExporter';
 import styles from './SkyfireCanvas.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -20,9 +21,9 @@ const LAYERS = [
 const LAYER_COLORS = LAYERS.reduce((acc, l) => { acc[l.id] = l.color; return acc; }, {});
 
 const TOOL_HINTS = {
-  select:    'Click to select objects. <kbd>Delete</kbd> to remove.',
+  select:    'Click to select objects. <kbd>Delete</kbd> to remove. Hover for info.',
   line:      '<strong>Line</strong> — Click start, click end. <kbd>Esc</kbd> cancel.',
-  polyline:  '<strong>Polyline</strong> — Click points. <kbd>Double-click</kbd> or <kbd>Right-click</kbd> to finish.',
+  polyline:  '<strong>Polyline</strong> — Click points. Snap to first point to close. <kbd>Double-click</kbd> or <kbd>Right-click</kbd> to finish.',
   rect:      '<strong>Rectangle</strong> — Click corner, click opposite corner.',
   circle:    '<strong>Circle</strong> — Click center, click radius point.',
   dimension: '<strong>Dimension</strong> — Click start, click end to measure.',
@@ -40,11 +41,15 @@ const DEFAULT_MAP_ZOOM = 20;
 const GRID_METERS = 1.0;
 // Feet per meter
 const FT_PER_M = 3.28084;
+// Endpoint snap radius in screen pixels
+const ENDPOINT_SNAP_PX = 15;
+// Close-polygon snap radius in screen pixels
+const CLOSE_SNAP_PX = 18;
+// localStorage key prefix for auto-save
+const LS_KEY_PREFIX = 'skyfire_canvas_';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GEO HELPERS
-// All objects store coordinates as { lat, lng }.
-// We use the Google Maps OverlayView projection to convert lat/lng → canvas px.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Offset a lat/lng by (dx meters East, dy meters North) */
@@ -69,7 +74,6 @@ function haversineMeters(a, b) {
 /** Snap a {lat,lng} to the nearest GRID_METERS grid anchored at origin */
 function snapLatLng(pt, originLat, originLng, snapEnabled) {
   if (!snapEnabled) return pt;
-  // Convert to local meters, snap, convert back
   const dxM = (pt.lng - originLng) * 111320 * Math.cos(originLat * Math.PI / 180);
   const dyM = (pt.lat - originLat) * 111320;
   const snappedDx = Math.round(dxM / GRID_METERS) * GRID_METERS;
@@ -83,47 +87,132 @@ function applyOrthoLatLng(start, end, orthoEnabled) {
   const dLat = end.lat - start.lat;
   const dLng = (end.lng - start.lng) * Math.cos(start.lat * Math.PI / 180);
   if (Math.abs(dLng) > Math.abs(dLat)) {
-    // Horizontal — lock lat
     return { lat: start.lat, lng: end.lng };
   } else {
-    // Vertical — lock lng
     return { lat: end.lat, lng: start.lng };
   }
 }
 
-/** Build demo objects relative to origin lat/lng (placed in a ring around it) */
+/** Convert hex color to rgba string with given opacity */
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/**
+ * Shoelace area for a polygon defined by lat/lng points.
+ * Returns area in square feet.
+ */
+function polygonAreaSqFt(points) {
+  if (!points || points.length < 3) return 0;
+  // Convert to local meters (flat-Earth)
+  const origin = points[0];
+  const cosLat = Math.cos(origin.lat * Math.PI / 180);
+  const xy = points.map(p => ({
+    x: (p.lng - origin.lng) * 111320 * cosLat,
+    y: (p.lat - origin.lat) * 111320,
+  }));
+  // Shoelace
+  let area = 0;
+  const n = xy.length;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    area += xy[i].x * xy[j].y;
+    area -= xy[j].x * xy[i].y;
+  }
+  const sqMeters = Math.abs(area) / 2;
+  return sqMeters * FT_PER_M * FT_PER_M;
+}
+
+/**
+ * Compute centroid of polygon in lat/lng space.
+ */
+function polygonCentroid(points) {
+  if (!points || points.length === 0) return null;
+  const lat = points.reduce((s, p) => s + p.lat, 0) / points.length;
+  const lng = points.reduce((s, p) => s + p.lng, 0) / points.length;
+  return { lat, lng };
+}
+
+/**
+ * Collect all unique endpoint lat/lngs from all objects.
+ * Returns array of { lat, lng, objIdx, ptKey } for hit-testing.
+ */
+function getAllEndpoints(objects) {
+  const pts = [];
+  objects.forEach((obj, idx) => {
+    switch (obj.type) {
+      case 'line': case 'dimension':
+        pts.push({ ...obj.p1, objIdx: idx, ptKey: 'p1' });
+        pts.push({ ...obj.p2, objIdx: idx, ptKey: 'p2' });
+        break;
+      case 'rect':
+        ['nw','ne','se','sw'].forEach(k => pts.push({ ...obj[k], objIdx: idx, ptKey: k }));
+        break;
+      case 'circle':
+        pts.push({ ...obj.center, objIdx: idx, ptKey: 'center' });
+        pts.push({ ...obj.edge,   objIdx: idx, ptKey: 'edge' });
+        break;
+      case 'polyline':
+        (obj.points || []).forEach((p, i) => pts.push({ ...p, objIdx: idx, ptKey: i }));
+        break;
+      case 'equipment':
+        pts.push({ ...obj.pos, objIdx: idx, ptKey: 'pos' });
+        break;
+      default: break;
+    }
+  });
+  return pts;
+}
+
+/**
+ * Find the nearest endpoint within ENDPOINT_SNAP_PX of the mouse.
+ * Returns { lat, lng } or null.
+ */
+function findNearestEndpoint(mousePx, objects, proj) {
+  if (!proj || !mousePx) return null;
+  const endpoints = getAllEndpoints(objects);
+  let best = null;
+  let bestDist = ENDPOINT_SNAP_PX;
+  for (const ep of endpoints) {
+    const px = proj.fromLatLngToContainerPixel(
+      new window.google.maps.LatLng(ep.lat, ep.lng)
+    );
+    if (!px) continue;
+    const d = Math.sqrt((px.x - mousePx.x) ** 2 + (px.y - mousePx.y) ** 2);
+    if (d < bestDist) { bestDist = d; best = { lat: ep.lat, lng: ep.lng }; }
+  }
+  return best;
+}
+
+/** Build demo objects relative to origin lat/lng */
 function buildDemoObjects(originLat, originLng) {
   const o = (dx, dy) => offsetLatLng(originLat, originLng, dx, dy);
   return [
-    // Roof outline — 17m × 13m rectangle starting 6m W, 6m N of origin
     { type: 'rect',
       nw: o(-8.5,  6.5), ne: o( 8.5,  6.5),
       se: o( 8.5, -6.5), sw: o(-8.5, -6.5),
       layer: 'roof', lineStyle: 'solid' },
-    // Garage — 5.5m × 9m to the right
     { type: 'rect',
       nw: o( 8.5,  4.5), ne: o(14,    4.5),
       se: o(14,   -4.5), sw: o( 8.5, -4.5),
       layer: 'roof', lineStyle: 'solid' },
-    // Panel array 1 — top-left of roof
     { type: 'rect',
       nw: o(-8,    6),   ne: o(-1,    6),
       se: o(-1,    1),   sw: o(-8,    1),
       layer: 'panels', lineStyle: 'solid' },
-    // Panel array 2 — below
     { type: 'rect',
       nw: o(-8,   -1),  ne: o(-1,   -1),
       se: o(-1,  -5),   sw: o(-8,  -5),
       layer: 'panels', lineStyle: 'solid' },
-    // Conduit run
     { type: 'polyline',
       points: [o(-4.5, 0), o(-4.5, -7), o(9, -7), o(9, -10)],
       layer: 'conduit', lineStyle: 'dashed' },
-    // Equipment
     { type: 'equipment', pos: o(10, -10), label: 'MSP', layer: 'equipment' },
     { type: 'equipment', pos: o(12, -10), label: 'DIS', layer: 'equipment' },
     { type: 'equipment', pos: o(14, -10), label: 'MTR', layer: 'equipment' },
-    // Dimension — top edge of roof
     { type: 'dimension', p1: o(-8.5, 7.5), p2: o(8.5, 7.5), layer: 'dimensions', lineStyle: 'solid' },
   ];
 }
@@ -139,21 +228,21 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   const { isLoaded: mapsLoaded, loadError: mapsError } = useGoogleMaps();
   const mapContainerRef = useRef(null);
   const googleMapRef    = useRef(null);
-  const overlayRef      = useRef(null);   // google.maps.OverlayView instance
-  const projectionRef   = useRef(null);   // MapCanvasProjection (valid inside draw())
+  const overlayRef      = useRef(null);
+  const projectionRef   = useRef(null);
 
   // ── Canvas ───────────────────────────────────────────────────────────
   const canvasRef     = useRef(null);
   const canvasAreaRef = useRef(null);
 
-  // ── Drawing state (ref — not React state, updated on every frame) ─────
+  // ── Drawing state (ref — not React state) ─────────────────────────────
   const drawRef = useRef({
     tool: 'line',
     drawing: false,
-    startPt: null,       // {lat, lng}
-    currentPolyline: null, // [{lat,lng}, ...]
-    mouseLatLng: null,   // {lat, lng} of current cursor
-    mousePx: null,       // {x, y} screen pixels
+    startPt: null,
+    currentPolyline: null,
+    mouseLatLng: null,
+    mousePx: null,
     selectedIdx: null,
     objects: [],
     activeLayer: 'roof',
@@ -162,8 +251,12 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     gridEnabled: true,
     showMapLayer: true,
     isSpacePanning: false,
-    // Scale info updated from map
     metersPerPx: 0.15,
+    // Phase 3 additions
+    endpointSnap: null,     // { lat, lng } | null — current endpoint snap target
+    closeSnap: false,       // boolean — polyline close-path snap active
+    hoverIdx: null,         // object index under cursor (select tool)
+    hoverPx: null,          // { x, y } position of hover cursor for tooltip
   });
 
   // ── React UI state ────────────────────────────────────────────────────
@@ -185,18 +278,60 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   const [mapZoom,         setMapZoom]          = useState(DEFAULT_MAP_ZOOM);
   const [scaleLabel,      setScaleLabel]       = useState('');
   const [coordDisplay,    setCoordDisplay]     = useState({ x: '—', y: '—', delta: '—' });
+  const [hoverTooltip,    setHoverTooltip]     = useState(null); // { text, x, y }
+  const [toast,           setToast]            = useState(null); // { msg, type }
 
   const commandInputRef = useRef(null);
+  const toastTimerRef   = useRef(null);
+
+  // ── Toast helper ──────────────────────────────────────────────────────
+  const showToast = useCallback((msg, type = 'info') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ msg, type });
+    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  // ── Auto-save helpers ─────────────────────────────────────────────────
+  const getStorageKey = useCallback(() => {
+    return projectUuid ? `${LS_KEY_PREFIX}${projectUuid}` : null;
+  }, [projectUuid]);
+
+  const saveToStorage = useCallback(() => {
+    const key = getStorageKey();
+    if (!key) return;
+    try {
+      const payload = {
+        objects: drawRef.current.objects,
+        activeLayer: drawRef.current.activeLayer,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(key, JSON.stringify(payload));
+    } catch (err) {
+      // localStorage quota exceeded or unavailable — silently skip
+    }
+  }, [getStorageKey]);
+
+  const loadFromStorage = useCallback(() => {
+    const key = getStorageKey();
+    if (!key) return null;
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }, [getStorageKey]);
 
   // ── Sync objects array → React state ──────────────────────────────────
-  const syncObjects = useCallback(() => {
+  const syncObjects = useCallback((doSave = true) => {
     const d = drawRef.current;
     setObjects([...d.objects]);
     setSelectedIdx(d.selectedIdx);
-  }, []);
+    if (doSave) saveToStorage();
+  }, [saveToStorage]);
 
-  // ── Projection helpers (only valid when overlayRef is set) ────────────
-  /** lat/lng → canvas container pixel {x, y}. Returns null if projection not ready. */
+  // ── Projection helpers ────────────────────────────────────────────────
   const latLngToPx = useCallback((latLng) => {
     const proj = projectionRef.current;
     if (!proj) return null;
@@ -206,7 +341,6 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     return pt ? { x: pt.x, y: pt.y } : null;
   }, []);
 
-  /** Canvas container pixel → lat/lng. Returns null if projection not ready. */
   const pxToLatLng = useCallback((x, y) => {
     const proj = projectionRef.current;
     if (!proj) return null;
@@ -222,14 +356,9 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     if (!map) return;
     const zoom = map.getZoom();
     const centerLat = (map.getCenter()?.lat() ?? (lat || 33.4));
-    // Google Maps ground resolution formula
     const mPerPx = 156543.03392 * Math.cos(centerLat * Math.PI / 180) / Math.pow(2, zoom);
     drawRef.current.metersPerPx = mPerPx;
     const ftPerPx = mPerPx * FT_PER_M;
-    // Build a human-readable scale: find round number of feet that maps to ~80px
-    const feetAt80px = ftPerPx * 80;
-    const magnitude = Math.pow(10, Math.floor(Math.log10(feetAt80px)));
-    const rounded = Math.round(feetAt80px / magnitude) * magnitude;
     setScaleLabel(`1 px ≈ ${ftPerPx.toFixed(2)} ft`);
     setMapZoom(zoom);
   }, [lat]);
@@ -242,7 +371,6 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     const ctx = canvas.getContext('2d');
     const d   = drawRef.current;
 
-    // Resize canvas to container if needed
     const area = canvasAreaRef.current;
     if (area) {
       const r = area.getBoundingClientRect();
@@ -254,11 +382,8 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // No projection yet — show placeholder
     if (!proj) {
-      if (!hasCoords) {
-        drawNoCoordsPlaceholder(ctx, canvas);
-      }
+      if (!hasCoords) drawNoCoordsPlaceholder(ctx, canvas);
       return;
     }
 
@@ -266,7 +391,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     d.objects.forEach((obj, i) => drawObject(ctx, obj, i === d.selectedIdx, proj, d));
     if (d.drawing) drawPreview(ctx, proj, d);
     if (d.mousePx) drawCrosshair(ctx, canvas, d);
-    if (d.snapEnabled && d.mouseLatLng) drawSnapIndicator(ctx, proj, d);
+    drawSnapIndicators(ctx, proj, d);
   }, [hasCoords]);
 
   // ── Drawing helpers ────────────────────────────────────────────────────
@@ -285,13 +410,9 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
   function drawGrid(ctx, canvas, proj, d) {
     if (!proj) return;
-    const map = googleMapRef.current;
-    if (!map) return;
-
     ctx.save();
     ctx.lineWidth = 0.5;
 
-    // Find the lat/lng bounds of the visible canvas
     const topLeft  = proj.fromContainerPixelToLatLng(new window.google.maps.Point(0, 0));
     const botRight = proj.fromContainerPixelToLatLng(new window.google.maps.Point(canvas.width, canvas.height));
     if (!topLeft || !botRight) { ctx.restore(); return; }
@@ -299,11 +420,8 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     const minLat = botRight.lat(), maxLat = topLeft.lat();
     const minLng = topLeft.lng(),  maxLng = botRight.lng();
 
-    // Grid origin: snap to nearest GRID_METERS from (0,0) in lat/lng
-    // We draw lines spaced GRID_METERS apart in both axes
     const mPerDegLat = 111320;
     const mPerDegLng = 111320 * Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
-
     const dLat = GRID_METERS / mPerDegLat;
     const dLng = GRID_METERS / mPerDegLng;
 
@@ -346,7 +464,6 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   }
 
   function getObjPoints(obj, proj) {
-    // Returns {px} screen coords for all relevant points of an object
     switch (obj.type) {
       case 'line': case 'dimension':
         return { p1: proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(obj.p1.lat, obj.p1.lng)),
@@ -403,6 +520,16 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       case 'rect': {
         const { nw, ne, se, sw } = pts;
         if (!nw || !ne || !se || !sw) break;
+        // Fill for rect (layer color at 10% opacity)
+        ctx.setLineDash([]);
+        ctx.fillStyle = hexToRgba(LAYER_COLORS[obj.layer] || '#9CA3AF', 0.10);
+        ctx.beginPath();
+        ctx.moveTo(nw.x, nw.y); ctx.lineTo(ne.x, ne.y); ctx.lineTo(se.x, se.y); ctx.lineTo(sw.x, sw.y);
+        ctx.closePath(); ctx.fill();
+        // Restore dash for stroke
+        if (obj.lineStyle === 'dashed') ctx.setLineDash([8, 4]);
+        else if (obj.lineStyle === 'dashdot') ctx.setLineDash([8, 3, 2, 3]);
+        else ctx.setLineDash([]);
         ctx.beginPath();
         ctx.moveTo(nw.x, nw.y); ctx.lineTo(ne.x, ne.y); ctx.lineTo(se.x, se.y); ctx.lineTo(sw.x, sw.y);
         ctx.closePath(); ctx.stroke();
@@ -420,10 +547,49 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       case 'polyline': {
         const { pts: points } = pts;
         if (!points || points.length < 2) break;
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) { ctx.lineTo(points[i].x, points[i].y); }
-        ctx.stroke();
+
+        if (obj.closed && points.length >= 3) {
+          // Semi-transparent fill for closed polygon
+          ctx.setLineDash([]);
+          ctx.fillStyle = hexToRgba(LAYER_COLORS[obj.layer] || '#9CA3AF', 0.15);
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          for (let i = 1; i < points.length; i++) {
+            if (points[i]) ctx.lineTo(points[i].x, points[i].y);
+          }
+          ctx.closePath(); ctx.fill();
+          // Restore dash
+          if (obj.lineStyle === 'dashed') ctx.setLineDash([8, 4]);
+          else if (obj.lineStyle === 'dashdot') ctx.setLineDash([8, 3, 2, 3]);
+          else ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          for (let i = 1; i < points.length; i++) {
+            if (points[i]) ctx.lineTo(points[i].x, points[i].y);
+          }
+          ctx.closePath(); ctx.stroke();
+
+          // Area label at centroid
+          const centroid = polygonCentroid(obj.points);
+          if (centroid) {
+            const cp = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(centroid.lat, centroid.lng));
+            if (cp) {
+              const areaSqFt = polygonAreaSqFt(obj.points);
+              ctx.setLineDash([]);
+              ctx.fillStyle = color;
+              ctx.font = 'bold 11px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(`${areaSqFt.toFixed(0)} sq ft`, cp.x, cp.y);
+            }
+          }
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          for (let i = 1; i < points.length; i++) { ctx.lineTo(points[i].x, points[i].y); }
+          ctx.stroke();
+        }
+
         if (selected) { points.forEach(p => { if (p) drawHandle(ctx, p.x, p.y); }); }
         break;
       }
@@ -468,9 +634,15 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 4]);
 
-    let endPt = snapLatLng(d.mouseLatLng, d.startPt.lat, d.startPt.lng, d.snapEnabled);
-    if (d.orthoEnabled && d.tool !== 'rect' && d.tool !== 'circle') {
-      endPt = applyOrthoLatLng(d.startPt, endPt, true);
+    // Use endpoint snap if active, otherwise grid snap
+    let endPt;
+    if (d.endpointSnap) {
+      endPt = d.endpointSnap;
+    } else {
+      endPt = snapLatLng(d.mouseLatLng, d.startPt.lat, d.startPt.lng, d.snapEnabled);
+      if (d.orthoEnabled && d.tool !== 'rect' && d.tool !== 'circle') {
+        endPt = applyOrthoLatLng(d.startPt, endPt, true);
+      }
     }
 
     const sp = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(d.startPt.lat, d.startPt.lng));
@@ -490,7 +662,6 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         break;
       }
       case 'rect': {
-        // Draw rectangle using 4 corners in lat/lng space
         const ne = { lat: d.startPt.lat, lng: endPt.lng };
         const sw = { lat: endPt.lat,     lng: d.startPt.lng };
         const nePx = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(ne.lat, ne.lng));
@@ -514,6 +685,12 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       }
       case 'polyline': {
         if (d.currentPolyline && d.currentPolyline.length > 0) {
+          // If close-snap active, draw preview closing line in green
+          const isClosing = d.closeSnap && d.currentPolyline.length >= 3;
+          if (isClosing) {
+            ctx.strokeStyle = 'rgba(16,185,129,0.9)';
+            ctx.setLineDash([4, 3]);
+          }
           ctx.beginPath();
           const first = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(d.currentPolyline[0].lat, d.currentPolyline[0].lng));
           if (first) {
@@ -524,6 +701,16 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
             }
             ctx.lineTo(ep.x, ep.y);
             ctx.stroke();
+
+            // Close-snap green circle indicator at first point
+            if (isClosing) {
+              ctx.setLineDash([]);
+              ctx.strokeStyle = '#10B981';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.arc(first.x, first.y, 8, 0, Math.PI * 2);
+              ctx.stroke();
+            }
           }
         }
         break;
@@ -544,19 +731,45 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     ctx.restore();
   }
 
-  function drawSnapIndicator(ctx, proj, d) {
-    if (!d.mouseLatLng || !d.mousePx || !proj) return;
-    const snapped = snapLatLng(d.mouseLatLng, d.mouseLatLng.lat, d.mouseLatLng.lng, true);
-    const sp = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(snapped.lat, snapped.lng));
-    if (!sp) return;
-    const dist = Math.sqrt((sp.x - d.mousePx.x) ** 2 + (sp.y - d.mousePx.y) ** 2);
-    if (dist < 10) {
-      ctx.save(); ctx.strokeStyle = '#10B981'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.moveTo(sp.x, sp.y - 6); ctx.lineTo(sp.x + 6, sp.y);
-      ctx.lineTo(sp.x, sp.y + 6); ctx.lineTo(sp.x - 6, sp.y);
-      ctx.closePath(); ctx.stroke();
-      ctx.restore();
+  /** Draw both endpoint snap (circle) and grid snap (diamond) indicators */
+  function drawSnapIndicators(ctx, proj, d) {
+    if (!d.mousePx || !proj) return;
+
+    // Endpoint snap — circle indicator (higher priority)
+    if (d.endpointSnap) {
+      const sp = proj.fromLatLngToContainerPixel(
+        new window.google.maps.LatLng(d.endpointSnap.lat, d.endpointSnap.lng)
+      );
+      if (sp) {
+        ctx.save();
+        ctx.strokeStyle = '#F59E0B'; // amber
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, 7, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        return; // don't also draw grid snap
+      }
+    }
+
+    // Grid snap — diamond indicator
+    if (d.snapEnabled && d.mouseLatLng) {
+      const snapped = snapLatLng(d.mouseLatLng, d.mouseLatLng.lat, d.mouseLatLng.lng, true);
+      const sp = proj.fromLatLngToContainerPixel(new window.google.maps.LatLng(snapped.lat, snapped.lng));
+      if (!sp) return;
+      const dist = Math.sqrt((sp.x - d.mousePx.x) ** 2 + (sp.y - d.mousePx.y) ** 2);
+      if (dist < 10) {
+        ctx.save();
+        ctx.strokeStyle = '#10B981';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(sp.x, sp.y - 6); ctx.lineTo(sp.x + 6, sp.y);
+        ctx.lineTo(sp.x, sp.y + 6); ctx.lineTo(sp.x - 6, sp.y);
+        ctx.closePath(); ctx.stroke();
+        ctx.restore();
+      }
     }
   }
 
@@ -604,8 +817,11 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         case 'polyline': {
           const { pts: points } = pts;
           if (!points) break;
-          for (let j = 0; j < points.length - 1; j++) {
-            const a = points[j], b = points[j+1];
+          const segments = obj.closed
+            ? points.length  // includes closing segment
+            : points.length - 1;
+          for (let j = 0; j < segments; j++) {
+            const a = points[j], b = points[(j + 1) % points.length];
             if (a && b && distPxToSegment(a.x, a.y, b.x, b.y) < threshold) return i;
           }
           break;
@@ -621,11 +837,45 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     return null;
   }
 
+  // ── Build hover tooltip text for a given object ────────────────────────
+  function buildTooltip(obj) {
+    if (!obj) return null;
+    const name = OBJECT_NAMES[obj.type] || obj.type;
+    const layerLabel = LAYERS.find(l => l.id === obj.layer)?.name || obj.layer;
+    let measure = '';
+    switch (obj.type) {
+      case 'line': case 'dimension':
+        measure = ` · ${(haversineMeters(obj.p1, obj.p2) * FT_PER_M).toFixed(1)}'`;
+        break;
+      case 'circle':
+        measure = ` · r=${(haversineMeters(obj.center, obj.edge) * FT_PER_M).toFixed(1)}'`;
+        break;
+      case 'polyline':
+        if (obj.closed && obj.points?.length >= 3) {
+          measure = ` · ${polygonAreaSqFt(obj.points).toFixed(0)} sq ft`;
+        } else if (obj.points?.length >= 2) {
+          let total = 0;
+          for (let i = 0; i < obj.points.length - 1; i++) {
+            total += haversineMeters(obj.points[i], obj.points[i+1]);
+          }
+          measure = ` · ${(total * FT_PER_M).toFixed(1)}'`;
+        }
+        break;
+      case 'equipment':
+        measure = obj.label ? ` · ${obj.label}` : '';
+        break;
+      default: break;
+    }
+    return `${name} · ${layerLabel}${measure}`;
+  }
+
   // ── Tool switching ─────────────────────────────────────────────────────
   const setTool = useCallback((tool) => {
     drawRef.current.tool = tool;
     drawRef.current.drawing = false;
     drawRef.current.currentPolyline = null;
+    drawRef.current.endpointSnap = null;
+    drawRef.current.closeSnap = false;
     setActiveTool(tool);
     setToolHint(TOOL_HINTS[tool] || `<strong>${tool}</strong> tool active`);
     const canvas = canvasRef.current;
@@ -643,11 +893,9 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   // ── Initialize Google Map + OverlayView ────────────────────────────────
   useEffect(() => {
     if (!mapsLoaded || !mapContainerRef.current) return;
-    if (googleMapRef.current) return; // already initialized
+    if (googleMapRef.current) return;
 
-    const mapCenter = hasCoords
-      ? { lat, lng }
-      : { lat: 33.4484, lng: -112.0740 }; // Phoenix fallback
+    const mapCenter = hasCoords ? { lat, lng } : { lat: 33.4484, lng: -112.0740 };
 
     const map = new window.google.maps.Map(mapContainerRef.current, {
       center: mapCenter,
@@ -656,7 +904,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       tilt: 0,
       heading: 0,
       disableDefaultUI: true,
-      gestureHandling: 'greedy',   // Map handles its own pan/zoom natively
+      gestureHandling: 'greedy',
       keyboardShortcuts: false,
       clickableIcons: false,
       mapTypeControl: false,
@@ -669,7 +917,6 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
     googleMapRef.current = map;
 
-    // Build OverlayView to get the projection
     const overlay = new window.google.maps.OverlayView();
     overlay.onAdd = function () {};
     overlay.draw  = function () {
@@ -677,26 +924,22 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       render();
       updateScale();
     };
-    overlay.onRemove = function () {
-      projectionRef.current = null;
-    };
+    overlay.onRemove = function () { projectionRef.current = null; };
     overlay.setMap(map);
     overlayRef.current = overlay;
 
-    // Re-render canvas whenever map moves or zooms
-    map.addListener('bounds_changed', () => {
-      updateScale();
-      render();
-    });
-    map.addListener('idle', () => {
-      updateScale();
-      render();
-    });
+    map.addListener('bounds_changed', () => { updateScale(); render(); });
+    map.addListener('idle',           () => { updateScale(); render(); });
 
-    // Add demo objects once coords are available
-    if (hasCoords && drawRef.current.objects.length === 0) {
+    // Load from localStorage or fall back to demo objects
+    const saved = loadFromStorage();
+    if (saved && saved.objects && saved.objects.length > 0) {
+      drawRef.current.objects = saved.objects;
+      if (saved.activeLayer) drawRef.current.activeLayer = saved.activeLayer;
+      syncObjects(false);
+    } else if (hasCoords && drawRef.current.objects.length === 0) {
       drawRef.current.objects = buildDemoObjects(lat, lng);
-      syncObjects();
+      syncObjects(false);
     }
 
     return () => {
@@ -705,7 +948,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       projectionRef.current = null;
       googleMapRef.current = null;
     };
-  }, [mapsLoaded, hasCoords, lat, lng, render, updateScale, syncObjects]);
+  }, [mapsLoaded, hasCoords, lat, lng, render, updateScale, syncObjects, loadFromStorage]);
 
   // ── Canvas resize ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -730,9 +973,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
     const getLatLng = (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      return pxToLatLng(x, y);
+      return pxToLatLng(e.clientX - rect.left, e.clientY - rect.top);
     };
 
     const onMouseMove = (e) => {
@@ -744,19 +985,55 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       const ll = pxToLatLng(x, y);
       d.mouseLatLng = ll;
 
-      if (ll) {
-        // Coord display: distance in feet from property center
-        if (hasCoords) {
-          const dxM = (ll.lng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
-          const dyM = (ll.lat - lat) * 111320;
-          setCoordDisplay({
-            x: (dxM * FT_PER_M).toFixed(1) + "'",
-            y: (dyM * FT_PER_M).toFixed(1) + "'",
-            delta: d.drawing && d.startPt
-              ? (haversineMeters(d.startPt, ll) * FT_PER_M).toFixed(1) + "'"
-              : '—',
-          });
+      // ── Endpoint snap detection ──────────────────────────────────────
+      if (projectionRef.current && (d.drawing || d.tool !== 'select')) {
+        const ep = findNearestEndpoint({ x, y }, d.objects, projectionRef.current);
+        d.endpointSnap = ep;
+      } else {
+        d.endpointSnap = null;
+      }
+
+      // ── Close-path snap for polyline ──────────────────────────────────
+      if (d.tool === 'polyline' && d.drawing && d.currentPolyline && d.currentPolyline.length >= 3) {
+        const firstPt = d.currentPolyline[0];
+        if (projectionRef.current) {
+          const firstPx = projectionRef.current.fromLatLngToContainerPixel(
+            new window.google.maps.LatLng(firstPt.lat, firstPt.lng)
+          );
+          if (firstPx) {
+            const dist = Math.sqrt((x - firstPx.x) ** 2 + (y - firstPx.y) ** 2);
+            d.closeSnap = dist < CLOSE_SNAP_PX;
+            if (d.closeSnap) d.endpointSnap = firstPt; // snap to first point
+          }
         }
+      } else {
+        d.closeSnap = false;
+      }
+
+      // ── Hover tooltip (select tool) ───────────────────────────────────
+      if (d.tool === 'select' && ll && projectionRef.current) {
+        const hIdx = hitTestObjects(ll, projectionRef.current, d.objects, d);
+        d.hoverIdx = hIdx;
+        if (hIdx !== null) {
+          setHoverTooltip({ text: buildTooltip(d.objects[hIdx]), x: x + 15, y: y - 5 });
+        } else {
+          setHoverTooltip(null);
+        }
+      } else {
+        d.hoverIdx = null;
+        setHoverTooltip(null);
+      }
+
+      if (ll && hasCoords) {
+        const dxM = (ll.lng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
+        const dyM = (ll.lat - lat) * 111320;
+        setCoordDisplay({
+          x: (dxM * FT_PER_M).toFixed(1) + "'",
+          y: (dyM * FT_PER_M).toFixed(1) + "'",
+          delta: d.drawing && d.startPt
+            ? (haversineMeters(d.startPt, ll) * FT_PER_M).toFixed(1) + "'"
+            : '—',
+        });
       }
       render();
     };
@@ -766,11 +1043,15 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       const d = drawRef.current;
       const ll = getLatLng(e);
       if (!ll) return;
-
-      // Space-pan is handled by the map natively — just let it through
       if (d.isSpacePanning) return;
 
-      const snapped = snapLatLng(ll, ll.lat, ll.lng, d.snapEnabled);
+      // Resolve snap point: endpoint > grid
+      let snapped;
+      if (d.endpointSnap) {
+        snapped = d.endpointSnap;
+      } else {
+        snapped = snapLatLng(ll, ll.lat, ll.lng, d.snapEnabled);
+      }
 
       if (d.tool === 'select') {
         d.selectedIdx = hitTestObjects(ll, projectionRef.current, d.objects, d);
@@ -783,10 +1064,27 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
           d.currentPolyline = [snapped];
           d.startPt = snapped;
         } else {
+          // Check close-path
+          if (d.closeSnap && d.currentPolyline.length >= 3) {
+            // Close the polygon
+            d.objects.push({
+              type: 'polyline',
+              points: [...d.currentPolyline],
+              closed: true,
+              layer: d.activeLayer,
+              lineStyle: 'solid',
+            });
+            d.currentPolyline = null;
+            d.drawing = false;
+            d.closeSnap = false;
+            d.endpointSnap = null;
+            syncObjects(); render(); return;
+          }
+
           let end = snapped;
-          if (d.orthoEnabled) {
+          if (d.orthoEnabled && !d.endpointSnap) {
             const last = d.currentPolyline[d.currentPolyline.length - 1];
-            end = applyOrthoLatLng(last, snapped, true);
+            end = applyOrthoLatLng(last, end, true);
           }
           d.currentPolyline.push(end);
           d.startPt = end;
@@ -798,9 +1096,14 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         d.drawing = true;
         d.startPt = snapped;
       } else {
-        let endPt = snapped;
-        if (d.orthoEnabled && d.tool !== 'rect' && d.tool !== 'circle') {
-          endPt = applyOrthoLatLng(d.startPt, snapped, true);
+        let endPt;
+        if (d.endpointSnap) {
+          endPt = d.endpointSnap;
+        } else {
+          endPt = snapLatLng(ll, ll.lat, ll.lng, d.snapEnabled);
+          if (d.orthoEnabled && d.tool !== 'rect' && d.tool !== 'circle') {
+            endPt = applyOrthoLatLng(d.startPt, endPt, true);
+          }
         }
         let newObj = null;
         switch (d.tool) {
@@ -823,6 +1126,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         }
         if (newObj) d.objects.push(newObj);
         d.drawing = false;
+        d.endpointSnap = null;
         syncObjects(); render();
       }
     };
@@ -830,7 +1134,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     const onDblClick = (e) => {
       const d = drawRef.current;
       if (d.tool === 'polyline' && d.drawing && d.currentPolyline && d.currentPolyline.length >= 2) {
-        d.objects.push({ type: 'polyline', points: [...d.currentPolyline], layer: d.activeLayer, lineStyle: 'solid' });
+        d.objects.push({ type: 'polyline', points: [...d.currentPolyline], closed: false, layer: d.activeLayer, lineStyle: 'solid' });
         d.currentPolyline = null; d.drawing = false;
         syncObjects(); render();
       }
@@ -841,22 +1145,33 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       const d = drawRef.current;
       if (d.drawing) {
         if (d.tool === 'polyline' && d.currentPolyline && d.currentPolyline.length >= 2) {
-          d.objects.push({ type: 'polyline', points: [...d.currentPolyline], layer: d.activeLayer, lineStyle: 'solid' });
+          d.objects.push({ type: 'polyline', points: [...d.currentPolyline], closed: false, layer: d.activeLayer, lineStyle: 'solid' });
           syncObjects();
         }
-        d.drawing = false; d.currentPolyline = null; render();
+        d.drawing = false; d.currentPolyline = null; d.closeSnap = false;
+        render();
       }
+    };
+
+    const onMouseLeave = () => {
+      drawRef.current.mousePx = null;
+      drawRef.current.endpointSnap = null;
+      drawRef.current.closeSnap = false;
+      setHoverTooltip(null);
+      render();
     };
 
     canvas.addEventListener('mousemove',   onMouseMove);
     canvas.addEventListener('mousedown',   onMouseDown);
     canvas.addEventListener('dblclick',    onDblClick);
     canvas.addEventListener('contextmenu', onContextMenu);
+    canvas.addEventListener('mouseleave',  onMouseLeave);
     return () => {
       canvas.removeEventListener('mousemove',   onMouseMove);
       canvas.removeEventListener('mousedown',   onMouseDown);
       canvas.removeEventListener('dblclick',    onDblClick);
       canvas.removeEventListener('contextmenu', onContextMenu);
+      canvas.removeEventListener('mouseleave',  onMouseLeave);
     };
   }, [render, syncObjects, pxToLatLng, hasCoords, lat, lng]);
 
@@ -875,6 +1190,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       switch (e.key) {
         case 'Escape':
           d.drawing = false; d.currentPolyline = null; d.selectedIdx = null;
+          d.endpointSnap = null; d.closeSnap = false;
           syncObjects(); render(); break;
         case 'v': case 'V': setTool('select'); break;
         case 'l': case 'L': setTool('line'); break;
@@ -967,6 +1283,79 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     syncObjects(); render();
   };
 
+  // ── DXF Export ────────────────────────────────────────────────────────
+  const handleExportDXF = () => {
+    const d = drawRef.current;
+    if (d.objects.length === 0) {
+      showToast('Canvas is empty — nothing to export.', 'warn');
+      return;
+    }
+    if (!hasCoords) {
+      showToast('No coordinates — DXF will use relative origin (0,0).', 'warn');
+    }
+    try {
+      const origin = hasCoords ? { lat, lng } : { lat: 0, lng: 0 };
+      const dxf = exportToDXF(d.objects, LAYERS, origin);
+      const projectName = projectData?.address?.split(',')[0]?.trim().replace(/\s+/g, '-') || 'site-plan';
+      downloadDXF(dxf, `${projectName}.dxf`);
+      showToast('DXF exported successfully.', 'success');
+    } catch (err) {
+      showToast(`Export failed: ${err.message}`, 'error');
+    }
+  };
+
+  // ── Clear Canvas ──────────────────────────────────────────────────────
+  const handleClearCanvas = () => {
+    if (!window.confirm('Clear all objects? This cannot be undone.')) return;
+    const d = drawRef.current;
+    d.objects = [];
+    d.selectedIdx = null;
+    d.drawing = false;
+    d.currentPolyline = null;
+    // Clear localStorage
+    const key = getStorageKey();
+    if (key) localStorage.removeItem(key);
+    syncObjects(false);
+    render();
+    showToast('Canvas cleared.', 'info');
+  };
+
+  // ── Properties panel helper ───────────────────────────────────────────
+  const getSelectedObj = () => {
+    const d = drawRef.current;
+    if (d.selectedIdx === null || !d.objects[d.selectedIdx]) return null;
+    return d.objects[d.selectedIdx];
+  };
+
+  const getSelectedDetail = () => {
+    const obj = getSelectedObj();
+    if (!obj) return 'No objects selected';
+    const name = OBJECT_NAMES[obj.type] || obj.type;
+    const layerLabel = LAYERS.find(l => l.id === obj.layer)?.name || obj.layer;
+    let measure = '';
+    switch (obj.type) {
+      case 'line': case 'dimension':
+        measure = ` — ${(haversineMeters(obj.p1, obj.p2) * FT_PER_M).toFixed(1)}'`;
+        break;
+      case 'circle':
+        measure = ` — r=${(haversineMeters(obj.center, obj.edge) * FT_PER_M).toFixed(1)}'`;
+        break;
+      case 'polyline':
+        if (obj.closed && obj.points?.length >= 3) {
+          measure = ` — ${polygonAreaSqFt(obj.points).toFixed(0)} sq ft`;
+        } else if (obj.points?.length >= 2) {
+          let total = 0;
+          for (let i = 0; i < obj.points.length - 1; i++) {
+            total += haversineMeters(obj.points[i], obj.points[i+1]);
+          }
+          measure = ` — ${(total * FT_PER_M).toFixed(1)}'`;
+        }
+        break;
+      default: break;
+    }
+    return `${name} · ${layerLabel}${measure}`;
+  };
+
   // ── JSX ────────────────────────────────────────────────────────────────
   return (
     <div className={styles.canvasRoot}>
@@ -1029,6 +1418,22 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
             <span className={styles.zoomBadge}>Z{mapZoom}</span>
           </div>
         )}
+
+        {/* Export/File group */}
+        <div className={styles.toolGroup}>
+          <span className={styles.toolGroupLabel}>File</span>
+          <button title="Export DXF" className={styles.toolBtn} onClick={handleExportDXF}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M8 2v9M5 8l3 3 3-3"/>
+              <path d="M2 12v2h12v-2"/>
+            </svg>
+          </button>
+          <button title="Clear Canvas" className={styles.toolBtn} onClick={handleClearCanvas}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M3 4h10M6 4V2h4v2M5 4l.5 9h5l.5-9"/>
+            </svg>
+          </button>
+        </div>
 
         <div className={styles.toolbarFlex} />
 
@@ -1181,11 +1586,25 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
       {/* ===== CANVAS AREA ===== */}
       <div className={styles.canvasArea} ref={canvasAreaRef}>
-        {/* Google Maps satellite layer — the map controls pan/zoom natively */}
+        {/* Google Maps satellite layer */}
         <div ref={mapContainerRef} className={styles.mapLayer}/>
 
-        {/* Drawing canvas — transparent, sits on top of the map */}
+        {/* Drawing canvas */}
         <canvas ref={canvasRef} className={styles.canvasOverlay}/>
+
+        {/* Hover tooltip */}
+        {hoverTooltip && (
+          <div className={styles.hoverTooltip} style={{ left: hoverTooltip.x, top: hoverTooltip.y }}>
+            {hoverTooltip.text}
+          </div>
+        )}
+
+        {/* Toast notification */}
+        {toast && (
+          <div className={`${styles.toast} ${styles[`toast_${toast.type}`]}`}>
+            {toast.msg}
+          </div>
+        )}
 
         {/* Tool hint */}
         <div className={styles.canvasToolHint} dangerouslySetInnerHTML={{ __html: toolHint }}/>
@@ -1224,7 +1643,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
           </div>
         )}
 
-        {/* No-coords overlay (shown when map not available) */}
+        {/* No-coords overlay */}
         {!hasCoords && !mapsError && (
           <div className={styles.noCoordsOverlay}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -1250,19 +1669,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
         <div className={styles.propsSection}>
           <div className={styles.propsSectionTitle}>Selection</div>
-          <div className={styles.selectionInfo}>
-            {selectedIdx !== null && drawRef.current.objects[selectedIdx]
-              ? (() => {
-                  const obj = drawRef.current.objects[selectedIdx];
-                  // Show real-world measurement if available
-                  let detail = '';
-                  if (obj.type === 'line' || obj.type === 'dimension') {
-                    detail = ` — ${(haversineMeters(obj.p1, obj.p2) * FT_PER_M).toFixed(1)}'`;
-                  }
-                  return `${OBJECT_NAMES[obj.type] || obj.type} on layer: ${obj.layer}${detail}`;
-                })()
-              : 'No objects selected'}
-          </div>
+          <div className={styles.selectionInfo}>{getSelectedDetail()}</div>
         </div>
 
         <div className={styles.propsSection}>
@@ -1297,7 +1704,10 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
                 <span style={{ fontSize: 12, color: LAYER_COLORS[obj.layer] || '#9CA3AF' }}>
                   {OBJECT_ICONS[obj.type] || '?'}
                 </span>
-                <span className={styles.objectName}>{OBJECT_NAMES[obj.type] || obj.type} {i + 1}</span>
+                <span className={styles.objectName}>
+                  {OBJECT_NAMES[obj.type] || obj.type} {i + 1}
+                  {obj.closed && <span className={styles.closedBadge}>closed</span>}
+                </span>
                 <span className={styles.objectLayer}>{obj.layer}</span>
               </div>
             ))

@@ -793,3 +793,67 @@
 .statusDotYellow {
   background: var(--color-warning);
 }
+
+/* =============================================
+   PHASE 3 ADDITIONS
+   ============================================= */
+
+/* Hover tooltip on select tool */
+.hoverTooltip {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  background: rgba(15, 15, 20, 0.92);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Toast notification */
+.toast {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  animation: toastFadeIn 0.2s ease;
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.toast_info    { background: var(--bg-panel); border: 1px solid var(--border-subtle); color: var(--text-primary); }
+.toast_success { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #10B981; }
+.toast_warn    { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #F59E0B; }
+.toast_error   { background: rgba(239,68,68,0.15);  border: 1px solid rgba(239,68,68,0.4);  color: #EF4444; }
+
+/* Closed polygon badge in object list */
+.closedBadge {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 1px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(16,185,129,0.15);
+  color: #10B981;
+  border-radius: 3px;
+  vertical-align: middle;
+}
