@@ -335,13 +335,17 @@ function buildDemoObjects(originLat, originLng) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
-  const hasCoords = lat != null && lng != null && !isNaN(lat) && !isNaN(lng);
-
   // ── System details (equipment data) ───────────────────────────────────
   const { data: systemDetails, loading: systemLoading } = useSystemDetails({ projectUuid });
 
   // ── Google Maps ───────────────────────────────────────────────────────
   const { isLoaded: mapsLoaded, loadError: mapsError } = useGoogleMaps();
+
+  // ── Geocoded coordinates (props or geocoded from address) ──────────────
+  // Start with whatever was passed in; geocoding effect may override.
+  const [geocodedCoords, setGeocodedCoords] = useState({ lat, lng });
+  const hasCoords = geocodedCoords.lat != null && geocodedCoords.lng != null &&
+    !isNaN(geocodedCoords.lat) && !isNaN(geocodedCoords.lng);
   const mapContainerRef = useRef(null);
   const googleMapRef    = useRef(null);
   const overlayRef      = useRef(null);
@@ -540,13 +544,13 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     const map = googleMapRef.current;
     if (!map) return;
     const zoom = map.getZoom();
-    const centerLat = (map.getCenter()?.lat() ?? (lat || 33.4));
+    const centerLat = (map.getCenter()?.lat() ?? (geocodedCoords.lat || 33.4));
     const mPerPx = 156543.03392 * Math.cos(centerLat * Math.PI / 180) / Math.pow(2, zoom);
     drawRef.current.metersPerPx = mPerPx;
     const ftPerPx = mPerPx * FT_PER_M;
     setScaleLabel(`1 px ≈ ${ftPerPx.toFixed(2)} ft`);
     setMapZoom(zoom);
-  }, [lat]);
+  }, [geocodedCoords]);
 
   // ── Main render ────────────────────────────────────────────────────────
   const render = useCallback(() => {
@@ -1121,9 +1125,19 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   // ── Initialize Google Map + OverlayView ────────────────────────────────
   useEffect(() => {
     if (!mapsLoaded || !mapContainerRef.current) return;
-    if (googleMapRef.current) return;
 
-    const mapCenter = hasCoords ? { lat, lng } : { lat: 33.4484, lng: -112.0740 };
+    // If map already exists and we now have geocoded coords, just re-center it.
+    if (googleMapRef.current) {
+      if (hasCoords) {
+        googleMapRef.current.setCenter({ lat: geocodedCoords.lat, lng: geocodedCoords.lng });
+        googleMapRef.current.setZoom(DEFAULT_MAP_ZOOM);
+      }
+      return;
+    }
+
+    const mapCenter = hasCoords
+      ? { lat: geocodedCoords.lat, lng: geocodedCoords.lng }
+      : { lat: 33.4484, lng: -112.0740 };
 
     const map = new window.google.maps.Map(mapContainerRef.current, {
       center: mapCenter,
@@ -1202,7 +1216,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
       // Demo objects fallback
       if (hasCoords && drawRef.current.objects.length === 0) {
-        drawRef.current.objects = buildDemoObjects(lat, lng);
+        drawRef.current.objects = buildDemoObjects(geocodedCoords.lat, geocodedCoords.lng);
         syncObjects(false);
       }
     };
@@ -1214,7 +1228,36 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       projectionRef.current = null;
       googleMapRef.current = null;
     };
-  }, [mapsLoaded, hasCoords, lat, lng, render, updateScale, syncObjects, loadFromStorage, projectUuid]);
+  }, [mapsLoaded, hasCoords, geocodedCoords, render, updateScale, syncObjects, loadFromStorage, projectUuid]);
+
+  // ── Geocode address when lat/lng props are absent ──────────────────────
+  useEffect(() => {
+    // If we already have coordinates from props, nothing to do.
+    if (lat != null && lng != null && !isNaN(lat) && !isNaN(lng)) {
+      setGeocodedCoords({ lat, lng });
+      return;
+    }
+    // Need Google Maps loaded and an address to geocode.
+    const address = projectData?.site?.address;
+    if (!mapsLoaded || !address) return;
+
+    const fullAddress = [
+      address,
+      projectData?.site?.city,
+      projectData?.site?.state,
+      projectData?.site?.zip,
+    ].filter(Boolean).join(', ');
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address: fullAddress }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        const loc = results[0].geometry.location;
+        setGeocodedCoords({ lat: loc.lat(), lng: loc.lng() });
+      }
+      // On failure we leave geocodedCoords as-is ({ lat: undefined, lng: undefined })
+      // which keeps hasCoords false and shows the existing "No coordinates" overlay.
+    });
+  }, [lat, lng, mapsLoaded, projectData]);
 
   // ── Keep layer refs in sync with React state ──────────────────────────
   useEffect(() => { layerVisibilityRef.current = layerVisibility; }, [layerVisibility]);
@@ -1342,8 +1385,8 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       }
 
       if (ll && hasCoords) {
-        const dxM = (ll.lng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
-        const dyM = (ll.lat - lat) * 111320;
+        const dxM = (ll.lng - geocodedCoords.lng) * 111320 * Math.cos(geocodedCoords.lat * Math.PI / 180);
+        const dyM = (ll.lat - geocodedCoords.lat) * 111320;
         setCoordDisplay({
           x: (dxM * FT_PER_M).toFixed(1) + "'",
           y: (dyM * FT_PER_M).toFixed(1) + "'",
@@ -1539,7 +1582,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       canvas.removeEventListener('dragover',    onDragOver);
       canvas.removeEventListener('drop',        onDrop);
     };
-  }, [render, syncObjects, pxToLatLng, hasCoords, lat, lng]);
+  }, [render, syncObjects, pxToLatLng, hasCoords, geocodedCoords]);
 
   // ── Keyboard shortcuts ─────────────────────────────────────────────────
   useEffect(() => {
@@ -1609,7 +1652,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   // ── Map control handlers ───────────────────────────────────────────────
   const handleCenterOnProperty = () => {
     if (!googleMapRef.current || !hasCoords) return;
-    googleMapRef.current.setCenter({ lat, lng });
+    googleMapRef.current.setCenter({ lat: geocodedCoords.lat, lng: geocodedCoords.lng });
     googleMapRef.current.setZoom(DEFAULT_MAP_ZOOM);
   };
 
@@ -1667,7 +1710,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       showToast('No coordinates — DXF will use relative origin (0,0).', 'warn');
     }
     try {
-      const origin = hasCoords ? { lat, lng } : { lat: 0, lng: 0 };
+      const origin = hasCoords ? { lat: geocodedCoords.lat, lng: geocodedCoords.lng } : { lat: 0, lng: 0 };
       const dxf = exportToDXF(d.objects, LAYERS, origin);
       const projectName = projectData?.address?.split(',')[0]?.trim().replace(/\s+/g, '-') || 'site-plan';
       downloadDXF(dxf, `${projectName}.dxf`);
