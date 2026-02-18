@@ -42,16 +42,16 @@
 
 .headerLeft {
   display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 4px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   flex: 1; /* Default: take available space when collapsed */
   min-width: 0;
   text-align: left;
   justify-content: flex-start;
 }
 
-/* When collapsed, subline is inline — handled by flex-row above */
+/* When collapsed, title/subline/subtitle stack vertically */
 
 /* When expanded, use 25/75 split and right-align label to match field labels */
 .row.expanded .headerLeft {
