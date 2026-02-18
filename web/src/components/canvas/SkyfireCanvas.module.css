@@ -843,6 +843,50 @@
 .toast_warn    { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #F59E0B; }
 .toast_error   { background: rgba(239,68,68,0.15);  border: 1px solid rgba(239,68,68,0.4);  color: #EF4444; }
 
+/* Save status indicator in status bar */
+.saveStatus {
+  cursor: default;
+  gap: 4px;
+}
+
+.statusDotSaving {
+  background: var(--color-primary, #FD7332);
+  animation: savingPulse 1s ease-in-out infinite;
+}
+
+.statusDotRed {
+  background: #EF4444;
+}
+
+@keyframes savingPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.retryBtn {
+  background: none;
+  border: 1px solid currentColor;
+  color: inherit;
+  font: inherit;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: 4px;
+  opacity: 0.8;
+  transition: opacity 0.1s;
+}
+
+.retryBtn:hover {
+  opacity: 1;
+}
+
+/* Disabled toolbar button state */
+.toolBtnDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* Closed polygon badge in object list */
 .closedBadge {
   display: inline-block;

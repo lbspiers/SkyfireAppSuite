@@ -107,6 +107,10 @@ const apiEndpoints = {
       CHECK_STALE: (projectId: string) => `/project/${projectId}/tab-statuses/check-stale`,
       BATCH: '/projects/tab-statuses/batch',
     },
+    CANVAS: {
+      GET: (projectUuid: string) => `/project/${projectUuid}/canvas`,
+      SAVE: (projectUuid: string) => `/project/${projectUuid}/canvas`,
+    },
   },
 
   COMPANY: {

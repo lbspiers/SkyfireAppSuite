@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useGoogleMaps from '../../hooks/useGoogleMaps';
 import { exportToDXF, downloadDXF } from '../../utils/dxfExporter';
+import { fetchCanvasState, saveCanvasState } from '../../services/canvasAPI';
 import styles from './SkyfireCanvas.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -271,6 +272,9 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     LAYERS.reduce((acc, l) => { acc[l.id] = true; return acc; }, {}));
   const [layerLocked,     setLayerLocked]      = useState(() =>
     LAYERS.reduce((acc, l) => { acc[l.id] = l.locked; return acc; }, {}));
+  // Refs that mirror layer state — readable inside async callbacks without stale closures
+  const layerVisibilityRef = useRef(LAYERS.reduce((acc, l) => { acc[l.id] = true; return acc; }, {}));
+  const layerLockedRef     = useRef(LAYERS.reduce((acc, l) => { acc[l.id] = l.locked; return acc; }, {}));
   const [objects,         setObjects]          = useState([]);
   const [selectedIdx,     setSelectedIdx]      = useState(null);
   const [showShortcuts,   setShowShortcuts]    = useState(false);
@@ -284,6 +288,12 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   const commandInputRef = useRef(null);
   const toastTimerRef   = useRef(null);
 
+  // ── Server save state ─────────────────────────────────────────────────
+  const [saveStatus,    setSaveStatus]    = useState('saved');   // 'saved'|'saving'|'unsaved'|'error'
+  const [lastSavedAt,   setLastSavedAt]   = useState(null);      // ISO string
+  const versionRef      = useRef(0);
+  const saveTimeoutRef  = useRef(null);
+
   // ── Toast helper ──────────────────────────────────────────────────────
   const showToast = useCallback((msg, type = 'info') => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -291,12 +301,12 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     toastTimerRef.current = setTimeout(() => setToast(null), 3000);
   }, []);
 
-  // ── Auto-save helpers ─────────────────────────────────────────────────
+  // ── localStorage helpers ──────────────────────────────────────────────
   const getStorageKey = useCallback(() => {
     return projectUuid ? `${LS_KEY_PREFIX}${projectUuid}` : null;
   }, [projectUuid]);
 
-  const saveToStorage = useCallback(() => {
+  const saveToStorage = useCallback((extraFields = {}) => {
     const key = getStorageKey();
     if (!key) return;
     try {
@@ -304,6 +314,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         objects: drawRef.current.objects,
         activeLayer: drawRef.current.activeLayer,
         savedAt: new Date().toISOString(),
+        ...extraFields,
       };
       localStorage.setItem(key, JSON.stringify(payload));
     } catch (err) {
@@ -323,13 +334,60 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     }
   }, [getStorageKey]);
 
+  // ── Server save helpers ───────────────────────────────────────────────
+
+  /** Build the full CanvasState payload from current drawRef + layer refs. */
+  const buildCanvasState = useCallback(() => ({
+    objects: drawRef.current.objects,
+    layerVisibility: layerVisibilityRef.current,
+    layerLocked: layerLockedRef.current,
+    viewport: googleMapRef.current ? {
+      center: {
+        lat: googleMapRef.current.getCenter().lat(),
+        lng: googleMapRef.current.getCenter().lng(),
+      },
+      zoom: googleMapRef.current.getZoom(),
+    } : undefined,
+    version: versionRef.current + 1,
+  }), []);
+
+  /** Perform an immediate server save. Updates saveStatus and versionRef. */
+  const saveNow = useCallback(async () => {
+    if (!projectUuid) return;
+    try {
+      setSaveStatus('saving');
+      const state = buildCanvasState();
+      const result = await saveCanvasState(projectUuid, state);
+      versionRef.current = result.data.version;
+      setLastSavedAt(result.data.savedAt);
+      setSaveStatus('saved');
+    } catch (err) {
+      console.error('[Canvas] Server save failed:', err);
+      setSaveStatus('error');
+    }
+  }, [projectUuid, buildCanvasState]);
+
   // ── Sync objects array → React state ──────────────────────────────────
   const syncObjects = useCallback((doSave = true) => {
     const d = drawRef.current;
     setObjects([...d.objects]);
     setSelectedIdx(d.selectedIdx);
-    if (doSave) saveToStorage();
-  }, [saveToStorage]);
+    if (doSave) triggerSave();
+  }, [triggerSave]);
+
+  /**
+   * Called after every canvas mutation.
+   * Saves to localStorage immediately (offline-safe), then debounces a server save (2s).
+   */
+  const triggerSave = useCallback(() => {
+    saveToStorage();
+    setSaveStatus('unsaved');
+
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      saveNow();
+    }, 2000);
+  }, [saveToStorage, saveNow]);
 
   // ── Projection helpers ────────────────────────────────────────────────
   const latLngToPx = useCallback((latLng) => {
@@ -931,16 +989,54 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     map.addListener('bounds_changed', () => { updateScale(); render(); });
     map.addListener('idle',           () => { updateScale(); render(); });
 
-    // Load from localStorage or fall back to demo objects
-    const saved = loadFromStorage();
-    if (saved && saved.objects && saved.objects.length > 0) {
-      drawRef.current.objects = saved.objects;
-      if (saved.activeLayer) drawRef.current.activeLayer = saved.activeLayer;
-      syncObjects(false);
-    } else if (hasCoords && drawRef.current.objects.length === 0) {
-      drawRef.current.objects = buildDemoObjects(lat, lng);
-      syncObjects(false);
-    }
+    // Load canvas data: try server first, fall back to localStorage, then demo objects
+    const loadCanvasData = async () => {
+      if (projectUuid) {
+        try {
+          const serverState = await fetchCanvasState(projectUuid);
+          if (serverState && serverState.objects?.length > 0) {
+            drawRef.current.objects = serverState.objects;
+            versionRef.current = serverState.version ?? 0;
+            if (serverState.layerVisibility) {
+              layerVisibilityRef.current = serverState.layerVisibility;
+              setLayerVisibility(serverState.layerVisibility);
+            }
+            if (serverState.layerLocked) {
+              layerLockedRef.current = serverState.layerLocked;
+              setLayerLocked(serverState.layerLocked);
+            }
+            if (serverState.viewport && googleMapRef.current) {
+              googleMapRef.current.setCenter(serverState.viewport.center);
+              googleMapRef.current.setZoom(serverState.viewport.zoom);
+            }
+            syncObjects(false);
+            setSaveStatus('saved');
+            console.log(`[Canvas] Loaded ${serverState.objects.length} objects from server (v${serverState.version})`);
+            return;
+          }
+        } catch (err) {
+          console.warn('[Canvas] Server load failed, trying localStorage:', err?.message ?? err);
+        }
+      }
+
+      // localStorage fallback
+      const saved = loadFromStorage();
+      if (saved && saved.objects?.length > 0) {
+        drawRef.current.objects = saved.objects;
+        if (saved.activeLayer) drawRef.current.activeLayer = saved.activeLayer;
+        syncObjects(false);
+        setSaveStatus('unsaved'); // loaded locally but not confirmed on server
+        console.log(`[Canvas] Loaded ${saved.objects.length} objects from localStorage`);
+        return;
+      }
+
+      // Demo objects fallback
+      if (hasCoords && drawRef.current.objects.length === 0) {
+        drawRef.current.objects = buildDemoObjects(lat, lng);
+        syncObjects(false);
+      }
+    };
+    loadCanvasData();
 
     return () => {
       overlay.setMap(null);
@@ -948,7 +1044,23 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       projectionRef.current = null;
       googleMapRef.current = null;
     };
-  }, [mapsLoaded, hasCoords, lat, lng, render, updateScale, syncObjects, loadFromStorage]);
+  }, [mapsLoaded, hasCoords, lat, lng, render, updateScale, syncObjects, loadFromStorage, projectUuid]);
+
+  // ── Keep layer refs in sync with React state ──────────────────────────
+  useEffect(() => { layerVisibilityRef.current = layerVisibility; }, [layerVisibility]);
+  useEffect(() => { layerLockedRef.current = layerLocked; }, [layerLocked]);
+
+  // ── Warn before unload with unsaved changes ────────────────────────────
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (saveStatus === 'unsaved' || saveStatus === 'error') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [saveStatus]);
 
   // ── Canvas resize ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -1210,6 +1322,12 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
             if (d.objects.length > 0) { d.objects.pop(); d.selectedIdx = null; syncObjects(); render(); }
           }
           break;
+        case 's':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            saveNow();
+          }
+          break;
         case 'F7': e.preventDefault();
           d.gridEnabled = !d.gridEnabled; setGridEnabled(g => !g); render(); break;
         case 'F8': e.preventDefault();
@@ -1231,7 +1349,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup',   onKeyUp);
     };
-  }, [setTool, handleCommand, render, syncObjects]);
+  }, [setTool, handleCommand, render, syncObjects, saveNow]);
 
   // ── Map control handlers ───────────────────────────────────────────────
   const handleCenterOnProperty = () => {
@@ -1317,6 +1435,8 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     if (key) localStorage.removeItem(key);
     syncObjects(false);
     render();
+    // Save empty state to server to clear it there too
+    saveNow();
     showToast('Canvas cleared.', 'info');
   };
 
@@ -1422,6 +1542,16 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         {/* Export/File group */}
         <div className={styles.toolGroup}>
           <span className={styles.toolGroupLabel}>File</span>
+          <button
+            title={saveStatus === 'saved' ? 'All changes saved' : 'Save Now (Ctrl+S)'}
+            className={`${styles.toolBtn} ${saveStatus === 'saved' ? styles.toolBtnDisabled : ''}`}
+            onClick={() => saveNow()}
+            disabled={saveStatus === 'saving'}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M2 2h9l3 3v9H2V2z"/>
+              <path d="M5 2v4h6V2M5 9h6"/>
+            </svg>
+          </button>
           <button title="Export DXF" className={styles.toolBtn} onClick={handleExportDXF}>
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M8 2v9M5 8l3 3 3-3"/>
@@ -1739,6 +1869,23 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
           </div>
           {scaleLabel && <div className={styles.statusItem}>{scaleLabel}</div>}
           <div className={styles.statusItem}>Objects: {objects.length}</div>
+          {/* Save status indicator */}
+          <div
+            className={`${styles.statusItem} ${styles.saveStatus}`}
+            title={lastSavedAt ? `Last saved: ${new Date(lastSavedAt).toLocaleTimeString()}` : 'Not yet saved to server'}>
+            <div className={`${styles.statusDot} ${
+              saveStatus === 'saved'   ? styles.statusDotGreen  :
+              saveStatus === 'saving'  ? styles.statusDotSaving :
+              saveStatus === 'error'   ? styles.statusDotRed    :
+              styles.statusDotYellow
+            }`}/>
+            {saveStatus === 'saved'   && 'Saved'}
+            {saveStatus === 'saving'  && 'Saving…'}
+            {saveStatus === 'unsaved' && 'Unsaved changes'}
+            {saveStatus === 'error'   && (
+              <>Save failed <button className={styles.retryBtn} onClick={() => saveNow()}>Retry</button></>
+            )}
+          </div>
         </div>
       </div>
     </div>
