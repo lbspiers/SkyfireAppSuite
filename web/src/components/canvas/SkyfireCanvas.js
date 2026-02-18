@@ -367,14 +367,6 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     }
   }, [projectUuid, buildCanvasState]);
 
-  // ── Sync objects array → React state ──────────────────────────────────
-  const syncObjects = useCallback((doSave = true) => {
-    const d = drawRef.current;
-    setObjects([...d.objects]);
-    setSelectedIdx(d.selectedIdx);
-    if (doSave) triggerSave();
-  }, [triggerSave]);
-
   /**
    * Called after every canvas mutation.
    * Saves to localStorage immediately (offline-safe), then debounces a server save (2s).
@@ -388,6 +380,14 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       saveNow();
     }, 2000);
   }, [saveToStorage, saveNow]);
+
+  // ── Sync objects array → React state ──────────────────────────────────
+  const syncObjects = useCallback((doSave = true) => {
+    const d = drawRef.current;
+    setObjects([...d.objects]);
+    setSelectedIdx(d.selectedIdx);
+    if (doSave) triggerSave();
+  }, [triggerSave]);
 
   // ── Projection helpers ────────────────────────────────────────────────
   const latLngToPx = useCallback((latLng) => {
