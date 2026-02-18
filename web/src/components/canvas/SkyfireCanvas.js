@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useGoogleMaps from '../../hooks/useGoogleMaps';
 import { exportToDXF, downloadDXF } from '../../utils/dxfExporter';
 import { fetchCanvasState, saveCanvasState } from '../../services/canvasAPI';
+import { useSystemDetails } from '../../hooks/useSystemDetails';
+import { getSolarPanelSpecs } from '../../services/equipmentService';
+import { generatePanelArray, countPanelsFit } from '../../utils/panelArrayAlgorithm';
 import styles from './SkyfireCanvas.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -22,16 +25,36 @@ const LAYERS = [
 const LAYER_COLORS = LAYERS.reduce((acc, l) => { acc[l.id] = l.color; return acc; }, {});
 
 const TOOL_HINTS = {
-  select:    'Click to select objects. <kbd>Delete</kbd> to remove. Hover for info.',
-  line:      '<strong>Line</strong> — Click start, click end. <kbd>Esc</kbd> cancel.',
-  polyline:  '<strong>Polyline</strong> — Click points. Snap to first point to close. <kbd>Double-click</kbd> or <kbd>Right-click</kbd> to finish.',
-  rect:      '<strong>Rectangle</strong> — Click corner, click opposite corner.',
-  circle:    '<strong>Circle</strong> — Click center, click radius point.',
-  dimension: '<strong>Dimension</strong> — Click start, click end to measure.',
-  pan:       '<strong>Pan</strong> — Drag to pan. Also <kbd>Space</kbd>+drag.',
-  text:      '<strong>Text</strong> — Click to place text (coming soon).',
-  measure:   '<strong>Measure</strong> — Click two points to measure distance.',
+  select:     'Click to select objects. <kbd>Delete</kbd> to remove. Hover for info.',
+  line:       '<strong>Line</strong> — Click start, click end. <kbd>Esc</kbd> cancel.',
+  polyline:   '<strong>Polyline</strong> — Click points. Snap to first point to close. <kbd>Double-click</kbd> or <kbd>Right-click</kbd> to finish.',
+  rect:       '<strong>Rectangle</strong> — Click corner, click opposite corner.',
+  circle:     '<strong>Circle</strong> — Click center, click radius point.',
+  dimension:  '<strong>Dimension</strong> — Click start, click end to measure.',
+  pan:        '<strong>Pan</strong> — Drag to pan. Also <kbd>Space</kbd>+drag.',
+  text:       '<strong>Text</strong> — Click to place text (coming soon).',
+  measure:    '<strong>Measure</strong> — Click two points to measure distance.',
+  panelArray: '<strong>Panel Array (A)</strong> — Click a closed polygon to fill with solar panels.',
 };
+
+const EQUIPMENT_ABBREVIATIONS = {
+  'msp': 'MSP', 'disconnect': 'DIS', 'meter': 'MTR', 'utility-meter': 'UTL',
+  'ground': 'GND', 'jbox': 'JB', 'subpanel': 'SUB', 'combiner': 'CMB',
+  'solar-panel': 'PV', 'inverter': 'INV', 'battery': 'BAT', 'ess': 'ESS',
+  'sms': 'SMS', 'ev-charger': 'EV',
+};
+
+// Electrical symbols always present in the equipment library
+const ELECTRICAL_SYMBOLS = [
+  { label: 'Main Panel (MSP)', symbolType: 'msp',           widthFt: 1.5,  heightFt: 2.5  },
+  { label: 'AC Disconnect',    symbolType: 'disconnect',     widthFt: 1.0,  heightFt: 1.3  },
+  { label: 'Production Meter', symbolType: 'meter',          widthFt: 0.7,  heightFt: 0.9  },
+  { label: 'Utility Meter',    symbolType: 'utility-meter',  widthFt: 0.7,  heightFt: 0.9  },
+  { label: 'Ground Rod',       symbolType: 'ground',         widthFt: 0.3,  heightFt: 0.3  },
+  { label: 'Junction Box',     symbolType: 'jbox',           widthFt: 0.5,  heightFt: 0.5  },
+  { label: 'Sub Panel',        symbolType: 'subpanel',       widthFt: 1.2,  heightFt: 2.0  },
+  { label: 'Combiner Panel',   symbolType: 'combiner',       widthFt: 1.0,  heightFt: 1.3  },
+];
 
 const OBJECT_ICONS = { line:'╱', rect:'▭', circle:'○', polyline:'⟋', dimension:'↔', equipment:'▣' };
 const OBJECT_NAMES = { line:'Line', rect:'Rectangle', circle:'Circle', polyline:'Polyline', dimension:'Dimension', equipment:'Equipment' };
@@ -42,6 +65,9 @@ const DEFAULT_MAP_ZOOM = 20;
 const GRID_METERS = 1.0;
 // Feet per meter
 const FT_PER_M = 3.28084;
+// Simple ID generator (no external dep)
+let _idCounter = 0;
+const genId = () => `eq_${Date.now()}_${++_idCounter}`;
 // Endpoint snap radius in screen pixels
 const ENDPOINT_SNAP_PX = 15;
 // Close-polygon snap radius in screen pixels
@@ -188,6 +214,92 @@ function findNearestEndpoint(mousePx, objects, proj) {
   return best;
 }
 
+/**
+ * Extract equipment items from system details for the equipment library panel.
+ * Returns grouped categories: [{category, items:[{make, model, qty, system, symbolType, widthFt, heightFt, label}]}]
+ */
+function extractProjectEquipment(sd) {
+  if (!sd) return [];
+  const items = [];
+
+  for (const sys of [1, 2]) {
+    const prefix = `sys${sys}_`;
+    // Solar panels
+    if (sd[`${prefix}solar_panel_make`]) {
+      items.push({
+        category: 'Solar Panels', system: sys,
+        make: sd[`${prefix}solar_panel_make`],
+        model: sd[`${prefix}solar_panel_model`] || '',
+        qty: sd[`${prefix}solar_panel_qty`] || 0,
+        symbolType: 'solar-panel',
+        widthFt: 3.38, heightFt: 5.65, // defaults; overridden at placement time from API
+        _needsDimensions: true, // flag to fetch real dims from API
+      });
+    }
+    // SP Type 2
+    if (sd[`${prefix}solar_panel_type2_manufacturer`]) {
+      items.push({
+        category: 'Solar Panels', system: sys, subtype: 'Type 2',
+        make: sd[`${prefix}solar_panel_type2_manufacturer`],
+        model: sd[`${prefix}solar_panel_type2_model`] || '',
+        qty: sd[`${prefix}solar_panel_type2_quantity`] || 0,
+        symbolType: 'solar-panel',
+        widthFt: 3.38, heightFt: 5.65, _needsDimensions: true,
+      });
+    }
+    // Micro inverter
+    if (sd[`${prefix}micro_inverter_make`]) {
+      items.push({
+        category: 'Inverters', system: sys,
+        make: sd[`${prefix}micro_inverter_make`],
+        model: sd[`${prefix}micro_inverter_model`] || '',
+        qty: sd[`${prefix}micro_inverter_qty`] || 0,
+        symbolType: 'inverter', widthFt: 1.0, heightFt: 1.0,
+      });
+    }
+    // String/ESS inverter
+    if (sd[`${prefix}ess_make`]) {
+      items.push({
+        category: 'Inverters', system: sys,
+        make: sd[`${prefix}ess_make`],
+        model: sd[`${prefix}ess_model`] || '',
+        symbolType: 'ess', widthFt: 2.0, heightFt: 1.3,
+      });
+    }
+    // Battery
+    if (sd[`${prefix}battery_1_make`]) {
+      items.push({
+        category: 'Batteries', system: sys,
+        make: sd[`${prefix}battery_1_make`],
+        model: sd[`${prefix}battery_1_model`] || '',
+        qty: sd[`${prefix}battery_1_qty`] || 0,
+        symbolType: 'battery', widthFt: 2.0, heightFt: 1.0,
+      });
+    }
+    // SMS
+    if (sd[`${prefix}sms_make`]) {
+      items.push({
+        category: 'Storage Management', system: sys,
+        make: sd[`${prefix}sms_make`],
+        model: sd[`${prefix}sms_model`] || '',
+        symbolType: 'sms', widthFt: 1.6, heightFt: 1.3,
+      });
+    }
+  }
+
+  // Electrical symbols always shown
+  const electrical = ELECTRICAL_SYMBOLS.map(s => ({ ...s, category: 'Electrical', make: '', model: '' }));
+
+  // Group by category
+  const grouped = {};
+  [...items, ...electrical].forEach(item => {
+    if (!grouped[item.category]) grouped[item.category] = [];
+    grouped[item.category].push(item);
+  });
+
+  return Object.entries(grouped).map(([category, catItems]) => ({ category, items: catItems }));
+}
+
 /** Build demo objects relative to origin lat/lng */
 function buildDemoObjects(originLat, originLng) {
   const o = (dx, dy) => offsetLatLng(originLat, originLng, dx, dy);
@@ -224,6 +336,9 @@ function buildDemoObjects(originLat, originLng) {
 
 const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   const hasCoords = lat != null && lng != null && !isNaN(lat) && !isNaN(lng);
+
+  // ── System details (equipment data) ───────────────────────────────────
+  const { data: systemDetails, loading: systemLoading } = useSystemDetails({ projectUuid });
 
   // ── Google Maps ───────────────────────────────────────────────────────
   const { isLoaded: mapsLoaded, loadError: mapsError } = useGoogleMaps();
@@ -284,6 +399,18 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   const [coordDisplay,    setCoordDisplay]     = useState({ x: '—', y: '—', delta: '—' });
   const [hoverTooltip,    setHoverTooltip]     = useState(null); // { text, x, y }
   const [toast,           setToast]            = useState(null); // { msg, type }
+  // Panel array modal state (Phase 6)
+  const [arrayModal,      setArrayModal]       = useState(null); // { polygonIdx } | null
+  const [arrayConfig,     setArrayConfig]      = useState({
+    panelLongFt: 5.65, panelShortFt: 3.38,
+    portrait: true, rowSpacingFt: 0, colSpacingFt: 0.5, setbackFt: 1.0,
+    azimuthDeg: 180, panelMake: '', panelModel: '', panelWatts: 430,
+  });
+  const [arrayPreviewCount, setArrayPreviewCount] = useState(null);
+  const [arrayLoading,    setArrayLoading]     = useState(false);
+  // Equipment library (Phase 5)
+  const [equipCategories, setEquipCategories]  = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   const commandInputRef = useRef(null);
   const toastTimerRef   = useRef(null);
@@ -654,13 +781,52 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       case 'equipment': {
         const { center } = pts;
         if (!center) break;
-        const sz = 24;
-        ctx.fillStyle = 'rgba(139,92,246,0.15)';
-        ctx.fillRect(center.x - sz/2, center.y - sz/2, sz, sz);
-        ctx.strokeRect(center.x - sz/2, center.y - sz/2, sz, sz);
-        ctx.fillStyle = color; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(obj.label || 'EQ', center.x, center.y);
-        if (selected) drawHandle(ctx, center.x, center.y);
+        // Real-world size: convert feet → meters → pixels
+        const mPerPx = d.metersPerPx || 0.15;
+        const wFt = obj.widthFt  || 2.0;
+        const hFt = obj.heightFt || 2.0;
+        const wPx = Math.max(8, (wFt / FT_PER_M) / mPerPx);
+        const hPx = Math.max(8, (hFt / FT_PER_M) / mPerPx);
+
+        ctx.save();
+        ctx.translate(center.x, center.y);
+        if (obj.rotation) ctx.rotate(obj.rotation * Math.PI / 180);
+
+        // Fill
+        ctx.fillStyle = hexToRgba(LAYER_COLORS[obj.layer] || '#8B5CF6', 0.20);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = selected ? 2 : 1.5;
+        ctx.setLineDash([]);
+        ctx.fillRect(-wPx/2, -hPx/2, wPx, hPx);
+        ctx.strokeRect(-wPx/2, -hPx/2, wPx, hPx);
+
+        // Abbreviation (always visible)
+        const abbrev = EQUIPMENT_ABBREVIATIONS[obj.symbolType] || (obj.label || 'EQ').slice(0, 3).toUpperCase();
+        ctx.fillStyle = color;
+        ctx.font = `bold ${Math.max(9, Math.min(14, wPx * 0.35))}px monospace`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(abbrev, 0, 0);
+
+        // Label below — only when zoomed in enough (wPx > 40)
+        if (obj.label && wPx > 40 && obj.symbolType !== 'solar-panel') {
+          ctx.font = `${Math.max(8, Math.min(10, wPx * 0.15))}px sans-serif`;
+          ctx.fillText(obj.label.length > 16 ? obj.label.slice(0, 14) + '…' : obj.label, 0, hPx/2 + 10);
+        }
+
+        ctx.restore();
+        if (selected) {
+          const sp = { x: center.x, y: center.y }; // center handle
+          drawHandle(ctx, sp.x, sp.y);
+          // Corner handles
+          const cosR = obj.rotation ? Math.cos(obj.rotation * Math.PI/180) : 1;
+          const sinR = obj.rotation ? Math.sin(obj.rotation * Math.PI/180) : 0;
+          const corners = [[-wPx/2,-hPx/2],[wPx/2,-hPx/2],[wPx/2,hPx/2],[-wPx/2,hPx/2]];
+          corners.forEach(([cx2, cy2]) => {
+            drawHandle(ctx,
+              center.x + cx2*cosR - cy2*sinR,
+              center.y + cx2*sinR + cy2*cosR);
+          });
+        }
         break;
       }
       case 'dimension': {
@@ -886,7 +1052,11 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         }
         case 'equipment': {
           const { center } = pts;
-          if (center && Math.abs(px.x - center.x) < 16 && Math.abs(px.y - center.y) < 16) return i;
+          if (!center) break;
+          const mPerPx = d.metersPerPx || 0.15;
+          const wPx = Math.max(8, ((obj.widthFt  || 2.0) / FT_PER_M) / mPerPx) / 2;
+          const hPx = Math.max(8, ((obj.heightFt || 2.0) / FT_PER_M) / mPerPx) / 2;
+          if (Math.abs(px.x - center.x) < wPx + 4 && Math.abs(px.y - center.y) < hPx + 4) return i;
           break;
         }
         default: break;
@@ -1050,6 +1220,41 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
   useEffect(() => { layerVisibilityRef.current = layerVisibility; }, [layerVisibility]);
   useEffect(() => { layerLockedRef.current = layerLocked; }, [layerLocked]);
 
+  // ── Populate equipment library from system details ────────────────────
+  useEffect(() => {
+    const cats = extractProjectEquipment(systemDetails);
+    setEquipCategories(cats);
+    // Default expand first category
+    if (cats.length > 0 && Object.keys(expandedCategories).length === 0) {
+      setExpandedCategories({ [cats[0].category]: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [systemDetails]);
+
+  // ── Sync arrayConfig panel dims from systemDetails ────────────────────
+  useEffect(() => {
+    if (!systemDetails) return;
+    const make  = systemDetails.sys1_solar_panel_make  || '';
+    const model = systemDetails.sys1_solar_panel_model || '';
+    const watts = parseFloat(systemDetails.sys1_solar_panel_wattage) || 430;
+    if (make || model) {
+      setArrayConfig(prev => ({ ...prev, panelMake: make, panelModel: model, panelWatts: watts }));
+      // Fetch real dimensions from panel table
+      if (make && model) {
+        getSolarPanelSpecs(make, model).then(specs => {
+          if (specs?.longSideFt && specs?.shortSideFt) {
+            setArrayConfig(prev => ({
+              ...prev,
+              panelLongFt:  specs.longSideFt,
+              panelShortFt: specs.shortSideFt,
+              panelWatts: specs.wattagePmax || prev.panelWatts,
+            }));
+          }
+        });
+      }
+    }
+  }, [systemDetails]);
+
   // ── Warn before unload with unsaved changes ────────────────────────────
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -1170,6 +1375,17 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         syncObjects(); render(); return;
       }
 
+      if (d.tool === 'panelArray') {
+        // Find a closed polyline under the click
+        const idx = hitTestObjects(ll, projectionRef.current, d.objects, d);
+        if (idx !== null && d.objects[idx]?.type === 'polyline' && d.objects[idx]?.closed) {
+          setArrayModal({ polygonIdx: idx });
+        } else {
+          showToast('Click a closed polygon (traced roof face) to generate a panel array.', 'warn');
+        }
+        return;
+      }
+
       if (d.tool === 'polyline') {
         if (!d.drawing) {
           d.drawing = true;
@@ -1273,17 +1489,55 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
       render();
     };
 
+    // ── Drag-and-drop equipment placement ──────────────────────────────
+    const onDragOver = (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    };
+
+    const onDrop = (e) => {
+      e.preventDefault();
+      const raw = e.dataTransfer.getData('application/json');
+      if (!raw) return;
+      let equipment;
+      try { equipment = JSON.parse(raw); } catch { return; }
+      const rect = canvas.getBoundingClientRect();
+      const dropLatLng = pxToLatLng(e.clientX - rect.left, e.clientY - rect.top);
+      if (!dropLatLng) return;
+      const d = drawRef.current;
+      const newObj = {
+        id: genId(),
+        type: 'equipment',
+        pos: dropLatLng,
+        symbolType: equipment.symbolType || 'equipment',
+        widthFt:  equipment.widthFt  || 2.0,
+        heightFt: equipment.heightFt || 2.0,
+        label: equipment.label || (equipment.make && equipment.model ? `${equipment.make} ${equipment.model}` : equipment.make || 'EQ'),
+        make:  equipment.make  || '',
+        model: equipment.model || '',
+        rotation: 0,
+        layer: d.activeLayer === 'equipment' ? 'equipment' : 'equipment',
+        lineStyle: 'solid',
+      };
+      d.objects.push(newObj);
+      syncObjects(); render();
+    };
+
     canvas.addEventListener('mousemove',   onMouseMove);
     canvas.addEventListener('mousedown',   onMouseDown);
     canvas.addEventListener('dblclick',    onDblClick);
     canvas.addEventListener('contextmenu', onContextMenu);
     canvas.addEventListener('mouseleave',  onMouseLeave);
+    canvas.addEventListener('dragover',    onDragOver);
+    canvas.addEventListener('drop',        onDrop);
     return () => {
       canvas.removeEventListener('mousemove',   onMouseMove);
       canvas.removeEventListener('mousedown',   onMouseDown);
       canvas.removeEventListener('dblclick',    onDblClick);
       canvas.removeEventListener('contextmenu', onContextMenu);
       canvas.removeEventListener('mouseleave',  onMouseLeave);
+      canvas.removeEventListener('dragover',    onDragOver);
+      canvas.removeEventListener('drop',        onDrop);
     };
   }, [render, syncObjects, pxToLatLng, hasCoords, lat, lng]);
 
@@ -1310,6 +1564,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         case 'c': case 'C': setTool('circle'); break;
         case 'd': case 'D': setTool('dimension'); break;
         case 't': case 'T': setTool('text'); break;
+        case 'a': case 'A': setTool('panelArray'); break;
         case 'Delete': case 'Backspace':
           if (d.selectedIdx !== null) {
             d.objects.splice(d.selectedIdx, 1);
@@ -1440,6 +1695,58 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
     showToast('Canvas cleared.', 'info');
   };
 
+  // ── Panel array generation ────────────────────────────────────────────
+  const handleGenerateArray = useCallback(() => {
+    if (!arrayModal) return;
+    const d = drawRef.current;
+    const poly = d.objects[arrayModal.polygonIdx];
+    if (!poly || !poly.points) return;
+    setArrayLoading(true);
+
+    // Run in a timeout so the UI can update first
+    setTimeout(() => {
+      const centers = generatePanelArray(poly.points, arrayConfig);
+      const arrayId = genId();
+      const newPanels = centers.map((center, idx) => ({
+        id: genId(),
+        type: 'equipment',
+        pos: center,
+        symbolType: 'solar-panel',
+        widthFt:  arrayConfig.portrait ? arrayConfig.panelShortFt : arrayConfig.panelLongFt,
+        heightFt: arrayConfig.portrait ? arrayConfig.panelLongFt  : arrayConfig.panelShortFt,
+        label: arrayConfig.panelModel || 'PV',
+        make: arrayConfig.panelMake,
+        model: arrayConfig.panelModel,
+        rotation: (arrayConfig.azimuthDeg - 180), // relative to North
+        arrayId, arrayIndex: idx,
+        layer: 'panels', lineStyle: 'solid',
+      }));
+      d.objects.push(...newPanels);
+      setArrayModal(null);
+      setArrayLoading(false);
+      syncObjects();
+      render();
+      showToast(`Generated ${newPanels.length} panels (${(newPanels.length * (arrayConfig.panelWatts || 430) / 1000).toFixed(2)} kW)`, 'success');
+    }, 10);
+  }, [arrayModal, arrayConfig, syncObjects, render, showToast]);
+
+  /** Preview count — recalc when polygon or config changes */
+  const updateArrayPreview = useCallback(() => {
+    if (!arrayModal) { setArrayPreviewCount(null); return; }
+    const d = drawRef.current;
+    const poly = d.objects[arrayModal.polygonIdx];
+    if (!poly?.points) { setArrayPreviewCount(null); return; }
+    setArrayPreviewCount(countPanelsFit(poly.points, arrayConfig));
+  }, [arrayModal, arrayConfig]);
+
+  useEffect(() => { updateArrayPreview(); }, [updateArrayPreview]);
+
+  // ── Panel count from canvas objects ──────────────────────────────────
+  const panelCount = objects.filter(o => o.type === 'equipment' && o.symbolType === 'solar-panel').length;
+  const totalKw = (panelCount * (arrayConfig.panelWatts || 430) / 1000).toFixed(2);
+  const specPanelCount = systemDetails?.sys1_solar_panel_qty
+    ? parseInt(systemDetails.sys1_solar_panel_qty, 10) : null;
+
   // ── Properties panel helper ───────────────────────────────────────────
   const getSelectedObj = () => {
     const d = drawRef.current;
@@ -1490,6 +1797,7 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
             { tool:'polyline', tip:'Polyline (PL)',  svg:<polyline points="2,14 6,4 10,10 14,2"/> },
             { tool:'rect',     tip:'Rectangle (R)',  svg:<rect x="2" y="3" width="12" height="10" rx="0.5"/> },
             { tool:'circle',   tip:'Circle (C)',     svg:<circle cx="8" cy="8" r="6"/> },
+            { tool:'panelArray', tip:'Panel Array (A)', svg:<><rect x="1" y="1" width="6" height="4"/><rect x="9" y="1" width="6" height="4"/><rect x="1" y="7" width="6" height="4"/><rect x="9" y="7" width="6" height="4"/><rect x="5" y="12" width="6" height="3"/></> },
           ].map(({ tool, tip, svg }) => (
             <button key={tool} title={tip}
               className={`${styles.toolBtn} ${activeTool === tool ? styles.toolBtnActive : ''}`}
@@ -1617,6 +1925,14 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
             <line x1="3" y1="13" x2="15" y2="13"/><line x1="3" y1="10" x2="3" y2="16"/><line x1="15" y1="10" x2="15" y2="16"/>
           </svg>
         </button>
+        <div className={styles.railDivider}/>
+        <button title="Panel Array (A)" className={`${styles.railBtn} ${activeTool==='panelArray' ? styles.railBtnActive : ''}`} onClick={() => setTool('panelArray')}>
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="1" y="1" width="7" height="5"/><rect x="10" y="1" width="7" height="5"/>
+            <rect x="1" y="8" width="7" height="5"/><rect x="10" y="8" width="7" height="5"/>
+            <rect x="5" y="14" width="7" height="3"/>
+          </svg>
+        </button>
       </div>
 
       {/* ===== LEFT PANEL ===== */}
@@ -1659,31 +1975,44 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
 
         {leftTab === 'equipment' && (
           <div className={styles.panelContent}>
-            {[
-              { title: 'Solar Panels',       items: [{ icon:'⬛', name:'REC Alpha Pure-R 430W', detail:'67.8" × 40.6" — Sys 1' }] },
-              { title: 'Inverters / Micros', items: [{ icon:'⚡', name:'Enphase IQ8M-72', detail:'Microinverter — Sys 1' },
-                                                      { icon:'⚡', name:'Enphase IQ Combiner 4C', detail:'Combiner Panel' }] },
-              { title: 'Energy Storage',     items: [{ icon:'🔋', name:'Enphase IQ Battery 5P', detail:'5.0 kWh — Qty: 2' }] },
-              { title: 'BOS Equipment',      items: [{ icon:'🔌', name:'AC Disconnect', detail:'60A — New' },
-                                                      { icon:'📊', name:'Production Meter', detail:'APS Required' },
-                                                      { icon:'⏚', name:'Ground Rod', detail:'8ft Copper — #6 AWG' }] },
-              { title: 'Electrical Symbols', items: [{ icon:'◎', name:'Main Panel (MSP)', detail:'200A Bus / 200A MCB' },
-                                                      { icon:'▣', name:'Sub Panel', detail:'125A Bus' },
-                                                      { icon:'Ⓜ', name:'Utility Meter', detail:'APS — 200A Service' }] },
-            ].map(cat => (
-              <div key={cat.title} className={styles.equipCategory}>
-                <div className={styles.equipCategoryTitle}>{cat.title}</div>
-                {cat.items.map((item, i) => (
-                  <div key={i} className={styles.equipItem} draggable>
-                    <div className={styles.equipIcon}>{item.icon}</div>
-                    <div className={styles.equipInfo}>
-                      <div className={styles.equipName}>{item.name}</div>
-                      <div className={styles.equipDetail}>{item.detail}</div>
+            {systemLoading ? (
+              <div className={styles.equipLoading}>Loading equipment…</div>
+            ) : equipCategories.length === 0 ? (
+              <div className={styles.equipEmpty}>No equipment data found for this project.</div>
+            ) : (
+              equipCategories.map(cat => (
+                <div key={cat.category} className={styles.equipCategory}>
+                  <button
+                    className={styles.equipCategoryTitle}
+                    onClick={() => setExpandedCategories(prev => ({ ...prev, [cat.category]: !prev[cat.category] }))}>
+                    <svg width="8" height="8" viewBox="0 0 8 8" style={{ transform: expandedCategories[cat.category] ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>
+                      <path d="M2 1l4 3-4 3z" fill="currentColor"/>
+                    </svg>
+                    {cat.category}
+                  </button>
+                  {expandedCategories[cat.category] && cat.items.map((item, i) => (
+                    <div key={i} className={styles.equipItem} draggable
+                      onDragStart={e => {
+                        e.dataTransfer.effectAllowed = 'copy';
+                        e.dataTransfer.setData('application/json', JSON.stringify({
+                          symbolType: item.symbolType,
+                          label:      item.label,
+                          widthFt:    item.widthFt,
+                          heightFt:   item.heightFt,
+                        }));
+                      }}>
+                      <div className={styles.equipIconAbbr}>
+                        {(EQUIPMENT_ABBREVIATIONS[item.symbolType] || item.symbolType?.slice(0,3)?.toUpperCase() || '?')}
+                      </div>
+                      <div className={styles.equipInfo}>
+                        <div className={styles.equipName}>{item.label}</div>
+                        {item.detail && <div className={styles.equipDetail}>{item.detail}</div>}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ))}
+                  ))}
+                </div>
+              ))
+            )}
           </div>
         )}
 
@@ -1793,6 +2122,113 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
         )}
       </div>
 
+      {/* ===== PANEL ARRAY MODAL ===== */}
+      {arrayModal && (
+        <div className={styles.modalBackdrop} onClick={() => setArrayModal(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <span>Panel Array Configuration</span>
+              <button className={styles.modalClose} onClick={() => setArrayModal(null)}>✕</button>
+            </div>
+            <div className={styles.modalBody}>
+
+              {/* Panel identity */}
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Panel</div>
+                <div className={styles.modalRow}>
+                  <span className={styles.modalLabel}>Make / Model</span>
+                  <span className={styles.modalValue}>
+                    {arrayConfig.panelMake || '—'} {arrayConfig.panelModel || ''}
+                  </span>
+                </div>
+                <div className={styles.modalRow}>
+                  <span className={styles.modalLabel}>Size</span>
+                  <span className={styles.modalValue}>
+                    {arrayConfig.panelLongFt}"L × {arrayConfig.panelShortFt}"W
+                    &nbsp;({(arrayConfig.panelWatts || 430)}W)
+                  </span>
+                </div>
+              </div>
+
+              {/* Orientation */}
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Orientation</div>
+                <div className={styles.orientRow}>
+                  <button
+                    className={`${styles.orientBtn} ${arrayConfig.portrait ? styles.orientBtnActive : ''}`}
+                    onClick={() => setArrayConfig(c => ({ ...c, portrait: true }))}>
+                    <svg viewBox="0 0 20 28" width="20" height="28" fill="currentColor" opacity="0.6"><rect x="2" y="2" width="16" height="24" rx="1"/></svg>
+                    Portrait
+                  </button>
+                  <button
+                    className={`${styles.orientBtn} ${!arrayConfig.portrait ? styles.orientBtnActive : ''}`}
+                    onClick={() => setArrayConfig(c => ({ ...c, portrait: false }))}>
+                    <svg viewBox="0 0 28 20" width="28" height="20" fill="currentColor" opacity="0.6"><rect x="2" y="2" width="24" height="16" rx="1"/></svg>
+                    Landscape
+                  </button>
+                </div>
+              </div>
+
+              {/* Spacing + setback */}
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Spacing &amp; Setback</div>
+                <div className={styles.modalRow}>
+                  <label className={styles.modalLabel} htmlFor="rowSpacing">Row gap (ft)</label>
+                  <input id="rowSpacing" type="number" min="0" step="0.25" className={styles.modalInput}
+                    value={arrayConfig.rowSpacingFt}
+                    onChange={e => setArrayConfig(c => ({ ...c, rowSpacingFt: parseFloat(e.target.value) || 0 }))}/>
+                </div>
+                <div className={styles.modalRow}>
+                  <label className={styles.modalLabel} htmlFor="colSpacing">Col gap (ft)</label>
+                  <input id="colSpacing" type="number" min="0" step="0.25" className={styles.modalInput}
+                    value={arrayConfig.colSpacingFt}
+                    onChange={e => setArrayConfig(c => ({ ...c, colSpacingFt: parseFloat(e.target.value) || 0 }))}/>
+                </div>
+                <div className={styles.modalRow}>
+                  <label className={styles.modalLabel} htmlFor="setback">Edge setback (ft)</label>
+                  <input id="setback" type="number" min="0" step="0.25" className={styles.modalInput}
+                    value={arrayConfig.setbackFt}
+                    onChange={e => setArrayConfig(c => ({ ...c, setbackFt: parseFloat(e.target.value) || 0 }))}/>
+                </div>
+                <div className={styles.modalRow}>
+                  <label className={styles.modalLabel} htmlFor="azimuth">Azimuth (°)</label>
+                  <input id="azimuth" type="number" min="0" max="359" step="1" className={styles.modalInput}
+                    value={arrayConfig.azimuthDeg}
+                    onChange={e => setArrayConfig(c => ({ ...c, azimuthDeg: parseFloat(e.target.value) || 180 }))}/>
+                </div>
+              </div>
+
+              {/* Preview count */}
+              <div className={styles.modalPreview}>
+                {arrayLoading ? (
+                  <span>Calculating…</span>
+                ) : arrayPreviewCount !== null ? (
+                  <>
+                    <span className={styles.previewCount}>{arrayPreviewCount}</span> panels fit
+                    &nbsp;·&nbsp;
+                    <span className={styles.previewKw}>
+                      ~{(arrayPreviewCount * (arrayConfig.panelWatts || 430) / 1000).toFixed(2)} kW
+                    </span>
+                    {specPanelCount !== null && (
+                      <span className={styles.previewSpec}> (spec: {specPanelCount})</span>
+                    )}
+                  </>
+                ) : (
+                  <span>Adjust settings to preview</span>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button className={styles.modalBtnSecondary} onClick={() => setArrayModal(null)}>Cancel</button>
+              <button className={styles.modalBtnPrimary} disabled={arrayLoading} onClick={() => { handleGenerateArray(); setArrayModal(null); }}>
+                Generate Array
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ===== RIGHT PANEL ===== */}
       <div className={styles.rightPanel}>
         <div className={styles.propsHeader}>Properties</div>
@@ -1869,6 +2305,17 @@ const SkyfireCanvas = ({ projectUuid, projectData, lat, lng }) => {
           </div>
           {scaleLabel && <div className={styles.statusItem}>{scaleLabel}</div>}
           <div className={styles.statusItem}>Objects: {objects.length}</div>
+          {panelCount > 0 && (
+            <div className={styles.statusItem} style={{ color: 'var(--color-primary, #3B82F6)', fontWeight: 500 }}>
+              {panelCount} PV · {totalKw} kW
+              {specPanelCount !== null && panelCount !== specPanelCount && (
+                <span title={`Project calls for ${specPanelCount} panels`}
+                  style={{ marginLeft: 4, color: 'var(--color-warn, #F59E0B)' }}>
+                  ⚠ spec: {specPanelCount}
+                </span>
+              )}
+            </div>
+          )}
           {/* Save status indicator */}
           <div
             className={`${styles.statusItem} ${styles.saveStatus}`}

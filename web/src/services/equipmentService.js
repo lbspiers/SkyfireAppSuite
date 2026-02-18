@@ -319,6 +319,51 @@ export const getRailManufacturers = async () => {
 };
 
 /**
+ * Get solar panel physical specifications (dimensions) by make and model.
+ * Fetches from /solar-panels/search endpoint.
+ * Expects the panel record to include long_side_ft and short_side_ft (physical dimensions in feet).
+ *
+ * @param {string} make  - Panel manufacturer name
+ * @param {string} model - Panel model number
+ * @returns {Promise<{longSideFt: number, shortSideFt: number, wattagePmax: number}|null>}
+ *   Returns null if panel not found or endpoint unavailable.
+ */
+export const getSolarPanelSpecs = async (make, model) => {
+  if (!make || !model) return null;
+  const cacheKey = `panel-specs-${make}-${model}`;
+  const cached = getCachedData(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const url = `${API_BASE_URL}/solar-panels/search?manufacturer=${enc(make)}&model_number=${enc(model)}`;
+    logger.debug('Equipment', `Fetching panel specs: ${make} ${model}`);
+    const response = await axios.get(url);
+    const panels = response.data?.data ?? response.data ?? [];
+    // Find exact match or first result
+    const panel = Array.isArray(panels)
+      ? (panels.find(p => p.model_number === model || p.manufacturer_model?.includes(model)) ?? panels[0])
+      : panels;
+
+    if (!panel) { logger.warn('Equipment', `No panel found for ${make} ${model}`); return null; }
+
+    const specs = {
+      longSideFt:   parseFloat(panel.long_side_ft  ?? panel.long_side  ?? 0) || null,
+      shortSideFt:  parseFloat(panel.short_side_ft ?? panel.short_side ?? 0) || null,
+      wattagePmax:  parseFloat(panel.nameplate_pmax ?? panel.pmax ?? 0) || null,
+    };
+
+    // Only cache if we got valid dimensions
+    if (specs.longSideFt && specs.shortSideFt) {
+      setCachedData(cacheKey, specs);
+    }
+    return specs;
+  } catch (error) {
+    logger.warn('Equipment', `Failed to fetch panel specs for ${make} ${model}:`, error);
+    return null;
+  }
+};
+
+/**
  * Get rail models by manufacturer
  * @param {string} manufacturer - Manufacturer name
  * @returns {Promise} API response with rail models
