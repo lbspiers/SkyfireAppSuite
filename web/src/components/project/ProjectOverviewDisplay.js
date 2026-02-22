@@ -1,422 +1,383 @@
 import React, { useMemo } from 'react';
 import styles from './ProjectOverviewDisplay.module.css';
 
-/**
- * ProjectOverviewDisplay - Clean read-only display of all project fields
- * Organized into sections: Customer/Site, System 1-4, Electrical, Structural
- * Shows field name : value pairs in a tight table format
- *
- * @param {object} projectData - Full project data object
- * @param {object} systemDetails - System details from useSystemDetails hook
- * @param {function} onUtilityClick - Optional callback when utility field is clicked (if empty)
- * @param {function} onHouseSqFtClick - Optional callback when house sq ft field is clicked (if empty)
- */
-const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick, onHouseSqFtClick }) => {
-  // Organize data into sections
-  const sections = useMemo(() => {
-    const allSections = [];
+const ProjectOverviewDisplay = ({ projectData, systemDetails, onUtilityClick }) => {
 
-    if (!projectData && !systemDetails) return allSections;
+  const fieldExists = (value) => {
+    return value !== null && value !== undefined && value !== '' && value !== '-' && value !== false;
+  };
 
+  const customerSite = useMemo(() => {
+    if (!projectData) return null;
     const site = projectData?.site || {};
     const details = projectData?.details || {};
 
-    // Helper to add field if value exists
-    const addField = (sectionFields, label, value, specialClass = null) => {
-      if (value !== null && value !== undefined && value !== '' && value !== '-' && value !== false) {
-        sectionFields.push({ label, value: String(value), specialClass });
-      }
+    const name = [details.customer_first_name, details.customer_last_name].filter(Boolean).join(' ');
+    const addressLine1 = site.address || '';
+    const addressLine2 = [site.city, site.state].filter(Boolean).join(', ');
+    const addressLine2Full = [addressLine2, site.zip_code].filter(Boolean).join(' ');
+
+    return {
+      name: name || null,
+      email: details.customer_email || null,
+      phone: details.customer_phone || null,
+      addressLine1,
+      addressLine2: addressLine2Full,
+      hasAddress: !!(addressLine1 || addressLine2Full),
+      jurisdiction: site.ahj || null,
+      utility: site.utility || null,
+      apn: site.apn || null,
+      sqft: site.house_sqft || (systemDetails?.house_sqft) || null,
     };
-
-    // Helper to check if field exists (for inverter type display)
-    const fieldExists = (value) => {
-      return value !== null && value !== undefined && value !== '' && value !== '-' && value !== false;
-    };
-
-    // ===== CUSTOMER & SITE SECTION =====
-    const customerSiteFields = [];
-    if (details.customer_first_name) addField(customerSiteFields, 'First Name', details.customer_first_name);
-    if (details.customer_last_name) addField(customerSiteFields, 'Last Name', details.customer_last_name);
-    if (details.customer_email) addField(customerSiteFields, 'Email', details.customer_email);
-    if (details.customer_phone) addField(customerSiteFields, 'Phone', details.customer_phone);
-    if (site.address) addField(customerSiteFields, 'Address', site.address);
-    if (site.city) addField(customerSiteFields, 'City', site.city);
-    if (site.state) addField(customerSiteFields, 'State', site.state);
-    if (site.zip_code) addField(customerSiteFields, 'ZIP Code', site.zip_code);
-    if (site.ahj) addField(customerSiteFields, 'Jurisdiction', site.ahj);
-    // Always show utility field (even if empty) - mark as special if empty
-    if (site.utility) {
-      addField(customerSiteFields, 'Utility', site.utility);
-    } else {
-      addField(customerSiteFields, 'Utility', 'Not Selected', 'utilityMissing');
-    }
-    if (site.apn) addField(customerSiteFields, 'APN', site.apn);
-    // Always show House Sq Ft field (even if empty) - mark as special if empty
-    // House Sq Ft is stored in systemDetails, not site
-    if (systemDetails?.house_sqft) {
-      addField(customerSiteFields, 'House Sq Ft', systemDetails.house_sqft);
-    } else {
-      addField(customerSiteFields, 'House Sq Ft', 'Please Add', 'houseSqFtMissing');
-    }
-
-    if (customerSiteFields.length > 0) {
-      allSections.push({ title: 'Customer & Site', fields: customerSiteFields });
-    }
-
-    // ===== SYSTEM 1, 2, 3, 4 SECTIONS =====
-    if (systemDetails) {
-      [1, 2, 3, 4].forEach(sysNum => {
-        const systemFields = [];
-        const prefix = `sys${sysNum}_`;
-
-        // Solar Panels
-        if (systemDetails[`${prefix}solar_panel_make`]) {
-          addField(systemFields, 'Solar Panel Make', systemDetails[`${prefix}solar_panel_make`]);
-          addField(systemFields, 'Solar Panel Model', systemDetails[`${prefix}solar_panel_model`]);
-          addField(systemFields, 'Solar Panel Qty', systemDetails[`${prefix}solar_panel_qty`]);
-          addField(systemFields, 'Solar Panel Wattage', systemDetails[`${prefix}solar_panel_wattage`]);
-          const isNew = !systemDetails[`${prefix}solar_panel_existing`];
-          addField(systemFields, 'Solar Panel Status', isNew ? 'New' : 'Existing');
-        }
-
-        // Solar Panel Type 2 (if exists)
-        if (systemDetails[`${prefix}show_solar_panel_2`] && systemDetails[`${prefix}solar_panel_type2_manufacturer`]) {
-          addField(systemFields, 'Solar Panel 2 Make', systemDetails[`${prefix}solar_panel_type2_manufacturer`]);
-          addField(systemFields, 'Solar Panel 2 Model', systemDetails[`${prefix}solar_panel_type2_model`]);
-          addField(systemFields, 'Solar Panel 2 Qty', systemDetails[`${prefix}solar_panel_type2_quantity`]);
-          addField(systemFields, 'Solar Panel 2 Wattage', systemDetails[`${prefix}solar_panel_type2_wattage`]);
-          const isNew = systemDetails[`${prefix}solar_panel_type2_is_new`];
-          addField(systemFields, 'Solar Panel 2 Status', isNew ? 'New' : 'Existing');
-        }
-
-        // Inverter/Microinverter
-        if (systemDetails[`${prefix}micro_inverter_make`]) {
-          const inverterType = systemDetails[`${prefix}inverter_type`] || systemDetails[`${prefix}selectedsystem`] || 'Inverter';
-          const typeLabel = inverterType === 'microinverter' ? 'Microinverter' : 'Inverter';
-          addField(systemFields, `${typeLabel} Make`, systemDetails[`${prefix}micro_inverter_make`]);
-          addField(systemFields, `${typeLabel} Model`, systemDetails[`${prefix}micro_inverter_model`]);
-          addField(systemFields, `${typeLabel} Qty`, systemDetails[`${prefix}micro_inverter_qty`]);
-          const isNew = !systemDetails[`${prefix}micro_inverter_existing`];
-          addField(systemFields, `${typeLabel} Status`, isNew ? 'New' : 'Existing');
-          if (fieldExists(systemDetails[`${prefix}inv_max_continuous_output`])) {
-            addField(systemFields, `${typeLabel} Max Output`, `${systemDetails[`${prefix}inv_max_continuous_output`]} A`);
-          }
-        }
-
-        // Optimizers
-        if (systemDetails[`${prefix}optimizer_make`]) {
-          addField(systemFields, 'Optimizer Make', systemDetails[`${prefix}optimizer_make`]);
-          addField(systemFields, 'Optimizer Model', systemDetails[`${prefix}optimizer_model`]);
-          addField(systemFields, 'Optimizer Qty', systemDetails[`${prefix}optimizer_qty`]);
-          const isNew = !systemDetails[`${prefix}optimizer_existing`];
-          addField(systemFields, 'Optimizer Status', isNew ? 'New' : 'Existing');
-        }
-
-        // Battery
-        if (systemDetails[`${prefix}battery_1_make`]) {
-          addField(systemFields, 'Battery Make', systemDetails[`${prefix}battery_1_make`]);
-          addField(systemFields, 'Battery Model', systemDetails[`${prefix}battery_1_model`]);
-          addField(systemFields, 'Battery Qty', systemDetails[`${prefix}battery_1_qty`]);
-          const isNew = !systemDetails[`${prefix}battery_1_existing`];
-          addField(systemFields, 'Battery Status', isNew ? 'New' : 'Existing');
-          if (fieldExists(systemDetails[`${prefix}battery_1_max_continuous_output`])) {
-            addField(systemFields, 'Battery Max Output', `${systemDetails[`${prefix}battery_1_max_continuous_output`]} A`);
-          }
-        }
-
-        // SMS (Storage Management System)
-        if (systemDetails[`${prefix}sms_make`]) {
-          addField(systemFields, 'SMS Make', systemDetails[`${prefix}sms_make`]);
-          addField(systemFields, 'SMS Model', systemDetails[`${prefix}sms_model`]);
-          const isNew = !systemDetails[`${prefix}sms_existing`];
-          addField(systemFields, 'SMS Status', isNew ? 'New' : 'Existing');
-        }
-
-        // Backup Load Sub Panel
-        const backupMake = sysNum === 1
-          ? systemDetails.bls1_backup_load_sub_panel_make
-          : systemDetails[`${prefix}backuploadsubpanel_make`];
-        if (backupMake) {
-          const backupModel = sysNum === 1
-            ? systemDetails.bls1_backup_load_sub_panel_model
-            : systemDetails[`${prefix}backuploadsubpanel_model`];
-          const backupBus = sysNum === 1
-            ? systemDetails.bls1_backuploader_bus_bar_rating
-            : systemDetails[`${prefix}backuploadsubpanel_bus_rating`];
-          const backupExisting = sysNum === 1
-            ? systemDetails.bls1_backuploader_existing
-            : systemDetails[`${prefix}backuploadsubpanel_existing`];
-
-          addField(systemFields, 'Backup Panel Make', backupMake);
-          addField(systemFields, 'Backup Panel Model', backupModel);
-          if (fieldExists(backupBus)) {
-            addField(systemFields, 'Backup Panel Bus Rating', `${backupBus} A`);
-          }
-          const isNew = !backupExisting;
-          addField(systemFields, 'Backup Panel Status', isNew ? 'New' : 'Existing');
-
-          const backupOption = systemDetails[`${prefix}backup_option`];
-          if (backupOption) {
-            addField(systemFields, 'Backup Option', backupOption);
-          }
-        }
-
-        // String Combiner
-        if (systemDetails[`${prefix}string_combiner_make`]) {
-          addField(systemFields, 'Combiner Make', systemDetails[`${prefix}string_combiner_make`]);
-          addField(systemFields, 'Combiner Model', systemDetails[`${prefix}string_combiner_model`]);
-          if (fieldExists(systemDetails[`${prefix}string_combiner_bus_rating`])) {
-            addField(systemFields, 'Combiner Bus Rating', `${systemDetails[`${prefix}string_combiner_bus_rating`]} A`);
-          }
-          if (fieldExists(systemDetails[`${prefix}string_combiner_main_breaker_rating`])) {
-            addField(systemFields, 'Combiner Main Breaker', `${systemDetails[`${prefix}string_combiner_main_breaker_rating`]} A`);
-          }
-          const isNew = !systemDetails[`${prefix}string_combiner_existing`];
-          addField(systemFields, 'Combiner Status', isNew ? 'New' : 'Existing');
-        }
-
-        // EV Charger
-        if (systemDetails[`${prefix}ev_charger_make`]) {
-          addField(systemFields, 'EV Charger Make', systemDetails[`${prefix}ev_charger_make`]);
-          addField(systemFields, 'EV Charger Model', systemDetails[`${prefix}ev_charger_model`]);
-          const isNew = !systemDetails[`${prefix}ev_charger_existing`];
-          addField(systemFields, 'EV Charger Status', isNew ? 'New' : 'Existing');
-        }
-
-        // Battery Only Mode
-        const batteryOnly = sysNum === 1 ? systemDetails.batteryonly : systemDetails[`${prefix}batteryonly`];
-        if (batteryOnly) {
-          addField(systemFields, 'Battery Only Mode', 'Yes');
-        }
-
-        if (systemFields.length > 0) {
-          allSections.push({ title: `System ${sysNum}`, fields: systemFields });
-        }
-      });
-    }
-
-    // ===== ELECTRICAL SETUP SECTION =====
-    if (systemDetails) {
-      const electricalFields = [];
-
-      // Service Entrance
-      if (systemDetails.ele_ses_type) addField(electricalFields, 'Service Type', systemDetails.ele_ses_type);
-      if (systemDetails.ele_bus_bar_rating) addField(electricalFields, 'Bus Bar Rating', `${systemDetails.ele_bus_bar_rating} A`);
-      if (systemDetails.ele_main_circuit_breaker_rating) addField(electricalFields, 'Main Breaker Rating', `${systemDetails.ele_main_circuit_breaker_rating} A`);
-      if (systemDetails.ele_main_circuit_breakers_qty) addField(electricalFields, 'Main Breakers Qty', systemDetails.ele_main_circuit_breakers_qty);
-      if (systemDetails.ele_feeder_location_on_bus_bar) addField(electricalFields, 'Feeder Location', systemDetails.ele_feeder_location_on_bus_bar);
-
-      // Main Panel A
-      if (fieldExists(systemDetails.mpa_bus_bar_existing)) {
-        addField(electricalFields, 'MPA Bus Bar', systemDetails.mpa_bus_bar_existing ? 'Existing' : 'New/MPU');
-      }
-      if (fieldExists(systemDetails.mpa_main_circuit_breaker_existing)) {
-        addField(electricalFields, 'MPA Main Breaker', systemDetails.mpa_main_circuit_breaker_existing ? 'Existing' : 'New');
-      }
-      if (systemDetails.el_mpa_derated) {
-        addField(electricalFields, 'MPA Derated', 'Yes');
-      }
-
-      // Sub-Panels
-      if (systemDetails.ele_subpanel_b_bus_rating) {
-        addField(electricalFields, 'Sub-Panel B Bus Rating', `${systemDetails.ele_subpanel_b_bus_rating} A`);
-        if (systemDetails.ele_subpanel_b_main_breaker) {
-          addField(electricalFields, 'Sub-Panel B Main Breaker', `${systemDetails.ele_subpanel_b_main_breaker} A`);
-        }
-        if (systemDetails.ele_subpanel_b_upstream_breaker) {
-          addField(electricalFields, 'Sub-Panel B Upstream Breaker', `${systemDetails.ele_subpanel_b_upstream_breaker} A`);
-        }
-      }
-
-      if (systemDetails.ele_subpanel_c_bus_rating) {
-        addField(electricalFields, 'Sub-Panel C Bus Rating', `${systemDetails.ele_subpanel_c_bus_rating} A`);
-        if (systemDetails.ele_subpanel_c_main_breaker) {
-          addField(electricalFields, 'Sub-Panel C Main Breaker', `${systemDetails.ele_subpanel_c_main_breaker} A`);
-        }
-        if (systemDetails.ele_subpanel_c_upstream_breaker) {
-          addField(electricalFields, 'Sub-Panel C Upstream Breaker', `${systemDetails.ele_subpanel_c_upstream_breaker} A`);
-        }
-      }
-
-      if (systemDetails.ele_subpanel_d_bus_rating) {
-        addField(electricalFields, 'Sub-Panel D Bus Rating', `${systemDetails.ele_subpanel_d_bus_rating} A`);
-        if (systemDetails.ele_subpanel_d_main_breaker) {
-          addField(electricalFields, 'Sub-Panel D Main Breaker', `${systemDetails.ele_subpanel_d_main_breaker} A`);
-        }
-        if (systemDetails.ele_subpanel_d_upstream_breaker) {
-          addField(electricalFields, 'Sub-Panel D Upstream Breaker', `${systemDetails.ele_subpanel_d_upstream_breaker} A`);
-        }
-      }
-
-      // Multi-System Combine
-      if (systemDetails.ele_combine_systems) {
-        addField(electricalFields, 'Combined Systems', systemDetails.ele_combine_systems);
-      }
-      if (systemDetails.ele_combine_positions) {
-        try {
-          const positions = JSON.parse(systemDetails.ele_combine_positions);
-          if (positions.method) {
-            addField(electricalFields, 'Combine Method', positions.method);
-          }
-        } catch (e) {
-          // Ignore parse errors
-        }
-      }
-
-      // Point of Interconnection
-      if (systemDetails.ele_method_of_interconnection) {
-        addField(electricalFields, 'Interconnection Method', systemDetails.ele_method_of_interconnection);
-      }
-
-      if (electricalFields.length > 0) {
-        allSections.push({ title: 'Electrical Setup', fields: electricalFields });
-      }
-    }
-
-    // ===== STRUCTURAL SECTION =====
-    if (systemDetails) {
-      const structuralFields = [];
-
-      if (systemDetails.st_manufactured_home) {
-        addField(structuralFields, 'Manufactured Home', 'Yes');
-      }
-
-      // Roofing Types
-      if (systemDetails.st_roof_a_framing_type) {
-        addField(structuralFields, 'Roof A Type', systemDetails.st_roof_a_framing_type);
-        if (systemDetails.st_roof_a_area_sqft) {
-          addField(structuralFields, 'Roof A Area', `${systemDetails.st_roof_a_area_sqft} sqft`);
-        }
-      }
-
-      if (systemDetails.st_roof_b_framing_type) {
-        addField(structuralFields, 'Roof B Type', systemDetails.st_roof_b_framing_type);
-        if (systemDetails.st_roof_b_area_sqft) {
-          addField(structuralFields, 'Roof B Area', `${systemDetails.st_roof_b_area_sqft} sqft`);
-        }
-      }
-
-      // Mounting Hardware
-      if (systemDetails.st_rail_manufacturer) {
-        addField(structuralFields, 'Rail Manufacturer', systemDetails.st_rail_manufacturer);
-        if (systemDetails.st_rail_model) {
-          addField(structuralFields, 'Rail Model', systemDetails.st_rail_model);
-        }
-        if (systemDetails.st_rail_length) {
-          addField(structuralFields, 'Rail Length', systemDetails.st_rail_length);
-        }
-      }
-
-      // Mounting Planes (1-10)
-      for (let mp = 1; mp <= 10; mp++) {
-        const prefix = `mp${mp}_`;
-        const panelCount = systemDetails[`panel_count_${prefix.replace('_', '')}`]; // panel_count_mp1, panel_count_mp2, etc.
-
-        // Only show mounting plane if it has both azimuth AND pitch
-        if (systemDetails[`${prefix}azimuth`] && systemDetails[`${prefix}pitch`]) {
-          if (systemDetails[`${prefix}roof_type`]) {
-            addField(structuralFields, `MP${mp} Roof Type`, systemDetails[`${prefix}roof_type`]);
-          }
-          if (panelCount) {
-            addField(structuralFields, `MP${mp} Panel Count`, panelCount);
-          }
-          if (systemDetails[`${prefix}pitch`]) {
-            addField(structuralFields, `MP${mp} Pitch`, `${systemDetails[`${prefix}pitch`]}°`);
-          }
-          if (systemDetails[`${prefix}azimuth`]) {
-            addField(structuralFields, `MP${mp} Azimuth`, `${systemDetails[`${prefix}azimuth`]}°`);
-          }
-          if (systemDetails[`${prefix}stories`]) {
-            addField(structuralFields, `MP${mp} Stories`, systemDetails[`${prefix}stories`]);
-          }
-          if (systemDetails[`${prefix}tilt_mount_pitch`]) {
-            addField(structuralFields, `MP${mp} Tilt Mount Pitch`, `${systemDetails[`${prefix}tilt_mount_pitch`]}°`);
-          }
-          if (systemDetails[`${prefix}tilt_mount_azimuth`]) {
-            addField(structuralFields, `MP${mp} Tilt Mount Azimuth`, `${systemDetails[`${prefix}tilt_mount_azimuth`]}°`);
-          }
-
-          // st_mp mode (last field - add orange divider)
-          const mode = systemDetails[`st_${prefix}mode`];
-          if (mode) {
-            addField(structuralFields, `MP${mp} Mode`, mode, 'mountingPlaneDivider');
-          }
-        }
-      }
-
-      if (structuralFields.length > 0) {
-        allSections.push({ title: 'Structural', fields: structuralFields });
-      }
-    }
-
-    return allSections;
   }, [projectData, systemDetails]);
 
-  if (sections.length === 0) {
+  const systems = useMemo(() => {
+    if (!systemDetails) return [];
+    var result = [];
+
+    [1, 2, 3, 4].forEach(function(sysNum) {
+      var prefix = 'sys' + sysNum + '_';
+      var equipment = [];
+
+      if (systemDetails[prefix + 'solar_panel_make']) {
+        var isNew = !systemDetails[prefix + 'solar_panel_existing'];
+        var qty = systemDetails[prefix + 'solar_panel_qty'];
+        var make = systemDetails[prefix + 'solar_panel_make'];
+        var model = systemDetails[prefix + 'solar_panel_model'];
+        var wattage = systemDetails[prefix + 'solar_panel_wattage'];
+        var detail = [qty ? qty + ' \u00d7' : null, make, model, wattage || null].filter(Boolean).join(' ');
+        equipment.push({ label: 'Solar Panel', detail: detail, isNew: isNew });
+      }
+
+      if (systemDetails[prefix + 'show_solar_panel_2'] && systemDetails[prefix + 'solar_panel_type2_manufacturer']) {
+        var isNew2 = systemDetails[prefix + 'solar_panel_type2_is_new'];
+        var qty2 = systemDetails[prefix + 'solar_panel_type2_quantity'];
+        var make2 = systemDetails[prefix + 'solar_panel_type2_manufacturer'];
+        var model2 = systemDetails[prefix + 'solar_panel_type2_model'];
+        var detail2 = [qty2 ? qty2 + ' \u00d7' : null, make2, model2].filter(Boolean).join(' ');
+        equipment.push({ label: 'Solar Panel 2', detail: detail2, isNew: isNew2 });
+      }
+
+      if (systemDetails[prefix + 'micro_inverter_make']) {
+        var invType = systemDetails[prefix + 'inverter_type'] || systemDetails[prefix + 'selectedsystem'] || 'Inverter';
+        var typeLabel = invType === 'microinverter' ? 'Micro' : 'Inverter';
+        var isNewInv = !systemDetails[prefix + 'micro_inverter_existing'];
+        var qtyInv = systemDetails[prefix + 'micro_inverter_qty'];
+        var makeInv = systemDetails[prefix + 'micro_inverter_make'];
+        var modelInv = systemDetails[prefix + 'micro_inverter_model'];
+        var detailInv = [qtyInv ? qtyInv + ' \u00d7' : null, makeInv, modelInv].filter(Boolean).join(' ');
+        equipment.push({ label: typeLabel, detail: detailInv, isNew: isNewInv });
+      }
+
+      if (systemDetails[prefix + 'optimizer_make']) {
+        var isNewOpt = !systemDetails[prefix + 'optimizer_existing'];
+        var makeOpt = systemDetails[prefix + 'optimizer_make'];
+        var modelOpt = systemDetails[prefix + 'optimizer_model'];
+        equipment.push({ label: 'Optimizer', detail: [makeOpt, modelOpt].filter(Boolean).join(' '), isNew: isNewOpt });
+      }
+
+      if (systemDetails[prefix + 'battery_1_make']) {
+        var isNewBat = !systemDetails[prefix + 'battery_1_existing'];
+        var qtyBat = systemDetails[prefix + 'battery_1_qty'];
+        var makeBat = systemDetails[prefix + 'battery_1_make'];
+        var modelBat = systemDetails[prefix + 'battery_1_model'];
+        var detailBat = [qtyBat ? qtyBat + ' \u00d7' : null, makeBat, modelBat].filter(Boolean).join(' ');
+        equipment.push({ label: 'Battery', detail: detailBat, isNew: isNewBat });
+      }
+
+      if (systemDetails[prefix + 'sms_make']) {
+        var isNewSms = !systemDetails[prefix + 'sms_existing'];
+        var makeSms = systemDetails[prefix + 'sms_make'];
+        var modelSms = systemDetails[prefix + 'sms_model'];
+        equipment.push({ label: 'SMS', detail: [makeSms, modelSms].filter(Boolean).join(' '), isNew: isNewSms });
+      }
+
+      var backupMake = sysNum === 1
+        ? systemDetails.bls1_backup_load_sub_panel_make
+        : systemDetails[prefix + 'backuploadsubpanel_make'];
+      if (backupMake) {
+        var backupModel = sysNum === 1
+          ? systemDetails.bls1_backup_load_sub_panel_model
+          : systemDetails[prefix + 'backuploadsubpanel_model'];
+        var backupBus = sysNum === 1
+          ? systemDetails.bls1_backuploader_bus_bar_rating
+          : systemDetails[prefix + 'backuploadsubpanel_bus_rating'];
+        var backupExisting = sysNum === 1
+          ? systemDetails.bls1_backuploader_existing
+          : systemDetails[prefix + 'backuploadsubpanel_existing'];
+        var isNewBackup = !backupExisting;
+        var bParts = [backupMake, backupModel];
+        if (fieldExists(backupBus) && backupModel && !String(backupModel).includes(String(backupBus))) {
+          bParts.push(backupBus + ' Amps');
+        }
+        equipment.push({ label: 'Backup Panel', detail: bParts.filter(Boolean).join(' '), isNew: isNewBackup });
+      }
+
+      if (systemDetails[prefix + 'string_combiner_make']) {
+        var isNewComb = !systemDetails[prefix + 'string_combiner_existing'];
+        var makeComb = systemDetails[prefix + 'string_combiner_make'];
+        var modelComb = systemDetails[prefix + 'string_combiner_model'];
+        equipment.push({ label: 'Combiner', detail: [makeComb, modelComb].filter(Boolean).join(' '), isNew: isNewComb });
+      }
+
+      if (systemDetails[prefix + 'ev_charger_make']) {
+        var isNewEv = !systemDetails[prefix + 'ev_charger_existing'];
+        var makeEv = systemDetails[prefix + 'ev_charger_make'];
+        var modelEv = systemDetails[prefix + 'ev_charger_model'];
+        equipment.push({ label: 'EV Charger', detail: [makeEv, modelEv].filter(Boolean).join(' '), isNew: isNewEv });
+      }
+
+      if (equipment.length > 0) {
+        result.push({ sysNum: sysNum, equipment: equipment });
+      }
+    });
+
+    return result;
+  }, [systemDetails]);
+
+  var electrical = useMemo(function() {
+    if (!systemDetails) return [];
+    var rows = [];
+
+    if (systemDetails.ele_ses_type || systemDetails.ele_bus_bar_rating || systemDetails.ele_main_circuit_breaker_rating) {
+      var parts = [];
+      if (systemDetails.ele_ses_type) parts.push(systemDetails.ele_ses_type);
+      if (systemDetails.ele_bus_bar_rating) parts.push(systemDetails.ele_bus_bar_rating + 'A bus');
+      if (systemDetails.ele_main_circuit_breaker_rating) parts.push(systemDetails.ele_main_circuit_breaker_rating + 'A main');
+      rows.push({ label: 'Service', value: parts.join(' \u00b7 ') });
+    }
+
+    if (systemDetails.ele_main_circuit_breakers_qty) {
+      rows.push({ label: 'Main Breakers', value: '' + systemDetails.ele_main_circuit_breakers_qty });
+    }
+
+    if (systemDetails.ele_feeder_location_on_bus_bar) {
+      rows.push({ label: 'Feeder Location', value: systemDetails.ele_feeder_location_on_bus_bar });
+    }
+
+    var mpaItems = [];
+    if (fieldExists(systemDetails.mpa_bus_bar_existing)) {
+      mpaItems.push('Bus: ' + (systemDetails.mpa_bus_bar_existing ? 'Existing' : 'New/MPU'));
+    }
+    if (fieldExists(systemDetails.mpa_main_circuit_breaker_existing)) {
+      mpaItems.push('MCB: ' + (systemDetails.mpa_main_circuit_breaker_existing ? 'Existing' : 'New'));
+    }
+    if (systemDetails.el_mpa_derated) mpaItems.push('Derated');
+    if (mpaItems.length > 0) {
+      rows.push({ label: 'MPA', value: mpaItems.join(' \u00b7 ') });
+    }
+
+    var subPanels = [
+      { key: 'b', busField: 'ele_subpanel_b_bus_rating', mcbField: 'ele_subpanel_b_main_breaker', upField: 'ele_subpanel_b_upstream_breaker', busFallback: 'spb_bus_bar_rating', mcbFallback: 'spb_main_breaker_rating', upFallback: 'spb_upstream_breaker_rating' },
+      { key: 'c', busField: 'ele_subpanel_c_bus_rating', mcbField: 'ele_subpanel_c_main_breaker', upField: 'ele_subpanel_c_upstream_breaker', busFallback: 'el_spc_bus_rating', mcbFallback: 'el_spc_main_breaker_rating', upFallback: 'el_spc_upstream_breaker_rating' },
+      { key: 'd', busField: 'ele_subpanel_d_bus_rating', mcbField: 'ele_subpanel_d_main_breaker', upField: 'ele_subpanel_d_upstream_breaker', busFallback: 'el_spd_bus_rating', mcbFallback: 'el_spd_main_breaker_rating', upFallback: 'el_spd_upstream_breaker_rating' },
+    ];
+
+    subPanels.forEach(function(sp) {
+      var bus = systemDetails[sp.busField] || systemDetails[sp.busFallback];
+      var mcb = systemDetails[sp.mcbField] || systemDetails[sp.mcbFallback];
+      var up = systemDetails[sp.upField] || systemDetails[sp.upFallback];
+      if (bus || mcb || up) {
+        var spParts = [];
+        if (bus) spParts.push(bus + 'A bus');
+        if (mcb) spParts.push(mcb + 'A main');
+        if (up) spParts.push(up + 'A upstream');
+        rows.push({ label: 'SP ' + sp.key.toUpperCase(), value: spParts.join(' \u00b7 ') });
+      }
+    });
+
+    if (systemDetails.ele_combine_systems) {
+      rows.push({ label: 'Combined', value: String(systemDetails.ele_combine_systems) });
+    }
+
+    if (systemDetails.ele_method_of_interconnection) {
+      rows.push({ label: 'POI', value: systemDetails.ele_method_of_interconnection });
+    }
+
+    return rows;
+  }, [systemDetails]);
+
+  var structural = useMemo(function() {
+    if (!systemDetails) return [];
+    var rows = [];
+
+    if (systemDetails.st_roof_a_framing_type) {
+      var areaA = systemDetails.st_roof_a_area_sqft ? ' \u00b7 ' + systemDetails.st_roof_a_area_sqft + ' sqft' : '';
+      rows.push({ label: 'Roof A', value: systemDetails.st_roof_a_framing_type + areaA });
+    }
+    if (systemDetails.st_roof_b_framing_type) {
+      var areaB = systemDetails.st_roof_b_area_sqft ? ' \u00b7 ' + systemDetails.st_roof_b_area_sqft + ' sqft' : '';
+      rows.push({ label: 'Roof B', value: systemDetails.st_roof_b_framing_type + areaB });
+    }
+
+    if (systemDetails.rta_rail_make || systemDetails.st_rail_manufacturer) {
+      var railMake = systemDetails.rta_rail_make || systemDetails.st_rail_manufacturer || '';
+      var railModel = systemDetails.rta_rail_model || systemDetails.st_rail_model || '';
+      rows.push({ label: 'Rails', value: [railMake, railModel].filter(Boolean).join(' ') });
+    }
+
+    if (systemDetails.rta_attachment_make) {
+      rows.push({ label: 'Attachments', value: [systemDetails.rta_attachment_make, systemDetails.rta_attachment_model].filter(Boolean).join(' ') });
+    }
+
+    for (var mp = 1; mp <= 10; mp++) {
+      var mpPrefix = 'mp' + mp + '_';
+      var azimuth = systemDetails[mpPrefix + 'azimuth'];
+      var pitch = systemDetails[mpPrefix + 'pitch'];
+
+      if (azimuth && pitch) {
+        var mpParts = [];
+        if (systemDetails[mpPrefix + 'roof_type']) mpParts.push(systemDetails[mpPrefix + 'roof_type']);
+        mpParts.push(pitch + '\u00b0');
+        mpParts.push(azimuth + '\u00b0');
+        if (systemDetails[mpPrefix + 'stories']) mpParts.push(systemDetails[mpPrefix + 'stories'] + 'st');
+        var panelCount = systemDetails['panel_count_mp' + mp];
+        if (panelCount) mpParts.push(panelCount + ' panels');
+        rows.push({ label: 'MP' + mp, value: mpParts.join(' \u00b7 ') });
+      }
+    }
+
+    return rows;
+  }, [systemDetails]);
+
+  if (!customerSite && systems.length === 0 && electrical.length === 0 && structural.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <div className={styles.emptyIcon}>📋</div>
+        <div className={styles.emptyIcon}>{'\uD83D\uDCCB'}</div>
         <div className={styles.emptyTitle}>No Project Data</div>
-        <div className={styles.emptyText}>
-          No fields have been filled in yet
-        </div>
+        <div className={styles.emptyText}>No fields have been filled in yet</div>
       </div>
     );
   }
 
-  // Debug: Log when component renders
-
   return (
     <div className={styles.overviewDisplay}>
-      {sections.map((section, sectionIndex) => {
-        // Debug log for Customer & Site section
-        if (section.title === 'Customer & Site') {
-        }
 
+      {customerSite && (
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>Customer & Site</div>
+
+          {customerSite.name && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>Name</div>
+              <div className={styles.valueCol}>{customerSite.name}</div>
+            </div>
+          )}
+
+          {customerSite.hasAddress && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>Address</div>
+              <div className={styles.addressValue}>
+                {customerSite.addressLine1 && <div>{customerSite.addressLine1}</div>}
+                {customerSite.addressLine2 && <div>{customerSite.addressLine2}</div>}
+              </div>
+            </div>
+          )}
+
+          {customerSite.email && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>Email</div>
+              <div className={styles.valueCol}>{customerSite.email}</div>
+            </div>
+          )}
+
+          {customerSite.phone && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>Phone</div>
+              <div className={styles.valueCol}>{customerSite.phone}</div>
+            </div>
+          )}
+
+          {customerSite.jurisdiction && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>Jurisdiction</div>
+              <div className={styles.valueCol}>{customerSite.jurisdiction}</div>
+            </div>
+          )}
+
+          <div className={styles.row}>
+            <div className={styles.labelCol}>Utility</div>
+            {customerSite.utility ? (
+              <div className={styles.valueCol}>{customerSite.utility}</div>
+            ) : (
+              <div
+                className={styles.valueCol + ' ' + styles.fieldValueMissing}
+                onClick={onUtilityClick || undefined}
+                title={onUtilityClick ? 'Click to select utility' : undefined}
+              >
+                Not Selected
+              </div>
+            )}
+          </div>
+
+          {customerSite.apn && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>APN</div>
+              <div className={styles.valueCol}>{customerSite.apn}</div>
+            </div>
+          )}
+
+          {customerSite.sqft && (
+            <div className={styles.row}>
+              <div className={styles.labelCol}>Sq Ft</div>
+              <div className={styles.valueCol}>{customerSite.sqft}</div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {systems.map(function(sys) {
         return (
-          <div key={sectionIndex}>
-            {/* Section Header */}
-            <div className={styles.sectionHeader}>{section.title}</div>
-
-            {/* Section Fields */}
-            {section.fields.map((field, fieldIndex) => {
-              const isUtilityMissing = field.specialClass === 'utilityMissing';
-              const isHouseSqFtMissing = field.specialClass === 'houseSqFtMissing';
-              const isMountingPlaneDivider = field.specialClass === 'mountingPlaneDivider';
-
-              const handleClick = () => {
-                if (isUtilityMissing && onUtilityClick) {
-                  onUtilityClick();
-                } else if (isHouseSqFtMissing && onHouseSqFtClick) {
-                  onHouseSqFtClick();
-                }
-              };
-
-              const isClickable = (isUtilityMissing && onUtilityClick) || (isHouseSqFtMissing && onHouseSqFtClick);
-              const isMissing = isUtilityMissing || isHouseSqFtMissing;
-
+          <div key={sys.sysNum} className={styles.section}>
+            <div className={styles.sectionHeader}>System {sys.sysNum}</div>
+            {sys.equipment.map(function(item, idx) {
               return (
-                <div
-                  key={fieldIndex}
-                  className={isMountingPlaneDivider ? styles.fieldRowMountingPlaneDivider : styles.fieldRow}
-                >
-                  <div className={styles.fieldLabel}>{field.label}</div>
-                  <div
-                    className={isMissing ? `${styles.fieldValue} ${styles.fieldValueMissing}` : styles.fieldValue}
-                    onClick={isClickable ? handleClick : undefined}
-                    style={isClickable ? { cursor: 'pointer' } : undefined}
-                    title={isUtilityMissing && onUtilityClick ? 'Click to select utility' : isHouseSqFtMissing && onHouseSqFtClick ? 'Click to add house square footage' : undefined}
-                  >
-                    {field.value}
+                <div key={idx} className={styles.row}>
+                  <div className={styles.labelCol}>
+                    {item.label}
+                    <span className={item.isNew ? styles.badgeNew : styles.badgeExisting}>
+                      {item.isNew ? 'New' : 'Exs'}
+                    </span>
                   </div>
+                  <div className={styles.valueCol}>{item.detail}</div>
                 </div>
               );
             })}
           </div>
         );
       })}
+
+      {electrical.length > 0 && (
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>Electrical</div>
+          {electrical.map(function(row, idx) {
+            return (
+              <div key={idx} className={styles.row}>
+                <div className={styles.labelCol}>{row.label}</div>
+                <div className={styles.valueCol}>{row.value}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {structural.length > 0 && (
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>Structural</div>
+          {structural.map(function(row, idx) {
+            return (
+              <div key={idx} className={styles.row}>
+                <div className={styles.labelCol}>{row.label}</div>
+                <div className={styles.valueCol}>{row.value}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
 export default ProjectOverviewDisplay;
+
+

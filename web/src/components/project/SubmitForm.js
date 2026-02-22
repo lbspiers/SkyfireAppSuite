@@ -7,7 +7,6 @@ import GenerateStatusModal from '../modals/GenerateStatusModal';
 import UtilityValidationModal from '../modals/UtilityValidationModal';
 import HouseSqFtModal from '../modals/HouseSqFtModal';
 import ProjectOverview from './ProjectOverview';
-import ProjectHeader from '../common/ProjectHeader';
 import ProjectOverviewDisplay from './ProjectOverviewDisplay';
 import { Button, FormFieldRow, TableDropdown, EquipmentRow, Alert } from '../ui';
 import ConfirmActionModal from '../ui/ConfirmActionModal';
@@ -463,8 +462,7 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab, onSwitchToPlanS
       <div className={equipStyles.scrollableContent}>
         {/* Overview View */}
         {selectedView === 'overview' && (
-          <div style={{ padding: 'var(--spacing)' }}>
-            {localProjectData && <ProjectHeader projectData={localProjectData} />}
+          <>
             {localProjectData && (
               <ProjectOverviewDisplay
                 projectData={localProjectData}
@@ -473,7 +471,7 @@ const SubmitForm = ({ projectUuid, projectData, onNavigateToTab, onSwitchToPlanS
                 onHouseSqFtClick={handleHouseSqFtClick}
               />
             )}
-          </div>
+          </>
         )}
 
         {/* QC View */}

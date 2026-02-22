@@ -1,58 +1,114 @@
+/* ProjectOverviewDisplay - Compact overview with underline section headers */
+
 .overviewDisplay {
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
-.sectionHeader {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-primary);
-  margin: var(--spacing) 0 0 0;
-  padding-bottom: var(--spacing-tight);
-  border-bottom: 1px solid transparent;
-  border-image: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark)) 1;
+.section {
+  padding: 0;
 }
 
-.sectionHeader:first-child {
+.section:first-child .sectionHeader {
   margin-top: 0;
 }
 
-.fieldRow {
+.sectionHeader {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  margin: var(--spacing) 0 0 0;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--color-primary);
+}
+
+/* ===== UNIVERSAL ROW - same 25/75 split everywhere ===== */
+.row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-tight) var(--spacing);
+  padding: 3px var(--spacing-tight) 3px var(--spacing);
   border-bottom: var(--border-thin) solid var(--border-subtle);
+  min-height: 28px;
 }
 
-.fieldRowMountingPlaneDivider {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-tight) var(--spacing);
-  border-bottom: 1px solid transparent;
-  border-image: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark)) 1;
-}
-
-.fieldRow:last-child {
+.row:last-child {
   border-bottom: none;
 }
 
-.fieldLabel {
-  font-size: var(--text-sm);
+.labelCol {
+  width: 25%;
+  min-width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: var(--spacing);
+  padding-left: 40px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  position: relative;
 }
 
-.fieldValue {
+.valueCol {
+  flex: 1;
+  text-align: left;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
   color: var(--text-primary);
-  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* ===== ADDRESS BLOCK (stacked USPS format) ===== */
+.addressValue {
+  flex: 1;
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+/* ===== NEW/EXISTING BADGE ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  padding: 2px 0;
+  width: 34px;
+  min-width: 34px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  position: absolute;
+  left: calc(-1 * var(--spacing));
+}
+
+.badgeNew {
+  composes: badge;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.badgeExisting {
+  composes: badge;
+  color: var(--color-info);
+  border: 1px solid var(--color-info);
+}
+
+/* ===== UTILITY MISSING ===== */
 .fieldValueMissing {
-  color: #ef4444;
+  color: var(--color-warning);
   font-style: italic;
+  cursor: pointer;
   transition: var(--transition-colors);
 }
 
@@ -61,16 +117,7 @@
   text-decoration: underline;
 }
 
-.fieldRow:has(.fieldValueMissing) {
-  background-color: rgba(239, 68, 68, 0.1);
-  border-left: 3px solid #ef4444;
-}
-
-.fieldRowMountingPlaneDivider:has(.fieldValueMissing) {
-  background-color: rgba(239, 68, 68, 0.1);
-  border-left: 3px solid #ef4444;
-}
-
+/* ===== EMPTY STATE ===== */
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -96,3 +143,8 @@
   color: var(--text-muted);
   text-align: center;
 }
+
+
+
+
+
